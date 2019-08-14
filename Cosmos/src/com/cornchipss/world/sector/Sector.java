@@ -73,17 +73,17 @@ public class Sector
 	{
 		if(firstUpdate || player.getX() != lastX || player.getY() != lastY || player.getZ() != lastZ)
 		{
-			int lastSectorX = fromLocalX(lastX);
-			int lastSectorY = fromLocalX(lastY);
-			int lastSectorZ = fromLocalX(lastZ);
+			int lastSectorX = chunkAtLocalX(lastX);
+			int lastSectorY = chunkAtLocalX(lastY);
+			int lastSectorZ = chunkAtLocalX(lastZ);
 			
 			lastX = player.getX();
 			lastY = player.getY();
 			lastZ = player.getZ();
 			
-			int secX = fromLocalX(lastX);
-			int secY = fromLocalX(lastY);
-			int secZ = fromLocalX(lastZ);
+			int secX = chunkAtLocalX(lastX);
+			int secY = chunkAtLocalX(lastY);
+			int secZ = chunkAtLocalX(lastZ);
 			
 			if(firstUpdate || lastSectorX != secX || lastSectorY != secY || lastSectorZ != secZ)
 			{
@@ -270,15 +270,27 @@ public class Sector
 	 */
 	public void generatePlanetsWithin(int centerX, int centerY, int centerZ, int radius)
 	{
-		System.out.println("Called. " + centerX + ", " + centerY + ", " + centerZ + ", [" + radius + "]");
-		for(int z = centerZ - radius >= -CHUNK_OFFSET ? centerZ - radius : -CHUNK_OFFSET; z <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); z++)
+		int lowZ, highZ;
+		lowZ = (int)Math.max(centerZ - radius, -CHUNK_OFFSET);
+		highZ = (int)Math.min(centerZ + radius, CHUNK_OFFSET - 1);
+		
+		int lowY, highY;
+		lowY = (int)Math.max(centerY - radius, -CHUNK_OFFSET);
+		highY = (int)Math.min(centerY + radius, CHUNK_OFFSET - 1);
+		
+		int lowX, highX;
+		lowX = (int)Math.max(centerX - radius, -CHUNK_OFFSET);
+		highX = (int)Math.min(centerX + radius, CHUNK_OFFSET - 1);
+		
+		for(int z = lowZ; z <= highZ; z++)
 		{
-			for(int y = centerY - radius >= -CHUNK_OFFSET ? centerY - radius : -CHUNK_OFFSET; y <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); y++)
+			for(int y = lowY; y <= highY; y++)
 			{
-				for(int x = centerX - radius >= -CHUNK_OFFSET ? centerX - radius : -CHUNK_OFFSET; x <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); x++)
+				for(int x = lowX; x <= highX; x++)
 				{
 					if(getPlanet(x, y, z) != null)
 					{
+						System.out.println("Called @ " + x + ", " + y + ", " + z);
 						System.out.println("Non null: " + getPlanet(x, y, z).isGenerated());
 						if(!getPlanet(x, y, z).isGenerated())
 						{
@@ -303,11 +315,23 @@ public class Sector
 	{
 		renderer.setupRender(player);
 		
-		for(int z = centerZ - radius >= -CHUNK_OFFSET ? centerZ - radius : -CHUNK_OFFSET; z <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); z++)
+		int lowZ, highZ;
+		lowZ = (int)Math.max(centerZ - radius, -CHUNK_OFFSET);
+		highZ = (int)Math.min(centerZ + radius, CHUNK_OFFSET - 1);
+		
+		int lowY, highY;
+		lowY = (int)Math.max(centerY - radius, -CHUNK_OFFSET);
+		highY = (int)Math.min(centerY + radius, CHUNK_OFFSET - 1);
+		
+		int lowX, highX;
+		lowX = (int)Math.max(centerX - radius, -CHUNK_OFFSET);
+		highX = (int)Math.min(centerX + radius, CHUNK_OFFSET - 1);
+		
+		for(int z = lowZ; z <= highZ; z++)
 		{
-			for(int y = centerY - radius >= -CHUNK_OFFSET ? centerY - radius : -CHUNK_OFFSET; y <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); y++)
+			for(int y = lowY; y <= highY; y++)
 			{
-				for(int x = centerX - radius >= -CHUNK_OFFSET ? centerX - radius : -CHUNK_OFFSET; x <= (radius < CHUNK_OFFSET ? radius : CHUNK_OFFSET - 1); x++)
+				for(int x = lowX; x <= highX; x++)
 				{
 					if(getPlanet(x, y, z) != null)
 					{
@@ -328,20 +352,20 @@ public class Sector
 	
 	public void renderPlanetsWithin(int radius, PlanetRenderer renderer, Player player)
 	{
-		renderPlanetsWithin(fromLocalX(player.getX()), fromLocalY(player.getY()), fromLocalZ(player.getZ()), radius, renderer, player);
+		renderPlanetsWithin(chunkAtLocalX(player.getX()), chunkAtLocalY(player.getY()), chunkAtLocalZ(player.getZ()), radius, renderer, player);
 	}
 	
-	public static int fromLocalX(float x)
+	public static int chunkAtLocalX(float x)
 	{
 		return (int) Math.round(x / CHUNK_DIMENSIONS);
 	}
 	
-	public static int fromLocalY(float y)
+	public static int chunkAtLocalY(float y)
 	{
 		return (int) Math.round(y / CHUNK_DIMENSIONS);
 	}
 	
-	public static int fromLocalZ(float z)
+	public static int chunkAtLocalZ(float z)
 	{
 		return (int) Math.round(z / CHUNK_DIMENSIONS);
 	}

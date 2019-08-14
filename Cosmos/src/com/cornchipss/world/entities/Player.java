@@ -23,7 +23,7 @@ public class Player extends Entity
 	{
 		float vX = 0, vY = 0, vZ = 0;
 		
-		float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) ? 1f : .2f;
+		float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) ? 3f : .2f;
 		
 		float sensitivity = 0.0025f;
 		

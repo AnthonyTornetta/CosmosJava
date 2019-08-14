@@ -26,7 +26,7 @@ public class PlanetGenerator
 		{
 			for(int x = planet.getBeginningCornerX(); x < planet.getEndingCornerX(); x++)
 			{
-				int y = noise(x, z, 0.02f, 6) + 64;
+				int y = noise(x, z, 0.01f, 6) + 64;
 				int ogY = y;
 				
 				// Updating the model at this stage is pointless because we're making so many changes

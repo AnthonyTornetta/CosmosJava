@@ -1,11 +1,5 @@
 package com.cornchipss.physics;
 
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-
-import com.cornchipss.world.Universe;
-import com.cornchipss.world.sector.Sector;
-
 public class Raycast
 {
 	// TODO
