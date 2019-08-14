@@ -73,17 +73,17 @@ public class Sector
 	{
 		if(firstUpdate || player.getX() != lastX || player.getY() != lastY || player.getZ() != lastZ)
 		{
-			int lastSectorX = fromAbsoluteX(lastX);
-			int lastSectorY = fromAbsoluteX(lastY);
-			int lastSectorZ = fromAbsoluteX(lastZ);
+			int lastSectorX = fromLocalX(lastX);
+			int lastSectorY = fromLocalX(lastY);
+			int lastSectorZ = fromLocalX(lastZ);
 			
 			lastX = player.getX();
 			lastY = player.getY();
 			lastZ = player.getZ();
 			
-			int secX = fromAbsoluteX(lastX);
-			int secY = fromAbsoluteX(lastY);
-			int secZ = fromAbsoluteX(lastZ);
+			int secX = fromLocalX(lastX);
+			int secY = fromLocalX(lastY);
+			int secZ = fromLocalX(lastZ);
 			
 			if(firstUpdate || lastSectorX != secX || lastSectorY != secY || lastSectorZ != secZ)
 			{
@@ -328,20 +328,20 @@ public class Sector
 	
 	public void renderPlanetsWithin(int radius, PlanetRenderer renderer, Player player)
 	{
-		renderPlanetsWithin(fromAbsoluteX(player.getX()), fromAbsoluteY(player.getY()), fromAbsoluteZ(player.getZ()), radius, renderer, player);
+		renderPlanetsWithin(fromLocalX(player.getX()), fromLocalY(player.getY()), fromLocalZ(player.getZ()), radius, renderer, player);
 	}
 	
-	public static int fromAbsoluteX(float x)
+	public static int fromLocalX(float x)
 	{
 		return (int) Math.round(x / CHUNK_DIMENSIONS);
 	}
 	
-	public static int fromAbsoluteY(float y)
+	public static int fromLocalY(float y)
 	{
 		return (int) Math.round(y / CHUNK_DIMENSIONS);
 	}
 	
-	public static int fromAbsoluteZ(float z)
+	public static int fromLocalZ(float z)
 	{
 		return (int) Math.round(z / CHUNK_DIMENSIONS);
 	}

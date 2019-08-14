@@ -1,18 +1,17 @@
 package com.cornchipss.world.generation;
 
-import org.joml.SimplexNoise;
-
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.world.planet.Planet;
 
+import libs.noise.SimplexNoise;
+
 public class PlanetGenerator
 {
-	private long seed;
-	public boolean flat = false;
+	private SimplexNoise noiseMaker;
 	
 	public PlanetGenerator(long seed)
 	{
-		this.seed = seed;
+		noiseMaker = new SimplexNoise(seed);
 	}
 	
 	/**
@@ -60,8 +59,8 @@ public class PlanetGenerator
 		planet.setGenerated(true);
 	}
 	
-	private static int noise(int x, int z, float frequency, float amplitude)
+	private int noise(int x, int z, float frequency, float amplitude)
 	{
-		return (int) (amplitude * SimplexNoise.noise(x * frequency, z * frequency));
+		return (int) (amplitude * noiseMaker.noise(x * frequency, z * frequency));
 	}
 }

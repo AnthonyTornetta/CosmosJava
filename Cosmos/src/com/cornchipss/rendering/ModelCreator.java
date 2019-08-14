@@ -25,8 +25,6 @@ public class ModelCreator
 	
 	public ModelCreator()
 	{
-		System.out.println(Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory());
-		
 		// These default sizes are equal to the amount of values that a cube would have
 		positions = new ArrayListF(72);
 		colors = new ArrayListF(36);
