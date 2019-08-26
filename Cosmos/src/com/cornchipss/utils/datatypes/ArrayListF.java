@@ -1,4 +1,4 @@
-package com.cornchipss.utils;
+package com.cornchipss.utils.datatypes;
 
 import java.io.Serializable;
 import java.util.RandomAccess;

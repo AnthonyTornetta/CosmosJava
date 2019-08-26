@@ -5,7 +5,7 @@ import com.cornchipss.world.Block;
 public class Dirt extends Block
 {
 	@Override
-	public int getTexture(int face)
+	public int getTexture(BlockFace face)
 	{
 		return 3;
 	}

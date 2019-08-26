@@ -10,8 +10,10 @@ import com.cornchipss.world.blocks.Stone;
 
 public class Blocks
 {
-	private static Block[] blocks = new Block[4096];
-	private static Model[] models = new Model[4096];
+	public static final int MAX_BLOCKS = 4096;
+	
+	private static Block[] blocks = new Block[MAX_BLOCKS];
+	private static Model[] models = new Model[MAX_BLOCKS];
 	
 	public static final Air air = new Air();
 	public static final Stone stone = new Stone();

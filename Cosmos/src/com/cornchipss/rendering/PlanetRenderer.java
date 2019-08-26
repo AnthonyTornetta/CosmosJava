@@ -13,8 +13,8 @@ import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.Game;
 import com.cornchipss.rendering.shaders.PlanetShader;
-import com.cornchipss.utils.ArrayListF;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.datatypes.ArrayListF;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
 
@@ -89,7 +89,7 @@ public class PlanetRenderer
 		
 		if(planet.isGenerated())
 		{
-			shader.setUniformVector(chunkLocation, planet.getUniverseX(), planet.getUniverseY(), planet.getUniverseZ());
+			shader.setUniformVector(chunkLocation, planet.getAbsoluteX(), planet.getAbsoluteY(), planet.getAbsoluteZ());
 			
 			Map<Model, ArrayListF> modelsAndPositions = planet.getModelsAndPositions();
 			

@@ -16,4 +16,10 @@ public class Air extends Block
 	{
 		return null;
 	}
+	
+	@Override
+	public boolean isInteractable()
+	{
+		return false;
+	}
 }

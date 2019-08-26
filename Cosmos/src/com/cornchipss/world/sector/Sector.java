@@ -2,6 +2,9 @@ package com.cornchipss.world.sector;
 
 import java.util.Random;
 
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.entities.Player;
@@ -21,14 +24,12 @@ public class Sector
 	/**
 	 * How long a chunk is in block in any direction from one side to the other
 	 */
-	public static final int CHUNK_DIMENSIONS = 500;
+	public static final int CHUNK_DIMENSIONS = 2000;
 	
 	/**
 	 * The dimensions of a sector in blocks
 	 */
-	public static final int WIDTH = CHUNKS * CHUNK_DIMENSIONS, 
-			HEIGHT = CHUNKS * CHUNK_DIMENSIONS, 
-			LENGTH = CHUNKS * CHUNK_DIMENSIONS;
+	public static final int DIMENSIONS = CHUNKS * CHUNK_DIMENSIONS;
 	
 	public static final int CHUNK_OFFSET = CHUNKS / 2;
 	
@@ -55,11 +56,8 @@ public class Sector
 	
 	/**
 	 * A big thing that holds other smaller things
-	 * @param x How many sectors away from center of universe, x edition
-	 * @param y How many sectors away from center of universe, y edition
-	 * @param z How many sectors away from center of universe, z edition
 	 */
-	public Sector(int x, int y, int z)
+	public Sector()
 	{
 		planets = new Planet[CHUNKS][CHUNKS][CHUNKS];
 		
@@ -87,9 +85,7 @@ public class Sector
 			
 			if(firstUpdate || lastSectorX != secX || lastSectorY != secY || lastSectorZ != secZ)
 			{
-				System.out.println("called @ " + secX + ", " + secY + ", " + secZ);
 				generatePlanetsWithin(secX, secY, secZ, 1);
-				System.out.println("DONE!");
 				
 				firstUpdate = false;
 			}
@@ -125,6 +121,16 @@ public class Sector
 	}
 	
 	/**
+	 * Gets the planet at the given point
+	 * @param c The relative coordinates, each within -CHUNK_OFFSET to CHUNK_OFFSET - 1
+	 * @return The planet at the given coordinates
+	 */
+	public Planet getPlanet(Vector3i c)
+	{
+		return getPlanet(c.x, c.y, c.z);
+	}
+	
+	/**
 	 * Gets the array that contains every planet in the sector - modifying this will change the actual sector, so be cautious
 	 * @return The array that contains every planet in the sector
 	 */
@@ -139,7 +145,7 @@ public class Sector
 	 */
 	public int getAbsoluteX()
 	{
-		return getUniverseX() * WIDTH;
+		return getUniverseX() * DIMENSIONS;
 	}
 	
 	/**
@@ -148,7 +154,7 @@ public class Sector
 	 */
 	public int getAbsoluteY()
 	{
-		return getUniverseY() * HEIGHT;
+		return getUniverseY() * DIMENSIONS;
 	}
 	
 	/**
@@ -157,7 +163,7 @@ public class Sector
 	 */
 	public int getAbsoluteZ()
 	{
-		return getUniverseZ() * LENGTH;
+		return getUniverseZ() * DIMENSIONS;
 	}
 	
 	/**
@@ -254,7 +260,7 @@ public class Sector
 				if(getPlanet(x, y, z) == null)
 					throw new IllegalArgumentException("No planet found at " + x + ", " + y + ", " + z + ".");
 				
-				planetGenerator.generatePlanet(getPlanet(x, y, z), render, 20);
+				planetGenerator.generatePlanet(getPlanet(x, y, z), render, 30);
 			}
 		});
 		
@@ -290,8 +296,6 @@ public class Sector
 				{
 					if(getPlanet(x, y, z) != null)
 					{
-						System.out.println("Called @ " + x + ", " + y + ", " + z);
-						System.out.println("Non null: " + getPlanet(x, y, z).isGenerated());
 						if(!getPlanet(x, y, z).isGenerated())
 						{
 							generatePlanet(x, y, z, false);
@@ -370,6 +374,11 @@ public class Sector
 		return (int) Math.round(z / CHUNK_DIMENSIONS);
 	}
 	
+	public static Vector3i chunkAtLocalCoords(Vector3f c)
+	{
+		return new Vector3i(chunkAtLocalX(c.x), chunkAtLocalY(c.y), chunkAtLocalZ(c.z));
+	}
+	
 	/**
 	 * Generates the sector with empty planets, and does not build any terrain
 	 */
@@ -377,21 +386,18 @@ public class Sector
 	{
 		Random random = new Random();
 		
-		System.out.println("Generate");
 		for(int z = -CHUNK_OFFSET; z < CHUNK_OFFSET; z++)
 		{
 			for(int y = -CHUNK_OFFSET; y < CHUNK_OFFSET; y++)
 			{
 				for(int x = -CHUNK_OFFSET; x < CHUNK_OFFSET; x++)
 				{
-					if(random.nextInt(3) == 0 || x == 0 && y == 0 && z == 0 || true)
+					if(x == 0 && y == 0 && z == 0 || random.nextInt(3) == 0)
 					{
 						int xz = random.nextInt(100) + 100;
 						if(xz % 2 != 0)
 							xz++;
 						setPlanet(x, y, z, new Planet(xz, 256, xz));
-						
-						System.out.println("Planet created @ " + x + "," + y + "," + z + "!");
 					}
 				}
 			}

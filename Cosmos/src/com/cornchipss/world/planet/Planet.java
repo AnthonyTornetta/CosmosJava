@@ -3,11 +3,12 @@ package com.cornchipss.world.planet;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
-import com.cornchipss.utils.ArrayListF;
+import com.cornchipss.utils.datatypes.ArrayListF;
 import com.cornchipss.world.Block;
 import com.cornchipss.world.sector.Sector;
 
@@ -38,9 +39,19 @@ public class Planet
 	 */
 	private int width, height, length;
 	
+	/**
+	 * A list of every model present on the planet and each position that model is at
+	 */
 	private Map<Model, ArrayListF> modelsList = new HashMap<>();
+	
+	/**
+	 * A list of every position stored in the models list and the index in the modelsList it is at for quicker removal of models
+	 */
 	private Map<Vector3i, Integer> positionsInArray = new HashMap<>();
 	
+	/**
+	 * Whether or not the planet has been generated (modified by outside sources to allow for multithreading of the planet's generation)
+	 */
 	private boolean generated = false;
 	
 	/**
@@ -193,15 +204,51 @@ public class Planet
 	}
 	
 	/**
-	 * Gets a block at the relative coordinates of the planet
-	 * @param x The x coordinate relative to the planet
-	 * @param y The y coordinate relative to the planet
-	 * @param z The z coordinate relative to the planet
+	 * Gets a block at the relative coordinates of the planet's center
+	 * @param x The x coordinate relative to the planet's center
+	 * @param y The y coordinate relative to the planet's center
+	 * @param z The z coordinate relative to the planet's center
 	 * @return The block at a given coordinate relative the planet's center
 	 */
 	public Block getBlock(int x, int y, int z)
 	{
-		return Blocks.getBlock(blocks[z - getBeginningCornerZ()][y - getBeginningCornerY()][x - getBeginningCornerX()]);
+		short id = blocks[z - getBeginningCornerZ()][y - getBeginningCornerY()][x - getBeginningCornerX()];
+		
+		return Blocks.getBlock(id);
+	}
+	
+	/**
+	 * Gets a block at the relative coordinates of the planet's center
+	 * @param c The coordinates relative to the planet's center
+	 * @return The block at a given coordinate relative the planet's center
+	 */
+	public Block getBlock(Vector3i c)
+	{
+		return getBlock(c.x, c.y, c.z);
+	}
+
+	/**
+	 * Sees if there is a block at the relative coordinates of the planet's center
+	 * @param c The coordinates relative to the planet's center
+	 * @return If there is a block at a given coordinate relative the planet's center
+	 */
+	public boolean hasBlockAt(Vector3f c)
+	{
+		return hasBlockAt(c.x, c.y, c.z);
+	}
+	
+	/**
+	 * Sees if there is a block at the relative coordinates of the planet's center
+	 * @param x The x coordinate relative to the planet's center
+	 * @param y The y coordinate relative to the planet's center
+	 * @param z The z coordinate relative to the planet's center
+	 * @return If there is a block at a given coordinate relative the planet's center
+	 */
+	public boolean hasBlockAt(float x, float y, float z)
+	{
+		return isGenerated() && x >= getBeginningCornerX() && x < getEndingCornerX() &&
+				y >= getBeginningCornerY() && y < getEndingCornerY() &&
+				z >= getBeginningCornerZ() && z < getEndingCornerZ();
 	}
 	
 	/**
@@ -385,6 +432,7 @@ public class Planet
 	{
 		if(modelsList.size() == 0)
 			render();
+		
 		return modelsList;
 	}
 	
@@ -392,7 +440,7 @@ public class Planet
 	 * Gets the absolute center position of the planet
 	 * @return The absolute center position of the planet
 	 */
-	public float getUniverseX()
+	public float getAbsoluteX()
 	{
 		return sector.getAbsoluteX() + getSectorX() * Sector.CHUNK_DIMENSIONS;
 	}
@@ -401,7 +449,7 @@ public class Planet
 	 * Gets the absolute center position of the planet
 	 * @return The absolute center position of the planet
 	 */
-	public float getUniverseY()
+	public float getAbsoluteY()
 	{
 		return sector.getAbsoluteY() + getSectorY() * Sector.CHUNK_DIMENSIONS;
 	}
@@ -410,9 +458,18 @@ public class Planet
 	 * Gets the absolute center position of the planet
 	 * @return The absolute center position of the planet
 	 */
-	public float getUniverseZ()
+	public float getAbsoluteZ()
 	{
 		return sector.getAbsoluteZ() + getSectorZ() * Sector.CHUNK_DIMENSIONS;
+	}
+	
+	/**
+	 * Gets the absolute center position of the planet
+	 * @return The absolute center position of the planet
+	 */
+	public Vector3f getUniverseCoords()
+	{
+		return new Vector3f(getAbsoluteX(), getAbsoluteY(), getAbsoluteZ());
 	}
 	
 	/**
@@ -431,6 +488,10 @@ public class Planet
 	 */
 	public boolean isGenerated() { return generated; }
 
+	/**
+	 * Sets if the planet has been generated
+	 * @param b Whether or not it has
+	 */
 	public void setGenerated(boolean b) 
 	{ 
 		this.generated = b;

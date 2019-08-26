@@ -7,6 +7,7 @@ import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
+import com.cornchipss.world.Universe;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.sector.Sector;
 
@@ -44,13 +45,16 @@ public class Game implements Runnable
 		
 		Blocks.registerBlocks();
 		
-		Sector sector = new Sector(0, 0, 0);
+		Universe universe = new Universe();
+		Sector sector = new Sector();
+		universe.setSector(0, 0, 0, sector);
+		
 		sector.generate();
-//		sector.generatePlanetsWithin(0, 0, 0, 1);
 		
 		PlanetRenderer renderer = new PlanetRenderer();
 		
 		Player player = new Player(0, 0, 0);
+		player.setUniverse(universe);
 		
 		Timer updateTimer = new Timer();
 		Timer secondsTimer = new Timer();

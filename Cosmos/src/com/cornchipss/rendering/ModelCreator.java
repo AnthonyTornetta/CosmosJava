@@ -4,8 +4,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 
-import com.cornchipss.utils.ArrayListF;
-import com.cornchipss.utils.ArrayListI;
+import com.cornchipss.utils.datatypes.ArrayListF;
+import com.cornchipss.utils.datatypes.ArrayListI;
 
 public class ModelCreator
 {
