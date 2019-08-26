@@ -34,4 +34,19 @@ public class Timer
 	{
 		subtractTimeNano(time * 1_000_000);;
 	}
+
+	public static void sleep(long millis)
+	{
+		if(millis > 0)
+		{
+			try
+			{
+				Thread.sleep(millis);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
 }
