@@ -100,12 +100,4 @@ public abstract class Hitbox
 		
 		return closest;
 	}
-
-	public static void getCollidingSlopes(Hitbox hb1, Hitbox hb2, Vector3f position, Vector3f newPos)
-	{
-		Vector3f[] v1 = hb1.getVerticies();
-		Vector3f[] v2 = hb2.getVerticies();
-		
-		
-	}
 }

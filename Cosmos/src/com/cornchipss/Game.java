@@ -55,10 +55,10 @@ public class Game implements Runnable
 		
 		sector.generate();
 		
-		PlanetRenderer renderer = new PlanetRenderer();
-		
 		Player player = new Player(0, 0, 0);
 		player.setUniverse(universe);
+
+		PlanetRenderer renderer = new PlanetRenderer(player);
 		
 		Timer updateTimer = new Timer();
 		Timer secondsTimer = new Timer();
@@ -87,14 +87,8 @@ public class Game implements Runnable
 				secondsTimer.subtractTimeMilli(1000);
 			}
 			
-			try
-			{
-				long sleep = 1000 / FPS_CAP - updateTimer.getDeltaMillis();
-				if(sleep > 0)
-					Thread.sleep(sleep);
-			}
-			catch (InterruptedException e)
-			{}
+			long sleep = 1000 / FPS_CAP - updateTimer.getDeltaMillis();
+			Timer.sleep(sleep);
 			
 			window.clear(0.5f, 0.8f, 1f, 1f);
 			

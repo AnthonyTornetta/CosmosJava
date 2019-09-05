@@ -31,7 +31,7 @@ public class PlanetRenderer
 	
 	private int positionsVBO;
 	
-	public PlanetRenderer()
+	public PlanetRenderer(Player player)
 	{
 		shader = new PlanetShader();
 		
@@ -42,7 +42,10 @@ public class PlanetRenderer
 		
 		atlas = Texture.loadTexture("atlas/main.png");
 		projectionMatrix = new Matrix4f();
-		projectionMatrix.perspective((float)Math.toRadians(90), Game.getInstance().getWindow().getWidth() / (float)Game.getInstance().getWindow().getHeight(), 0.1f, 1000);
+		projectionMatrix.perspective((float)Math.toRadians(90), 
+				Game.getInstance().getWindow().getWidth() / 
+				(float)Game.getInstance().getWindow().getHeight(), 
+				0.1f, player.getViewDistance());
 		
 		viewMatrix = new Matrix4f();
 		

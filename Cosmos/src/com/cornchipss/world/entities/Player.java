@@ -10,6 +10,7 @@ public class Player extends Entity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
+	private int viewDistance = 1000;
 	
 	public Player(float x, float y, float z)
 	{
@@ -88,6 +89,7 @@ public class Player extends Entity
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
 	}
-
 	
+	public int getViewDistance() { return viewDistance; }
+	public void setViewDistance(int viewDistance) { this.viewDistance = viewDistance; }
 }

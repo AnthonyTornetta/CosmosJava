@@ -40,7 +40,7 @@ public abstract class Entity
 						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
 						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getPosition(), newPos))
 						{
-							Hitbox.getCollidingSlopes(hb, getHitbox(), locations[z][y][x].getPosition(), newPos);
+							
 						}
 					}
 				}

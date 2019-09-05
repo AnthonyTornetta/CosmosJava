@@ -25,7 +25,7 @@ public class Sector
 	/**
 	 * How long a chunk is in block in any direction from one side to the other
 	 */
-	public static final int CHUNK_DIMENSIONS = 2000;
+	public static final int CHUNK_DIMENSIONS = 500;
 	
 	/**
 	 * The dimensions of a sector in blocks

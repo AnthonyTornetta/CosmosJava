@@ -197,6 +197,10 @@ public class Universe
 		
 		Sector sector = getSector(coords);
 		Planet planet = sector.getPlanet(Sector.chunkAtLocalCoords(sectorCoords));
+		
+		if(planet == null)
+			return null;
+		
 		Vector3f chunkCoords = clampSectorCoordsToChunkCoords(sectorCoords);
 		
 		if(planet.hasBlockAt(chunkCoords))
