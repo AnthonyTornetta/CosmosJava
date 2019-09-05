@@ -2,12 +2,14 @@ package com.cornchipss;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
 import com.cornchipss.world.Universe;
+import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.sector.Sector;
 
@@ -42,6 +44,8 @@ public class Game implements Runnable
 	{
 		window = new Window(startWidth, startHeight, "end my eternal suffering");
 		Input.setWindow(window);
+		
+		Biospheres.registerBiospheres("com.cornchipss.world.biospheres");
 		
 		Blocks.registerBlocks();
 		

@@ -1,9 +1,11 @@
-package com.cornchipss.world;
+package com.cornchipss.world.entities;
 
 import org.joml.Vector3f;
 
 import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.utils.Utils;
+import com.cornchipss.world.Location;
+import com.cornchipss.world.Universe;
 
 public abstract class Entity
 {

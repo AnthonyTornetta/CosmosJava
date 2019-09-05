@@ -5,10 +5,11 @@ import java.util.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.entities.Player;
-import com.cornchipss.world.generation.PlanetGenerator;
+import com.cornchipss.world.generation.DefaultPlanetGenerator;
 import com.cornchipss.world.planet.Planet;
 
 /**
@@ -52,7 +53,7 @@ public class Sector
 	/**
 	 * Used to generate planets within the sector
 	 */
-	private PlanetGenerator planetGenerator;
+	private DefaultPlanetGenerator planetGenerator;
 	
 	/**
 	 * A big thing that holds other smaller things
@@ -61,7 +62,7 @@ public class Sector
 	{
 		planets = new Planet[CHUNKS][CHUNKS][CHUNKS];
 		
-		planetGenerator = new PlanetGenerator(System.nanoTime());
+		planetGenerator = new DefaultPlanetGenerator(System.nanoTime());
 	}
 	
 	private boolean firstUpdate = true;
@@ -397,7 +398,7 @@ public class Sector
 						int xz = random.nextInt(100) + 100;
 						if(xz % 2 != 0)
 							xz++;
-						setPlanet(x, y, z, new Planet(xz, 256, xz));
+						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance("cosmos:grassland")));
 					}
 				}
 			}

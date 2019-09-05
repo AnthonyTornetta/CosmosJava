@@ -191,5 +191,6 @@
 	<classpathentry kind="lib" path="libs/steamworks4j-server-1.8.0-sources.jar"/>
 	<classpathentry kind="lib" path="libs/steamworks4j-server-1.8.0.jar"/>
 	<classpathentry kind="lib" path="libs/slick-util.jar"/>
+	<classpathentry kind="lib" path="libs/reflections-0.9.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

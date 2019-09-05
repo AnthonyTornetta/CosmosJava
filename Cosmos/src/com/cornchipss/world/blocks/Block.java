@@ -1,11 +1,10 @@
-package com.cornchipss.world;
+package com.cornchipss.world.blocks;
 
 import com.cornchipss.physics.collision.hitbox.CubeHitbox;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
 import com.cornchipss.rendering.ModelCreator;
-import com.cornchipss.world.blocks.BlockFace;
 
 /**
  * <p>A thing in the world</p>

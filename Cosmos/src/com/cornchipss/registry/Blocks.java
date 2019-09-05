@@ -2,8 +2,8 @@ package com.cornchipss.registry;
 
 import com.cornchipss.rendering.Model;
 import com.cornchipss.rendering.ModelCreator;
-import com.cornchipss.world.Block;
 import com.cornchipss.world.blocks.Air;
+import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.Dirt;
 import com.cornchipss.world.blocks.Grass;
 import com.cornchipss.world.blocks.Stone;

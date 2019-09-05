@@ -2,6 +2,8 @@ package com.cornchipss.world;
 
 import org.joml.Vector3f;
 
+import com.cornchipss.world.blocks.Block;
+
 public class Location
 {
 	private Vector3f position;

@@ -5,7 +5,6 @@ import org.lwjgl.glfw.GLFW;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
-import com.cornchipss.world.Entity;
 
 public class Player extends Entity
 {

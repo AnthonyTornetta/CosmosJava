@@ -1,17 +1,18 @@
-package com.cornchipss.world.generation;
+package com.cornchipss.world.biospheres;
 
 import com.cornchipss.registry.Blocks;
+import com.cornchipss.registry.annotations.RegisteredBiosphere;
 import com.cornchipss.world.planet.Planet;
 
 import libs.noise.SimplexNoise;
 
-public class PlanetGenerator
+@RegisteredBiosphere(id="cosmos:grassland")
+public class Grassland extends Biosphere
 {
-	private SimplexNoise noiseMaker;
-	
-	public PlanetGenerator(long seed)
+	@Override
+	public void generate(boolean render, int delay)
 	{
-		noiseMaker = new SimplexNoise(seed);
+		generatePlanet()
 	}
 	
 	/**

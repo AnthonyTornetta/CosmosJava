@@ -9,7 +9,8 @@ import org.joml.Vector3i;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
 import com.cornchipss.utils.datatypes.ArrayListF;
-import com.cornchipss.world.Block;
+import com.cornchipss.world.biospheres.Biosphere;
+import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.sector.Sector;
 
 /**
@@ -22,6 +23,11 @@ public class Planet
 	 * The sector the planet is a part of (wow)
 	 */
 	private Sector sector;
+	
+	/**
+	 * The {@link Biosphere} of the planet
+	 */
+	private Biosphere biosphere;
 	
 	/**
 	 * <p>Coordinate of the planet's center, relative to the sector's chunk coordinates</p>
@@ -63,13 +69,14 @@ public class Planet
 	 * @param height The height of the planet (in blocks) - MUST BE EVEN
 	 * @param length The length of the planet (in blocks) - MUST BE EVEN
 	 */
-	public Planet(int width, int height, int length)
+	public Planet(int width, int height, int length, Biosphere biosphere)
 	{
 		if(width % 2 != 0 || height % 2 != 0 || length % 2 != 0)
 			throw new IllegalArgumentException("Width, Height, and Length of any planet MUST be even!");
 		
 		generated = false;
 		
+		this.biosphere = biosphere;
 		this.length = length;
 		this.width = width;
 		this.height = height;
