@@ -503,4 +503,7 @@ public class Planet
 	{ 
 		this.generated = b;
 	}
+	
+	public Biosphere getBiosphere() { return biosphere; }
+	public void setBiosphere(Biosphere b) { this.biosphere = b; }
 }

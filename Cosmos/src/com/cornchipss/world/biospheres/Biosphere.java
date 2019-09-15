@@ -10,35 +10,32 @@ public abstract class Biosphere
 	private Planet planet;
 	private SimplexNoise noise;
 	
-	public abstract void generate(boolean render, int delay);
+	public abstract void generate(boolean render, int delay, SimplexNoise noiseMaker);
 	
 	public Planet getPlanet() { return planet; }
 	public void setPlanet(Planet planet) { this.planet = planet; }
 
 	public SimplexNoise getNoise() { return noise; }
 
-	public Block getBlockAtY(int y) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	public abstract Block getBlockY(int y, int maxY);
 
-	public int minGenerationLevel() {
-		// TODO Auto-generated method stub
+	public int minGenerationLevel()
+	{
 		return 0;
 	}
 
-	public float frequency() {
-		// TODO Auto-generated method stub
-		return 0;
+	public float frequency()
+	{
+		return 0.01f;
 	}
 
 	public float amplitude()
 	{
-		return 0;
+		return 6;
 	}
 
 	public int baseHeight()
 	{
-		return 200;
+		return 64;
 	}
 }

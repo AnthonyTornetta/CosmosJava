@@ -7,9 +7,9 @@ import com.cornchipss.world.generation.DefaultPlanetGenerator;
 
 import libs.noise.SimplexNoise;
 
-@RegisteredBiosphere(id="cosmos:grassland")
-public class Grassland extends Biosphere
-{	
+@RegisteredBiosphere(id="cosmos:snow")
+public class SnowPlanet extends Biosphere
+{
 	@Override
 	public void generate(boolean render, int delay, SimplexNoise noiseMaker)
 	{
@@ -17,13 +17,14 @@ public class Grassland extends Biosphere
 	}
 	
 	@Override
+	public float frequency()
+	{
+		return 0.005f;
+	}
+
+	@Override
 	public Block getBlockY(int y, int maxY)
 	{
-		if(y == maxY)
-			return Blocks.grass;
-		if(maxY - y <= 5)
-			return Blocks.dirt;
-		else
-			return Blocks.stone;
+		return maxY - y <= 5 ? Blocks.snow : Blocks.snowstone;
 	}
 }

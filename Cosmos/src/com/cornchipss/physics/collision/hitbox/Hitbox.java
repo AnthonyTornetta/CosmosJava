@@ -10,6 +10,14 @@ import com.cornchipss.utils.datatypes.Tuple;
  */
 public abstract class Hitbox
 {
+	/**
+	 * Returns true if two hitboxes are colliding based on the two positions
+	 * @param a Hitbox A
+	 * @param b Hitbox B
+	 * @param positionA Position of hitbox A
+	 * @param positionB Position of hitbox B
+	 * @return true if two hitboxes are colliding based on the two positions
+	 */
 	public static boolean isColliding(Hitbox a, Hitbox b, Vector3f positionA, Vector3f positionB)
 	{
 		if(a == null || b == null)
@@ -48,10 +56,22 @@ public abstract class Hitbox
 		return false;
 	}
 	
+	/**
+	 * Gets a general rectangle that can be used for broadphase collision detection
+	 * @return a general rectangle that can be used for broadphase collision detection
+	 */
 	public abstract Vector3f getBoundingBox();
 	
+	/**
+	 * Gets every corner present in the hitbox
+	 * @return every corner present in the hitbox
+	 */
 	public abstract Vector3f[] getCorners();
 
+	/**
+	 * Gets every verticie present in the hitbox - there may be duplicates in this
+	 * @return every verticie present in the hitbox - there may be duplicates in this
+	 */
 	public Vector3f[] getVerticies()
 	{
 		Vector3f[] corners = getCorners();
@@ -78,6 +98,12 @@ public abstract class Hitbox
 		return verts;
 	}
 	
+	/**
+	 * Gets the two closest verticies in two hitboxes
+	 * @param x Hitbox A
+	 * @param y Hitbox B
+	 * @return the two closest verticies in two hitboxes
+	 */
 	public static Tuple<Vector3f> getClosestVerticies(Hitbox x, Hitbox y)
 	{
 		float shortestDist = -1;
@@ -95,6 +121,26 @@ public abstract class Hitbox
 					closest.set(0, v1);
 					closest.set(1, v2);
 				}
+			}
+		}
+		
+		return closest;
+	}
+
+	public static Vector3f getClosestVerticie(Hitbox h, Vector3f vert)
+	{
+		float shortestDist = -1;
+		
+		Vector3f closest = null;
+		
+		for(Vector3f v : h.getVerticies())
+		{
+			float dist = v.distanceSquared(vert);
+			
+			if(shortestDist == -1 || dist < shortestDist)
+			{
+				shortestDist = dist;
+				closest = v;
 			}
 		}
 		

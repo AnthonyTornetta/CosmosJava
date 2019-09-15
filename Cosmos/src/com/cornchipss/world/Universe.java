@@ -3,6 +3,8 @@ package com.cornchipss.world;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.physics.shapes.Rectangle;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 import com.cornchipss.world.sector.Sector;
@@ -219,7 +221,7 @@ public class Universe
 		if(pos == null)
 			throw new IllegalArgumentException("Position for the block cannot be null!");
 		
-		Vector3i coords = toSectorCoords(pos);		
+		Vector3i coords = toSectorCoords(pos);
 		Vector3f sectorCoords = clampAbsoluteCoordsToSectorCoords(pos);
 		
 		Sector sector = getSector(coords);
@@ -230,11 +232,12 @@ public class Universe
 			planet.setBlock((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z, block);
 	}
 
+	@Deprecated
 	public Location[][][] getBlocksWithin(Vector3f position, Vector3f dimensions)
 	{
-		int cZ = (int)Math.ceil(dimensions.z / 2);
-		int cY = (int)Math.ceil(dimensions.y / 2);
-		int cX = (int)Math.ceil(dimensions.x / 2);
+		int cZ = (int)Math.abs(Math.ceil(dimensions.z / 2));
+		int cY = (int)Math.abs(Math.ceil(dimensions.y / 2));
+		int cX = (int)Math.abs(Math.ceil(dimensions.x / 2));
 		
 		Location[][][] blocks = new Location[cZ * 2][cY * 2][cX * 2];
 		
@@ -255,5 +258,60 @@ public class Universe
 		}
 		
 		return blocks;
+	}
+	
+	public Location[][][] getBlocksBetween(Vector3f a, Vector3f b)
+	{
+		// Makes sure that corner1 has coordinate values smaller than corner2, and if not swaps them
+		// This is perfectly fine to do because it just finds new corners of the square to use
+		Vector3f corner1 = new Vector3f(), corner2 = new Vector3f();
+		
+		corner1.x = (float)Math.min(Math.floor(a.x), Math.floor(b.x));
+		corner2.x = (float)Math.max(Math.ceil(a.x), Math.floor(b.x));
+		
+		corner1.y = (float)Math.min(Math.floor(a.y), Math.floor(b.y));
+		corner2.y = (float)Math.max(Math.ceil(a.y), Math.floor(b.y));
+		
+		corner1.z = (float)Math.min(Math.floor(a.z), Math.floor(b.z));
+		corner2.z = (float)Math.max(Math.ceil(a.z), Math.floor(b.z));
+		
+		int floorZ = (int)Math.floor(corner1.z),
+			floorY = (int)Math.floor(corner1.y),
+			floorX = (int)Math.floor(corner1.x);
+		
+		int ceilZ = (int)Math.ceil(corner2.z),
+			ceilY = (int)Math.ceil(corner2.y),
+			ceilX = (int)Math.ceil(corner2.x);
+		
+		// Allows for a and b to be swapped
+		int difZ = Math.abs(ceilZ - floorZ);
+		int difY = Math.abs(ceilY - floorY);
+		int difX = Math.abs(ceilX - floorX);
+		
+		
+		Location[][][] blocks = new Location[difZ + 1][difY + 1][difX + 1];
+		
+		for(int z = floorZ; z <= ceilZ; z++)
+		{
+			for(int y = floorY; y <= ceilY; y++)
+			{
+				for(int x = floorX; x <= ceilX; x++)
+				{
+					Location loc = new Location(new Vector3f(x, y, z), this);
+										
+					if(loc.getBlock() != null)
+					{
+						blocks[z - floorZ][y - floorY][x - floorX] = loc;
+					}
+				}
+			}
+		}
+		
+		return blocks;
+	}
+
+	public Location[][][] getBlocksWithin(Rectangle rect)
+	{
+		return getBlocksWithin(rect.getPosition(), rect.getDimensions());
 	}
 }

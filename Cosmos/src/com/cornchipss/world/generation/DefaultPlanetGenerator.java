@@ -1,6 +1,5 @@
 package com.cornchipss.world.generation;
 
-import com.cornchipss.registry.Blocks;
 import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.planet.Planet;
 
@@ -20,12 +19,13 @@ public class DefaultPlanetGenerator
 		{
 			for(int x = planet.getBeginningCornerX(); x < planet.getEndingCornerX(); x++)
 			{
-				int y = noise(noiseMaker, x, z, bio.frequency(), bio.amplitude()) + bio.baseHeight(); // 0.01f, 6 + 64
+				int maxY;
+				int y = maxY = noise(noiseMaker, x, z, bio.frequency(), bio.amplitude()) + bio.baseHeight(); // 0.01f, 6 + 64
 				
 				for(; y >= bio.minGenerationLevel(); y--)
 				{
 					// Updating the model at this stage is pointless because we're making so many changes
-					planet.setBlock(x, y, z, false, bio.getBlockAtY(y));
+					planet.setBlock(x, y, z, false, bio.getBlockY(y, maxY));
 				}
 			}
 			

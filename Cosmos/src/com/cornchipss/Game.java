@@ -9,7 +9,6 @@ import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
 import com.cornchipss.world.Universe;
-import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.sector.Sector;
 

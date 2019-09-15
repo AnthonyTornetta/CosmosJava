@@ -4,8 +4,8 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 
@@ -72,6 +72,11 @@ public class Utils
 		else if(obj instanceof Vector3i)
 		{
 			Vector3i t = (Vector3i)obj;
+			return "[" + t.x + ", " + t.y + ", " + t.z + "]";
+		}
+		else if(obj instanceof Vector3d)
+		{
+			Vector3d t = (Vector3d)obj;
 			return "[" + t.x + ", " + t.y + ", " + t.z + "]";
 		}
 		
@@ -160,6 +165,11 @@ public class Utils
 	public static Vector3f mul(Vector3f a, Vector3f b)
 	{
 		return new Vector3f(a.x * b.x, a.y * b.y, a.z * b.z);
+	}
+	
+	public static Vector3f mul(Vector3f a, float f)
+	{
+		return mul(a, new Vector3f(f));
 	}
 	
 	/**

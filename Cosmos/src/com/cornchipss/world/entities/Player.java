@@ -2,7 +2,9 @@ package com.cornchipss.world.entities;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.physics.Raycast;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
+import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
 
@@ -88,7 +90,24 @@ public class Player extends Entity
 			setRx((float)Math.PI / 2);
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
+		
+		Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 6);
+		
+		Utils.println(ray.size());
+		
+		for(int i = 0; i < ray.size(); i++)
+		{
+			Utils.println(ray.getNthHit(i).getPosition());
+		}
+		
+		if(ray.size() > 0)
+			ray.getFirstHit().setBlock(Blocks.grass);
 	}
+	
+//	public Location getBlockLookingAt()
+//	{
+//		Raycast raycast = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), getRz(), 50);
+//	}
 	
 	public int getViewDistance() { return viewDistance; }
 	public void setViewDistance(int viewDistance) { this.viewDistance = viewDistance; }

@@ -6,6 +6,10 @@ import com.cornchipss.world.blocks.Air;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.Dirt;
 import com.cornchipss.world.blocks.Grass;
+import com.cornchipss.world.blocks.Sand;
+import com.cornchipss.world.blocks.Sandstone;
+import com.cornchipss.world.blocks.Snow;
+import com.cornchipss.world.blocks.Snowstone;
 import com.cornchipss.world.blocks.Stone;
 
 public class Blocks
@@ -19,6 +23,10 @@ public class Blocks
 	public static final Stone stone = new Stone();
 	public static final Grass grass = new Grass();
 	public static final Dirt dirt = new Dirt();
+	public static final Snow snow = new Snow();
+	public static final Snowstone snowstone = new Snowstone();
+	public static final Sand sand = new Sand();
+	public static final Sandstone sandstone = new Sandstone();
 	
 	public static void registerBlocks()
 	{
@@ -26,6 +34,10 @@ public class Blocks
 		registerBlock(stone);
 		registerBlock(grass);
 		registerBlock(dirt);
+		registerBlock(snow);
+		registerBlock(snowstone);
+		registerBlock(sand);
+		registerBlock(sandstone);
 	}
 	
 	public static void registerBlock(Block b)

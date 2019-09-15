@@ -27,7 +27,7 @@ public abstract class Entity
 	{
 		Location[][][] locations = universe.getBlocksWithin(getPosition(), hitbox.getBoundingBox());
 		
-		Vector3f newPos = Utils.add(getPosition(), velocity);
+		Vector3f newPos = Utils.add(getPosition(), getVelocity());
 		
 		for(int z = 0; z < locations.length; z++)
 		{
@@ -40,7 +40,8 @@ public abstract class Entity
 						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
 						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getPosition(), newPos))
 						{
-							
+//							getVelocity().mul(-0.01f);
+//							newPos = Utils.add(getPosition(), getVelocity());
 						}
 					}
 				}

@@ -8,9 +8,11 @@ import org.joml.Vector3i;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.world.Universe;
+import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.entities.Player;
-import com.cornchipss.world.generation.DefaultPlanetGenerator;
 import com.cornchipss.world.planet.Planet;
+
+import libs.noise.SimplexNoise;
 
 /**
  * A big thing that holds other smaller things (wow)
@@ -53,7 +55,7 @@ public class Sector
 	/**
 	 * Used to generate planets within the sector
 	 */
-	private DefaultPlanetGenerator planetGenerator;
+	private SimplexNoise noiseMaker;
 	
 	/**
 	 * A big thing that holds other smaller things
@@ -62,7 +64,7 @@ public class Sector
 	{
 		planets = new Planet[CHUNKS][CHUNKS][CHUNKS];
 		
-		planetGenerator = new DefaultPlanetGenerator(System.nanoTime());
+		noiseMaker = new SimplexNoise(System.nanoTime());
 	}
 	
 	private boolean firstUpdate = true;
@@ -261,7 +263,9 @@ public class Sector
 				if(getPlanet(x, y, z) == null)
 					throw new IllegalArgumentException("No planet found at " + x + ", " + y + ", " + z + ".");
 				
-				planetGenerator.generatePlanet(getPlanet(x, y, z), render, 30);
+				Biosphere bio = Biospheres.newInstance(Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size())));
+				bio.setPlanet(getPlanet(x, y, z));
+				bio.generate(render, 30, noiseMaker);
 			}
 		});
 		

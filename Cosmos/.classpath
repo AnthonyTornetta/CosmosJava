@@ -192,5 +192,8 @@
 	<classpathentry kind="lib" path="libs/steamworks4j-server-1.8.0.jar"/>
 	<classpathentry kind="lib" path="libs/slick-util.jar"/>
 	<classpathentry kind="lib" path="libs/reflections-0.9.10.jar"/>
+	<classpathentry kind="lib" path="libs/annotations-3.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/guava-28.1-jre.jar"/>
+	<classpathentry kind="lib" path="libs/javassist-3.25.0-GA.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

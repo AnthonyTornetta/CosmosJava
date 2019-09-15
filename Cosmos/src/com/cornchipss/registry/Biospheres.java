@@ -1,6 +1,8 @@
 package com.cornchipss.registry;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class Biospheres
 	}
 	
 	public int getBiosphereAmount() { return biospheres.size(); }
-	public static Set<String> getBiosphereIds() { return biospheres.keySet(); }
+	public static List<String> getBiosphereIds() { return new ArrayList<>(biospheres.keySet()); }
 	public static Biosphere newInstance(String id)
 	{
 		try
