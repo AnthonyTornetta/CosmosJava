@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.cornchipss.physics.shapes.Rectangle;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 import com.cornchipss.world.sector.Sector;
@@ -232,7 +231,6 @@ public class Universe
 			planet.setBlock((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z, block);
 	}
 
-	@Deprecated
 	public Location[][][] getBlocksWithin(Vector3f position, Vector3f dimensions)
 	{
 		int cZ = (int)Math.abs(Math.ceil(dimensions.z / 2));
