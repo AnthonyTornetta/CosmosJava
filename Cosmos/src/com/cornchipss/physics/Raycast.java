@@ -1,9 +1,6 @@
 package com.cornchipss.physics;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Deque;
 import java.util.List;
 
 import org.joml.Vector3f;
@@ -62,17 +59,19 @@ public class Raycast
 						
 						if(posDist <= maxDist)
 						{
-							Vector3f rayAtStart = Utils.add(position, Utils.mul(direction, posDist / maxDist));
-							Vector3f rayAtEnd = Utils.add(position, Utils.mul(direction,  posBoxDist / maxDist));
+							Vector3f rayAtStart = position; //Utils.add(position, Utils.mul(direction, posDist / maxDist));
+							Vector3f rayAtEnd = endPoint;//Utils.add(position, Utils.mul(direction,  posBoxDist / maxDist));
 							
-							if(Math.signum(pos.x + box.x - rayAtStart.x) != Math.signum(pos.x - rayAtEnd.x) || 
-									rayAtStart.x >= pos.x && rayAtStart.x <= box.x + pos.x || rayAtEnd.x >= pos.x && rayAtEnd.x <= box.x + pos.x)
+							Vector3f extremeNeg = Utils.add(pos, hb.getExtremeNeg()), extremePos = Utils.add(pos, hb.getExtremePos());
+							
+							if(rayAtStart.x <= extremeNeg.x && rayAtEnd.x >= extremeNeg.x || rayAtStart.x <= extremePos.x && rayAtEnd.x >= extremePos.x || 
+									rayAtStart.x >= extremeNeg.x && rayAtStart.x <= extremePos.x || rayAtEnd.x >= extremeNeg.x && rayAtEnd.x <= extremePos.x)
 							{
-								if(Math.signum(pos.y + box.y - rayAtStart.y) != Math.signum(pos.y - rayAtEnd.y) || 
-										rayAtStart.y >= pos.y && rayAtStart.y <= box.y + pos.y || rayAtEnd.y >= pos.y && rayAtEnd.y <= box.y + pos.y)
+								if(rayAtStart.y <= extremeNeg.y && rayAtEnd.y >= extremeNeg.y || rayAtStart.y <= extremePos.y && rayAtEnd.y >= extremePos.y || 
+										rayAtStart.y >= extremeNeg.y && rayAtStart.y <= extremePos.y || rayAtEnd.y >= extremeNeg.y && rayAtEnd.y <= extremePos.y)
 								{
-									if(Math.signum(pos.z + box.z - rayAtStart.z) != Math.signum(pos.z - rayAtEnd.z) || 
-											rayAtStart.z >= pos.z && rayAtStart.z <= box.z + pos.z || rayAtEnd.z >= pos.z && rayAtEnd.z <= box.z + pos.z)
+									if(rayAtStart.z <= extremeNeg.z && rayAtEnd.z >= extremeNeg.z || rayAtStart.z <= extremePos.z && rayAtEnd.z >= extremePos.z || 
+											rayAtStart.z >= extremeNeg.z && rayAtStart.z <= extremePos.z || rayAtEnd.z >= extremeNeg.z && rayAtEnd.z <= extremePos.z)
 									{
 										float distSqrd = loc.getPosition().distanceSquared(position);
 										
@@ -98,15 +97,6 @@ public class Raycast
 				}
 			}
 		}
-		
-//		Collections.sort(hits, new Comparator<Location>() 
-//		{
-//			@Override
-//			public int compare(Location o1, Location o2)
-//			{
-//				return (int) (o1.getPosition().distanceSquared(position) - o2.getPosition().distanceSquared(position));
-//			}
-//		});
 		
 		return new Raycast(hits, null, position, endPoint);
 	}

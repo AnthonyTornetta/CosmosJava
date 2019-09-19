@@ -146,4 +146,52 @@ public abstract class Hitbox
 		
 		return closest;
 	}
+
+	public Vector3f getExtremeNeg()
+	{
+		Vector3f[] corners = getCorners();
+		
+		Vector3f extreme = null;
+		
+		for(Vector3f v : corners)
+		{
+			if(extreme == null)
+				extreme = v;
+			else
+			{
+				if(extreme.x < v.x)
+					extreme.x = v.x;
+				if(extreme.y < v.y)
+					extreme.y = v.y;
+				if(extreme.z < v.z)
+					extreme.z = v.z;
+			}
+		}
+		
+		return extreme;
+	}
+	
+	public Vector3f getExtremePos()
+	{
+		Vector3f[] corners = getCorners();
+		
+		Vector3f extreme = null;
+		
+		for(Vector3f v : corners)
+		{
+			if(extreme == null)
+				extreme = v;
+			else
+			{
+				if(extreme.x > v.x)
+					extreme.x = v.x;
+				if(extreme.y > v.y)
+					extreme.y = v.y;
+				if(extreme.z > v.z)
+					extreme.z = v.z;
+			}
+		}
+		
+		return extreme;
+	}
 }
