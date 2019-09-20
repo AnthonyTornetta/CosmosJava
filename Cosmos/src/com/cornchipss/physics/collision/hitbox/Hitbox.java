@@ -156,7 +156,7 @@ public abstract class Hitbox
 		for(Vector3f v : corners)
 		{
 			if(extreme == null)
-				extreme = v;
+				extreme = new Vector3f(v);
 			else
 			{
 				if(extreme.x < v.x)
@@ -180,7 +180,7 @@ public abstract class Hitbox
 		for(Vector3f v : corners)
 		{
 			if(extreme == null)
-				extreme = v;
+				extreme = new Vector3f(v);
 			else
 			{
 				if(extreme.x > v.x)

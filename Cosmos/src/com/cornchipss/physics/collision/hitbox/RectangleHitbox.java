@@ -63,14 +63,14 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 	}
 
 	@Override
-	public Vector3f getPosition()
-	{
-		return corners[0];
-	}
-
-	@Override
 	public Vector3f getDimensions()
 	{
 		return new Vector3f(dimensions);
+	}
+
+	@Override
+	public Vector3f getPosition()
+	{
+		return corners[0];
 	}
 }

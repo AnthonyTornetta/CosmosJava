@@ -7,7 +7,7 @@ import com.cornchipss.world.generation.DefaultPlanetGenerator;
 
 import libs.noise.SimplexNoise;
 
-@RegisteredBiosphere(id="cosmos:sand")
+//@RegisteredBiosphere(id="cosmos:sand")
 public class SandPlanet extends Biosphere
 {
 	@Override

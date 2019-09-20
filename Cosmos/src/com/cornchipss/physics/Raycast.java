@@ -32,7 +32,7 @@ public class Raycast
 		Vector3f endPoint = pointAt(position, rx, ry, maxDist);
 		
 		// Used for finding the slope if a 3d line; https://math.stackexchange.com/questions/799783/slope-of-a-line-in-3d-coordinate-system
-		Vector3f direction = Utils.sub(endPoint, position);
+//		Vector3f direction = Utils.sub(endPoint, position);
 		
 		// Broad phase
 		Location[][][] locs = universe.getBlocksBetween(position, endPoint);
@@ -52,45 +52,37 @@ public class Raycast
 					{
 						Vector3f pos = loc.getPosition();
 						Hitbox hb = loc.getBlock().getHitbox();
-						Vector3f box = hb.getBoundingBox(); // getting too specific may make it too hard to place blocks on it
+//						Vector3f box = hb.getBoundingBox(); // getting too specific may make it too hard to place blocks on it
 						
 						float posDist = pos.distance(position);
-						float posBoxDist = Utils.add(pos, box).distance(position);
+//						float posBoxDist = Utils.add(pos, box).distance(position);
 						
 						if(posDist <= maxDist)
 						{
 							Vector3f rayAtStart = position; //Utils.add(position, Utils.mul(direction, posDist / maxDist));
 							Vector3f rayAtEnd = endPoint;//Utils.add(position, Utils.mul(direction,  posBoxDist / maxDist));
 							
-							Vector3f extremeNeg = Utils.add(pos, hb.getExtremeNeg()), extremePos = Utils.add(pos, hb.getExtremePos());
+							Vector3f extremeNeg = Utils.add(pos, hb.getExtremeNeg());
+							Vector3f extremePos = Utils.add(pos, hb.getExtremePos());
 							
-							if(rayAtStart.x <= extremeNeg.x && rayAtEnd.x >= extremeNeg.x || rayAtStart.x <= extremePos.x && rayAtEnd.x >= extremePos.x || 
-									rayAtStart.x >= extremeNeg.x && rayAtStart.x <= extremePos.x || rayAtEnd.x >= extremeNeg.x && rayAtEnd.x <= extremePos.x)
+							if(isVectorColliding(rayAtStart, rayAtEnd, extremeNeg, extremePos))
 							{
-								if(rayAtStart.y <= extremeNeg.y && rayAtEnd.y >= extremeNeg.y || rayAtStart.y <= extremePos.y && rayAtEnd.y >= extremePos.y || 
-										rayAtStart.y >= extremeNeg.y && rayAtStart.y <= extremePos.y || rayAtEnd.y >= extremeNeg.y && rayAtEnd.y <= extremePos.y)
+								float distSqrd = loc.getPosition().distanceSquared(position);
+								
+								boolean placed = false;
+								
+								for(int i = 0; i < hits.size(); i++)
 								{
-									if(rayAtStart.z <= extremeNeg.z && rayAtEnd.z >= extremeNeg.z || rayAtStart.z <= extremePos.z && rayAtEnd.z >= extremePos.z || 
-											rayAtStart.z >= extremeNeg.z && rayAtStart.z <= extremePos.z || rayAtEnd.z >= extremeNeg.z && rayAtEnd.z <= extremePos.z)
+									if(distSqrd < hits.get(0).getPosition().distanceSquared(position))
 									{
-										float distSqrd = loc.getPosition().distanceSquared(position);
-										
-										boolean placed = false;
-										
-										for(int i = 0; i < hits.size(); i++)
-										{
-											if(distSqrd < hits.get(0).getPosition().distanceSquared(position))
-											{
-												hits.add(i, loc);
-												placed = true;
-												break;
-											}
-										}
-										
-										if(!placed)
-											hits.add(loc);
+										hits.add(i, loc);
+										placed = true;
+										break;
 									}
 								}
+								
+								if(!placed)
+									hits.add(loc);
 							}
 						}
 					}
@@ -99,6 +91,29 @@ public class Raycast
 		}
 		
 		return new Raycast(hits, null, position, endPoint);
+	}
+	
+	private static boolean isVectorColliding(Vector3f rayAtStart, Vector3f rayAtEnd, Vector3f extremeNeg, Vector3f extremePos)
+	{
+//		for(int i = 1; i < 2; i++)
+//		{
+//			
+//			Utils.println(i + ": ");
+//			Utils.println(rayAtStart.get(i) <= extremeNeg.get(i) && rayAtEnd.get(i) >= extremeNeg.get(i));
+//			Utils.println(rayAtStart.get(i) <= extremePos.get(i) && rayAtEnd.get(i) >= extremePos.get(i));
+//			Utils.println(rayAtStart.get(i) >= extremeNeg.get(i) && rayAtStart.get(i) <= extremePos.get(i));
+//			Utils.println(rayAtEnd.get(i) >= extremeNeg.get(i) && rayAtEnd.get(i) <= extremePos.get(i));
+//			
+//			if(!((rayAtStart.get(i) <= extremeNeg.get(i) && rayAtEnd.get(i) >= extremeNeg.get(i)
+//					|| rayAtStart.get(i) <= extremePos.get(i) && rayAtEnd.get(i) >= extremePos.get(i))
+//					|| (rayAtStart.get(i) >= extremeNeg.get(i) && rayAtStart.get(i) <= extremePos.get(i) 
+//					|| rayAtEnd.get(i) >= extremeNeg.get(i) && rayAtEnd.get(i) <= extremePos.get(i))))
+//			{
+//				return false;
+//			}
+//		}
+		
+		return true;
 	}
 	
 	private static Vector3f pointAt(Vector3f start, float rx, float ry, float dist)

@@ -97,6 +97,7 @@ public class Player extends Entity
 		
 		for(int i = 0; i < ray.size(); i++)
 		{
+			ray.getNthHit(i).setBlock(Blocks.grass);
 			Utils.println(ray.getNthHit(i).getPosition());
 		}
 		
