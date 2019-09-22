@@ -13,21 +13,21 @@ public class Player extends Entity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
-	
+
 	public Player(float x, float y, float z)
 	{
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f));
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
 		setVelocity(Utils.zero());
-		
+
 		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
 			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .2f : .02f;
-			
+
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 			{
 				addVelocityX((float) (speed * Math.sin(getRy())));
@@ -48,7 +48,7 @@ public class Player extends Entity
 				addVelocityX((float) (speed * Math.cos(getRy())));
 				addVelocityZ((float) (speed * Math.sin(getRy())));
 			}
-			
+
 			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
 			{
 				addVelocityY(speed);
@@ -57,7 +57,7 @@ public class Player extends Entity
 			{
 				addVelocityY(-speed);
 			}
-			
+
 			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 			{
 				setX(0);
@@ -74,38 +74,38 @@ public class Player extends Entity
 			addVelocityY(Utils.clamp(-getVelocityY(), -maxSlowdown, maxSlowdown) * 0.1f);
 			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
 		}
-		
+
 		updatePhysics();
-		
+
 //		addVelocityY(-9.8f / 60.0f);
-		
+
 //		Vector3f cloesestBlock = getUniverse().getClosestBlock(getX(), getY(), getZ(), 0);
 //		if(cloesestBlock != null)
 //		{
 //			Block b = getUniverse().getBlockAt(cloesestBlock);
 //		}
-		
+
 		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
 		setRy(getRy() + sensitivity * -Input.getMouseDeltaX());
-		
+
 		if(getRx() > Math.PI / 2)
 			setRx((float)Math.PI / 2);
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
-		
+
 		Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 6);
-		
+
 		Utils.println(ray.size());
-		
+
 		if(ray.size() > 0)
 		{
-			Utils.println(ray.getFirstHit().getPosition());
-			ray.getFirstHit().setBlock(Blocks.grass);
+			ray.getNthHit(i).setBlock(Blocks.grass);
+			Utils.println(ray.getNthHit(i).getPosition());
 		}
-		
+
 		Game.renderLine(ray.getStartPoint(), ray.getEndPoint(), 255, 0, 0);
 	}
-	
+
 //	public Location getBlockLookingAt()
 //	{
 //		Raycast raycast = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), getRz(), 50);
