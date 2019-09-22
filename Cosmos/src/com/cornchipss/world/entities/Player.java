@@ -2,6 +2,7 @@ package com.cornchipss.world.entities;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.Game;
 import com.cornchipss.physics.Raycast;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.registry.Blocks;
@@ -12,7 +13,6 @@ public class Player extends Entity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
-	private int viewDistance = 1000;
 	
 	public Player(float x, float y, float z)
 	{
@@ -22,6 +22,8 @@ public class Player extends Entity
 	@Override
 	public void onUpdate()
 	{
+		setVelocity(Utils.zero());
+		
 		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
 			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .2f : .02f;
@@ -95,20 +97,17 @@ public class Player extends Entity
 		
 		Utils.println(ray.size());
 		
-		for(int i = 0; i < ray.size(); i++)
+		if(ray.size() > 0)
 		{
-			Utils.println(ray.getNthHit(i).getPosition());
+			Utils.println(ray.getFirstHit().getPosition());
+			ray.getFirstHit().setBlock(Blocks.grass);
 		}
 		
-		if(ray.size() > 0)
-			ray.getFirstHit().setBlock(Blocks.grass);
+		Game.renderLine(ray.getStartPoint(), ray.getEndPoint(), 255, 0, 0);
 	}
 	
 //	public Location getBlockLookingAt()
 //	{
 //		Raycast raycast = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), getRz(), 50);
 //	}
-	
-	public int getViewDistance() { return viewDistance; }
-	public void setViewDistance(int viewDistance) { this.viewDistance = viewDistance; }
 }

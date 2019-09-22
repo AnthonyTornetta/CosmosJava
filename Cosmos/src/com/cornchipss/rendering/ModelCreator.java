@@ -1,5 +1,6 @@
 package com.cornchipss.rendering;
 
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
@@ -121,4 +122,9 @@ public class ModelCreator
 	}
 	
 	public int getVertexCount() { return vertexCount; }
+
+	public void vertex(Vector3f v)
+	{
+		vertex(v.x, v.y, v.z);
+	}
 }

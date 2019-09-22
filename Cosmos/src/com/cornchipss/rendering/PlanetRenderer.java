@@ -2,52 +2,29 @@ package com.cornchipss.rendering;
 
 import java.util.Map;
 
-import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 
-import com.cornchipss.Game;
 import com.cornchipss.rendering.shaders.PlanetShader;
-import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.datatypes.ArrayListF;
-import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
 
-public class PlanetRenderer
+public class PlanetRenderer extends Renderer
 {
-	private PlanetShader shader;
-	
-	private int timeLocation, projectionLocation, viewLocation, chunkLocation;
+	private int timeLocation, chunkLocation;
 	
 	private Texture atlas;
 	
-	private Matrix4f projectionMatrix;
-	private Matrix4f viewMatrix;
-	
+	// Used for mass rendering models
 	private int positionsVBO;
 	
-	public PlanetRenderer(Player player)
+	public PlanetRenderer()
 	{
-		shader = new PlanetShader();
-		
-		timeLocation = shader.getUniformLocation("u_time");
-		projectionLocation = shader.getUniformLocation("projection");
-		viewLocation = shader.getUniformLocation("view");
-		chunkLocation = shader.getUniformLocation("chunkLocation");
-		
-		atlas = Texture.loadTexture("atlas/main.png");
-		projectionMatrix = new Matrix4f();
-		projectionMatrix.perspective((float)Math.toRadians(90), 
-				Game.getInstance().getWindow().getWidth() / 
-				(float)Game.getInstance().getWindow().getHeight(), 
-				0.1f, player.getViewDistance());
-		
-		viewMatrix = new Matrix4f();
+		super(new PlanetShader());
 		
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
@@ -63,26 +40,29 @@ public class PlanetRenderer
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 	
-	public void setupRender(Player player)
+	@Override
+	public void loadTextures()
 	{
-		GL11.glEnable(GL13.GL_TEXTURE0);
-		
-		Maths.createViewMatrix(player.getX(), player.getY(), player.getZ(), 
-				player.getRx(), player.getRy(), player.getRz(), viewMatrix);
-		
-		shader.start();
-		shader.setUniformF(timeLocation, (float)GLFW.glfwGetTime());
-		shader.loadUniformMatrix(projectionMatrix, projectionLocation);
-		shader.loadUniformMatrix(viewMatrix, viewLocation);
-		
-		atlas.bind();
+		atlas = Texture.loadTexture("atlas/main.png");
 	}
 	
-	public void stopRender()
+	@Override
+	public void loadUniformLocations()
 	{
-		Texture.unbind();
-		
-		shader.stop();
+		timeLocation = getShader().getUniformLocation("u_time");
+		chunkLocation = getShader().getUniformLocation("chunkLocation");
+	}
+	
+	@Override
+	public void loadUniforms()
+	{
+		getShader().setUniformF(timeLocation, (float)GLFW.glfwGetTime());
+	}
+	
+	@Override
+	public void bindTextures()
+	{
+		atlas.bind();
 	}
 	
 	public void render(Planet planet)
@@ -92,7 +72,7 @@ public class PlanetRenderer
 		
 		if(planet.isGenerated())
 		{
-			shader.setUniformVector(chunkLocation, planet.getAbsoluteX(), planet.getAbsoluteY(), planet.getAbsoluteZ());
+			getShader().setUniformVector(chunkLocation, planet.getAbsoluteX(), planet.getAbsoluteY(), planet.getAbsoluteZ());
 			
 			Map<Model, ArrayListF> modelsAndPositions = planet.getModelsAndPositions();
 			

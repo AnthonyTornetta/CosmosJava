@@ -1,9 +1,12 @@
 package com.cornchipss;
 
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
+import com.cornchipss.registry.Options;
+import com.cornchipss.rendering.DebugRenderer;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
@@ -38,11 +41,20 @@ public class Game implements Runnable
 		gameThread.start();
 	}
 	
+	private static DebugRenderer debug;
+	
+	public static void renderLine(Vector3f begin, Vector3f end, int r, int g, int b)
+	{
+		debug.addLine(begin, end, r, g, b);
+	}
+	
 	@Override
 	public void run()
-	{
+	{		
 		window = new Window(startWidth, startHeight, "end my eternal suffering");
 		Input.setWindow(window);
+		
+		Options.registerDefaults();
 		
 		Biospheres.registerBiospheres("com.cornchipss.world.biospheres");
 		
@@ -56,8 +68,9 @@ public class Game implements Runnable
 		
 		Player player = new Player(0, 0, 0);
 		player.setUniverse(universe);
-
-		PlanetRenderer renderer = new PlanetRenderer(player);
+		
+		PlanetRenderer renderer = new PlanetRenderer();
+		debug = new DebugRenderer();
 		
 		Timer updateTimer = new Timer();
 		Timer secondsTimer = new Timer();
@@ -92,6 +105,11 @@ public class Game implements Runnable
 			window.clear(0.5f, 0.8f, 1f, 1f);
 			
 			sector.renderPlanetsWithin(1, renderer, player);
+			
+			debug.setupRender(player);
+			debug.render();
+			
+			debug.clear();
 			
 			window.update();
 			

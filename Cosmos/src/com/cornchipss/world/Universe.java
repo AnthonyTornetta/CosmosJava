@@ -232,7 +232,6 @@ public class Universe
 			planet.setBlock((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z, block);
 	}
 
-	@Deprecated
 	public Location[][][] getBlocksWithin(Vector3f position, Vector3f dimensions)
 	{
 		int cZ = (int)Math.abs(Math.ceil(dimensions.z / 2));
