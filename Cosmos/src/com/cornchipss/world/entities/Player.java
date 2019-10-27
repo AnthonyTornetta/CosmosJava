@@ -8,6 +8,7 @@ import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
+import com.cornchipss.world.Location;
 
 public class Player extends Entity
 {
@@ -93,17 +94,17 @@ public class Player extends Entity
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
 
-		Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 6);
-
-		Utils.println(ray.size());
-
-		if(ray.size() > 0)
+		if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
 		{
-			ray.getNthHit(i).setBlock(Blocks.grass);
-			Utils.println(ray.getNthHit(i).getPosition());
-		}
+			Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 10);
 
-		Game.renderLine(ray.getStartPoint(), ray.getEndPoint(), 255, 0, 0);
+			Utils.println(ray.size());
+			
+			for(int i = 0; i < ray.size(); i++)
+			{
+				ray.getNthHit(i).setBlock(Blocks.stone);
+			}
+		}
 	}
 
 //	public Location getBlockLookingAt()

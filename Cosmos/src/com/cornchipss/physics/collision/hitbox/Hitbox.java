@@ -63,8 +63,8 @@ public abstract class Hitbox
 	public abstract Vector3f getBoundingBox();
 	
 	/**
-	 * Gets every corner present in the hitbox
-	 * @return every corner present in the hitbox
+	 * Gets the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
+	 * @return the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
 	 */
 	public abstract Vector3f[] getCorners();
 

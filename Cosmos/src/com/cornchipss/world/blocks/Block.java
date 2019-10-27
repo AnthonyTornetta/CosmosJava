@@ -1,6 +1,7 @@
 package com.cornchipss.world.blocks;
 
 import com.cornchipss.physics.collision.hitbox.CubeHitbox;
+import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
@@ -119,9 +120,9 @@ public class Block
 	/**
 	 * The default hitbox for a default cube
 	 */
-	private static final RectangleHitbox defaultHitbox = new CubeHitbox(.5f);
+	private static final RectangleHitbox defaultHitbox = new CubeHitbox(1f);
 	
-	public RectangleHitbox getHitbox()
+	public Hitbox getHitbox()
 	{
 		return defaultHitbox;
 	}

@@ -7,19 +7,19 @@ import com.cornchipss.utils.Utils;
 
 public class RectangleHitbox extends Hitbox implements Rectangle
 {
-	private Vector3f[] corners;
-	private Vector3f dimensions;
+	private final Vector3f[] corners;
+	private final Vector3f dimensions;
 	
 	/**
 	 * A hitbox that represents a rectangle
-	 * @param width The width of each side
-	 * @param height The height of each side
-	 * @param length The length of each side
+	 * @param width The total width of each side
+	 * @param height The total height of each side
+	 * @param length The total length of each side
 	 */
 	public RectangleHitbox(float width, float height, float length)
 	{
-		this(new Vector3f(-width, -height, -length), 
-				new Vector3f(width, height, length));
+		this(new Vector3f(-width / 2f, -height / 2f, -length / 2f), 
+				new Vector3f(width / 2f, height / 2f, length / 2f));
 	}
 	
 	/**
@@ -71,6 +71,6 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 	@Override
 	public Vector3f getPosition()
 	{
-		return corners[0];
+		return new Vector3f(corners[0]);
 	}
 }

@@ -1,13 +1,17 @@
 package com.cornchipss.physics;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.AABBf;
+import org.joml.Intersectionf;
+import org.joml.LineSegmentf;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.physics.collision.hitbox.Hitbox;
-import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.datatypes.LinkedArrayList;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.blocks.BlockFace;
@@ -17,9 +21,9 @@ public class Raycast
 	private List<Location> blocksHit;
 	private List<BlockFace> facesHit;
 	
-	private Vector3f start, end;
+	private Vector3fc start, end;
 	
-	private Raycast(List<Location> locs, List<BlockFace> faces, Vector3f start, Vector3f end)
+	private Raycast(List<Location> locs, List<BlockFace> faces, Vector3fc start, Vector3fc end)
 	{
 		this.blocksHit = locs;
 		this.facesHit = faces;
@@ -27,18 +31,55 @@ public class Raycast
 		this.end = end;
 	}
 	
-	public static Raycast fire(Vector3f position, Universe universe, float rx, float ry, float maxDist)
+	public static Raycast fire(Vector3fc position, Universe universe, float rx, float ry, float maxDist)
 	{
+//		position = Utils.add(position, new Vector3f(0, 2, 0));
+		
 		Vector3f endPoint = pointAt(position, rx, ry, maxDist);
 		
+		Utils.println(position);
+		Utils.println(endPoint);
+		
+//		float maxDistSqrd = maxDist * maxDist;
+//		
+//		Vector3f slopes = new Vector3f((endPoint.x - position.x) / maxDistSqrd, (endPoint.y - position.y) / maxDistSqrd, (endPoint.z - position.z) / maxDistSqrd);
+		
 		// Used for finding the slope if a 3d line; https://math.stackexchange.com/questions/799783/slope-of-a-line-in-3d-coordinate-system
-//		Vector3f direction = Utils.sub(endPoint, position);
 		
-		// Broad phase
-		Location[][][] locs = universe.getBlocksBetween(position, endPoint);
+		//line @ t
 		
-		// Narrow phase
-		List<Location> hits = new ArrayList<Location>();
+//		Intersectionf.intersectRayAab(position, new Vector3f(rx, ry, 0), 0, maxDist, )
+		
+//		RayAabIntersection ray = new RayAabIntersection(position.x, position.y, position.z, rx, ry, 0);
+		
+		
+//		ry = -(ry - pi / 2) % (2 * pi);
+		
+
+		float pi = (float)Math.PI;
+		
+		float useRy = Math.abs(ry) % (2 * pi);
+		
+		if(useRy >= pi)
+		{
+			useRy = -2 * pi + useRy;
+		}
+		
+		Utils.println(rx);
+		Utils.println(useRy);
+		
+		LineSegmentf seg = new LineSegmentf(position, endPoint);
+		
+//		Rayf ray = new Rayf(position, new Vector3f(
+//				useRy * (float)Math.cos(rx), // idk
+//				-rx,  // correct
+//				2)); // idk * idk
+		
+		Utils.println(useRy);
+		
+		Location[][][] locs = universe.getBlocksBetween(new Vector3f(-10, -20, -10), new Vector3f(10, 0, 10));
+		
+		LinkedArrayList<Location> hits = new LinkedArrayList<Location>();
 		
 		for(int z = 0; z < locs.length; z++)
 		{
@@ -46,51 +87,80 @@ public class Raycast
 			{
 				for(int x = 0; x < locs[z][y].length; x++)
 				{
-					Location loc = locs[z][y][x];
-					
-					if(loc != null && !loc.getBlock().equals(Blocks.air))
+					if(locs[z][y][x] != null)
 					{
-						Vector3f pos = loc.getPosition();
-						Hitbox hb = loc.getBlock().getHitbox();
-//						Vector3f box = hb.getBoundingBox(); // getting too specific may make it too hard to place blocks on it
+						Location loc = locs[z][y][x];
 						
-						float posDist = pos.distance(position);
-//						float posBoxDist = Utils.add(pos, box).distance(position);
+						Hitbox box = loc.getBlock().getHitbox();
+						Vector3f[] corners = box.getCorners();
 						
-						if(posDist <= maxDist)
+//						Utils.println(corners);
+						
+						Vector3f leftCornerLoc = Utils.add(loc.getPosition(), corners[0]);
+						Vector3f rightCornerLoc = Utils.add(loc.getPosition(), corners[1]);
+						
+						AABBf aabb = new AABBf(leftCornerLoc, rightCornerLoc);
+						
+						Vector2f result = new Vector2f();
+						
+						int res = Intersectionf.intersectLineSegmentAab(seg, aabb, result);
+						
+						if(res != Intersectionf.OUTSIDE)
 						{
-							Vector3f rayAtStart = position; //Utils.add(position, Utils.mul(direction, posDist / maxDist));
-							Vector3f rayAtEnd = endPoint;//Utils.add(position, Utils.mul(direction,  posBoxDist / maxDist));
-							
-							Vector3f extremeNeg = Utils.add(pos, hb.getExtremeNeg());
-							Vector3f extremePos = Utils.add(pos, hb.getExtremePos());
-							
-							if(isVectorColliding(rayAtStart, rayAtEnd, extremeNeg, extremePos))
-							{
-								float distSqrd = loc.getPosition().distanceSquared(position);
-								
-								boolean placed = false;
-								
-								for(int i = 0; i < hits.size(); i++)
-								{
-									if(distSqrd < hits.get(0).getPosition().distanceSquared(position))
-									{
-										hits.add(i, loc);
-										placed = true;
-										break;
-									}
-								}
-								
-								if(!placed)
-									hits.add(loc);
-							}
+							hits.add(loc);
 						}
+						
+//						{							
+//							float distStart = leftCornerLoc.distanceSquared(position);
+//							float distEnd = rightCornerLoc.distanceSquared(position);
+//							
+//							if(distStart <= maxDist || distEnd <= maxDist)
+//							{
+//								Vector3f lineAtStart = Utils.add(position, Utils.mul(slopes, distStart));
+//								Vector3f lineAtEnd = Utils.add(position, Utils.mul(slopes, distEnd));
+//								
+//								if(isColliding(lineAtStart, lineAtEnd, leftCornerLoc, rightCornerLoc))
+//								{
+//									hits.add(loc);
+//								}
+//							}
+//						}
 					}
 				}
 			}
 		}
 		
+		hits.finalize();
 		return new Raycast(hits, null, position, endPoint);
+	}
+	
+	private static boolean isColliding(Vector3f lineAtStart, Vector3f lineAtEnd, Vector3f leftCornerLoc,
+			Vector3f rightCornerLoc)
+	{
+		return isColliding(lineAtStart.x, lineAtEnd.x, leftCornerLoc.x, rightCornerLoc.x) && 
+				isColliding(lineAtStart.x, lineAtEnd.x, leftCornerLoc.x, rightCornerLoc.x) &&
+				isColliding(lineAtStart.x, lineAtEnd.x, leftCornerLoc.x, rightCornerLoc.x);
+	}
+
+	private static boolean isColliding(float start, float end, float x1, float x2)
+	{
+		// start/end inside
+		if(start >= x1 && start <= x2)
+			return true;
+		if(end >= x1 && end <= x2)
+			return true;
+		
+		// on different sides
+		if(start <= x1 && end >= x1)
+			return true;
+		if(start >= x1 && end <= x1)
+			return true;
+		if(start <= x2 && end >= x2)
+			return true;
+		if(start >= x2 && end <= x2)
+			return true;
+		
+		return false;
 	}
 	
 	private static boolean isVectorColliding(Vector3f rayAtStart, Vector3f rayAtEnd, Vector3f extremeNeg, Vector3f extremePos)
@@ -116,21 +186,21 @@ public class Raycast
 		return true;
 	}
 	
-	private static Vector3f pointAt(Vector3f start, float rx, float ry, float dist)
+	private static Vector3f pointAt(Vector3fc position, float rx, float ry, float dist)
 	{
 		Vector3f endPoint = new Vector3f();
 		
 		final double j = dist * Math.cos(rx);
 		
-		endPoint.x = (float) (start.x + j * Math.sin(ry));
-		endPoint.y = (float) (start.y - dist * Math.sin(rx));
-		endPoint.z = (float) (start.z - j * Math.cos(ry));
+		endPoint.x = (float) (position.x() + j * Math.sin(ry));
+		endPoint.y = (float) (position.y() - dist * Math.sin(rx));
+		endPoint.z = (float) (position.z() - j * Math.cos(ry));
 		
 		return endPoint;
 	}
 	
-	public Vector3f getStartPoint() { return start; }
-	public Vector3f getEndPoint() { return end; }
+	public Vector3fc getStartPoint() { return start; }
+	public Vector3fc getEndPoint() { return end; }
 	
 	public Location getNthHit(int n) { return blocksHit.get(n); }
 	public Location getFirstHit() { return size() > 0 ? getNthHit(0) : null; }

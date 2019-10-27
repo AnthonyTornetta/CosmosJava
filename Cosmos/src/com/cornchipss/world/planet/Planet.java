@@ -84,7 +84,7 @@ public class Planet
 	
 	/**
 	 * Saves memory by not creating an array for every planet, even if the actual blocks haven't been generated/set yet.
-	 * This is called whenever the {@link Planet#setBlock(int, int, int, boolean, short)} function is called.
+	 * This is called whenever the {@link Planet#setBlock(int, int, int, boolean, short)} function is called for the first time.
 	 */
 	private void initBlocks()
 	{
