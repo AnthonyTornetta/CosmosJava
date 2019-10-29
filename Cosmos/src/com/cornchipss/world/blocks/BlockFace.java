@@ -1,5 +1,7 @@
 package com.cornchipss.world.blocks;
 
+import org.joml.Vector3f;
+
 public enum BlockFace
 {
 	FRONT(0), 
@@ -40,6 +42,27 @@ public enum BlockFace
 			return LEFT;
 		default:
 			return UNKNOWN;
+		}
+	}
+
+	public Vector3f getDirection()
+	{
+		switch(this)
+		{
+		case FRONT:
+			return new Vector3f(0, 0, 1);
+		case BACK:
+			return new Vector3f(0, 0, -1);
+		case TOP:
+			return new Vector3f(0, 1, 0);
+		case BOTTOM:
+			return new Vector3f(0, -1, 0);
+		case RIGHT:
+			return new Vector3f(1, 0, 0);
+		case LEFT:
+			return new Vector3f(-1, 0, 0);
+		default:
+			return new Vector3f(0, 0, 0);
 		}
 	}
 }

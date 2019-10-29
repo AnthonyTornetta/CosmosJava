@@ -1,9 +1,11 @@
 package com.cornchipss.physics.collision.hitbox;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Tuple;
+import com.cornchipss.world.blocks.BlockFace;
 
 /**
  * TODO: read up: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
@@ -18,13 +20,13 @@ public abstract class Hitbox
 	 * @param positionB Position of hitbox B
 	 * @return true if two hitboxes are colliding based on the two positions
 	 */
-	public static boolean isColliding(Hitbox a, Hitbox b, Vector3f positionA, Vector3f positionB)
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB)
 	{
 		if(a == null || b == null)
 			return false;
 		
-		Vector3f[] cornersA = a.getCorners();
-		Vector3f[] cornersB = b.getCorners();
+		Vector3fc[] cornersA = a.getCorners();
+		Vector3fc[] cornersB = b.getCorners();
 		
 		for(int j = 0; j < cornersA.length; j+=2)
 		{
@@ -60,38 +62,38 @@ public abstract class Hitbox
 	 * Gets a general rectangle that can be used for broadphase collision detection
 	 * @return a general rectangle that can be used for broadphase collision detection
 	 */
-	public abstract Vector3f getBoundingBox();
+	public abstract Vector3fc getBoundingBox();
 	
 	/**
 	 * Gets the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
 	 * @return the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
 	 */
-	public abstract Vector3f[] getCorners();
+	public abstract Vector3fc[] getCorners();
 
 	/**
 	 * Gets every verticie present in the hitbox - there may be duplicates in this
 	 * @return every verticie present in the hitbox - there may be duplicates in this
 	 */
-	public Vector3f[] getVerticies()
+	public Vector3fc[] getVerticies()
 	{
-		Vector3f[] corners = getCorners();
+		Vector3fc[] corners = getCorners();
 		
-		Vector3f[] verts = new Vector3f[8 * (corners.length / 2)];
+		Vector3fc[] verts = new Vector3f[8 * (corners.length / 2)];
 		
 		int vertIndex = 0;
 		
 		for(int i = 0; i < corners.length; i += 2)
 		{ 
-			Vector3f c1 = corners[i];
-			Vector3f c2 = corners[i + 1];
+			Vector3fc c1 = corners[i];
+			Vector3fc c2 = corners[i + 1];
 			
 			verts[vertIndex++] = new Vector3f(c1);
-			verts[vertIndex++] = new Vector3f(c1.x, c1.y, c2.z);
-			verts[vertIndex++] = new Vector3f(c1.x, c2.y, c1.z);
-			verts[vertIndex++] = new Vector3f(c2.x, c1.y, c1.z);
-			verts[vertIndex++] = new Vector3f(c1.x, c2.y, c2.z);
-			verts[vertIndex++] = new Vector3f(c2.x, c2.y, c1.z);
-			verts[vertIndex++] = new Vector3f(c2.x, c1.y, c2.z);
+			verts[vertIndex++] = new Vector3f(c1.x(), c1.y(), c2.z());
+			verts[vertIndex++] = new Vector3f(c1.x(), c2.y(), c1.z());
+			verts[vertIndex++] = new Vector3f(c2.x(), c1.y(), c1.z());
+			verts[vertIndex++] = new Vector3f(c1.x(), c2.y(), c2.z());
+			verts[vertIndex++] = new Vector3f(c2.x(), c2.y(), c1.z());
+			verts[vertIndex++] = new Vector3f(c2.x(), c1.y(), c2.z());
 			verts[vertIndex++] = new Vector3f(c2);
 		}
 		
@@ -104,14 +106,14 @@ public abstract class Hitbox
 	 * @param y Hitbox B
 	 * @return the two closest verticies in two hitboxes
 	 */
-	public static Tuple<Vector3f> getClosestVerticies(Hitbox x, Hitbox y)
+	public static Tuple<Vector3fc> getClosestVerticies(Hitbox x, Hitbox y)
 	{
 		float shortestDist = -1;
-		Tuple<Vector3f> closest = new Tuple<>(2);
+		Tuple<Vector3fc> closest = new Tuple<>(2);
 		
-		for(Vector3f v1 : x.getVerticies())
+		for(Vector3fc v1 : x.getVerticies())
 		{
-			for(Vector3f v2 : y.getVerticies())
+			for(Vector3fc v2 : y.getVerticies())
 			{
 				float dist = v1.distanceSquared(v2);
 				
@@ -127,13 +129,13 @@ public abstract class Hitbox
 		return closest;
 	}
 
-	public static Vector3f getClosestVerticie(Hitbox h, Vector3f vert)
+	public static Vector3fc getClosestVerticie(Hitbox h, Vector3f vert)
 	{
 		float shortestDist = -1;
 		
-		Vector3f closest = null;
+		Vector3fc closest = null;
 		
-		for(Vector3f v : h.getVerticies())
+		for(Vector3fc v : h.getVerticies())
 		{
 			float dist = v.distanceSquared(vert);
 			
@@ -147,51 +149,54 @@ public abstract class Hitbox
 		return closest;
 	}
 
-	public Vector3f getExtremeNeg()
+	public Vector3fc getExtremeNeg()
 	{
-		Vector3f[] corners = getCorners();
+		Vector3fc[] corners = getCorners();
 		
 		Vector3f extreme = null;
 		
-		for(Vector3f v : corners)
+		for(Vector3fc v : corners)
 		{
 			if(extreme == null)
 				extreme = new Vector3f(v);
 			else
 			{
-				if(extreme.x < v.x)
-					extreme.x = v.x;
-				if(extreme.y < v.y)
-					extreme.y = v.y;
-				if(extreme.z < v.z)
-					extreme.z = v.z;
+				if(extreme.x < v.x())
+					extreme.x = v.x();
+				if(extreme.y < v.y())
+					extreme.y = v.y();
+				if(extreme.z < v.z())
+					extreme.z = v.z();
 			}
 		}
 		
 		return extreme;
 	}
 	
-	public Vector3f getExtremePos()
+	public Vector3fc getExtremePos()
 	{
-		Vector3f[] corners = getCorners();
+		Vector3fc[] corners = getCorners();
 		
 		Vector3f extreme = null;
 		
-		for(Vector3f v : corners)
+		for(Vector3fc v : corners)
 		{
 			if(extreme == null)
 				extreme = new Vector3f(v);
 			else
 			{
-				if(extreme.x > v.x)
-					extreme.x = v.x;
-				if(extreme.y > v.y)
-					extreme.y = v.y;
-				if(extreme.z > v.z)
-					extreme.z = v.z;
+				if(extreme.x > v.x())
+					extreme.x = v.x();
+				if(extreme.y > v.y())
+					extreme.y = v.y();
+				if(extreme.z > v.z())
+					extreme.z = v.z();
 			}
 		}
 		
 		return extreme;
 	}
+
+	public abstract Vector3fc[] getTriangles();
+	public abstract BlockFace[] getFaces();
 }

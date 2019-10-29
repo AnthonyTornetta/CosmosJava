@@ -6,8 +6,11 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
+
+import com.cornchipss.world.blocks.Block;
 
 public class Utils
 {
@@ -140,9 +143,9 @@ public class Utils
 	 * @param b The second vector
 	 * @return A new vector of the two vectors added
 	 */
-	public static Vector3f add(Vector3f a, Vector3f b)
+	public static Vector3f add(Vector3fc a, Vector3fc b)
 	{
-		return new Vector3f(a.x + b.x, a.y + b.y, a.z + b.z);
+		return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
 	}
 	
 	/**
@@ -151,9 +154,9 @@ public class Utils
 	 * @param b The second vector
 	 * @return A new vector of the two vectors subtracted
 	 */
-	public static Vector3f sub(Vector3f a, Vector3f b)
+	public static Vector3f sub(Vector3fc a, Vector3fc b)
 	{
-		return new Vector3f(a.x - b.x, a.y - b.y, a.z - b.z);
+		return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
 	}
 	
 	/**
@@ -162,14 +165,20 @@ public class Utils
 	 * @param b The second vector
 	 * @return A new vector of the two vectors multiplied
 	 */
-	public static Vector3f mul(Vector3f a, Vector3f b)
+	public static Vector3f mul(Vector3fc a, Vector3fc b)
 	{
-		return new Vector3f(a.x * b.x, a.y * b.y, a.z * b.z);
+		return new Vector3f(a.x() * b.x(), a.y() * b.y(), a.z() * b.z());
 	}
 	
-	public static Vector3f mul(Vector3f a, float f)
+	/**
+	 * Multiplies two vectors without modifying either one
+	 * @param x The first vector (<code>new Vector3f(x, x, x)</code>)
+	 * @param b The second vector
+	 * @return A new vector of the two vectors multiplied
+	 */
+	public static Vector3f mul(float x, Vector3fc a)
 	{
-		return mul(a, new Vector3f(f));
+		return mul(a, new Vector3f(x));
 	}
 	
 	/**
@@ -178,9 +187,9 @@ public class Utils
 	 * @param b The second vector
 	 * @return A new vector of the two vectors divided
 	 */
-	public static Vector3f div(Vector3f a, Vector3f b)
+	public static Vector3f div(Vector3fc a, Vector3fc b)
 	{
-		return new Vector3f(a.x / b.x, a.y / b.y, a.z / b.z);
+		return new Vector3f(a.x() / b.x(), a.y() / b.y(), a.z() / b.z());
 	}
 	
 	/**
@@ -189,9 +198,9 @@ public class Utils
 	 * @param b The second vector
 	 * @return A new vector of the two vectors modulus'ed
 	 */
-	public static Vector3f mod(Vector3f a, Vector3f b)
+	public static Vector3f mod(Vector3fc a, Vector3fc b)
 	{
-		return new Vector3f(a.x % b.x, a.y % b.y, a.z % b.z);
+		return new Vector3f(a.x() % b.x(), a.y() % b.y(), a.z() % b.z());
 	}
 
 	public static Vector3f zero()
@@ -209,5 +218,13 @@ public class Utils
 	public static float clamp(float x, float m, float M)
 	{
 		return x > M ? M : x < m ? m : x;
+	}
+
+	public static boolean contains(Object[] arr, Object o)
+	{
+		for(int i = 0; i < arr.length; i++)
+			if(arr[i].equals(o))
+				return true;
+		return false;
 	}
 }

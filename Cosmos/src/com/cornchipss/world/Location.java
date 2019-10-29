@@ -2,11 +2,13 @@ package com.cornchipss.world;
 
 import org.joml.Vector3f;
 
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.Block;
 
 public class Location
 {
 	private Vector3f position;
+	private Vector3f relativeRotation;
 	private Universe universe;
 	
 	private Block block;
@@ -20,8 +22,15 @@ public class Location
 	{
 		setUniverse(universe);
 		setPosition(position);
+		setRotation(Utils.zero()); // TODO
 	}
 	
+	private void setRotation(Vector3f rot)
+	{
+		this.relativeRotation = rot;
+	}
+	public Vector3f getRelativeRotation() { return relativeRotation; }
+
 	public Vector3f getPosition()
 	{
 		return position;
@@ -42,10 +51,12 @@ public class Location
 		this.block = block;
 	}
 	
-	public Universe getUniverse() {
+	public Universe getUniverse()
+	{
 		return universe;
 	}
-	public void setUniverse(Universe universe) {
+	public void setUniverse(Universe universe)
+	{
 		this.universe = universe;
 	}
 	

@@ -1,14 +1,16 @@
 package com.cornchipss.world.entities;
 
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import com.cornchipss.Game;
-import com.cornchipss.physics.Raycast;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
+import com.cornchipss.physics.raycast.Raycast;
+import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Location;
+import com.cornchipss.world.blocks.BlockFace;
 
 public class Player extends Entity
 {
@@ -96,17 +98,45 @@ public class Player extends Entity
 
 		if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
 		{
-			Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 10);
-
+			RaycastOptions settings = new RaycastOptions();
+			
+			settings.setBlacklist(Blocks.air);
+			
+			Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 10, settings);
+			
 			Utils.println(ray.size());
+			
+			int closest = -1;
+			float closestDist = 0;
 			
 			for(int i = 0; i < ray.size(); i++)
 			{
-				ray.getNthHit(i).setBlock(Blocks.stone);
+				Location l = ray.getNthHit(i);
+				
+				Utils.println(l.getPosition().y());
+				
+//				if(ray.getNthHit(i).getBlock().getId() == Blocks.air.getId())
+//					continue;
+				
+				float dist = ray.getNthHit(i).getPosition().distanceSquared(getPosition());
+				
+				if(closest == -1 || dist < closestDist)
+				{
+					closest = i;
+					closestDist = dist;
+				}
+			}
+			
+			if(closest != -1)
+			{
+				BlockFace face = ray.getNthFace(closest);
+				Vector3f dir = face.getDirection();
+				
+				getUniverse().setBlockAt(Utils.add(getPosition(), dir), Blocks.stone);
 			}
 		}
 	}
-
+	
 //	public Location getBlockLookingAt()
 //	{
 //		Raycast raycast = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), getRz(), 50);

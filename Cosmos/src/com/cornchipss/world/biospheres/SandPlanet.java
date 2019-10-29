@@ -1,7 +1,6 @@
 package com.cornchipss.world.biospheres;
 
 import com.cornchipss.registry.Blocks;
-import com.cornchipss.registry.annotations.RegisteredBiosphere;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.generation.DefaultPlanetGenerator;
 

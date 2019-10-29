@@ -1,9 +1,9 @@
 package com.cornchipss.physics.shapes;
 
-import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public interface Rectangle
 {
-	public Vector3f getPosition();
-	public Vector3f getDimensions();
+	public Vector3fc getPosition();
+	public Vector3fc getDimensions();
 }

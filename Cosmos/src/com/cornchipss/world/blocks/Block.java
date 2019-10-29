@@ -184,6 +184,12 @@ public class Block
 	
 	public short getId() { return id; }
 	
+	@Override
+	public boolean equals(Object o)
+	{
+		return o instanceof Block && ((Block)o).getId() == getId();
+	}
+	
 	private static short getNextId()
 	{
 		return lastUsedId++;
