@@ -10,8 +10,6 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 
-import com.cornchipss.world.blocks.Block;
-
 public class Utils
 {
 	
@@ -226,5 +224,17 @@ public class Utils
 			if(arr[i].equals(o))
 				return true;
 		return false;
+	}
+
+	public static boolean equals(Object a, Object b)
+	{
+		if(a == null && b != null)
+			return false;
+		if(a != null && b == null)
+			return false;
+		if(a == null && b == null)
+			return true;
+		   
+		return a.equals(b);
 	}
 }

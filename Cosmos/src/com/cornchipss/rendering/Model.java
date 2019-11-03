@@ -18,4 +18,10 @@ public class Model
 	{
 		return "Model [vertexCount:" + getVertexCount() + ", vao:" + getVao() + "]";
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		return o instanceof Model && ((Model)o).getVao() == getVao();
+	}
 }

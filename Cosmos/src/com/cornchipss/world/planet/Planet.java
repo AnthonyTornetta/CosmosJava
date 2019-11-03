@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
-import com.cornchipss.utils.datatypes.ArrayListF;
+import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.datatypes.Pair;
+import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.sector.Sector;
@@ -48,12 +52,7 @@ public class Planet
 	/**
 	 * A list of every model present on the planet and each position that model is at
 	 */
-	private Map<Model, ArrayListF> modelsList = new HashMap<>();
-	
-	/**
-	 * A list of every position stored in the models list and the index in the modelsList it is at for quicker removal of models
-	 */
-	private Map<Vector3i, Integer> positionsInArray = new HashMap<>();
+	private Map<Model, Vector3fList> modelsList = new HashMap<>();
 	
 	/**
 	 * Whether or not the planet has been generated (modified by outside sources to allow for multithreading of the planet's generation)
@@ -99,22 +98,35 @@ public class Planet
 	 * @param x The x coordinate of the block to remove
 	 * @param y The y coordinate of the block to remove
 	 * @param z The z coordinate of the block to remove
+	 * @return True if a model was removed, false if not
 	 */
-	public void removeModel(int x, int y, int z)
+	public boolean removeModel(float x, float y, float z, Block oldBlock)
 	{
-		Model model = getBlock(x, y, z).getModel();
-		ArrayListF positions = modelsList.get(model);
-		if(positions == null)
-			return;
+		if(oldBlock == null)
+			return false;
 		
-		if(positionsInArray.containsKey(new Vector3i(x, y, z)))
-		{
-			int i = positionsInArray.get(new Vector3i(x, y, z));
-			int sizeToCopy = 3; // x,y,z
-			
-			for(int j = 0; j < sizeToCopy; j++)
-				positions.remove(i + j);
-		}
+		Model model = oldBlock.getModel();
+
+		if(model == null)
+			return false;
+		
+		Vector3fList positions = modelsList.get(model);
+		
+		if(positions == null)
+			return false;
+		
+		return positions.removeVector(new Vector3f(x, y, z));
+	}
+	
+	/**
+	 * <p>Adds/Replaces a model to the list of models at a given coordinate, and makes sure there is no model already there.</p>
+	 * <p>This automatically calls {@link Planet#removeModel(int, int, int)} before trying to add a new one</p>
+	 * @param pos The coordinates of the block to add/replace
+	 * @param oldBlock The block that used to be here if you're changing it
+	 */
+	public void updateModel(Vector3ic pos, Block oldBlock)
+	{
+		updateModel(pos.x(), pos.y(), pos.z(), oldBlock, true);
 	}
 	
 	/**
@@ -123,64 +135,146 @@ public class Planet
 	 * @param x The x coordinate of the block to add/replace
 	 * @param y The y coordinate of the block to add/replace
 	 * @param z The z coordinate of the block to add/replace
+	 * @param oldBlock The block that used to be here if you're changing it
 	 */
-	public void updateModel(int x, int y, int z)
+	public boolean updateModel(int x, int y, int z, Block oldBlock)
 	{
-		removeModel(x, y, z);
+		return updateModel(x, y, z, oldBlock, true);
+	}
+	
+	public BlockLoc[] getSurroundingBlocks(Vector3ic vec)
+	{
+		return getSurroundingBlocks(vec.x(), vec.y(), vec.z());
+	}
+	
+	/**
+	 * Stores a block's Block & location because generics are too slow to use a {@linkplain Pair}.
+	 * @author Cornchip
+	 */
+	private static class BlockLoc
+	{
+		Block   block;
+		Vector3i location;
 		
-		boolean nonOpaqueFound = false;
-		
-		for(int dZ = -1; dZ <= 1; dZ++)
+		BlockLoc(Block b, Vector3i l)
 		{
-			for(int dY = -1; dY <= 1; dY++)
-			{
-				for(int dX = -1; dX <= 1; dX++)
+			this.block = b;
+			this.location = l;
+		}
+	}
+	
+	public BlockLoc[] getSurroundingBlocks(int x, int y, int z)
+	{
+		BlockLoc[] blocks = new BlockLoc[6]; // A cube has 6 faces
+		
+		if(within(x + 1, y, z))
+			blocks[0] = new BlockLoc(getBlock(x + 1, y, z), new Vector3i(x + 1, y, z));
+		else
+			blocks[0] = new BlockLoc(null, new Vector3i(x + 1, y, z));
+		
+		if(within(x - 1, y, z))
+			blocks[1] = new BlockLoc(getBlock(x - 1, y, z), new Vector3i(x - 1, y, z));
+		else
+			blocks[1] = new BlockLoc(null, new Vector3i(x +- 1, y, z));
+		
+		if(within(x, y + 1, z))
+			blocks[2] = new BlockLoc(getBlock(x, y + 1, z), new Vector3i(x, y + 1, z));
+		else
+			blocks[2] = new BlockLoc(null, new Vector3i(x, y + 1, z));
+		
+		if(within(x, y - 1, z))
+			blocks[3] = new BlockLoc(getBlock(x, y - 1, z), new Vector3i(x, y - 1, z));
+		else
+			blocks[3] = new BlockLoc(null, new Vector3i(x, y - 1, z));
+		
+		if(within(x, y, z + 1))
+			blocks[4] = new BlockLoc(getBlock(x, y, z + 1), new Vector3i(x, y, z + 1));
+		else
+			blocks[4] = new BlockLoc(null, new Vector3i(x, y, z + 1));
+		
+		if(within(x, y, z - 1))
+			blocks[5] = new BlockLoc(getBlock(x, y, z - 1), new Vector3i(x, y, z - 1));
+		else
+			blocks[5] = new BlockLoc(null, new Vector3i(x, y, z - 1));
+		
+		return blocks;
+	}
+	
+	/**
+	 * <p>Adds/Replaces a model to the list of models at a given coordinate, and makes sure there is no model already there.</p>
+	 * <p>This automatically calls {@link Planet#removeModel(int, int, int)} before trying to add a new one</p>
+	 * @param x The x coordinate of the block to add/replace
+	 * @param y The y coordinate of the block to add/replace
+	 * @param z The z coordinate of the block to add/replace
+	 * @param oldBlock The block that used to be here if you're changing it
+	 * @param updateSurrounding Whether or not to update the surrounding blocks
+	 * @return If the model was changed at all
+	 */
+	public boolean updateModel(int x, int y, int z, Block oldBlock, boolean updateSurrounding)
+	{
+		Block block = getBlock(x, y, z);
+		
+		// Removes any previous model in this spot, or leaves it be if none was there
+		boolean removed = removeModel(x, y, z, oldBlock);
+		
+		// Searches for see-through blocks near this block
+		// If there are no see-through blocks surrounding this block no point in rendering this
+		BlockLoc[] surrounding = getSurroundingBlocks(x, y, z);
+		
+		boolean added = false;
+		
+		if(block != null)
+		{
+			for(BlockLoc b : surrounding)
+			{			
+				if(b.block == null || !b.block.isOpaque())
 				{
-					if(Math.abs(dX) + Math.abs(dY) + Math.abs(dZ) != 1)
-						continue;
+					// Sets model if it should be rendered because a non-opaque block was found
+					added = addModelLocation(block.getModel(), new Vector3f(x, y, z));
 					
-					int xx = x + dX;
-					int yy = y + dY;
-					int zz = z + dZ;
-					
-					if(within(xx, yy, zz))
-					{
-						if(!getBlock(xx, yy, zz).isOpaque())
-						{
-							nonOpaqueFound = true;
-							break;
-						}
-					}
-					else
-					{
-						nonOpaqueFound = true;
-						break;
-					}
-				}
-				if(nonOpaqueFound)
 					break;
+				}
 			}
-			if(nonOpaqueFound)
-				break;
 		}
 		
-		if(nonOpaqueFound)
-		{
-			Model model = getBlock(x, y, z).getModel();
-			if(model != null)
+		boolean changed = (removed && !added || !Utils.equals(oldBlock, block));
+		
+		if(updateSurrounding && changed)
+		{			
+			for(BlockLoc b : surrounding)
 			{
-				ArrayListF modelLocations = modelsList.get(model);
-				if(modelLocations == null)
+				if(b.block != null)
 				{
-					modelLocations = new ArrayListF(30000);
-					modelsList.put(model, modelLocations);
+					updateModel(b.location, b.block);
 				}
-				
-				modelLocations.add((float) x);
-				modelLocations.add((float) y);
-				modelLocations.add((float) z);
 			}
 		}
+		
+		return changed;
+	}
+	
+	/**
+	 * Adds a model at this given location
+	 * @param model The model to add
+	 * @param loc The location to put it
+	 * @return True if it was added, false if not
+	 */
+	private boolean addModelLocation(Model model, Vector3fc loc)
+	{
+		if(model != null)
+		{
+			Vector3fList modelLocations = modelsList.get(model);
+			
+			if(modelLocations == null)
+			{
+				modelLocations = new Vector3fList(30000);
+				modelsList.put(model, modelLocations);
+			}
+			
+			modelLocations.addVector(loc);
+			return true;
+		}
+		return false;
 	}
 	
 	private boolean within(int x, int y, int z)
@@ -201,13 +295,13 @@ public class Planet
 			{
 				for(int x = getBeginningCornerX(); x < getEndingCornerX(); x++)
 				{
-					updateModel(x, y, z);
+					updateModel(x, y, z, null, false);
 				}
 			}
 		}
 		
 		for(Model m : modelsList.keySet())
-			modelsList.get(m).shrink(); // Saves memoy
+			modelsList.get(m).shrink(); // Saves memory
 	}
 	
 	/**
@@ -314,9 +408,12 @@ public class Planet
 		
 		if(id != getBlock(x, y, z).getId())
 		{
-			blocks[zz][yy][xx] = id;
+			Block oldBlock = getBlock(x, y, z);
+			blocks[zz][yy][xx] = id;			
 			if(setModel)
-				updateModel(x, y, z);
+			{
+				updateModel(x, y, z, oldBlock);
+			}
 		}
 	}
 	
@@ -435,7 +532,7 @@ public class Planet
 	 * Gets every model the planet has and every position that model is at
 	 * @return Every model the planet has and every position that model is at
 	 */
-	public Map<Model, ArrayListF> getModelsAndPositions()
+	public Map<Model, Vector3fList> getModelsAndPositions()
 	{
 		if(modelsList.size() == 0)
 			render();

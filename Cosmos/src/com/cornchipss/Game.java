@@ -80,16 +80,19 @@ public class Game implements Runnable
 		
 		Input.hideCursor(true);
 		
+		Input.update();
+		
 		while(!window.shouldClose() && !Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
-		{			
+		{
 			while(updateTimer.getDeltaMillis() >= 1000 / FPS_CAP)
 			{
-				Input.update();
 				player.onUpdate();
 				sector.update(player);
 				
 				updateTimer.subtractTimeMilli(1000 / FPS_CAP);
 				ups++;
+				
+				Input.update();
 			}
 			
 			while(secondsTimer.getDeltaMillis() >= 1000)

@@ -9,6 +9,7 @@ import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.BlockFace;
 
@@ -16,6 +17,8 @@ public class Player extends Entity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
+	
+	private final int LOOK_DISTANCE = 10;
 
 	public Player(float x, float y, float z)
 	{
@@ -96,49 +99,86 @@ public class Player extends Entity
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
 
-		if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
+		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT))
 		{
-			RaycastOptions settings = new RaycastOptions();
+			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(10);
 			
-			settings.setBlacklist(Blocks.air);
-			
-			Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), 10, settings);
-			
-			Utils.println(ray.size());
-			
-			int closest = -1;
-			float closestDist = 0;
-			
-			for(int i = 0; i < ray.size(); i++)
+			if(lookingAt.getA() != null && lookingAt.getB() != null)
 			{
-				Location l = ray.getNthHit(i);
-				
-				Utils.println(l.getPosition().y());
-				
-//				if(ray.getNthHit(i).getBlock().getId() == Blocks.air.getId())
-//					continue;
-				
-				float dist = ray.getNthHit(i).getPosition().distanceSquared(getPosition());
-				
-				if(closest == -1 || dist < closestDist)
-				{
-					closest = i;
-					closestDist = dist;
-				}
-			}
-			
-			if(closest != -1)
-			{
-				BlockFace face = ray.getNthFace(closest);
+				BlockFace face = lookingAt.getB();
 				Vector3f dir = face.getDirection();
 				
-				getUniverse().setBlockAt(Utils.add(getPosition(), dir), Blocks.stone);
+				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.stone);
+			}
+		}
+		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+		{
+			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(LOOK_DISTANCE);
+			
+			if(lookingAt.getA() != null && lookingAt.getB() != null)
+			{
+				getUniverse().setBlockAt(lookingAt.getA().getPosition(), Blocks.air);
+			}
+		}
+		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_MIDDLE))
+		{
+			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(LOOK_DISTANCE);
+			
+			int explosionRadius = 10;
+			
+			if(lookingAt.getA() != null && lookingAt.getB() != null)
+			{
+				for(int dz = -explosionRadius; dz <= explosionRadius; dz++)
+				{
+					for(int dy = -explosionRadius; dy <= explosionRadius; dy++)
+					{
+						for(int dx = -explosionRadius; dx <= explosionRadius; dx++)
+						{
+							if(dz * dz + dy * dy + dx * dx <= explosionRadius * explosionRadius)
+							{
+								getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), new Vector3f(dx, dy, dz)), Blocks.air);
+							}
+						}
+					}
+				}
 			}
 		}
 	}
 	
-//	public Location getBlockLookingAt()
-//	{
-//		Raycast raycast = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), getRz(), 50);
-//	}
+	public Pair<Location, BlockFace> getBlockLookingAt(float lookDist)
+	{
+		RaycastOptions settings = new RaycastOptions();
+		
+		settings.setBlacklist(Blocks.air);
+		
+		Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), lookDist, settings);
+
+		int closest = -1;
+		float closestDist = 0;
+		
+		for(int i = 0; i < ray.size(); i++)
+		{
+			Location l = ray.getNthHit(i);
+			
+			float dist = l.getPosition().distanceSquared(getPosition());
+			
+			if(closest == -1 || dist < closestDist)
+			{
+				closest = i;
+				closestDist = dist;
+			}
+		}
+		
+		if(closest != -1)
+		{
+			return new Pair<Location, BlockFace>(ray.getNthHit(closest), ray.getNthFace(closest));
+		}
+		else
+			return new Pair<Location, BlockFace>();
+	}
+	
+	public Vector3f getHeadPosition()
+	{
+		return Utils.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
+	}
 }

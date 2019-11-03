@@ -50,17 +50,17 @@ public enum BlockFace
 		switch(this)
 		{
 		case FRONT:
-			return new Vector3f(0, 0, 1);
+			return new Vector3f(0, 0, .5f);
 		case BACK:
-			return new Vector3f(0, 0, -1);
+			return new Vector3f(0, 0, -.5f);
 		case TOP:
-			return new Vector3f(0, 1, 0);
+			return new Vector3f(0, .5f, 0);
 		case BOTTOM:
-			return new Vector3f(0, -1, 0);
+			return new Vector3f(0, -.5f, 0);
 		case RIGHT:
-			return new Vector3f(1, 0, 0);
+			return new Vector3f(.5f, 0, 0);
 		case LEFT:
-			return new Vector3f(-1, 0, 0);
+			return new Vector3f(-.5f, 0, 0);
 		default:
 			return new Vector3f(0, 0, 0);
 		}

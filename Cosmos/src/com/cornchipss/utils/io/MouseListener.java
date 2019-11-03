@@ -37,6 +37,7 @@ public class MouseListener implements GLFWMouseButtonCallbackI
 		{
 			mouseButtonsDown[mouseBtn] = true;
 			mouseBtnsJustDown[mouseBtn] = true;
+			
 			mouseButtonsJustPressed.add(mouseBtn);
 		}
 		else

@@ -98,18 +98,23 @@ public class Raycast
 							Location bestLoc = null;
 							
 							for(int i = 0; i < tris.length; i += 3)
-							{
+							{								
 								if(Intersectionf.intersectLineSegmentTriangle(
 										position, endPoint, 
 										Utils.add(loc.getPosition(), tris[i]), 
 										Utils.add(loc.getPosition(), tris[i + 1]), 
 										Utils.add(loc.getPosition(), tris[i + 2]),
-										(float) 1E-5, intPoint))
+										(float) 1E-9, intPoint))
 								{
-									if(bestLoc == null || (loc.getPosition().distanceSquared(position) < distSqrdBest))
+									BlockFace face = boxFaces[i / 3];
+									
+									float distSqrdTemp = Utils.add(loc.getPosition(), face.getDirection()).distanceSquared(position);
+									
+									if(bestLoc == null || distSqrdTemp < distSqrdBest)
 									{
 										bestLoc = loc;
-										bestFace = boxFaces[i / 3];
+										bestFace = face;
+										distSqrdBest = distSqrdTemp;
 									}
 								}
 							}

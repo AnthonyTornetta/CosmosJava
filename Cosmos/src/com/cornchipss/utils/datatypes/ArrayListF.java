@@ -75,13 +75,28 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	
 	public void remove(int i)
 	{
-		if(i >= size() || i < 0)
-			throw new IndexOutOfBoundsException("Cannot remove index " + i + " from list of size " + size());
-		if(i < size() - 1)
-			System.arraycopy(list, i + 1, list, i, size() - i - 1);
-		else
-			list[i] = 0; // No shifting required if it's the last digit
-		size--;
+//		if(i >= size() || i < 0)
+//			throw new IndexOutOfBoundsException("Cannot remove index " + i + " from list of size " + size());
+//		if(i < size() - 1)
+//			System.arraycopy(list, i + 1, list, i, size() - i - 1);
+//		else
+//			list[i] = 0; // No shifting required if it's the last digit
+//		size--;
+		
+		remove(i, 1);
+	}
+	
+	public void remove(int start, int len)
+	{
+		if(start + len > size() || start < 0)
+			throw new IndexOutOfBoundsException("Cannot remove index " + start + " to " + (start + len) + " from list of size " + size());
+		
+//		if(start + len != size())
+			System.arraycopy(list, start + len, list, start, list.length - (start + len));
+		
+		// If it's equal to the size of the array, we can just shrink the size and not worry about shifting stuff over
+		
+		size -= len;
 	}
 	
 	public void shrink()
@@ -144,5 +159,17 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	{
 		list = new float[newSize];
 		size = 0;
+	}
+
+	public void swap(int i, int j)
+	{
+		float temp = list[i];
+		list[i] = list[j];
+		list[j] = temp;
+	}
+
+	public boolean empty()
+	{
+		return size() == 0;
 	}
 }

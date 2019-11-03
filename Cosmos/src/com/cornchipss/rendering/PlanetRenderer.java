@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.PlanetShader;
-import com.cornchipss.utils.datatypes.ArrayListF;
+import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.planet.Planet;
 
 public class PlanetRenderer extends Renderer
@@ -74,12 +74,12 @@ public class PlanetRenderer extends Renderer
 		{
 			getShader().setUniformVector(chunkLocation, planet.getAbsoluteX(), planet.getAbsoluteY(), planet.getAbsoluteZ());
 			
-			Map<Model, ArrayListF> modelsAndPositions = planet.getModelsAndPositions();
+			Map<Model, Vector3fList> modelsAndPositions = planet.getModelsAndPositions();
 			
 			for(Model m : modelsAndPositions.keySet())
 			{
-				ArrayListF posList = modelsAndPositions.get(m);
-				float[] positions = posList.getArray();
+				Vector3fList posList = modelsAndPositions.get(m);
+				float[] positions = posList.asFloats();
 				
 				GL30.glBindVertexArray(m.getVao());
 				

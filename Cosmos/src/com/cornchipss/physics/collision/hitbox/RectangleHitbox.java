@@ -22,8 +22,8 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 	 */
 	public RectangleHitbox(float width, float height, float length)
 	{
-		this(new Vector3f(-width / 2f, -height / 2f, -length / 2f), 
-				new Vector3f(width / 2f, height / 2f, length / 2f));
+		this(new Vector3f(width / 2f, height / 2f, length / 2f),
+				new Vector3f(-width / 2f, -height / 2f, -length / 2f));
 	}
 	
 	/**
@@ -71,37 +71,37 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 		
 		triangles[6] = new Vector3f(end);
 		triangles[7] = new Vector3f(start.x(), end.y(), end.z());
-		triangles[8] = new Vector3f(start.x(), end.y(), start.z());
+		triangles[8] = new Vector3f(end.x(), end.y(), start.z());
 		
 		triangles[9] = new Vector3f(end);
 		triangles[10] = new Vector3f(end.x(), end.y(), start.z());
-		triangles[11] = new Vector3f(start.x(), end.y(), end.z());
+		triangles[11] = new Vector3f(start.x(), end.y(), start.z());
 		
 		faces[2] = BlockFace.BOTTOM;
 		faces[3] = BlockFace.BOTTOM;
 		
 		// LEFT
 		
-		triangles[12] = new Vector3f(start);
-		triangles[13] = new Vector3f(start.x(), start.y(), end.z());
-		triangles[14] = new Vector3f(start.x(), end.y(), end.z());
+		triangles[12] = new Vector3f(end.x(), start.y(), start.z());
+		triangles[13] = new Vector3f(end.x(), start.y(), end.z());
+		triangles[14] = new Vector3f(end);
 		
-		triangles[15] = new Vector3f(start);
-		triangles[16] = new Vector3f(start.x(), end.y(), start.z());
-		triangles[17] = new Vector3f(start.x(), end.y(), end.z());
+		triangles[15] = new Vector3f(end.x(), start.y(), start.z());
+		triangles[16] = new Vector3f(end.x(), end.y(), start.z());
+		triangles[17] = new Vector3f(end);
 		
 		faces[4] = BlockFace.LEFT;
 		faces[5] = BlockFace.LEFT;
 		
 		// RIGHT
 		
-		triangles[18] = new Vector3f(end);
-		triangles[19] = new Vector3f(end.x(), start.y(), end.z());
-		triangles[20] = new Vector3f(end.x(), start.y(), start.z());
+		triangles[18] = new Vector3f(start);
+		triangles[19] = new Vector3f(start.x(), start.y(), end.z());
+		triangles[20] = new Vector3f(start.x(), end.y(), end.z());
 		
-		triangles[21] = new Vector3f(end);
-		triangles[22] = new Vector3f(end.x(), end.y(), start.z());
-		triangles[23] = new Vector3f(end.x(), start.y(), start.z());
+		triangles[21] = new Vector3f(start);
+		triangles[22] = new Vector3f(start.x(), end.y(), start.z());
+		triangles[23] = new Vector3f(start.x(), end.y(), end.z());
 		
 		faces[6] = BlockFace.RIGHT;
 		faces[7] = BlockFace.RIGHT;
