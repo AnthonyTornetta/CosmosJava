@@ -13,8 +13,10 @@ public class DefaultPlanetGenerator
 	 * @param render Whether or not to actually make it ready for rendering
 	 * @param delay How long to rest in milliseconds between each z coordinate generated - this helps reduce FPS crashes when this function is called on a seperate thread, but also makes planets generate slower, 20 is decent number
 	 */
-	public static void generatePlanet(Planet planet, SimplexNoise noiseMaker, boolean render, int delay, Biosphere bio)
+	public static void generatePlanet(Planet planet, SimplexNoise noiseMaker, boolean render, int delay)
 	{
+		Biosphere bio = planet.getBiosphere();
+		
 		for(int z = planet.getBeginningCornerZ(); z < planet.getEndingCornerZ(); z++)
 		{
 			for(int x = planet.getBeginningCornerX(); x < planet.getEndingCornerX(); x++)

@@ -31,7 +31,7 @@ public class Game implements Runnable
 	public Game()
 	{
 		if(instance != null)
-			throw new IllegalStateException("Cannot instantiate Minecraft Ripoff twice!");
+			throw new IllegalStateException("Cannot instantiate Cosmos twice!");
 		instance = this;
 	}
 	
@@ -57,7 +57,7 @@ public class Game implements Runnable
 		Options.registerDefaults();
 		
 		Biospheres.registerBiospheres("com.cornchipss.world.biospheres");
-		
+
 		Blocks.registerBlocks();
 		
 		Universe universe = new Universe();

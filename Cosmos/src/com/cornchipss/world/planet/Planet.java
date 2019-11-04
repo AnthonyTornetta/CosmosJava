@@ -245,7 +245,7 @@ public class Planet
 			{
 				if(b.block != null)
 				{
-					updateModel(b.location, b.block);
+					updateModel(b.location.x(), b.location.y(), b.location.z(), b.block, true);
 				}
 			}
 		}

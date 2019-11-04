@@ -1,18 +1,19 @@
 package com.cornchipss.world.biospheres;
 
 import com.cornchipss.registry.Blocks;
+import com.cornchipss.registry.annotations.RegisteredBiosphere;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.generation.DefaultPlanetGenerator;
 
 import libs.noise.SimplexNoise;
 
-//@RegisteredBiosphere(id="cosmos:snow")
+@RegisteredBiosphere(id="cosmos:snow")
 public class SnowPlanet extends Biosphere
 {
 	@Override
 	public void generate(boolean render, int delay, SimplexNoise noiseMaker)
 	{
-		DefaultPlanetGenerator.generatePlanet(getPlanet(), noiseMaker, render, delay, this);
+		DefaultPlanetGenerator.generatePlanet(getPlanet(), noiseMaker, render, delay);
 	}
 	
 	@Override

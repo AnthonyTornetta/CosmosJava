@@ -27,7 +27,7 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	
 	public ArrayListF(int size)
 	{
-		this(size, DEFAULT_INCR_AMOUNT);
+		this(size > 0 ? size : 1, DEFAULT_INCR_AMOUNT);
 	}
 	
 	public ArrayListF(int size, int icrAmount, float... floats)
@@ -112,10 +112,12 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	/**
 	 * <p>Converts the {@link ArrayListF} to a standard float array that has the length of {@link ArrayListF#size()}</p>
 	 * <p>To save time, this array is a direct reference to the internal array in the ArrayListF, so modifying one will effect the other (aka don't mess with the returned copy).</p>
+	 * <p>The {@link #shrink()} method is called during this to ensure lengths are correct
 	 * @return The ArrayListF as standard float array that does <b>not</b> have the length of {@link ArrayListF#size()}
 	 */
 	public float[] getArray()
 	{
+		shrink();
 		return list;
 	}
 	

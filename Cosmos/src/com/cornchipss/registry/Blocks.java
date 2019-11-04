@@ -44,7 +44,6 @@ public class Blocks
 	{
 		blocks[b.getId()] = b;
 		models[b.getId()] = b.createModel(ModelCreator.DEFAULT);
-		
 	}
 	
 	public static Block getBlock(short id)

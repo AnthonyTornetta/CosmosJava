@@ -13,6 +13,14 @@ public class Vector3fList
 	
 	/**
 	 * A list of vectors also stored as an array of floats that supports constant time additions/deletions of vectors
+	 */
+	public Vector3fList()
+	{
+		floats = new ArrayListF();
+	}
+	
+	/**
+	 * A list of vectors also stored as an array of floats that supports constant time additions/deletions of vectors
 	 * @param defaultSize The default size of the list of floats (should be 3 * approx number of vectors this will contain) This can expand/shrink on demand. See {@link #shrink()} to shrink this and save some memory
 	 */
 	public Vector3fList(int defaultSize)
@@ -49,10 +57,10 @@ public class Vector3fList
 			// This is near constant time
 			floats.remove(floats.size() - 3, 3);
 			
+			indicies.remove(vec);
+			
 			if(!floats.empty())
 			{
-				indicies.remove(vec);
-				
 				indicies.put(new Vector3f(floats.get(index), floats.get(index + 1), floats.get(index + 2)), index);
 			}
 			

@@ -195,5 +195,6 @@
 	<classpathentry kind="lib" path="libs/annotations-3.0.1.jar"/>
 	<classpathentry kind="lib" path="libs/guava-28.1-jre.jar"/>
 	<classpathentry kind="lib" path="libs/javassist-3.25.0-GA.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

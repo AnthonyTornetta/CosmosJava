@@ -13,7 +13,7 @@ public class Grassland extends Biosphere
 	@Override
 	public void generate(boolean render, int delay, SimplexNoise noiseMaker)
 	{
-		DefaultPlanetGenerator.generatePlanet(getPlanet(), noiseMaker, render, delay, this);
+		DefaultPlanetGenerator.generatePlanet(getPlanet(), noiseMaker, render, delay);
 	}
 	
 	@Override
