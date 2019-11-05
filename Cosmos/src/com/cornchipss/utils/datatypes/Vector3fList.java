@@ -50,12 +50,12 @@ public class Vector3fList
 		if(indicies.containsKey(vec))
 		{
 			int index = indicies.get(vec);
-			floats.swap(index, floats.size() - 3);
-			floats.swap(index + 1, floats.size() - 2);
-			floats.swap(index + 2, floats.size() - 1);
+			floats.set(index, floats.get(floats.size() - 3));
+			floats.set(index + 1, floats.get(floats.size() - 2));
+			floats.set(index + 2, floats.get(floats.size() - 1));
 			
-			// This is near constant time
-			floats.remove(floats.size() - 3, 3);
+			// This is constant time
+			floats.trimEnd(3);
 			
 			indicies.remove(vec);
 			

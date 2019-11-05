@@ -73,16 +73,27 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 		size++;
 	}
 	
+	public void set(int index, float f)
+	{
+		if(index >= size())
+			expand(index + 1);
+		
+		list[index] = f;
+	}
+
+	/**
+	 * Expands the array to a new length
+	 * @param len length (must be >= {@link #size()})
+	 */
+	private void expand(int len)
+	{
+		float[] temp = new float[len];
+		System.arraycopy(list, 0, temp, 0, size());
+		list = temp;
+	}
+
 	public void remove(int i)
 	{
-//		if(i >= size() || i < 0)
-//			throw new IndexOutOfBoundsException("Cannot remove index " + i + " from list of size " + size());
-//		if(i < size() - 1)
-//			System.arraycopy(list, i + 1, list, i, size() - i - 1);
-//		else
-//			list[i] = 0; // No shifting required if it's the last digit
-//		size--;
-		
 		remove(i, 1);
 	}
 	
@@ -91,10 +102,7 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 		if(start + len > size() || start < 0)
 			throw new IndexOutOfBoundsException("Cannot remove index " + start + " to " + (start + len) + " from list of size " + size());
 		
-//		if(start + len != size())
-			System.arraycopy(list, start + len, list, start, list.length - (start + len));
-		
-		// If it's equal to the size of the array, we can just shrink the size and not worry about shifting stuff over
+		System.arraycopy(list, start + len, list, start, list.length - (start + len));
 		
 		size -= len;
 	}
@@ -126,6 +134,10 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 		return list[i];
 	}
 	
+	/**
+	 * The amount of elements in this array
+	 * @return The amount of elements in this array
+	 */
 	public int size()
 	{
 		return size;
@@ -174,4 +186,17 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	{
 		return size() == 0;
 	}
+
+	/**
+	 * Removes the ending portion of an array and is constant time as opposed to {@link #remove(int)} or {@link #remove(int, int)}
+	 * @param len The length from the end to trim - must be <= size()
+	 */
+	public void trimEnd(int len)
+	{
+		if(len > size())
+			throw new IndexOutOfBoundsException("Argument len cannot be larger than size() (" + len + " > " + size() + ")");
+		
+		size -= len;
+	}
+
 }
