@@ -3,6 +3,7 @@ package com.cornchipss.rendering;
 public class Model
 {
 	private int vao, vertexCount;
+	private boolean transparent = false;
 	
 	public Model(int vao, int vertexCount)
 	{
@@ -23,5 +24,15 @@ public class Model
 	public boolean equals(Object o)
 	{
 		return o instanceof Model && ((Model)o).getVao() == getVao();
+	}
+
+	public boolean isTransparent()
+	{
+		return transparent;
+	}
+	
+	public void setTransparent(boolean t)
+	{
+		this.transparent = t;
 	}
 }

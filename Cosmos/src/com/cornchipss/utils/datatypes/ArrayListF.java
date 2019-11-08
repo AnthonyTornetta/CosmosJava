@@ -5,7 +5,7 @@ import java.util.RandomAccess;
 
 /**
  * <p>A way faster version of the standard {@link java.util.ArrayList} just for primitive floats</p>
- * <p>Main benifit is the {@link ArrayListF#asArray} being quite fast.</p>
+ * <p>Main benefit is the {@link ArrayListF#asArray} being quite fast.</p>
  * @author Cornchip
  */
 public class ArrayListF implements Serializable, RandomAccess, Cloneable
@@ -20,14 +20,14 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 	private int size = 0;
 	private int icrAmount;
 	
-	public ArrayListF()
+	public ArrayListF(float...floats)
 	{
-		this(DEFAULT_SIZE);
+		this(DEFAULT_SIZE, floats);
 	}
 	
-	public ArrayListF(int size)
+	public ArrayListF(int size, float...floats)
 	{
-		this(size > 0 ? size : 1, DEFAULT_INCR_AMOUNT);
+		this(size, DEFAULT_INCR_AMOUNT, floats);
 	}
 	
 	public ArrayListF(int size, int icrAmount, float... floats)
@@ -50,46 +50,34 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 		add(size, f);
 	}
 	
-	private void expand(int amt, int splitIndex, float value)
+	private void expand(int amt)
 	{
-		float[] temp = new float[list.length + amt * (int)Math.ceil(splitIndex / (double)icrAmount)];
-		System.arraycopy(list, 0, temp, 0, splitIndex);
-		temp[splitIndex] = value;
-		
-		if(splitIndex < size())
-			System.arraycopy(list, splitIndex, temp, splitIndex + 1, size() - splitIndex);
-		
-		list = temp;
+		if(amt != 0)
+		{
+			float[] temp = new float[list.length + amt];
+			System.arraycopy(list, 0, temp, 0, size());
+			list = temp;
+		}
 	}
 	
 	public void add(int i, float f)
 	{
-		if(i + 1 >= list.length)
-			expand(icrAmount, i, f);
-		else if(i < size())
-			System.arraycopy(list, i, list, i + 1, size - i);
+		while(i + 1 >= list.length)
+			expand(icrAmount);
 		
+		if(i != size())
+			System.arraycopy(list, i, list, i + 1, size - i);
 		list[i] = f;
+		
 		size++;
 	}
 	
 	public void set(int index, float f)
 	{
 		if(index >= size())
-			expand(index + 1);
+			expand(index - size() + 1);
 		
 		list[index] = f;
-	}
-
-	/**
-	 * Expands the array to a new length
-	 * @param len length (must be >= {@link #size()})
-	 */
-	private void expand(int len)
-	{
-		float[] temp = new float[len];
-		System.arraycopy(list, 0, temp, 0, size());
-		list = temp;
 	}
 
 	public void remove(int i)

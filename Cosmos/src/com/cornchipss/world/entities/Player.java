@@ -108,7 +108,7 @@ public class Player extends Entity
 				BlockFace face = lookingAt.getB();
 				Vector3f dir = face.getDirection();
 				
-				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.stone);
+				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.sand);
 			}
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))

@@ -78,6 +78,11 @@ public class PlanetRenderer extends Renderer
 			
 			for(Model m : modelsAndPositions.keySet())
 			{
+				if(m.isTransparent())
+				{
+					
+				}
+				
 				Vector3fList posList = modelsAndPositions.get(m);
 				float[] positions = posList.asFloats();
 				
