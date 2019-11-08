@@ -403,7 +403,8 @@ public class Sector
 						int xz = random.nextInt(100) + 100;
 						if(xz % 2 != 0)
 							xz++;
-						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance("cosmos:grassland")));
+						String id = Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size()));
+						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance(id)));
 					}
 				}
 			}
