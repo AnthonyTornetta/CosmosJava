@@ -11,6 +11,7 @@ import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.sector.Sector;
@@ -97,7 +98,7 @@ public class Game implements Runnable
 			
 			while(secondsTimer.getDeltaMillis() >= 1000)
 			{
-				System.out.println("FPS/UPS: " + fps + " / " + ups);
+				Utils.println("FPS/UPS: " + fps + " / " + ups);
 				fps = ups = 0;
 				secondsTimer.subtractTimeMilli(1000);
 			}

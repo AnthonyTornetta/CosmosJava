@@ -7,6 +7,7 @@ import org.joml.Vector3i;
 
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.entities.Player;
@@ -350,7 +351,7 @@ public class Sector
 						
 						long time = System.currentTimeMillis() - mils;
 						if(time > 16)
-							System.out.println("Longer render time @ chunk " + x + ", " + y + ", " + z + ": " + time + "ms");
+							Utils.println("Longer render time @ chunk " + x + ", " + y + ", " + z + ": " + time + "ms");
 					}
 				}
 			}

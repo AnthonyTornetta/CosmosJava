@@ -1,2 +1,2 @@
 # Cosmos
-very cool and epic
+A block-based space exploration game

@@ -31,13 +31,20 @@ public class Vector3fList
 	/**
 	 * Must be constant time or very near
 	 * @param vec The vector to add
+	 * @return If the vector was actually added or already existed
 	 */
-	public void addVector(Vector3fc vec)
+	public boolean addVector(Vector3fc vec)
 	{
-		indicies.put(vec, floats.size());
-		floats.add(vec.x());
-		floats.add(vec.y());
-		floats.add(vec.z());
+		if(!indicies.containsKey(vec))
+		{
+			indicies.put(vec, floats.size());
+			floats.add(vec.x());
+			floats.add(vec.y());
+			floats.add(vec.z());
+			return true;
+		}
+		else
+			return false;
 	}
 	
 	/**
@@ -50,18 +57,26 @@ public class Vector3fList
 		if(indicies.containsKey(vec))
 		{
 			int index = indicies.get(vec);
-			floats.set(index, floats.get(floats.size() - 3));
-			floats.set(index + 1, floats.get(floats.size() - 2));
-			floats.set(index + 2, floats.get(floats.size() - 1));
+			
+			Vector3fc atEnd = new Vector3f(floats.get(floats.size() - 3), floats.get(floats.size() - 2), floats.get(floats.size() - 1));
+			
+			boolean sameAsLast = atEnd.equals(vec);
+			
+			if(!sameAsLast)
+			{
+				floats.set(index, atEnd.x());
+				floats.set(index + 1, atEnd.y());
+				floats.set(index + 2, atEnd.z());
+			}
 			
 			// This is constant time
 			floats.trimEnd(3);
 			
 			indicies.remove(vec);
 			
-			if(!floats.empty())
+			if(!sameAsLast && !floats.empty())
 			{
-				indicies.put(new Vector3f(floats.get(index), floats.get(index + 1), floats.get(index + 2)), index);
+				indicies.put(atEnd, index);
 			}
 			
 			return true;
