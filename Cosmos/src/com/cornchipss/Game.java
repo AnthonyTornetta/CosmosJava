@@ -52,7 +52,7 @@ public class Game implements Runnable
 	@Override
 	public void run()
 	{		
-		window = new Window(startWidth, startHeight, "end my eternal suffering");
+		window = new Window(startWidth, startHeight, "Cosmos");
 		Input.setWindow(window);
 		
 		Options.registerDefaults();

@@ -56,7 +56,7 @@ public class Shader
 		GL20.glUseProgram(id);
 	}
 	
-	public void stop()
+	public static void stop()
 	{
 		GL20.glUseProgram(0);
 	}

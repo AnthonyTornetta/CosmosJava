@@ -163,7 +163,10 @@ public class Block
 			mc.index(cubeIndices[i]);
 		}
 		
-		return mc.create();
+		Model m = mc.create();
+		m.setTransparent(!isOpaque());
+		
+		return m;
 	}
 	
 	/**

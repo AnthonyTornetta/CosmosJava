@@ -5,6 +5,7 @@ import com.cornchipss.rendering.ModelCreator;
 import com.cornchipss.world.blocks.Air;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.Dirt;
+import com.cornchipss.world.blocks.Glass;
 import com.cornchipss.world.blocks.Grass;
 import com.cornchipss.world.blocks.Sand;
 import com.cornchipss.world.blocks.Sandstone;
@@ -27,6 +28,7 @@ public class Blocks
 	public static final Snowstone snowstone = new Snowstone();
 	public static final Sand sand = new Sand();
 	public static final Sandstone sandstone = new Sandstone();
+	public static final Glass glass = new Glass();
 	
 	public static void registerBlocks()
 	{
@@ -38,6 +40,7 @@ public class Blocks
 		registerBlock(snowstone);
 		registerBlock(sand);
 		registerBlock(sandstone);
+		registerBlock(glass);
 	}
 	
 	public static void registerBlock(Block b)

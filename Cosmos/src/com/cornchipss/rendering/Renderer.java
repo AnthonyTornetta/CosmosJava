@@ -32,6 +32,7 @@ public abstract class Renderer
 		
 		u_projectionLocation = getShader().getUniformLocation("projection");
 		u_viewLocation = getShader().getUniformLocation("view");
+		
 		loadUniformLocations();
 		loadTextures();
 	}
@@ -44,9 +45,9 @@ public abstract class Renderer
 				player.getRx(), player.getRy(), player.getRz(), getViewMatrix());
 		
 		getShader().start();
-		
 		getShader().loadUniformMatrix(getProjectionMatrix(), u_projectionLocation);
 		getShader().loadUniformMatrix(getViewMatrix(), u_viewLocation);
+		
 		loadUniforms();
 		bindTextures();
 	}
@@ -63,7 +64,7 @@ public abstract class Renderer
 	{
 		Texture.unbind();
 		
-		getShader().stop();
+		Shader.stop();
 	}
 	
 	public Shader getShader() { return shader; }

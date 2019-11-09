@@ -24,7 +24,7 @@ public class Player extends Entity
 	{
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f));
 	}
-
+	
 	@Override
 	public void onUpdate()
 	{
@@ -32,8 +32,8 @@ public class Player extends Entity
 
 		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .2f : .02f;
-
+			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) ? 2f : Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .2f : .02f;
+			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 			{
 				addVelocityX((float) (speed * Math.sin(getRy())));
@@ -108,7 +108,7 @@ public class Player extends Entity
 				BlockFace face = lookingAt.getB();
 				Vector3f dir = face.getDirection();
 				
-				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.sand);
+				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.glass);
 			}
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
@@ -122,25 +122,11 @@ public class Player extends Entity
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_MIDDLE))
 		{
-			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(LOOK_DISTANCE);
+			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(LOOK_DISTANCE * 10);
 			
-			int explosionRadius = 10;
-			
-			if(lookingAt.getA() != null && lookingAt.getB() != null)
+			if(lookingAt.getA() != null)
 			{
-				for(int dz = -explosionRadius; dz <= explosionRadius; dz++)
-				{
-					for(int dy = -explosionRadius; dy <= explosionRadius; dy++)
-					{
-						for(int dx = -explosionRadius; dx <= explosionRadius; dx++)
-						{
-							if(dz * dz + dy * dy + dx * dx <= explosionRadius * explosionRadius)
-							{
-								getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), new Vector3f(dx, dy, dz)), Blocks.air);
-							}
-						}
-					}
-				}
+				getUniverse().explode(lookingAt.getA(), 10);
 			}
 		}
 	}

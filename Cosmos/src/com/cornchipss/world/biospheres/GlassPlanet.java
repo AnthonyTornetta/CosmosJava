@@ -7,8 +7,8 @@ import com.cornchipss.world.generation.DefaultPlanetGenerator;
 
 import libs.noise.SimplexNoise;
 
-@RegisteredBiosphere(id="cosmos:sand")
-public class SandPlanet extends Biosphere
+@RegisteredBiosphere(id="cosmos:glass")
+public class GlassPlanet extends Biosphere
 {
 	@Override
 	public void generate(boolean render, int delay, SimplexNoise noiseMaker)
@@ -19,17 +19,15 @@ public class SandPlanet extends Biosphere
 	@Override
 	public float frequency()
 	{
-		return 0.001f;
+		return 0.1f;
 	}
 	
 	@Override
 	public Block getBlockY(int y, int maxY)
 	{
-		if(maxY - y <= 5)
-			return Blocks.sand;
-		if(Math.random() * (maxY - y - 20) > 5)
-			return Blocks.stone;
+		if(y == maxY)
+			return Blocks.glass;
 		else
-			return Blocks.sandstone;
+			return Blocks.stone;
 	}
 }

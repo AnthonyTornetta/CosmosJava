@@ -10,5 +10,10 @@ out vec4 out_color;
 
 void main()
 {
-	out_color = texture(sampler, uv) * vec4(color, 1.0); 
+	vec4 textColor = texture(sampler, uv);
+	
+	if(textColor.a < 0.1)
+		discard;
+	
+	out_color = textColor * vec4(color, 1.0);
 }

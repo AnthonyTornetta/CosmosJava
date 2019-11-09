@@ -5,6 +5,8 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
 import com.cornchipss.physics.shapes.Rectangle;
+import com.cornchipss.registry.Blocks;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 import com.cornchipss.world.sector.Sector;
@@ -64,9 +66,10 @@ public class Universe
 	
 	public Vector3i toSectorCoords(Vector3f c)
 	{
-		return new Vector3i((int)Math.round(c.x / (WIDTH / 2)),
-				(int)Math.round(c.y / (HEIGHT / 2)),
-				(int)Math.round(c.z / (WIDTH / 2)));
+		return new Vector3i(
+				(int)(c.x / (WIDTH / 2) + .5),
+				(int)(c.y / (HEIGHT / 2) + .5),
+				(int)(c.z / (WIDTH / 2) + .5));
 	}
 	
 	/**
@@ -90,7 +93,7 @@ public class Universe
 		final int hs = Sector.DIMENSIONS / 2;
 		
 		int c = Math.round(coord);
-		int inverseSign = c < 0 ? 1 : -1;
+		int inverseSign = (int)-Math.signum(c);
 		c = Math.abs(c);
 		
 		return inverseSign * (((c / hs) % 2 * hs) - c % hs);
@@ -314,5 +317,22 @@ public class Universe
 	public Location[][][] getBlocksWithin(Rectangle rect)
 	{
 		return getBlocksWithin(rect.getPosition(), rect.getDimensions());
+	}
+
+	public void explode(Location location, int explosionRadius)
+	{
+		for(int dz = -explosionRadius; dz <= explosionRadius; dz++)
+		{
+			for(int dy = -explosionRadius; dy <= explosionRadius; dy++)
+			{
+				for(int dx = -explosionRadius; dx <= explosionRadius; dx++)
+				{
+					if(dz * dz + dy * dy + dx * dx <= explosionRadius * explosionRadius)
+					{
+						setBlockAt(Utils.add(location.getPosition(), new Vector3f(dx, dy, dz)), Blocks.air);
+					}
+				}
+			}
+		}
 	}
 }

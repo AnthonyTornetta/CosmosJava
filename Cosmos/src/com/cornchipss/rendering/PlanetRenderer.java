@@ -1,5 +1,7 @@
 package com.cornchipss.rendering;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.glfw.GLFW;
@@ -27,8 +29,6 @@ public class PlanetRenderer extends Renderer
 		super(new PlanetShader());
 		
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glCullFace(GL11.GL_BACK);
 		
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		
@@ -76,42 +76,76 @@ public class PlanetRenderer extends Renderer
 			
 			Map<Model, Vector3fList> modelsAndPositions = planet.getModelsAndPositions();
 			
+			List<Model> transparentModels = new LinkedList<>();
+			
+			GL11.glEnable(GL11.GL_CULL_FACE);
+			GL11.glCullFace(GL11.GL_BACK);
+			
 			for(Model m : modelsAndPositions.keySet())
 			{
 				if(m.isTransparent())
-				{
-					
-				}
+					transparentModels.add(m);
+				else
+					renderModel(m, modelsAndPositions.get(m));
+			}
+			
+			GL11.glEnable(GL11.GL_CULL_FACE); 
+			GL11.glCullFace(GL11.GL_FRONT);
+			
+			GL11.glEnable(GL30.GL_SAMPLE_ALPHA_TO_COVERAGE);
+			
+			GL11.glEnable(GL11.GL_BLEND);
+			GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
+			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			
+			for(Model m : transparentModels)
+			{
+				GL11.glEnable(GL11.GL_BLEND);
+				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				
-				Vector3fList posList = modelsAndPositions.get(m);
-				float[] positions = posList.asFloats();
+				renderModel(m, modelsAndPositions.get(m));
 				
-				GL30.glBindVertexArray(m.getVao());
-				
-				// Update every position in the model
-				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionsVBO);
-				
-				GL15.glBufferData(GL15.GL_ARRAY_BUFFER, positions, GL15.GL_STATIC_DRAW);
-				GL30.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 0, 0);
-				GL33.glVertexAttribDivisor(3, 1);
-				
-				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-				
-				// Draw it all!
-				GL30.glEnableVertexAttribArray(0);
-				GL30.glEnableVertexAttribArray(1);
-				GL30.glEnableVertexAttribArray(2);
-				GL30.glEnableVertexAttribArray(3);
-				
-				GL31.glDrawElementsInstanced(GL30.GL_TRIANGLES, m.getVertexCount(), GL11.GL_UNSIGNED_INT, 0, posList.size() / 3);
-				
-				GL33.glDisableVertexAttribArray(3);
-				GL30.glDisableVertexAttribArray(2);
-				GL30.glDisableVertexAttribArray(1);
-				GL30.glDisableVertexAttribArray(0);
-				
-				GL30.glBindVertexArray(0);
-			}		
+				GL11.glDisable(GL11.GL_BLEND);
+			}
+			
+			GL11.glCullFace(GL11.GL_BACK);
+			for(Model m : transparentModels)
+			{
+				renderModel(m, modelsAndPositions.get(m));
+			}
+			
+			GL11.glDisable(GL11.GL_BLEND);
 		}
+	}
+	
+	private void renderModel(Model m, Vector3fList posList)
+	{
+		float[] positions = posList.asFloats();
+		
+		GL30.glBindVertexArray(m.getVao());
+		
+		// Update every position in the model
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionsVBO);
+		
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, positions, GL15.GL_STATIC_DRAW);
+		GL30.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 0, 0);
+		GL33.glVertexAttribDivisor(3, 1);
+		
+		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		
+		// Draw it all!
+		GL30.glEnableVertexAttribArray(0);
+		GL30.glEnableVertexAttribArray(1);
+		GL30.glEnableVertexAttribArray(2);
+		GL30.glEnableVertexAttribArray(3);
+		
+		GL31.glDrawElementsInstanced(GL30.GL_TRIANGLES, m.getVertexCount(), GL11.GL_UNSIGNED_INT, 0, posList.size() / 3);
+		
+		GL33.glDisableVertexAttribArray(3);
+		GL30.glDisableVertexAttribArray(2);
+		GL30.glDisableVertexAttribArray(1);
+		GL30.glDisableVertexAttribArray(0);
+		
+		GL30.glBindVertexArray(0);
 	}
 }
