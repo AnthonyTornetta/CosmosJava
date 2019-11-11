@@ -91,12 +91,12 @@ public class PlanetRenderer extends Renderer
 			
 			GL11.glEnable(GL11.GL_CULL_FACE); 
 			GL11.glCullFace(GL11.GL_FRONT);
-			
-			GL11.glEnable(GL30.GL_SAMPLE_ALPHA_TO_COVERAGE);
-			
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+//			
+//			GL11.glEnable(GL30.GL_SAMPLE_ALPHA_TO_COVERAGE);
+//			
+//			GL11.glEnable(GL11.GL_BLEND);
+//			GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
+//			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			
 			for(Model m : transparentModels)
 			{

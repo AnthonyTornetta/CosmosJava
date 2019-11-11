@@ -11,12 +11,17 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
+import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.BlockFace;
 
 public class Player extends Entity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
+	
+	private int blockSelected;
+	private Block[] blocks = new Block[] 
+			{ Blocks.stone, Blocks.glass, Blocks.grass, Blocks.dirt, Blocks.sand, Blocks.snow, Blocks.sandstone, Blocks.snowstone };
 	
 	private final int LOOK_DISTANCE = 10;
 
@@ -99,6 +104,14 @@ public class Player extends Entity
 		else if(getRx() < -Math.PI / 2)
 			setRx((float)-Math.PI / 2);
 
+		for(int i = 0; i < blocks.length; i++)
+		{
+			if(Input.isKeyJustDown(GLFW.GLFW_KEY_1 + i))
+			{
+				blockSelected = i;
+			}
+		}
+		
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT))
 		{
 			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(10);
@@ -108,7 +121,7 @@ public class Player extends Entity
 				BlockFace face = lookingAt.getB();
 				Vector3f dir = face.getDirection();
 				
-				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), Blocks.glass);
+				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), blocks[blockSelected]);
 			}
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
