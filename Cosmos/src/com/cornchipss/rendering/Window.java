@@ -18,19 +18,28 @@ import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWWindowSizeCallbackI;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL20;
+
+import com.cornchipss.utils.Utils;
 
 public class Window
 {
 	private static long window;
 	private int width, height;
 	
+	private final float ogAspectRatio;
+	
 	public Window(int w, int h, String title)
 	{
 		this.width = w;
 		this.height = h;
+		
+		ogAspectRatio = width / (float)height;
 		
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -52,6 +61,28 @@ public class Window
 		
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
+		
+		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI()
+		{
+			@Override
+			public void invoke(long window, int width, int height)
+			{
+				int dX = 0, dY = 0;
+				
+				if(width / (float)height > ogAspectRatio)
+				{
+					float desiredHeight = (width / ogAspectRatio);
+					dY = -Math.round((desiredHeight - height) / 2);
+				}
+				else
+				{
+					float desiredWidth = (height * ogAspectRatio);
+					dX = -Math.round((desiredWidth - width) / 2);
+				}
+				
+				GL20.glViewport(dX, dY, width - dX, height - dY);
+			}
+		});
 		
 		// Make the window visible
 		glfwShowWindow(window);

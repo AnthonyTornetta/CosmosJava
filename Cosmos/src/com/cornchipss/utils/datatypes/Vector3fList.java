@@ -10,7 +10,7 @@ public class Vector3fList
 {
 	private ArrayListF floats;
 	private Map<Vector3fc, Integer> indicies = new HashMap<>();
-	
+		
 	/**
 	 * A list of vectors also stored as an array of floats that supports constant time additions/deletions of vectors
 	 */
@@ -99,6 +99,16 @@ public class Vector3fList
 	public float[] asFloats()
 	{
 		return floats.getArray();
+	}
+	
+	public Vector3fc[] asVecs()
+	{
+		Vector3fc[] vecs = new Vector3fc[floats.size() / 3];
+		for(int i = 0; i < floats.size(); i+=3)
+		{
+			vecs[i / 3] = new Vector3f(floats.get(i), floats.get(i + 1), floats.get(i + 2));
+		}
+		return vecs;
 	}
 	
 	/**

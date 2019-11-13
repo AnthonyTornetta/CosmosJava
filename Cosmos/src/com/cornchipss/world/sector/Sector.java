@@ -347,7 +347,7 @@ public class Sector
 					{
 						long mils = System.currentTimeMillis();
 						
-						renderer.render(getPlanet(x, y, z));
+						renderer.render(getPlanet(x, y, z), player);
 						
 						long time = System.currentTimeMillis() - mils;
 						if(time > 16)

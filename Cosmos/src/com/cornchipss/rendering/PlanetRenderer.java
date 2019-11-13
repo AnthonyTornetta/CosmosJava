@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.PlanetShader;
 import com.cornchipss.utils.datatypes.Vector3fList;
+import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
 
 public class PlanetRenderer extends Renderer
@@ -65,7 +66,7 @@ public class PlanetRenderer extends Renderer
 		atlas.bind();
 	}
 	
-	public void render(Planet planet)
+	public void render(Planet planet, Player player)
 	{
 		if(planet == null)
 			throw new IllegalArgumentException("Cannot render a null planet!");
@@ -89,29 +90,52 @@ public class PlanetRenderer extends Renderer
 					renderModel(m, modelsAndPositions.get(m));
 			}
 			
-			GL11.glEnable(GL11.GL_CULL_FACE); 
-			GL11.glCullFace(GL11.GL_FRONT);
-//			
-//			GL11.glEnable(GL30.GL_SAMPLE_ALPHA_TO_COVERAGE);
-//			
 //			GL11.glEnable(GL11.GL_BLEND);
-//			GL11.glAlphaFunc(GL11.GL_GREATER, 0.05f);
 //			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 			
 			for(Model m : transparentModels)
 			{
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				// TODO:
 				
-				renderModel(m, modelsAndPositions.get(m));
+//				Vector3fc[] vecs = modelsAndPositions.get(m).asVecs();
+//				
+//				final Vector3fc pos = new Vector3f(player.getPosition());
+//				
+//				Arrays.sort(vecs, new Comparator<Vector3fc>()
+//				{
+//					@Override
+//					public int compare(Vector3fc o1, Vector3fc o2)
+//					{
+////						Utils.println(Utils.toString(o1) + ", " + Utils.toString(o2));
+//						
+//						float d1 = o1.distanceSquared(pos);
+//						float d2 = o2.distanceSquared(pos);
+//						
+//						if(d1 < d2)
+//							return 1;
+//						if(d1 > d2)
+//							return -1;
+//						return 0;
+//					}
+//				});
+//				
+//				float[] floats = new float[vecs.length * 3];
+//				for(int i = 0; i < vecs.length; i++)
+//				{
+//					floats[i * 3] = vecs[i].x();
+//					floats[i * 3 + 1] = vecs[i].y();
+//					floats[i * 3 + 2] = vecs[i].z();
+//				}
 				
-				GL11.glDisable(GL11.GL_BLEND);
-			}
-			
-			GL11.glCullFace(GL11.GL_BACK);
-			for(Model m : transparentModels)
-			{
-				renderModel(m, modelsAndPositions.get(m));
+				float[] floats = modelsAndPositions.get(m).asFloats();
+				
+				GL11.glCullFace(GL11.GL_FRONT);
+				
+				renderModel(m, floats);
+				
+				GL11.glCullFace(GL11.GL_BACK);
+				
+				renderModel(m, floats);
 			}
 			
 			GL11.glDisable(GL11.GL_BLEND);
@@ -120,8 +144,11 @@ public class PlanetRenderer extends Renderer
 	
 	private void renderModel(Model m, Vector3fList posList)
 	{
-		float[] positions = posList.asFloats();
-		
+		renderModel(m, posList.asFloats());
+	}
+	
+	private void renderModel(Model m, float[] positions)
+	{
 		GL30.glBindVertexArray(m.getVao());
 		
 		// Update every position in the model
@@ -139,7 +166,7 @@ public class PlanetRenderer extends Renderer
 		GL30.glEnableVertexAttribArray(2);
 		GL30.glEnableVertexAttribArray(3);
 		
-		GL31.glDrawElementsInstanced(GL30.GL_TRIANGLES, m.getVertexCount(), GL11.GL_UNSIGNED_INT, 0, posList.size() / 3);
+		GL31.glDrawElementsInstanced(GL30.GL_TRIANGLES, m.getVertexCount(), GL11.GL_UNSIGNED_INT, 0, positions.length / 3);
 		
 		GL33.glDisableVertexAttribArray(3);
 		GL30.glDisableVertexAttribArray(2);

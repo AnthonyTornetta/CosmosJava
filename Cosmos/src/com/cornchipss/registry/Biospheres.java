@@ -50,9 +50,9 @@ public class Biospheres
 	{
 		try
 		{
-			return biospheres.get(id).newInstance();
+			return biospheres.get(id).getDeclaredConstructor().newInstance();
 		}
-		catch (InstantiationException | IllegalAccessException e)
+		catch (Exception e)
 		{
 			throw new RuntimeException(e);
 		}
