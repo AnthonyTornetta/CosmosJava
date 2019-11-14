@@ -25,8 +25,6 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 
-import com.cornchipss.utils.Utils;
-
 public class Window
 {
 	private static long window;

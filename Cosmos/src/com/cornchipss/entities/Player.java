@@ -1,4 +1,4 @@
-package com.cornchipss.world.entities;
+package com.cornchipss.entities;
 
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;

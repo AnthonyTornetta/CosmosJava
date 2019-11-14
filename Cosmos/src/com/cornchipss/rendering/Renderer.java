@@ -5,10 +5,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import com.cornchipss.Game;
+import com.cornchipss.entities.Player;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.shaders.Shader;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.world.entities.Player;
 
 public abstract class Renderer
 {

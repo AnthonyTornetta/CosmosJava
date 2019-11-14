@@ -5,12 +5,12 @@ import java.util.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.entities.Player;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.biospheres.Biosphere;
-import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
 
 import libs.noise.SimplexNoise;
