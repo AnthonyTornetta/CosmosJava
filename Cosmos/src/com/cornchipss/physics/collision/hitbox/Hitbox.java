@@ -3,14 +3,14 @@ package com.cornchipss.physics.collision.hitbox;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.datatypes.Tuple;
 import com.cornchipss.world.blocks.BlockFace;
 
 /**
  * TODO: read up: https://www.toptal.com/game/video-game-physics-part-ii-collision-detection-for-solid-objects
  */
-public abstract class Hitbox
+public abstract class Hitbox // Another name for Hotbox
 {
 	/**
 	 * Returns true if two hitboxes are colliding based on the two positions
@@ -18,9 +18,10 @@ public abstract class Hitbox
 	 * @param b Hitbox B
 	 * @param positionA Position of hitbox A
 	 * @param positionB Position of hitbox B
+	 * @param c 
 	 * @return true if two hitboxes are colliding based on the two positions
 	 */
-	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB)
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, boolean c)
 	{
 		if(a == null || b == null)
 			return false;
@@ -28,30 +29,20 @@ public abstract class Hitbox
 		Vector3fc[] cornersA = a.getCorners();
 		Vector3fc[] cornersB = b.getCorners();
 		
-		for(int j = 0; j < cornersA.length; j+=2)
+		for(int j = 0; j < cornersA.length; j += 2)
 		{
-			Vector3f va = Utils.add(cornersA[j], positionA);
-			Vector3f va2 = Utils.add(cornersA[j + 1], positionA);
+			Vector3f cornerRightA = Maths.add(cornersA[j], positionA);
+			Vector3f cornerLeftA = Maths.add(cornersA[j + 1], positionA);
 			
-			Vector3f dimsA = Utils.sub(va2, va);
-			
-			for(int i = 0; i < cornersB.length; i+=2)
+			for(int i = 0; i < cornersB.length; i += 2)
 			{
-				Vector3f vb = Utils.add(cornersB[i], positionB);
-				Vector3f vb2 = Utils.add(cornersB[i + 1], positionB);
+				Vector3f cornerRightB = Maths.add(cornersB[i], positionB);
+				Vector3f cornerLeftB = Maths.add(cornersB[i + 1], positionB);
 				
-				Vector3f dimsB = Utils.sub(vb2, vb);
-				
-				if(vb.x + dimsB.x >= va.x && vb.x <= va.x + dimsA.x)
-				{
-					if(vb.y + dimsB.y >= va.y && vb.y <= va.y + dimsA.y)
-					{
-						if(vb.z + dimsB.z >= va.z && vb.z <= va.z + dimsA.z)
-						{
-							return true;
-						}
-					}
-				}
+				if ((cornerRightA.x > cornerLeftB.x && cornerLeftA.x < cornerRightB.x)
+						&& (cornerRightA.y > cornerLeftB.y && cornerLeftA.y < cornerRightB.y)
+						&& (cornerRightA.z > cornerLeftB.z && cornerLeftA.z < cornerRightB.z))
+					return true;
 			}
 		}
 		
@@ -65,7 +56,7 @@ public abstract class Hitbox
 	public abstract Vector3fc getBoundingBox();
 	
 	/**
-	 * Gets the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
+	 * Gets the 2 corners of the hitbox as if it were one rectangle in order of x, y, z then -x, -y, -z
 	 * @return the 2 corners of the hitbox as if it were one rectangle in order of -x, -y, -z then x, y, z
 	 */
 	public abstract Vector3fc[] getCorners();

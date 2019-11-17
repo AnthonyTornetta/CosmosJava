@@ -4,22 +4,31 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3d;
-import org.joml.Vector3f;
+import org.joml.Vector3dc;
 import org.joml.Vector3fc;
-import org.joml.Vector3i;
+import org.joml.Vector3ic;
 import org.lwjgl.BufferUtils;
 
 public class Utils
 {
-	
+	/**
+	 * Buffer purely for holding mitricies. Pre-allocated to save some runtime processes
+	 */
 	private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 	
+	/**
+	 * Prints an object w/ the class & line number next to it and a newline
+	 * @param obj The object to print
+	 */
 	public static void println(Object obj)
 	{
 		printraw(toString(obj) + "\n");
 	}
 	
+	/**
+	 * Prints an object w/ the class & line number next to it
+	 * @param obj The object to print
+	 */
 	public static void print(Object obj)
 	{
 		printraw(toString(obj));
@@ -34,6 +43,11 @@ public class Utils
 		System.out.print(clazz.substring(clazz.lastIndexOf(".") + 1) + " (" + trace.getLineNumber() + ")> " + s);
 	}
 	
+	/**
+	 * Nicely puts an array into a String
+	 * @param obj The array
+	 * @return The Stringified array
+	 */
 	public static String arrayToString(Object[] obj)
 	{
 		if(obj == null)
@@ -54,6 +68,11 @@ public class Utils
 		return builder.toString();
 	}
 	
+	/**
+	 * .toString()++
+	 * @param obj The object to toString()
+	 * @return A nice String
+	 */
 	public static String toString(Object obj)
 	{
 		if(obj == null)
@@ -65,25 +84,30 @@ public class Utils
 			return arrayToString(arr);
 		}
 		
-		if(obj instanceof Vector3f)
+		if(obj instanceof Vector3fc)
 		{
-			Vector3f t = (Vector3f)obj;
-			return "[" + t.x + ", " + t.y + ", " + t.z + "]";
+			Vector3fc t = (Vector3fc)obj;
+			return "[" + t.x() + ", " + t.y() + ", " + t.z() + "]";
 		}
-		else if(obj instanceof Vector3i)
+		else if(obj instanceof Vector3ic)
 		{
-			Vector3i t = (Vector3i)obj;
-			return "[" + t.x + ", " + t.y + ", " + t.z + "]";
+			Vector3ic t = (Vector3ic)obj;
+			return "[" + t.x() + ", " + t.y() + ", " + t.z() + "]";
 		}
-		else if(obj instanceof Vector3d)
+		else if(obj instanceof Vector3dc)
 		{
-			Vector3d t = (Vector3d)obj;
-			return "[" + t.x + ", " + t.y + ", " + t.z + "]";
+			Vector3dc t = (Vector3dc)obj;
+			return "[" + t.x() + ", " + t.y() + ", " + t.z() + "]";
 		}
 		
 		return obj.toString();
 	}
 	
+	/**
+	 * Converts a List of Floats into a primitive array of floats
+	 * @param list The list
+	 * @return a primitive array of floats
+	 */
 	public static float[] toArray(List<Float> list)
 	{
 		float[] arr = new float[list.size()];
@@ -97,6 +121,11 @@ public class Utils
 		return arr;
 	}
 
+	/**
+	 * Converts a List of Integers into a primitive array of integers
+	 * @param list The list
+	 * @return a primitive array of integers
+	 */
 	public static int[] toArrayInt(List<Integer> list)
 	{
 		int[] arr = new int[list.size()];
@@ -111,9 +140,10 @@ public class Utils
 	}
 	
 	/**
-	 * NOT THREAD SAFE
-	 * @param mat
-	 * @return
+	 * <p>Not Thread Safe - the FloatBuffer used is pre-allocated in memory and is a static variable to this class</p>
+	 * <p>Puts a matrix into a FloatBuffer.</p>
+	 * @param mat The Matrix to use
+	 * @return The matrix in a FloatBuffer
 	 */
 	public static FloatBuffer toFloatBuffer(Matrix4f mat)
 	{
@@ -134,77 +164,6 @@ public class Utils
 	{
 		return x + y * width + z * width * height;
 	}
-
-	/**
-	 * Adds two vectors without modifying either one
-	 * @param a The first vector
-	 * @param b The second vector
-	 * @return A new vector of the two vectors added
-	 */
-	public static Vector3f add(Vector3fc a, Vector3fc b)
-	{
-		return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
-	}
-	
-	/**
-	 * Subtracts two vectors without modifying either one
-	 * @param a The first vector
-	 * @param b The second vector
-	 * @return A new vector of the two vectors subtracted
-	 */
-	public static Vector3f sub(Vector3fc a, Vector3fc b)
-	{
-		return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
-	}
-	
-	/**
-	 * Multiplies two vectors without modifying either one
-	 * @param a The first vector
-	 * @param b The second vector
-	 * @return A new vector of the two vectors multiplied
-	 */
-	public static Vector3f mul(Vector3fc a, Vector3fc b)
-	{
-		return new Vector3f(a.x() * b.x(), a.y() * b.y(), a.z() * b.z());
-	}
-	
-	/**
-	 * Multiplies two vectors without modifying either one
-	 * @param x The first vector (<code>new Vector3f(x, x, x)</code>)
-	 * @param b The second vector
-	 * @return A new vector of the two vectors multiplied
-	 */
-	public static Vector3f mul(float x, Vector3fc a)
-	{
-		return mul(a, new Vector3f(x));
-	}
-	
-	/**
-	 * Divides two vectors without modifying either one
-	 * @param a The first vector
-	 * @param b The second vector
-	 * @return A new vector of the two vectors divided
-	 */
-	public static Vector3f div(Vector3fc a, Vector3fc b)
-	{
-		return new Vector3f(a.x() / b.x(), a.y() / b.y(), a.z() / b.z());
-	}
-	
-	/**
-	 * Takes the modulus two vectors without modifying either one
-	 * @param a The first vector
-	 * @param b The second vector
-	 * @return A new vector of the two vectors modulus'ed
-	 */
-	public static Vector3f mod(Vector3fc a, Vector3fc b)
-	{
-		return new Vector3f(a.x() % b.x(), a.y() % b.y(), a.z() % b.z());
-	}
-
-	public static Vector3f zero()
-	{
-		return new Vector3f(0, 0, 0);
-	}
 	
 	/**
 	 * Clamps a number between two other numbers
@@ -218,14 +177,40 @@ public class Utils
 		return x > M ? M : x < m ? m : x;
 	}
 
+	/**
+	 * Checks if an array contains an object o
+	 * @param arr The array
+	 * @param o The object
+	 * @return if an array contains an object o
+	 */
 	public static boolean contains(Object[] arr, Object o)
 	{
-		for(int i = 0; i < arr.length; i++)
-			if(arr[i].equals(o))
+		for(Object t : arr)
+			if(t == null && o == null || t != null && t.equals(o))
 				return true;
 		return false;
 	}
-
+	
+	/**
+	 * Checks if an array contains an object o
+	 * @param list The list
+	 * @param o The object
+	 * @return if an array contains an object o
+	 */
+	public static<T> boolean contains(List<T> list, T o)
+	{
+		for(T t : list)
+			if(t == null && o == null || t != null && t.equals(o))
+				return true;
+		return false;
+	}
+	
+	/**
+	 * Checks if two objects are equal & is null safe
+	 * @param a Object A
+	 * @param b Object B
+	 * @return Checks if two objects are equal
+	 */
 	public static boolean equals(Object a, Object b)
 	{
 		if(a == null && b != null)
@@ -237,4 +222,6 @@ public class Utils
 		   
 		return a.equals(b);
 	}
+
+	
 }

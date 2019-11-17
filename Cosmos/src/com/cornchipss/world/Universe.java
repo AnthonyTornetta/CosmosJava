@@ -6,7 +6,7 @@ import org.joml.Vector3i;
 
 import com.cornchipss.physics.shapes.Rectangle;
 import com.cornchipss.registry.Blocks;
-import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 import com.cornchipss.world.sector.Sector;
@@ -239,9 +239,9 @@ public class Universe
 
 	public Location[][][] getBlocksWithin(Vector3fc position, Vector3fc dimensions)
 	{
-		int cZ = (int)Math.abs(Math.ceil(dimensions.z() / 2));
-		int cY = (int)Math.abs(Math.ceil(dimensions.y() / 2));
-		int cX = (int)Math.abs(Math.ceil(dimensions.x() / 2));
+		int cZ = (int)(Math.ceil(Math.abs(dimensions.z()) / 2 + 1));
+		int cY = (int)(Math.ceil(Math.abs(dimensions.y()) / 2 + 1));
+		int cX = (int)(Math.ceil(Math.abs(dimensions.x()) / 2 + 1));
 		
 		Location[][][] blocks = new Location[cZ * 2][cY * 2][cX * 2];
 		
@@ -251,8 +251,11 @@ public class Universe
 			{
 				for(int x = -cX; x < cX; x++)
 				{
-					Location loc = new Location(new Vector3f(x + position.x(), y + position.y(), z + position.z()), this);
-										
+					Location loc = new Location(new Vector3f(
+							x + (float)Math.round(position.x()), 
+							y + (float)Math.round(position.y()), 
+							z + (float)Math.round(position.z())), this);
+					
 					if(loc.getBlock() != null)
 					{
 						blocks[z + cZ][y + cY][x + cX] = loc;
@@ -329,7 +332,7 @@ public class Universe
 				{
 					if(dz * dz + dy * dy + dx * dx <= explosionRadius * explosionRadius)
 					{
-						setBlockAt(Utils.add(location.getPosition(), new Vector3f(dx, dy, dz)), Blocks.air);
+						setBlockAt(Maths.add(location.getPosition(), new Vector3f(dx, dy, dz)), Blocks.air);
 					}
 				}
 			}

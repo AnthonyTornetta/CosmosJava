@@ -1,5 +1,7 @@
 package com.cornchipss.entities;
 
+import java.util.List;
+
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
@@ -8,16 +10,19 @@ import com.cornchipss.physics.raycast.Raycast;
 import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.BlockFace;
 
-public class Player extends Entity
+public class Player extends PhysicalEntity
 {
 	private float sensitivity = 0.0025f;
 	private float maxSlowdown = 1f;
+	
+	public static final float FRICTION = .001f;
 	
 	private int blockSelected;
 	private Block[] blocks = new Block[] 
@@ -27,17 +32,15 @@ public class Player extends Entity
 
 	public Player(float x, float y, float z)
 	{
-		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f));
+		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f), 0.5f);
 	}
 	
 	@Override
 	public void onUpdate()
 	{
-		setVelocity(Utils.zero());
-
 		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) ? 2f : Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .2f : .02f;
+			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_ALT) ? .2f : Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .02f : .007f;
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 			{
@@ -68,15 +71,15 @@ public class Player extends Entity
 			{
 				addVelocityY(-speed);
 			}
-
+			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 			{
 				setX(0);
-				setY(0);
+				setY(128);
 				setZ(0);
 				setRx(0);
 				setRy(0);
-				setVelocity(Utils.zero());
+				setVelocity(Maths.zero());
 			}
 		}
 		else
@@ -85,17 +88,7 @@ public class Player extends Entity
 			addVelocityY(Utils.clamp(-getVelocityY(), -maxSlowdown, maxSlowdown) * 0.1f);
 			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
 		}
-
-		updatePhysics();
-
-//		addVelocityY(-9.8f / 60.0f);
-
-//		Vector3f cloesestBlock = getUniverse().getClosestBlock(getX(), getY(), getZ(), 0);
-//		if(cloesestBlock != null)
-//		{
-//			Block b = getUniverse().getBlockAt(cloesestBlock);
-//		}
-
+		
 		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
 		setRy(getRy() + sensitivity * -Input.getMouseDeltaX());
 
@@ -119,9 +112,9 @@ public class Player extends Entity
 			if(lookingAt.getA() != null && lookingAt.getB() != null)
 			{
 				BlockFace face = lookingAt.getB();
-				Vector3f dir = face.getDirection();
+				Vector3f dir = face.getRelativePosition();
 				
-				getUniverse().setBlockAt(Utils.add(lookingAt.getA().getPosition(), Utils.mul(2, dir)), blocks[blockSelected]);
+				getUniverse().setBlockAt(Maths.add(lookingAt.getA().getPosition(), Maths.mul(2, dir)), blocks[blockSelected]);
 			}
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
@@ -141,6 +134,29 @@ public class Player extends Entity
 			{
 				getUniverse().explode(lookingAt.getA(), 10);
 			}
+		}
+		
+		addVelocityY(-.002f);
+		
+		List<BlockFace> hits = updatePhysics();
+		
+		// TODO: Make friction better
+		if(Utils.contains(hits, BlockFace.TOP))
+		{
+			float absX = Math.abs(getVelocityX());
+			float absZ = Math.abs(getVelocityZ());
+			
+			if(absX < .001f)
+				absX = 0;
+			else
+				absX -= .001f;
+			if(absZ < .001f)
+				absZ = 0;
+			else
+				absZ -= .001f;
+			
+			getVelocity().x = absX * Math.signum(getVelocityX());
+			getVelocity().z = absZ * Math.signum(getVelocityZ());
 		}
 	}
 	
@@ -178,6 +194,6 @@ public class Player extends Entity
 	
 	public Vector3f getHeadPosition()
 	{
-		return Utils.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
+		return Maths.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
 	}
 }

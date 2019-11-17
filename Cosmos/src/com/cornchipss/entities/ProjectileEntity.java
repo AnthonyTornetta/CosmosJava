@@ -2,21 +2,28 @@ package com.cornchipss.entities;
 
 import org.joml.Vector3fc;
 
+import com.cornchipss.physics.collision.hitbox.Hitbox;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.Location;
 
-public abstract class ProjectileEntity
-{
+public abstract class ProjectileEntity extends Entity
+{	
+	public ProjectileEntity(float x, float y, float z, Hitbox hitbox)
+	{
+		super(x, y, z, hitbox);
+	}
+
 	public void fire(Vector3fc vel)
 	{
 		
 	}
 	
-	public void fire(float vel, float rx, float ry)
+	public void fire(float velMagnitude, float rx, float ry)
 	{
-		
+		fire(Maths.toComponents(rx, ry, velMagnitude));
 	}
 	
-	public abstract void onHitBlock(Location loc);
+	public abstract boolean onHitBlock(Location loc);
 	
-	public abstract void onHitEntity(Entity e);
+	public abstract boolean onHitEntity(Entity e);
 }

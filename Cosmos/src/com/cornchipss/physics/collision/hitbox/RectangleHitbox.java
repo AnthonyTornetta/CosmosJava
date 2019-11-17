@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.physics.shapes.Rectangle;
-import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.BlockFace;
 
 public class RectangleHitbox extends Hitbox implements Rectangle
@@ -48,8 +48,32 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 	{
 		corners = new Vector3f[2];
 		
-		corners[0] = new Vector3f(start);
-		corners[1] = new Vector3f(end);
+		Vector3f c1 = new Vector3f(start);
+		Vector3f c2 = new Vector3f(end);
+		
+		if(c1.x < c2.x)
+		{
+			float temp = c1.x;
+			c1.x = c2.x;
+			c2.x = temp;
+		}
+		
+		if(c1.y < c2.y)
+		{
+			float temp = c1.y;
+			c1.y = c2.y;
+			c2.y = temp;
+		}
+		
+		if(c1.z < c2.z)
+		{
+			float temp = c1.z;
+			c1.z = c2.z;
+			c2.z = temp;
+		}
+		
+		corners[0] = c1;
+		corners[1] = c2;
 		
 		triangles = new Vector3fc[6 * 2 * 3]; // 6 faces, 2 triangles per face, 3 verticies per triangle
 		faces = new BlockFace[6 * 2];
@@ -132,7 +156,7 @@ public class RectangleHitbox extends Hitbox implements Rectangle
 		faces[10] = BlockFace.BACK;
 		faces[11] = BlockFace.BACK;
 		
-		dimensions = Utils.sub(end, start);
+		dimensions = Maths.sub(end, start);
 	}
 	
 	@Override

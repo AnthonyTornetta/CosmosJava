@@ -2,7 +2,7 @@ package com.cornchipss.world;
 
 import org.joml.Vector3f;
 
-import com.cornchipss.utils.Utils;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
 
 public class Location
@@ -22,7 +22,7 @@ public class Location
 	{
 		setUniverse(universe);
 		setPosition(position);
-		setRotation(Utils.zero()); // TODO
+		setRotation(Maths.zero()); // TODO
 	}
 	
 	private void setRotation(Vector3f rot)

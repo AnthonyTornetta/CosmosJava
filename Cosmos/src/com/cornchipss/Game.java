@@ -67,7 +67,7 @@ public class Game implements Runnable
 		
 		sector.generate();
 		
-		Player player = new Player(0, 0, 0);
+		Player player = new Player(0, 128, 0);
 		player.setUniverse(universe);
 		
 		PlanetRenderer renderer = new PlanetRenderer();

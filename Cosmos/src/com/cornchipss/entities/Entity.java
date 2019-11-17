@@ -3,8 +3,7 @@ package com.cornchipss.entities;
 import org.joml.Vector3f;
 
 import com.cornchipss.physics.collision.hitbox.Hitbox;
-import com.cornchipss.utils.Utils;
-import com.cornchipss.world.Location;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.Universe;
 
 public abstract class Entity
@@ -19,36 +18,8 @@ public abstract class Entity
 	public Entity(float x, float y, float z, Hitbox hitbox)
 	{
 		this.position = new Vector3f(x, y, z);
-		this.velocity = Utils.zero();
+		this.velocity = Maths.zero();
 		this.hitbox = hitbox;
-	}
-	
-	public void updatePhysics()
-	{
-		Location[][][] locations = universe.getBlocksWithin(getPosition(), hitbox.getBoundingBox());
-		
-		Vector3f newPos = Utils.add(getPosition(), getVelocity());
-		
-		for(int z = 0; z < locations.length; z++)
-		{
-			for(int y = 0; y < locations[z].length; y++)
-			{
-				for(int x = 0; x < locations[z][y].length; x++)
-				{
-					if(locations[z][y][x] != null && locations[z][y][x].getBlock().isInteractable())
-					{
-						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
-						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getPosition(), newPos))
-						{
-//							getVelocity().mul(-0.01f);
-//							newPos = Utils.add(getPosition(), getVelocity());
-						}
-					}
-				}
-			}
-		}
-		
-		setPosition(newPos);
 	}
 	
 	public abstract void onUpdate();

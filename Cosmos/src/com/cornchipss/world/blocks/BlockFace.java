@@ -2,6 +2,8 @@ package com.cornchipss.world.blocks;
 
 import org.joml.Vector3f;
 
+import com.cornchipss.utils.Maths;
+
 public enum BlockFace
 {
 	FRONT(0), 
@@ -10,6 +12,7 @@ public enum BlockFace
 	BOTTOM(3),
 	RIGHT(4),
 	LEFT(5),
+	MAX(5),
 	UNKNOWN(-1);
 	
 	private int f;
@@ -45,7 +48,7 @@ public enum BlockFace
 		}
 	}
 
-	public Vector3f getDirection()
+	public Vector3f getRelativePosition()
 	{
 		switch(this)
 		{
@@ -59,10 +62,37 @@ public enum BlockFace
 			return new Vector3f(0, -.5f, 0);
 		case RIGHT:
 			return new Vector3f(.5f, 0, 0);
+		case MAX:
 		case LEFT:
 			return new Vector3f(-.5f, 0, 0);
 		default:
 			return new Vector3f(0, 0, 0);
 		}
+	}
+	
+	public Vector3f getDirection()
+	{
+		return Maths.mul(2, getRelativePosition());
+	}
+
+	public static BlockFace getClosestFace(Vector3f start, Vector3f block)
+	{
+		BlockFace closest = fromFaceIndex(0);
+		float dist = Maths.add(block, closest.getRelativePosition()).distanceSquared(start);
+		
+		for(int i = 1; i <= BlockFace.MAX.f; i++)
+		{
+			BlockFace f = fromFaceIndex(i);
+			
+			float distTemp = Maths.add(block, f.getRelativePosition()).distanceSquared(start);
+			
+			if(distTemp < dist)
+			{
+				dist = distTemp;
+				closest = f;
+			}
+		}
+		
+		return closest;
 	}
 }
