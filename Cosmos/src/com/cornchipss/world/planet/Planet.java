@@ -299,6 +299,9 @@ public class Planet
 	 */
 	public Block getBlock(int x, int y, int z)
 	{
+		if(blocks == null)
+			return null;
+		
 		short id = blocks[z - getBeginningCornerZ()][y - getBeginningCornerY()][x - getBeginningCornerX()];
 		
 		return Blocks.getBlock(id);

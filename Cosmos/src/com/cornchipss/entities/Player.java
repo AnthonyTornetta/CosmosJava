@@ -26,7 +26,7 @@ public class Player extends PhysicalEntity
 	
 	public static final float FRICTION = 1f;
 	
-	public static final float GRAVITY_ACCEL = -0.1f;
+	public static final float GRAVITY_ACCEL = -0.01f;
 	
 	private int blockSelected;
 	private Block[] blocks = new Block[] 
@@ -152,8 +152,8 @@ public class Player extends PhysicalEntity
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			addVelocityX(Utils.clamp(-(getVelocityX() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
-			addVelocityY(Utils.clamp(-getVelocityY(), -maxSlowdown, maxSlowdown) * 0.1f);
+			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * 0.1f);
+			addVelocityY(Utils.clamp(-(getVelocityY() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
 			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
 		}
 		
