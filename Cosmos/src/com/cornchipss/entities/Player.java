@@ -24,7 +24,9 @@ public class Player extends PhysicalEntity
 	private float maxSpeed = 0.25f;
 	private float maxSpeedY = 0.5f;
 	
-	public static final float FRICTION = .1f;
+	public static final float FRICTION = 1f;
+	
+	public static final float GRAVITY_ACCEL = -0.1f;
 	
 	private int blockSelected;
 	private Block[] blocks = new Block[] 
@@ -40,70 +42,63 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
-		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+		
+		float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f;
+		float ySpeed = 0.15f;
+		
+		float velX = 0, velY = 0, velZ = 0;
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 		{
-			float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .015f : .007f;
-			
-			float velX = 0, velY = 0, velZ = 0;
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-			{
-				velX = (float) (speed * Math.sin(getRy()));
-				velZ = (float) (-speed * Math.cos(getRy()));
-			}
-			if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-			{
-				velX = (float) (-speed * Math.sin(getRy()));
-				velZ = (float) (speed * Math.cos(getRy()));
-			}
-			if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-			{
-				velX = (float) (-speed * Math.cos(getRy()));
-				velZ = (float) (-speed * Math.sin(getRy()));
-			}
-			if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-			{
-				velX = (float) (speed * Math.cos(getRy()));
-				velZ = (float) (speed * Math.sin(getRy()));
-			}
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-			{
-				velY = speed;
-			}
-			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-			{
-				velY = -speed;
-			}
-			
-			if(Math.abs(getVelocityX() + velX) < Math.abs(getVelocityX()) || Math.abs(getVelocityX()) <= maxSpeed)
-			{
-				getVelocity().x = Utils.clamp(getVelocityX() + velX, -maxSpeed, maxSpeed);
-			}
-			if(Math.abs(getVelocityY() + velY) < Math.abs(getVelocityY()) || Math.abs(getVelocityY()) <= maxSpeedY)
-			{
-				getVelocity().y = Utils.clamp(getVelocityY() + velY, -maxSpeedY, maxSpeedY);
-			}
-			if(Math.abs(getVelocityZ() + velZ) < Math.abs(getVelocityZ()) || Math.abs(getVelocityZ()) <= maxSpeed)
-			{
-				getVelocity().z = Utils.clamp(getVelocityZ() + velZ, -maxSpeed, maxSpeed);
-			}
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-			{
-				setX(0);
-				setY(128);
-				setZ(0);
-				setRx(0);
-				setRy(0);
-				setVelocity(Maths.zero());
-			}
+			velX = (float) (speed * Math.sin(getRy()));
+			velZ = (float) (-speed * Math.cos(getRy()));
 		}
-		else
+		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
 		{
-			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * 0.1f);
-			addVelocityY(Utils.clamp(-getVelocityY(), -maxSlowdown, maxSlowdown) * 0.1f);
-			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
+			velX = (float) (-speed * Math.sin(getRy()));
+			velZ = (float) (speed * Math.cos(getRy()));
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
+		{
+			velX = (float) (-speed * Math.cos(getRy()));
+			velZ = (float) (-speed * Math.sin(getRy()));
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
+		{
+			velX = (float) (speed * Math.cos(getRy()));
+			velZ = (float) (speed * Math.sin(getRy()));
+		}
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
+		{
+			velY = ySpeed;
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
+		{
+			velY = -ySpeed;
+		}
+		
+		if(Math.abs(getVelocityX() + velX) < Math.abs(getVelocityX()) || Math.abs(getVelocityX()) <= maxSpeed)
+		{
+			getVelocity().x = Utils.clamp(getVelocityX() + velX, -maxSpeed, maxSpeed);
+		}
+		if(Math.abs(getVelocityY() + velY) < Math.abs(getVelocityY()) || Math.abs(getVelocityY()) <= maxSpeedY)
+		{
+			getVelocity().y = Utils.clamp(getVelocityY() + velY, -maxSpeedY, maxSpeedY);
+		}
+		if(Math.abs(getVelocityZ() + velZ) < Math.abs(getVelocityZ()) || Math.abs(getVelocityZ()) <= maxSpeed)
+		{
+			getVelocity().z = Utils.clamp(getVelocityZ() + velZ, -maxSpeed, maxSpeed);
+		}
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
+		{
+			setX(0);
+			setY(128);
+			setZ(0);
+			setRx(0);
+			setRy(0);
+			setVelocity(Maths.zero());
 		}
 		
 		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
@@ -153,14 +148,24 @@ public class Player extends PhysicalEntity
 			}
 		}
 		
-		addVelocityY(-.01f);
+		addVelocityY(GRAVITY_ACCEL);
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+		{
+			addVelocityX(Utils.clamp(-(getVelocityX() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
+			addVelocityY(Utils.clamp(-getVelocityY(), -maxSlowdown, maxSlowdown) * 0.1f);
+			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
+		}
 		
 		List<BlockFace> hits = updatePhysics();
 		
+		addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+		addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+		
 		if(Utils.contains(hits, BlockFace.TOP))
 		{
-			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * FRICTION);
-			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * FRICTION);
+//			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+//			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
 			
 			if(hits.size() == 1 && Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
 			{
