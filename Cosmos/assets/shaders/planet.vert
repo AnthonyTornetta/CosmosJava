@@ -21,11 +21,13 @@ out vec2 uv;
 
 void main()
 {
-	float icr = (in_uv.x - u_max_uv) / u_uv_size;
+	//float icr = (in_uv.x - u_max_uv) / u_uv_size;
 	
-	float deltaUv = icr * ((u_time / (u_time_between_uv * icr)) % icr);
+	//float deltaUv = icr * ((u_time / (u_time_between_uv * icr)) % icr);
 	
-	uv = vec2((in_uv.x + deltaUv) % u_uv_width, in_uv.y + int((in_uv.x + deltaUv) / u_uv_width));
+	//uv = vec2((in_uv.x + deltaUv) % u_uv_width, in_uv.y + int((in_uv.x + deltaUv) / u_uv_width));
+	
+	uv = in_uv;
 	
 	gl_Position = projection * view * vec4(in_position + in_translation + chunkLocation, 1.0);
 	color = in_color;
