@@ -85,6 +85,9 @@ public class Game implements Runnable
 		
 		while(!window.shouldClose() && !Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 		{
+			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
+				Input.toggleCursor();
+			
 			while(updateTimer.getDeltaMillis() >= 1000 / FPS_CAP)
 			{
 				player.onUpdate();

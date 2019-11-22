@@ -6,6 +6,10 @@ uniform vec3 chunkLocation;
 uniform mat4 projection;
 uniform mat4 view;
 
+uniform mat4 u_rotation_x;
+uniform mat4 u_rotation_y;
+uniform mat4 u_rotation_z;
+
 layout (location = 0) in vec3 in_position;
 layout (location = 1) in vec3 in_color;
 layout (location = 2) in vec2 in_uv;
@@ -18,6 +22,7 @@ void main()
 {
 	uv = in_uv;
 	
-	gl_Position = projection * view * vec4(in_position + in_translation + chunkLocation, 1.0);
+	gl_Position = projection * view * u_rotation_x * u_rotation_y * u_rotation_z * vec4(in_translation + in_position + chunkLocation, 1.0);
 	color = in_color;
 }
+

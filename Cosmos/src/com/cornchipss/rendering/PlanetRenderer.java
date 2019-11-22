@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -19,6 +20,8 @@ import com.cornchipss.world.planet.Planet;
 public class PlanetRenderer extends Renderer
 {
 	private int timeLocation, chunkLocation;
+	
+	private int rotXLoc, rotYLoc, rotZLoc;
 	
 	private Texture atlas;
 	
@@ -52,6 +55,10 @@ public class PlanetRenderer extends Renderer
 	{
 		timeLocation = getShader().getUniformLocation("u_time");
 		chunkLocation = getShader().getUniformLocation("chunkLocation");
+		
+		rotXLoc = getShader().getUniformLocation("u_rotation_x");
+		rotYLoc = getShader().getUniformLocation("u_rotation_y");
+		rotZLoc = getShader().getUniformLocation("u_rotation_z");
 	}
 	
 	@Override
@@ -73,7 +80,13 @@ public class PlanetRenderer extends Renderer
 		
 		if(planet.isGenerated())
 		{
-			getShader().setUniformVector(chunkLocation, planet.getAbsoluteX(), planet.getAbsoluteY(), planet.getAbsoluteZ());
+			getShader().loadUniformMatrix(rotXLoc, planet.getRotationXMatrix());
+			getShader().loadUniformMatrix(rotYLoc, planet.getRotationYMatrix());
+			getShader().loadUniformMatrix(rotZLoc, planet.getRotationZMatrix());
+			
+			Vector3fc planetPos = planet.getUniverseCoords();
+			
+			getShader().setUniformVector(chunkLocation, planetPos.x(), planetPos.y(), planetPos.z());
 			
 			Map<Model, Vector3fList> modelsAndPositions = planet.getModelsAndPositions();
 			

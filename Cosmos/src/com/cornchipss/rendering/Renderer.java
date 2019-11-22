@@ -45,8 +45,8 @@ public abstract class Renderer
 				player.getRx(), player.getRy(), player.getRz(), getViewMatrix());
 		
 		getShader().start();
-		getShader().loadUniformMatrix(getProjectionMatrix(), u_projectionLocation);
-		getShader().loadUniformMatrix(getViewMatrix(), u_viewLocation);
+		getShader().loadUniformMatrix(u_projectionLocation, getProjectionMatrix());
+		getShader().loadUniformMatrix(u_viewLocation, getViewMatrix());
 		
 		loadUniforms();
 		bindTextures();

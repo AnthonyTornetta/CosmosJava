@@ -46,7 +46,7 @@ public class Shader
 		GL30.glUniform3f(location, x, y, z);
 	}
 	
-	public void loadUniformMatrix(Matrix4f mat, int location)
+	public void loadUniformMatrix(int location, Matrix4f mat)
 	{
 		GL30.glUniformMatrix4fv(location, false, Utils.toFloatBuffer(mat));
 	}

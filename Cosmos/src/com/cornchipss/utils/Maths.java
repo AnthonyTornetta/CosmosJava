@@ -1,11 +1,15 @@
 package com.cornchipss.utils;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector4f;
 
 public class Maths
 {
+	public static float PI = (float)Math.PI;
+	
 	/**
 	 * Creates a view matrix based on coordinates + rotations
 	 * @param x X
@@ -25,6 +29,87 @@ public class Maths
 		dest.rotate(rz, 0, 0, 1);
 		
 		dest.translate(-x, -y, -z);
+	}
+	
+	public static Matrix4f createTransformationMatrix(Vector3f pos, float rx, float ry, float rz)
+	{
+		return createTransformationMatrix(pos, rx, ry, rz, 1);
+	}
+	
+	public static Matrix4f createTransformationMatrix(Vector3f pos, float rx, float ry, float rz, float scale)
+	{
+        Matrix4f matrix = new Matrix4f();
+        matrix.identity();
+        matrix.translate(pos);
+        matrix.rotate((float) Math.toRadians(rx), new Vector3f(1,0,0));
+        matrix.rotate((float) Math.toRadians(ry), new Vector3f(0,1,0));
+        matrix.rotate((float) Math.toRadians(rz), new Vector3f(0,0,1));
+        matrix.scale(new Vector3f(scale,scale,scale));
+        return matrix;
+    }
+	
+	/*
+	 * https://open.gl/transformations
+	 */
+	
+	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
+	{
+		if(axis.y() != 0)
+			angle -= Maths.PI / 2; // OpenGL is funny for whatever reason
+		
+	    float s = sin(angle);
+	    float c = cos(angle);
+	    float oc = 1.0f - c;
+	    
+	    return new Matrix4f(oc * axis.x() * axis.x() + c,           oc * axis.x() * axis.y() - axis.z() * s,  oc * axis.z() * axis.x() + axis.y() * s,  0.0f,
+	                oc * axis.x() * axis.y() + axis.z() * s,  oc * axis.y() * axis.y() + c,           oc * axis.y() * axis.z() - axis.x() * s,  0.0f,
+	                oc * axis.z() * axis.x() - axis.y() * s,  oc * axis.y() * axis.z() + axis.x() * s,  oc * axis.z() * axis.z() + c,           0.0f,
+	                0.0f,                                0.0f,                                0.0f,                                1.0f);
+	}
+	
+	public static Vector3f getPositionActual(Vector3f pos, Matrix4f... rotations)
+	{
+		Matrix4f rotationFinal = new Matrix4f();
+		rotationFinal.identity();
+		
+		for(Matrix4f rot : rotations)
+			rotationFinal.mul(rot);
+		
+		Vector4f vec = new Vector4f(pos.x, pos.y, pos.z, 0).mul(rotationFinal);
+		
+		return new Vector3f(vec.x, vec.y, vec.z);
+	}
+	
+	public static float cos(float theta)
+	{
+		return (float)Math.cos(theta);
+	}
+	
+	public static float sin(float theta)
+	{
+		return (float)Math.sin(theta);
+	}
+	
+	public static float tan(float theta)
+	{
+		return (float)Math.tan(theta);
+	}
+	
+	public static Vector3f rotatePoint(Matrix3f rotationMatrixX, Matrix3f rotationMatrixY, Matrix3f rotationMatrixZ, Vector3f point)
+	{
+		return new Vector3f(point).mul(rotationMatrixX).mul(rotationMatrixY).mul(rotationMatrixY);
+		
+//		rotationMatrixX = new Matrix3f(
+//				1, 0, 0,
+//				0, Math.cos(angle), -Math.sin(angle),
+//				0, Math.sin(angle), Math.cos(angle)
+//				);
+//		
+//		rotationMatrixY = new Matrix3f(
+//				Math.cos(angle), -Math.sin(angle)
+//				);
+//		
+//		rotationMatrixX.mul(right, point);
 	}
 	
 	/**

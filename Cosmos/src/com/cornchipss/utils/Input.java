@@ -71,4 +71,9 @@ public class Input
 	public static float getMouseY() { return mouseListener.getMouse().y; }
 	public static float getMouseDeltaX() { return mouseListener.getMouse().deltaX; }
 	public static float getMouseDeltaY() { return mouseListener.getMouse().deltaY; }
+
+	public static void toggleCursor()
+	{
+		hideCursor(GLFW.glfwGetInputMode(window.getId(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_NORMAL);
+	}
 }

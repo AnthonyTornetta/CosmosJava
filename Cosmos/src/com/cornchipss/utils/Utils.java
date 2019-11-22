@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3dc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
 import org.lwjgl.BufferUtils;
@@ -15,6 +16,8 @@ public class Utils
 	 * Buffer purely for holding mitricies. Pre-allocated to save some runtime processes
 	 */
 	private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
+	
+	private static final Vector3fc X_VECTOR = new Vector3f(1, 0, 0), Y_VECTOR = new Vector3f(0, 1, 0), Z_VECTOR = new Vector3f(0, 0, 1);
 	
 	/**
 	 * Prints an object w/ the class & line number next to it and a newline
@@ -223,5 +226,7 @@ public class Utils
 		return a.equals(b);
 	}
 
-	
+	public static Vector3fc x() { return X_VECTOR; }
+	public static Vector3fc y() { return Y_VECTOR; }
+	public static Vector3fc z() { return Z_VECTOR; }
 }
