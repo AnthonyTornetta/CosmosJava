@@ -613,4 +613,17 @@ public abstract class BlockStructure
 	{ 
 		this.generated = b;
 	}
+	
+	/**
+	 * Rotates the planet
+	 * @param rx The change in x rotation
+	 * @param ry The change in y rotation
+	 * @param rz The change in z rotation
+	 */
+	public void rotate(float rx, float ry, float rz)
+	{
+		setRotationX(this.rx + rx);
+		setRotationY(this.ry + ry);
+		setRotationZ(this.rz + rz);
+	}
 }

@@ -11,6 +11,7 @@ import com.cornchipss.rendering.DebugRenderer;
 import com.cornchipss.rendering.PlanetRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Timer;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
@@ -90,6 +91,8 @@ public class Game implements Runnable
 			
 			while(updateTimer.getDeltaMillis() >= 1000 / FPS_CAP)
 			{
+				float r = (float)GLFW.glfwGetTime() / 1000000f;
+				sector.getPlanet(0, 0, 0).rotate(r, r, r);
 				player.onUpdate();
 				sector.update(player);
 				
