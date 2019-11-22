@@ -1,7 +1,9 @@
 package com.cornchipss.entities;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.world.Universe;
@@ -10,14 +12,14 @@ public abstract class Entity
 {
 	private Hitbox hitbox;
 	
-	private float rx, ry, rz;
-	private Vector3f position;
+	private Transform transform;
+	
 	private Vector3f velocity;
 	private Universe universe;
 	
 	public Entity(float x, float y, float z, Hitbox hitbox)
 	{
-		this.position = new Vector3f(x, y, z);
+		transform = new Transform(new Vector3f(x, y, z));
 		this.velocity = Maths.zero();
 		this.hitbox = hitbox;
 	}
@@ -27,26 +29,26 @@ public abstract class Entity
 	public Hitbox getHitbox() { return hitbox; }
 	protected void setHitbox(Hitbox hitbox) { this.hitbox = hitbox; }
 	
-	public float getRx() { return rx; }
-	public void setRx(float rx) { this.rx = rx; }
+	public float getX() { return transform.getPosition().x(); }
+	public void setX(float x) { transform.setX(x); }
 
-	public float getRy() { return ry; }
-	public void setRy(float ry) { this.ry = ry; }
+	public float getY() { return transform.getPosition().y(); }
+	public void setY(float y) { transform.setY(y); }
 
-	public float getRz() { return rz; }
-	public void setRz(float rz) { this.rz = rz; }
+	public float getZ() { return transform.getPosition().z(); }
+	public void setZ(float z) { transform.setZ(z); }
 
-	public float getX() { return position.x; }
-	public void setX(float x) { this.position.x = x; }
+	public float getRx() { return transform.getRotationX(); }
+	public void setRx(float x) { transform.setRotationX(x); }
 
-	public float getY() { return position.y; }
-	public void setY(float y) { this.position.y = y; }
+	public float getRy() { return transform.getRotationY(); }
+	public void setRy(float y) { transform.setRotationY(y); }
 
-	public float getZ() { return position.z; }
-	public void setZ(float z) { this.position.z = z; }
+	public float getRz() { return transform.getRotationZ(); }
+	public void setRz(float z) { transform.setRotationZ(z); }
 	
-	public Vector3f getPosition() { return position; }
-	public void setPosition(Vector3f pos) { this.position = pos; }
+	public Vector3f getPosition() { return transform.getPosition(); }
+	public void setPosition(Vector3fc pos) { transform.setPosition(pos); }
 	
 	public Vector3f getVelocity() { return velocity; }
 	public void setVelocity(Vector3f vel) { this.velocity = vel; }
@@ -58,6 +60,9 @@ public abstract class Entity
 	public float getVelocityX() { return velocity.x; }
 	public float getVelocityY() { return velocity.y; }
 	public float getVelocityZ() { return velocity.z; }
+	
+	public Transform getTransform() { return transform; }
+	public void setTransform(Transform t) { this.transform = t; }
 	
 	public Universe getUniverse() { return universe; }
 	public void setUniverse(Universe universe) { this.universe = universe; }

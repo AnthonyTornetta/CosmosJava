@@ -107,9 +107,7 @@ public class Sector
 	{
 		planets[z + CHUNK_OFFSET][y + CHUNK_OFFSET][x + CHUNK_OFFSET] = planet;
 		planet.setSector(this);
-		planet.setPlanetX(x);
-		planet.setPlanetY(y);
-		planet.setPlanetZ(z);
+		planet.setSectorCoords(x, y, z);
 	}
 	
 	/**

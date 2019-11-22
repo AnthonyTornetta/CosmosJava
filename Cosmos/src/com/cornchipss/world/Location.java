@@ -1,15 +1,16 @@
 package com.cornchipss.world;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
 
 public class Location
 {
-	private Vector3f position;
-	private Vector3f relativeRotation;
 	private Universe universe;
+	private Transform trans;
 	
 	private Block block;
 	
@@ -20,45 +21,34 @@ public class Location
 	
 	public Location(Vector3f position, Universe universe)
 	{
-		setUniverse(universe);
-		setPosition(position);
-		setRotation(Maths.zero()); // TODO
+		this.universe = universe;
+		trans = new Transform(position, Maths.zero()); // TODO: get rotation
+		
+		block = getUniverse().getBlockAt(position);
 	}
 	
-	private void setRotation(Vector3f rot)
-	{
-		this.relativeRotation = rot;
-	}
-	public Vector3f getRelativeRotation() { return relativeRotation; }
+	public Transform getTransform() { return trans; }
+	
+	public Vector3fc getRotation() { return trans.getRotation(); }
 
-	public Vector3f getPosition()
-	{
-		return position;
-	}
+	public Vector3f getPosition() { return trans.getPosition(); }
 	public void setPosition(Vector3f position)
 	{
-		this.position = position;
+		trans.setPosition(position);
 		this.block = getUniverse().getBlockAt(getPosition());
 	}
 	
-	public Block getBlock()
-	{
-		return block;
-	}
+	public Block getBlock() { return block; }
 	public void setBlock(Block block)
 	{
 		getUniverse().setBlockAt(getPosition(), block);
 		this.block = block;
 	}
 	
-	public Universe getUniverse()
-	{
-		return universe;
-	}
+	public Universe getUniverse() { return universe; }
 	public void setUniverse(Universe universe)
 	{
 		this.universe = universe;
+		block = universe.getBlockAt(trans.getPosition());
 	}
-	
-	
 }

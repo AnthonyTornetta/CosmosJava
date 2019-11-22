@@ -1,8 +1,10 @@
 package com.cornchipss.physics.collision.hitbox;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.datatypes.Tuple;
 import com.cornchipss.world.blocks.BlockFace;
@@ -16,12 +18,40 @@ public abstract class Hitbox // Another name for Hotbox
 	 * Returns true if two hitboxes are colliding based on the two positions
 	 * @param a Hitbox A
 	 * @param b Hitbox B
-	 * @param positionA Position of hitbox A
-	 * @param positionB Position of hitbox B
-	 * @param c 
+	 * @param positionA Unrotated position of hitbox A
+	 * @param positionB Unrotated position of hitbox B
 	 * @return true if two hitboxes are colliding based on the two positions
 	 */
-	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, boolean c)
+	@Deprecated
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB)
+	{
+		return isColliding(a, b, positionA, positionB, Maths.identity(), Maths.identity());
+	}
+	
+	/**
+	 * Returns true if two hitboxes are colliding based on the two positions
+	 * @param a Hitbox A
+	 * @param b Hitbox B
+	 * @param transformA Transform of hitbox A
+	 * @param transformB Transform of hitbox B
+	 * @return true if two hitboxes are colliding based on the two positions
+	 */
+	public static boolean isColliding(Hitbox a, Hitbox b, Transform transformA, Transform transformB)
+	{
+		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), Maths.identity(), Maths.identity());
+	}
+	
+	/**
+	 * Returns true if two hitboxes are colliding based on the two positions
+	 * @param a Hitbox A
+	 * @param b Hitbox B
+	 * @param positionA Position of hitbox A
+	 * @param positionB Position of hitbox B
+	 * @param rotationA Rotation of hitbox A
+	 * @param rotationB Rotation of hitbox B
+	 * @return true if two hitboxes are colliding based on the two positions
+	 */
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, Matrix4f rotationA, Matrix4f rotationB)
 	{
 		if(a == null || b == null)
 			return false;

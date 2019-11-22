@@ -1,10 +1,10 @@
 package com.cornchipss.utils;
 
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
+import org.joml.Vector4fc;
 
 public class Maths
 {
@@ -41,10 +41,10 @@ public class Maths
         Matrix4f matrix = new Matrix4f();
         matrix.identity();
         matrix.translate(pos);
-        matrix.rotate((float) Math.toRadians(rx), new Vector3f(1,0,0));
-        matrix.rotate((float) Math.toRadians(ry), new Vector3f(0,1,0));
-        matrix.rotate((float) Math.toRadians(rz), new Vector3f(0,0,1));
-        matrix.scale(new Vector3f(scale,scale,scale));
+        matrix.rotate(rx, new Vector3f(1,0,0));
+        matrix.rotate(ry, new Vector3f(0,1,0));
+        matrix.rotate(rz, new Vector3f(0,0,1));
+        matrix.scale(new Vector3f(scale, scale, scale));
         return matrix;
     }
 	
@@ -95,21 +95,15 @@ public class Maths
 		return (float)Math.tan(theta);
 	}
 	
-	public static Vector3f rotatePoint(Matrix3f rotationMatrixX, Matrix3f rotationMatrixY, Matrix3f rotationMatrixZ, Vector3f point)
+	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector3fc point)
 	{
-		return new Vector3f(point).mul(rotationMatrixX).mul(rotationMatrixY).mul(rotationMatrixY);
-		
-//		rotationMatrixX = new Matrix3f(
-//				1, 0, 0,
-//				0, Math.cos(angle), -Math.sin(angle),
-//				0, Math.sin(angle), Math.cos(angle)
-//				);
-//		
-//		rotationMatrixY = new Matrix3f(
-//				Math.cos(angle), -Math.sin(angle)
-//				);
-//		
-//		rotationMatrixX.mul(right, point);
+		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX, new Vector4f(point.x(), point.y(), point.z(), 0));
+	}
+	
+	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector4fc point)
+	{
+		Vector4f vec = new Vector4f(point).mul(rotationMatrixX).mul(rotationMatrixY).mul(rotationMatrixY);
+		return new Vector3f(vec.x, vec.y, vec.z);
 	}
 	
 	/**
@@ -169,6 +163,11 @@ public class Maths
 			v.add(c);
 		
 		return v;
+	}
+	
+	public static Vector3f add(Vector3fc v, float x, float y, float z)
+	{
+		return new Vector3f(v.x() + x, v.y() + y, v.z() + z);
 	}
 	
 	/**
@@ -305,5 +304,20 @@ public class Maths
 	public static Vector3fc negative()
 	{
 		return new Vector3f(-1, -1, -1);
+	}
+
+	public static float toRads(float degs)
+	{
+		return Maths.PI * degs / 180f;
+	}
+	
+	public static float toDegs(float rads)
+	{
+		return rads * 180f / Maths.PI;
+	}
+
+	public static Matrix4f identity()
+	{
+		return new Matrix4f().identity();
 	}
 }

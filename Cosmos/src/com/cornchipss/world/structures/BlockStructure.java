@@ -9,44 +9,41 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
-import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.blocks.Block;
-import com.cornchipss.world.planet.Planet;
 import com.cornchipss.world.sector.Sector;
 
 public abstract class BlockStructure
 {
 	/**
-	 * <p>Coordinate of the planet's center, relative to the sector's chunk coordinates</p>
-	 * <p>So a planet coordinate of 0 would coordinate exactly to the top left corner of the sector</p>
+	 * <p>Coordinate of the BlockStructure's center, relative to the sector's chunk coordinates</p>
+	 * <p>So a BlockStructure coordinate of 0 would coordinate exactly to the center of the sector</p>
 	 */
-	private float planetX, planetY, planetZ;
+	private Vector3f sectorCoords;
 	
 	/**
-	 * Every block that makes up the planet
+	 * Every block that makes up the BlockStructure
 	 */
 	private short[][][] blocks;
 	
 	/**
-	 * Dimensions of the planet
+	 * Dimensions of the BlockStructure
 	 */
 	private int width, height, length;
 	
-	private float rx, ry, rz;
-	
-	private Matrix4f rotationX = new Matrix4f().identity(), rotationY = new Matrix4f().identity(), rotationZ = new Matrix4f().identity();
+	private Transform transform;
 	
 	/**
-	 * The sector the planet is a part of (wow)
+	 * The sector the BlockStructure is a part of (wow)
 	 */
 	private Sector sector;
 	
 	/**
-	 * A list of every model present on the planet and each position that model is at
+	 * A list of every model present on the BlockStructure and each position that model is at
 	 */
 	private Map<Model, Vector3fList> modelsList = new HashMap<>();
 	private Map<Vector3i, Model> modelsCoords = new HashMap<>();
@@ -59,43 +56,30 @@ public abstract class BlockStructure
 		this.height = height;
 		this.length = length;
 		
-		setRotationX(rx);
-		setRotationY(ry);
-		setRotationZ(rz);
+		transform = new Transform();
+		transform.setRotation(new Vector3f(rx, ry, rz));
 	}
 	
 	/*
 	 * https://open.gl/transformations
 	 */
 	
-	public float getRotationX() { return rx; }
-	public void setRotationX(float rx)
-	{
-		this.rx = rx;
-		rotationX = Maths.createRotationMatrix(Utils.x(), rx);
-	}
+	public float getRotationX() { return transform.getRotationX(); }
+	public void setRotationX(float rx) { transform.setRotationX(rx); }
 	
-	public float getRotationY() { return ry; }
-	public void setRotationY(float ry)
-	{
-		this.ry = ry;
-		rotationY = Maths.createRotationMatrix(Utils.y(), ry);
-	}
+	public float getRotationY() { return transform.getRotationY(); }
+	public void setRotationY(float ry) { transform.setRotationY(ry); }
 	
-	public float getRotationZ() { return rz; }
-	public void setRotationZ(float rz)
-	{
-		this.rz = rz;
-		rotationZ = Maths.createRotationMatrix(Utils.z(), rz);
-	}
+	public float getRotationZ() { return transform.getRotationZ(); }
+	public void setRotationZ(float rz) { transform.setRotationZ(rz); }
 	
-	public Matrix4f getRotationXMatrix() { return rotationX; }
-	public Matrix4f getRotationYMatrix() { return rotationY; }
-	public Matrix4f getRotationZMatrix() { return rotationZ; }
+	public Matrix4f getRotationXMatrix() { return transform.getRotationMatrixX(); }
+	public Matrix4f getRotationYMatrix() { return transform.getRotationMatrixY(); }
+	public Matrix4f getRotationZMatrix() { return transform.getRotationMatrixZ(); }
 	
 	/**
-	 * Gets the absolute center position of the planet
-	 * @return The absolute center position of the planet
+	 * Gets the absolute center position of the BlockStructure
+	 * @return The absolute center position of the BlockStructure
 	 */
 	private float getAbsoluteX()
 	{
@@ -103,8 +87,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the absolute center position of the planet
-	 * @return The absolute center position of the planet
+	 * Gets the absolute center position of the BlockStructure
+	 * @return The absolute center position of the BlockStructure
 	 */
 	private float getAbsoluteY()
 	{
@@ -112,8 +96,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the absolute center position of the planet
-	 * @return The absolute center position of the planet
+	 * Gets the absolute center position of the BlockStructure
+	 * @return The absolute center position of the BlockStructure
 	 */
 	private float getAbsoluteZ()
 	{
@@ -121,8 +105,17 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the absolute center position of the planet
-	 * @return The absolute center position of the planet
+	 * Gets the absolute center position of the BlockStructure
+	 * @return The absolute center position of the BlockStructure
+	 */
+	public Vector3f getAbsolutePosition()
+	{
+		return new Vector3f(getAbsoluteX(), getAbsoluteY(), getAbsoluteZ());
+	}
+	
+	/**
+	 * Gets the absolute center position of the BlockStructure
+	 * @return The absolute center position of the BlockStructure
 	 */
 	public Vector3fc getUniverseCoords()
 	{
@@ -130,8 +123,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * <p>Sets the sector that the planet is a part of</p>
-	 * <p>Make sure to update variables such as the planet's position in the sector!</p>
+	 * <p>Sets the sector that the BlockStructure is a part of</p>
+	 * <p>Make sure to update variables such as the BlockStructure's position in the sector!</p>
 	 * @param sector The sector to set it to
 	 */
 	public void setSector(Sector sector)
@@ -172,7 +165,7 @@ public abstract class BlockStructure
 	
 	/**
 	 * <p>Adds/Replaces a model to the list of models at a given coordinate, and makes sure there is no model already there.</p>
-	 * <p>This automatically calls {@link Planet#removeModel(int, int, int)} before trying to add a new one</p>
+	 * <p>This automatically calls {@link BlockStructure#removeModel(int, int, int)} before trying to add a new one</p>
 	 * @param pos The coordinates of the block to add/replace
 	 * @param oldBlock The block that used to be here if you're changing it
 	 */
@@ -183,7 +176,7 @@ public abstract class BlockStructure
 	
 	/**
 	 * <p>Adds/Replaces a model to the list of models at a given coordinate, and makes sure there is no model already there.</p>
-	 * <p>This automatically calls {@link Planet#removeModel(int, int, int)} before trying to add a new one</p>
+	 * <p>This automatically calls {@link BlockStructure#removeModel(int, int, int)} before trying to add a new one</p>
 	 * @param x The x coordinate of the block to add/replace
 	 * @param y The y coordinate of the block to add/replace
 	 * @param z The z coordinate of the block to add/replace
@@ -315,8 +308,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Saves memory by not creating an array for every planet, even if the actual blocks haven't been generated/set yet.
-	 * This is called whenever the {@link Planet#setBlock(int, int, int, boolean, short)} function is called for the first time.
+	 * Saves memory by not creating an array for every BlockStructure, even if the actual blocks haven't been generated/set yet.
+	 * This is called whenever the {@link BlockStructure#setBlock(int, int, int, boolean, short)} function is called for the first time.
 	 */
 	private void initBlocks()
 	{
@@ -332,7 +325,7 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * <p>Updates every model in the planet, so call sparingly.</p>
+	 * <p>Updates every model in the BlockStructure, so call sparingly.</p>
 	 */
 	public void render()
 	{
@@ -352,11 +345,11 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets a block at the relative coordinates of the planet's center
-	 * @param x The x coordinate relative to the planet's center
-	 * @param y The y coordinate relative to the planet's center
-	 * @param z The z coordinate relative to the planet's center
-	 * @return The block at a given coordinate relative the planet's center
+	 * Gets a block at the relative coordinates of the BlockStructure's center
+	 * @param x The x coordinate relative to the BlockStructure's center
+	 * @param y The y coordinate relative to the BlockStructure's center
+	 * @param z The z coordinate relative to the BlockStructure's center
+	 * @return The block at a given coordinate relative the BlockStructure's center
 	 */
 	public Block getBlock(int x, int y, int z)
 	{
@@ -369,9 +362,9 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets a block at the relative coordinates of the planet's center
-	 * @param c The coordinates relative to the planet's center
-	 * @return The block at a given coordinate relative the planet's center
+	 * Gets a block at the relative coordinates of the BlockStructure's center
+	 * @param c The coordinates relative to the BlockStructure's center
+	 * @return The block at a given coordinate relative the BlockStructure's center
 	 */
 	public Block getBlock(Vector3i c)
 	{
@@ -379,9 +372,9 @@ public abstract class BlockStructure
 	}
 
 	/**
-	 * Sees if there is a block at the relative coordinates of the planet's center
-	 * @param c The coordinates relative to the planet's center
-	 * @return If there is a block at a given coordinate relative the planet's center
+	 * Sees if there is a block at the relative coordinates of the BlockStructure's center
+	 * @param c The coordinates relative to the BlockStructure's center
+	 * @return If there is a block at a given coordinate relative the BlockStructure's center
 	 */
 	public boolean hasBlockAt(Vector3f c)
 	{
@@ -389,11 +382,11 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Sees if there is a block at the relative coordinates of the planet's center
-	 * @param x The x coordinate relative to the planet's center
-	 * @param y The y coordinate relative to the planet's center
-	 * @param z The z coordinate relative to the planet's center
-	 * @return If there is a block at a given coordinate relative the planet's center
+	 * Sees if there is a block at the relative coordinates of the BlockStructure's center
+	 * @param x The x coordinate relative to the BlockStructure's center
+	 * @param y The y coordinate relative to the BlockStructure's center
+	 * @param z The z coordinate relative to the BlockStructure's center
+	 * @return If there is a block at a given coordinate relative the BlockStructure's center
 	 */
 	public boolean hasBlockAt(float x, float y, float z)
 	{
@@ -412,10 +405,10 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Sets a block at the given coordinate, relative to the planet and updates the planet's model
-	 * @param x The x coordinate, relative to the planet's center
-	 * @param y The y coordinate, relative to the planet's center
-	 * @param z The z coordinate, relative to the planet's center
+	 * Sets a block at the given coordinate, relative to the BlockStructure and updates the BlockStructure's model
+	 * @param x The x coordinate, relative to the BlockStructure's center
+	 * @param y The y coordinate, relative to the BlockStructure's center
+	 * @param z The z coordinate, relative to the BlockStructure's center
 	 * @param b The block to set it to
 	 */
 	public void setBlock(int x, int y, int z, Block b)
@@ -424,10 +417,10 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Sets a block at the given coordinate, relative to the planet
-	 * @param x The x coordinate, relative to the planet's center
-	 * @param y The y coordinate, relative to the planet's center
-	 * @param z The z coordinate, relative to the planet's center
+	 * Sets a block at the given coordinate, relative to the BlockStructure
+	 * @param x The x coordinate, relative to the BlockStructure's center
+	 * @param y The y coordinate, relative to the BlockStructure's center
+	 * @param z The z coordinate, relative to the BlockStructure's center
 	 * @param setModel Whether or not the model should be set - this should only be called if you are calling a render() later. (When in doubt, set to true)
 	 * @param b The block to set it to
 	 */
@@ -437,10 +430,10 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Sets a block at the given coordinate, relative to the planet and updates the planet's model
-	 * @param x The x coordinate, relative to the planet's center
-	 * @param y The y coordinate, relative to the planet's center
-	 * @param z The z coordinate, relative to the planet's center
+	 * Sets a block at the given coordinate, relative to the BlockStructure and updates the BlockStructure's model
+	 * @param x The x coordinate, relative to the BlockStructure's center
+	 * @param y The y coordinate, relative to the BlockStructure's center
+	 * @param z The z coordinate, relative to the BlockStructure's center
 	 * @param id The block's id to set it to
 	 */
 	public void setBlock(int x, int y, int z, short id)
@@ -449,10 +442,10 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Sets a block at the given coordinate, relative to the planet
-	 * @param x The x coordinate, relative to the planet's center
-	 * @param y The y coordinate, relative to the planet's center
-	 * @param z The z coordinate, relative to the planet's center
+	 * Sets a block at the given coordinate, relative to the BlockStructure
+	 * @param x The x coordinate, relative to the BlockStructure's center
+	 * @param y The y coordinate, relative to the BlockStructure's center
+	 * @param z The z coordinate, relative to the BlockStructure's center
 	 * @param setModel Whether or not the model should be set - this should only be called if you are calling a render() later. (When in doubt, set to true)
 	 * @param b The block to set it to
 	 */
@@ -477,8 +470,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the negative x direction
-	 * @return The corner of the planet in the negative x direction
+	 * Gets the corner of the BlockStructure in the negative x direction
+	 * @return The corner of the BlockStructure in the negative x direction
 	 */
 	public int getBeginningCornerX()
 	{
@@ -486,8 +479,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the negative y direction
-	 * @return The corner of the planet in the negative y direction
+	 * Gets the corner of the BlockStructure in the negative y direction
+	 * @return The corner of the BlockStructure in the negative y direction
 	 */
 	public int getBeginningCornerY()
 	{
@@ -495,8 +488,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the negative z direction
-	 * @return The corner of the planet in the negative z direction
+	 * Gets the corner of the BlockStructure in the negative z direction
+	 * @return The corner of the BlockStructure in the negative z direction
 	 */
 	public int getBeginningCornerZ()
 	{
@@ -504,8 +497,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the positive x direction
-	 * @return The corner of the planet in the positive x direction
+	 * Gets the corner of the BlockStructure in the positive x direction
+	 * @return The corner of the BlockStructure in the positive x direction
 	 */
 	public int getEndingCornerX()
 	{
@@ -513,8 +506,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the positive y direction
-	 * @return The corner of the planet in the positive y direction
+	 * Gets the corner of the BlockStructure in the positive y direction
+	 * @return The corner of the BlockStructure in the positive y direction
 	 */
 	public int getEndingCornerY()
 	{
@@ -522,8 +515,8 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets the corner of the planet in the positive z direction
-	 * @return The corner of the planet in the positive z direction
+	 * Gets the corner of the BlockStructure in the positive z direction
+	 * @return The corner of the BlockStructure in the positive z direction
 	 */
 	public int getEndingCornerZ()
 	{
@@ -531,37 +524,43 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * The x of the planet relative to the position of the sector
-	 * @return The x of the planet relative to the position of the sector
+	 * The x of the BlockStructure relative to the position of the sector
+	 * @return The x of the BlockStructure relative to the position of the sector
 	 */
-	public float getSectorX() { return planetX; }
+	public float getSectorX() { return sectorCoords.x; }
 	
 	/**
-	 * The y of the planet relative to the position of the sector
-	 * @return The y of the planet relative to the position of the sector
+	 * The y of the BlockStructure relative to the position of the sector
+	 * @return The y of the BlockStructure relative to the position of the sector
 	 */
-	public float getSectorY() { return planetY; }
+	public float getSectorY() { return sectorCoords.y; }
 	
 	/**
-	 * The z of the planet relative to the position of the sector
-	 * @return The z of the planet relative to the position of the sector
+	 * The z of the BlockStructure relative to the position of the sector
+	 * @return The z of the BlockStructure relative to the position of the sector
 	 */
-	public float getSectorZ() { return planetZ; }
+	public float getSectorZ() { return sectorCoords.z; }
 	
 	/**
-	 * Sets the x of the planet relative to the position of the sector
+	 * Sets the coords of the BlockStructure relative to the center of the sector
+	 * @param coords The coords relative to the center of the center
 	 */
-	public void setPlanetX(float x) { this.planetX = x; }
+	public void setSectorCoords(Vector3fc coords)
+	{
+		setSectorCoords(coords.x(), coords.y(), coords.z());
+	}
 	
 	/**
-	 * Sets the y of the planet relative to the position of the sector
+	 * Sets the coords of the BlockStructure relative to the center of the sector
+	 * @param x The x coord relative to the center of the center
+	 * @param y The y coord relative to the center of the center
+	 * @param z The z coord relative to the center of the center
 	 */
-	public void setPlanetY(float y) { this.planetY = y; }
-	
-	/**
-	 * Sets the z of the planet relative to the position of the sector
-	 */
-	public void setPlanetZ(float z) { this.planetZ = z; }
+	public void setSectorCoords(float x, float y, float z)
+	{
+		sectorCoords = new Vector3f(x, y, z);
+		transform.setPosition(getAbsolutePosition());
+	}
 	
 	/**
 	 * Gets the array of blocks as an array of shorts that have each block's ID
@@ -570,26 +569,26 @@ public abstract class BlockStructure
 	public short[][][] getBlocks() { return blocks; }
 	
 	/**
-	 * The width of blocks the planet can hold
-	 * @return The width of blocks the planet can hold
+	 * The width of blocks the BlockStructure can hold
+	 * @return The width of blocks the BlockStructure can hold
 	 */
 	public int getWidth() { return width; }
 	
 	/**
-	 * The height of blocks the planet can hold
-	 * @return The height of blocks the planet can hold
+	 * The height of blocks the BlockStructure can hold
+	 * @return The height of blocks the BlockStructure can hold
 	 */
 	public int getHeight() { return height; }
 	
 	/**
-	 * The length of blocks the planet can hold
-	 * @return The length of blocks the planet can hold
+	 * The length of blocks the BlockStructure can hold
+	 * @return The length of blocks the BlockStructure can hold
 	 */
 	public int getLength() { return length; }
 	
 	/**
-	 * Gets every model the planet has and every position that model is at
-	 * @return Every model the planet has and every position that model is at
+	 * Gets every model the BlockStructure has and every position that model is at
+	 * @return Every model the BlockStructure has and every position that model is at
 	 */
 	public Map<Model, Vector3fList> getModelsAndPositions()
 	{
@@ -600,13 +599,13 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Gets if the planet has been generated
-	 * @return If the planet has been generated or not
+	 * Gets if the BlockStructure has been generated
+	 * @return If the BlockStructure has been generated or not
 	 */
 	public boolean isGenerated() { return generated; }
 
 	/**
-	 * Sets if the planet has been generated
+	 * Sets if the BlockStructure has been generated
 	 * @param b Whether or not it has
 	 */
 	public void setGenerated(boolean b) 
@@ -615,15 +614,13 @@ public abstract class BlockStructure
 	}
 	
 	/**
-	 * Rotates the planet
+	 * Rotates the BlockStructure
 	 * @param rx The change in x rotation
 	 * @param ry The change in y rotation
 	 * @param rz The change in z rotation
 	 */
 	public void rotate(float rx, float ry, float rz)
 	{
-		setRotationX(this.rx + rx);
-		setRotationY(this.ry + ry);
-		setRotationZ(this.rz + rz);
+		transform.rotate(rx, ry, rz);
 	}
 }

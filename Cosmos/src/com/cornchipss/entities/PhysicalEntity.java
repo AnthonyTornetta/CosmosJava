@@ -42,7 +42,7 @@ public abstract class PhysicalEntity extends Entity
 					{
 						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
 						
-						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getPosition(), newPos, locations[z][y][x].getPosition().x() > getX()))
+						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getPosition(), newPos))
 						{
 							BlockFace f = BlockFace.getClosestFace(getPosition(), locations[z][y][x].getPosition());
 							
