@@ -42,9 +42,8 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
-		
 		float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f;
-		float ySpeed = 0.15f;
+		float ySpeed = 0.015f;
 		
 		float velX = 0, velY = 0, velZ = 0;
 		
