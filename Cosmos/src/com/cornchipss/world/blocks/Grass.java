@@ -15,4 +15,10 @@ public class Grass extends Block
 				return 4;
 		}
 	}
+
+	@Override
+	public float getMass()
+	{
+		return 1220; // https://www.engineeringtoolbox.com/dirt-mud-densities-d_1727.html
+	}
 }

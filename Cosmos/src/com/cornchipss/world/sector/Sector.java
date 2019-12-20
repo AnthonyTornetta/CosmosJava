@@ -73,6 +73,9 @@ public class Sector
 	
 	public void update(Player player)
 	{
+		float r = (float)0.0004f;
+		getPlanet(0, 0, 0).rotate(0, r, 0);
+		
 		if(firstUpdate || player.getX() != lastX || player.getY() != lastY || player.getZ() != lastZ)
 		{
 			int lastSectorX = chunkAtLocalX(lastX);

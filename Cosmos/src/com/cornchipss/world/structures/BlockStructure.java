@@ -9,6 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.cornchipss.objects.PhysicalObject;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
@@ -17,13 +18,18 @@ import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.sector.Sector;
 
-public abstract class BlockStructure
+public abstract class BlockStructure extends PhysicalObject
 {
 	/**
 	 * <p>Coordinate of the BlockStructure's center, relative to the sector's chunk coordinates</p>
 	 * <p>So a BlockStructure coordinate of 0 would coordinate exactly to the center of the sector</p>
 	 */
 	private Vector3f sectorCoords;
+	
+	/**
+	 * The total mass of the planet - stored as a variable to avoid calculating it every time
+	 */
+	private float mass;
 	
 	/**
 	 * Every block that makes up the BlockStructure
@@ -60,9 +66,11 @@ public abstract class BlockStructure
 		transform.setRotation(new Vector3f(rx, ry, rz));
 	}
 	
-	/*
-	 * https://open.gl/transformations
-	 */
+	@Override
+	public float getMass()
+	{
+		return mass;
+	}
 	
 	public float getRotationX() { return transform.getRotationX(); }
 	public void setRotationX(float rx) { transform.setRotationX(rx); }
@@ -390,13 +398,14 @@ public abstract class BlockStructure
 	 */
 	public boolean hasBlockAt(float x, float y, float z)
 	{
-		Vector3f actualBeginning = new Vector3f(getBeginningCornerX(), getBeginningCornerY(), getBeginningCornerZ());
-		Vector3f actualEnd = new Vector3f(getEndingCornerX(), getEndingCornerY(), getEndingCornerZ());
+		Vector3f actualBeginning = getBeginningCorner();
+		Vector3f actualEnd = getEndingCorner();
 		
 //		Vector3f actualBeginning = Maths.getPositionActual(new Vector3f(getBeginningCornerX(), getBeginningCornerY(), getBeginningCornerZ()), rotationX, rotationY, rotationZ);
 //		Vector3f actualEnd = Maths.getPositionActual(new Vector3f(getEndingCornerX(), getEndingCornerY(), getEndingCornerZ()), rotationX, rotationY, rotationZ);
 //		Utils.println(actualBeginning);
 //		Utils.println(actualEnd);
+		
 		
 
 		return isGenerated() && x >= actualBeginning.x && x < actualEnd.x &&
@@ -461,7 +470,11 @@ public abstract class BlockStructure
 		if(id != getBlock(x, y, z).getId())
 		{
 			Block oldBlock = getBlock(x, y, z);
-			blocks[zz][yy][xx] = id;			
+			
+			blocks[zz][yy][xx] = id;
+			
+			mass = mass - oldBlock.getMass() + getBlock(x, y, z).getMass();
+			
 			if(setModel)
 			{
 				updateModel(x, y, z, oldBlock);
@@ -622,5 +635,25 @@ public abstract class BlockStructure
 	public void rotate(float rx, float ry, float rz)
 	{
 		transform.rotate(rx, ry, rz);
+	}
+
+	public Vector3fc getRotation()
+	{
+		return transform.getRotation();
+	}
+	
+	public Matrix4f getCombinedRotation()
+	{
+		return transform.getCombinedRotation();
+	}
+	
+	public Vector3f getBeginningCorner()
+	{
+		return new Vector3f(getBeginningCornerX(), getBeginningCornerY(), getBeginningCornerZ());
+	}
+	
+	public Vector3f getEndingCorner()
+	{
+		return new Vector3f(getEndingCornerX(), getEndingCornerY(), getEndingCornerZ());
 	}
 }

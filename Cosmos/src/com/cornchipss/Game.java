@@ -90,10 +90,8 @@ public class Game implements Runnable
 			
 			while(updateTimer.getDeltaMillis() >= 1000 / FPS_CAP)
 			{
-				float r = (float)GLFW.glfwGetTime() / 1000000f;
-				sector.getPlanet(0, 0, 0).rotate(r, r, r);
-				player.onUpdate();
 				sector.update(player);
+				player.onUpdate();
 				
 				updateTimer.subtractTimeMilli(1000 / FPS_CAP);
 				ups++;

@@ -32,4 +32,10 @@ public class Planet extends BlockStructure
 	
 	public Biosphere getBiosphere() { return biosphere; }
 	public void setBiosphere(Biosphere b) { this.biosphere = b; }
+
+	@Override
+	public boolean createsGravity()
+	{
+		return true;
+	}
 }

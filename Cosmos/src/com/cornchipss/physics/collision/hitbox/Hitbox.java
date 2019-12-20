@@ -38,7 +38,7 @@ public abstract class Hitbox // Another name for Hotbox
 	 */
 	public static boolean isColliding(Hitbox a, Hitbox b, Transform transformA, Transform transformB)
 	{
-		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), Maths.identity(), Maths.identity());
+		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), transformA.getCombinedRotation(), transformB.getCombinedRotation());
 	}
 	
 	/**
@@ -61,13 +61,20 @@ public abstract class Hitbox // Another name for Hotbox
 		
 		for(int j = 0; j < cornersA.length; j += 2)
 		{
-			Vector3f cornerRightA = Maths.add(cornersA[j], positionA);
-			Vector3f cornerLeftA = Maths.add(cornersA[j + 1], positionA);
+			Vector3f cornerRightA = Maths.rotatePoint(rotationA, Maths.add(cornersA[j], positionA));
+			Vector3f cornerLeftA = Maths.rotatePoint(rotationA, Maths.add(cornersA[j + 1], positionA));
 			
 			for(int i = 0; i < cornersB.length; i += 2)
 			{
-				Vector3f cornerRightB = Maths.add(cornersB[i], positionB);
-				Vector3f cornerLeftB = Maths.add(cornersB[i + 1], positionB);
+				Vector3f cornerRightB = Maths.rotatePoint(rotationB, Maths.add(cornersB[i], positionB));
+				Vector3f cornerLeftB = Maths.rotatePoint(rotationB, Maths.add(cornersB[i + 1], positionB));
+				
+//				Utils.println("==============================================");
+//				Utils.println(cornerRightA);
+//				Utils.println(cornerLeftA);
+//				
+//				Utils.println(cornerRightB);
+//				Utils.println(cornerLeftB);
 				
 				if ((cornerRightA.x > cornerLeftB.x && cornerLeftA.x < cornerRightB.x)
 						&& (cornerRightA.y > cornerLeftB.y && cornerLeftA.y < cornerRightB.y)

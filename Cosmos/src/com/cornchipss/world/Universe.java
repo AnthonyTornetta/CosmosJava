@@ -64,12 +64,12 @@ public class Universe
 		return sectors[z + SECTORS_Z / 2][y + SECTORS_Y / 2][x + SECTORS_X / 2];
 	}
 	
-	public Vector3i toSectorCoords(Vector3f c)
+	public Vector3i toSectorCoords(Vector3fc c)
 	{
 		return new Vector3i(
-				(int)(c.x / (WIDTH / 2) + .5),
-				(int)(c.y / (HEIGHT / 2) + .5),
-				(int)(c.z / (WIDTH / 2) + .5));
+				(int)(c.x() / (WIDTH / 2) + .5),
+				(int)(c.y() / (HEIGHT / 2) + .5),
+				(int)(c.z() / (WIDTH / 2) + .5));
 	}
 	
 	/**
@@ -99,12 +99,12 @@ public class Universe
 		return inverseSign * (((c / hs) % 2 * hs) - c % hs);
 	}
 	
-	public static Vector3f clampAbsoluteCoordsToSectorCoords(Vector3f absolute)
+	public static Vector3f clampAbsoluteCoordsToSectorCoords(Vector3fc absolute)
 	{
 		return new Vector3f(
-				clampAbsoluteCoordToSectorCoord(absolute.x), 
-				clampAbsoluteCoordToSectorCoord(absolute.y), 
-				clampAbsoluteCoordToSectorCoord(absolute.z));
+				clampAbsoluteCoordToSectorCoord(absolute.x()), 
+				clampAbsoluteCoordToSectorCoord(absolute.y()), 
+				clampAbsoluteCoordToSectorCoord(absolute.z()));
 	}
 	
 	/**
@@ -187,26 +187,39 @@ public class Universe
 		return closestBlock;
 	}
 	
-	/**
-	 * Gets the block at a given absolute coordinate
-	 * @param pos The position to search at
-	 * @return The block at a given coordinate
-	 */
-	public Block getBlockAt(Vector3f pos)
+	public Planet getPlanet(Vector3fc pos)
 	{
 		if(pos == null)
-			throw new IllegalArgumentException("Position for the block cannot be null!");
+			throw new IllegalArgumentException("Position for the planet cannot be null!");
 		
 		Vector3i coords = toSectorCoords(pos);		
 		Vector3f sectorCoords = clampAbsoluteCoordsToSectorCoords(pos);
 		
 		Sector sector = getSector(coords);
-		Planet planet = sector.getPlanet(Sector.chunkAtLocalCoords(sectorCoords));
+		return sector.getPlanet(Sector.chunkAtLocalCoords(sectorCoords));
+	}
+	
+	/**
+	 * Gets the block at a given absolute coordinate
+	 * @param pos The position to search at
+	 * @return The block at a given coordinate
+	 */
+	public Block getBlockAt(Vector3fc pos)
+	{
+		if(pos == null)
+			throw new IllegalArgumentException("Position for the block cannot be null!");
+		
+		Planet planet = getPlanet(pos);
 		
 		if(planet == null)
 			return null;
 		
-		Vector3f chunkCoords = clampSectorCoordsToChunkCoords(sectorCoords);
+		Vector3f chunkCoords = clampSectorCoordsToChunkCoords(clampAbsoluteCoordsToSectorCoords(pos));
+		
+//		chunkCoords = Maths.rotatePoint(planet.getCombinedRotation(), chunkCoords);
+		
+//		Utils.println("CC");
+//		Utils.println(chunkCoords);
 		
 		if(planet.hasBlockAt(chunkCoords))
 			return planet.getBlock(new Vector3i((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z));
@@ -243,32 +256,39 @@ public class Universe
 		int cY = (int)(Math.ceil(Math.abs(dimensions.y()) / 2 + 1));
 		int cX = (int)(Math.ceil(Math.abs(dimensions.x()) / 2 + 1));
 		
-		Location[][][] blocks = new Location[cZ * 2][cY * 2][cX * 2];
+		Location[][][] locs = new Location[cZ * 2][cY * 2][cX * 2];
 		
-		for(int z = -cZ; z < cZ; z++)
+		Planet p = getPlanet(position);
+		
+		if(p != null)
 		{
-			for(int y = -cY; y < cY; y++)
+	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(p.getCombinedRotation().invert(), position);
+			
+			for(int z = -cZ; z < cZ; z++)
 			{
-				for(int x = -cX; x < cX; x++)
+				for(int y = -cY; y < cY; y++)
 				{
-					Location loc = new Location(new Vector3f(
-							x + (float)Math.round(position.x()), 
-							y + (float)Math.round(position.y()), 
-							z + (float)Math.round(position.z())), this);
-					
-					if(loc.getBlock() != null)
+					for(int x = -cX; x < cX; x++)
 					{
-						blocks[z + cZ][y + cY][x + cX] = loc;
+						Location loc = new Location(new Vector3f(
+								x + (float)Math.round(relativeToPlanetPos.x()), 
+								y + (float)Math.round(relativeToPlanetPos.y()), 
+								z + (float)Math.round(relativeToPlanetPos.z())), this);
+						
+						if(loc.getBlock() != null)
+						{
+							locs[z + cZ][y + cY][x + cX] = loc;
+						}
 					}
 				}
 			}
 		}
 		
-		return blocks;
+		return locs;
 	}
 	
 	public Location[][][] getBlocksBetween(Vector3fc a, Vector3fc b)
-	{
+	{		
 		// Makes sure that corner1 has coordinate values smaller than corner2, and if not swaps them
 		// This is perfectly fine to do because it just finds new corners of the square to use
 		Vector3f corner1 = new Vector3f(), corner2 = new Vector3f();

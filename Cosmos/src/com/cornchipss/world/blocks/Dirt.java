@@ -7,4 +7,10 @@ public class Dirt extends Block
 	{
 		return 3;
 	}
+
+	@Override
+	public float getMass()
+	{
+		return 1220; // https://www.engineeringtoolbox.com/dirt-mud-densities-d_1727.html
+	}
 }

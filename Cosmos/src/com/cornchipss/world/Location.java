@@ -6,6 +6,7 @@ import org.joml.Vector3fc;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
+import com.cornchipss.world.planet.Planet;
 
 public class Location
 {
@@ -22,7 +23,9 @@ public class Location
 	public Location(Vector3f position, Universe universe)
 	{
 		this.universe = universe;
-		trans = new Transform(position, Maths.zero()); // TODO: get rotation
+		
+		Planet p = universe.getPlanet(position);
+		trans = new Transform(position, p != null ? p.getRotation() : Maths.zero()); // TODO: get rotation for other entities such as ships (loop thru each entity and find closest one i guess)
 		
 		block = getUniverse().getBlockAt(position);
 	}

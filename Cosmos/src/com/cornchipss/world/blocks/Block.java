@@ -12,7 +12,7 @@ import com.cornchipss.rendering.ModelCreator;
  * <p>A block should not have any instance variables that change per-block in the world</p>
  * <p>This should instead be handled by TODO: something to store block data per-block in the world</p>
  */
-public class Block
+public abstract class Block
 {
 	private static short lastUsedId = 0;
 	
@@ -205,4 +205,6 @@ public class Block
 	{
 		return Blocks.getModel(getId());
 	}
+	
+	public abstract float getMass();
 }

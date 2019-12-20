@@ -7,5 +7,10 @@ public class Snowstone extends Block
 	{
 		return 6;
 	}
-}
 
+	@Override
+	public float getMass()
+	{
+		return 2515; // https://www.aqua-calc.com/page/density-table/substance/stone-coma-and-blank-common-blank-generic
+	}
+}

@@ -16,6 +16,7 @@ import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.BlockFace;
+import com.cornchipss.world.planet.Planet;
 
 public class Player extends PhysicalEntity
 {
@@ -26,7 +27,7 @@ public class Player extends PhysicalEntity
 	
 	public static final float FRICTION = 1f;
 	
-	public static final float GRAVITY_ACCEL = -0.01f;
+	public static final float GRAVITY_ACCEL = 0;//-0.01f;
 	
 	private int blockSelected;
 	private Block[] blocks = new Block[] 
@@ -49,32 +50,32 @@ public class Player extends PhysicalEntity
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 		{
-			velX = (float) (speed * Math.sin(getRy()));
-			velZ = (float) (-speed * Math.cos(getRy()));
+			velX += (float) (speed * Math.sin(getRy()));
+			velZ += (float) (-speed * Math.cos(getRy()));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
 		{
-			velX = (float) (-speed * Math.sin(getRy()));
-			velZ = (float) (speed * Math.cos(getRy()));
+			velX += (float) (-speed * Math.sin(getRy()));
+			velZ += (float) (speed * Math.cos(getRy()));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
 		{
-			velX = (float) (-speed * Math.cos(getRy()));
-			velZ = (float) (-speed * Math.sin(getRy()));
+			velX += (float) (-speed * Math.cos(getRy()));
+			velZ += (float) (-speed * Math.sin(getRy()));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
 		{
-			velX = (float) (speed * Math.cos(getRy()));
-			velZ = (float) (speed * Math.sin(getRy()));
+			velX += (float) (speed * Math.cos(getRy()));
+			velZ += (float) (speed * Math.sin(getRy()));
 		}
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
 		{
-			velY = ySpeed;
+			velY += ySpeed;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 		{
-			velY = -ySpeed;
+			velY += -ySpeed;
 		}
 		
 		if(Math.abs(getVelocityX() + velX) < Math.abs(getVelocityX()) || Math.abs(getVelocityX()) <= maxSpeed)
@@ -91,22 +92,43 @@ public class Player extends PhysicalEntity
 		}
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-		{
-			setX(0);
-			setY(128);
-			setZ(0);
-			setRx(0);
-			setRy(0);
+		{			
+			if(getLockedOnto() == null)
+			{
+				setX(0);
+				setY(128);
+				setZ(0);
+				setRotation(0, 0, 0);
+			}
+			else
+			{
+				setPosition(Maths.rotatePoint(getLockedOnto().getCombinedRotation().invert(), Maths.zero().add(0, 128, 0)));
+				setRotation(getLockedOnto().getRotation());
+			}
+			
 			setVelocity(Maths.zero());
 		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE))
+		{
+			Planet p = getUniverse().getPlanet(getPosition());
+			setLockedOnto(p);
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_CAPS_LOCK))
+		{
+			setLockedOnto(null);
+		}
 		
-		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
-		setRy(getRy() + sensitivity * -Input.getMouseDeltaX());
-
-		if(getRx() > Math.PI / 2)
-			setRx((float)Math.PI / 2);
-		else if(getRx() < -Math.PI / 2)
-			setRx((float)-Math.PI / 2);
+//		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
+//		setRy(getRy() + sensitivity * -Input.getMouseDeltaX());
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
+		{
+			setRz(getRz() - Maths.PI / 180f);
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
+		{
+			setRz(getRz() + Maths.PI / 180f);
+		}
 		
 		for(int i = 0; i < blocks.length; i++)
 		{
@@ -163,10 +185,7 @@ public class Player extends PhysicalEntity
 		
 		if(Utils.contains(hits, BlockFace.TOP))
 		{
-//			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
-//			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
-			
-			if(hits.size() == 1 && Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
+			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
 			{
 				addVelocityY(.2f);
 			}
@@ -208,5 +227,11 @@ public class Player extends PhysicalEntity
 	public Vector3f getHeadPosition()
 	{
 		return Maths.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
+	}
+
+	@Override
+	public float getMass()
+	{
+		return 80;
 	}
 }

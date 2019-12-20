@@ -7,5 +7,11 @@ public class Sandstone extends Block
 	{
 		return 8;
 	}
+
+	@Override
+	public float getMass()
+	{
+		return 2323; // https://www.aqua-calc.com/page/density-table/substance/sandstone-coma-and-blank-solid
+	}
 }
 

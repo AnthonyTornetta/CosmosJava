@@ -21,4 +21,10 @@ public class Air extends Block
 	{
 		return false;
 	}
+
+	@Override
+	public float getMass()
+	{
+		return 0; // I know air doesn't have 0 mass, but shhh
+	}
 }

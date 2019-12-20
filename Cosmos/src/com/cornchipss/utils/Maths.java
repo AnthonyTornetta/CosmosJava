@@ -48,12 +48,12 @@ public class Maths
         return matrix;
     }
 	
-	/*
-	 * https://open.gl/transformations
-	 */
-	
 	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
 	{
+		/*
+		 * https://open.gl/transformations
+		 */
+		
 		if(axis.y() != 0)
 			angle -= Maths.PI / 2; // OpenGL is funny for whatever reason
 		
@@ -65,6 +65,11 @@ public class Maths
 	                oc * axis.x() * axis.y() + axis.z() * s,  oc * axis.y() * axis.y() + c,           oc * axis.y() * axis.z() - axis.x() * s,  0.0f,
 	                oc * axis.z() * axis.x() - axis.y() * s,  oc * axis.y() * axis.z() + axis.x() * s,  oc * axis.z() * axis.z() + c,           0.0f,
 	                0.0f,                                0.0f,                                0.0f,                                1.0f);
+	}
+	
+	public static Matrix4f createCombinedRotationMatrix(Vector3fc r)
+	{
+		return createRotationMatrix(Utils.x(), r.x()).mul(createRotationMatrix(Utils.y(), r.y()).mul(createRotationMatrix(Utils.z(), r.z())));
 	}
 	
 	public static Vector3f getPositionActual(Vector3f pos, Matrix4f... rotations)
@@ -94,7 +99,7 @@ public class Maths
 	{
 		return (float)Math.tan(theta);
 	}
-	
+		
 	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector3fc point)
 	{
 		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX, new Vector4f(point.x(), point.y(), point.z(), 0));
@@ -102,7 +107,17 @@ public class Maths
 	
 	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector4fc point)
 	{
-		Vector4f vec = new Vector4f(point).mul(rotationMatrixX).mul(rotationMatrixY).mul(rotationMatrixY);
+		return rotatePoint(Maths.mul(rotationMatrixX, rotationMatrixY).mul(rotationMatrixZ), point);
+	}
+	
+	public static Vector3f rotatePoint(Matrix4f combinedRotation, Vector3fc point)
+	{
+		return rotatePoint(combinedRotation, new Vector4f(point.x(), point.y(), point.z(), 0));
+	}
+	
+	public static Vector3f rotatePoint(Matrix4f combinedRotation, Vector4fc point)
+	{
+		Vector4f vec = new Vector4f(point).mul(combinedRotation);
 		return new Vector3f(vec.x, vec.y, vec.z);
 	}
 	
@@ -179,6 +194,17 @@ public class Maths
 	public static Vector3f sub(Vector3fc a, Vector3fc b)
 	{
 		return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
+	}
+	
+	/**
+	 * Subtracts a vector without modifying it
+	 * @param a The first vector
+	 * @param b The second scalor
+	 * @return A new vector of the vector - scalor
+	 */
+	public static Vector3f sub(Vector3fc a, float s)
+	{
+		return new Vector3f(a.x() - s, a.y() - s, a.z() - s);
 	}
 	
 	/**
@@ -319,5 +345,15 @@ public class Maths
 	public static Matrix4f identity()
 	{
 		return new Matrix4f().identity();
+	}
+
+	public static Matrix4f mul(Matrix4f a, Matrix4f b) 
+	{
+		return new Matrix4f().identity().mul(a).mul(b);
+	}
+
+	public static Vector3f invert(Vector3fc v)
+	{
+		return new Vector3f(-v.x(), -v.y(), -v.z());
 	}
 }
