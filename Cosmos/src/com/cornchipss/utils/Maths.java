@@ -31,6 +31,17 @@ public class Maths
 		dest.translate(-x, -y, -z);
 	}
 	
+	/**
+	 * Creates a view matrix based on coordinates + rotations
+	 * @param pos Position
+	 * @param rot Rotation
+	 * @param dest The destiantion matrix
+	 */
+	public static void createViewMatrix(Vector3fc pos, Vector3fc rot, Matrix4f dest)
+	{
+		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), dest);
+	}
+	
 	public static Matrix4f createTransformationMatrix(Vector3f pos, float rx, float ry, float rz)
 	{
 		return createTransformationMatrix(pos, rx, ry, rz, 1);
@@ -67,9 +78,9 @@ public class Maths
 	                0.0f,                                0.0f,                                0.0f,                                1.0f);
 	}
 	
-	public static Matrix4f createCombinedRotationMatrix(Vector3fc r)
+	public static Matrix4f createCombinedRotationMatrix(Vector3fc rotation)
 	{
-		return createRotationMatrix(Utils.x(), r.x()).mul(createRotationMatrix(Utils.y(), r.y()).mul(createRotationMatrix(Utils.z(), r.z())));
+		return createRotationMatrix(Utils.x(), rotation.x()).mul(createRotationMatrix(Utils.y(), rotation.y()).mul(createRotationMatrix(Utils.z(), rotation.z())));
 	}
 	
 	public static Vector3f getPositionActual(Vector3f pos, Matrix4f... rotations)

@@ -5,10 +5,10 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import com.cornchipss.Game;
-import com.cornchipss.entities.Player;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.shaders.Shader;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.world.entities.Player;
 
 public abstract class Renderer
 {
@@ -41,8 +41,8 @@ public abstract class Renderer
 	{
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
-		Maths.createViewMatrix(player.getX(), player.getY(), player.getZ(), 
-				player.getRx(), player.getRy(), player.getRz(), getViewMatrix());
+		Maths.createViewMatrix(player.getAbsolutePosition(), 
+				player.getAbsoluteRotation(), getViewMatrix());
 		
 		getShader().start();
 		getShader().loadUniformMatrix(u_projectionLocation, getProjectionMatrix());

@@ -1,4 +1,4 @@
-package com.cornchipss.entities;
+package com.cornchipss.world.entities;
 
 import org.joml.Vector3fc;
 

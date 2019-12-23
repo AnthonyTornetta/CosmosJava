@@ -3,7 +3,6 @@ package com.cornchipss;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import com.cornchipss.entities.Player;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.registry.Options;
@@ -14,6 +13,7 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
+import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.sector.Sector;
 
 /*

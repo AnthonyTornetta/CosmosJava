@@ -1,7 +1,7 @@
-package com.cornchipss.entities;
+package com.cornchipss.world.entities;
 
-import com.cornchipss.objects.PhysicalObject;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
+import com.cornchipss.world.objects.PhysicalObject;
 
 public abstract class Entity extends PhysicalObject
 {

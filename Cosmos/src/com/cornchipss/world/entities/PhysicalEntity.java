@@ -1,11 +1,9 @@
-package com.cornchipss.entities;
+package com.cornchipss.world.entities;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
@@ -14,15 +12,10 @@ import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.BlockFace;
-import com.cornchipss.world.structures.BlockStructure;
 
 public abstract class PhysicalEntity extends Entity
 {
 	private float elasticity;
-	private BlockStructure lockedOnto;
-	
-	Vector3fc lastRotation = null;
-	Vector3fc lastVelocity = null;
 	
 	public PhysicalEntity(float x, float y, float z, Hitbox hitbox, float elasticity)
 	{
@@ -36,45 +29,11 @@ public abstract class PhysicalEntity extends Entity
 	
 	public List<BlockFace> updatePhysics()
 	{
-		Vector3f newPos;
+		Vector3f newPos = Maths.add(getPosition(), getVelocity());
 		
-		if(getLockedOnto() != null)
-		{
-			if(lastRotation != null)
-			{
-//				Vector3fc deltaRotation = Maths.sub(getLockedOnto().getRotation(), lastRotation);
-//				Vector3fc deltaVel = Maths.sub(getLockedOnto().getVelocity(), lastVelocity);
-//				
-//				Matrix4f combinedLastRotationInverse = Maths.createCombinedRotationMatrix(lastRotation).invert();
-//				Matrix4f combinedNewRotation = getLockedOnto().getCombinedRotation();
-//				
-//				newPos = Maths.rotatePoint(combinedLastRotationInverse, getPosition());
-//				newPos = Maths.rotatePoint(combinedNewRotation, newPos);
-//				
-//				getTransform().setRotation(getLockedOnto().getRotation());
-//				
-////				getTransform().rotate(Maths.invert(lastRotation));
-////				getTransform().rotate(getLockedOnto().getRotation());
-//				getVelocity().add(deltaVel);
-				
-				Transform trans = getTransform();
-				trans.translate(Maths.invert(getLockedOnto().getTransform().getPosition()));
-//				newPos.add(getVelocity());
-			}
-			else
-			{
-				getTransform().setRotationZ(getLockedOnto().getRotationZ());
-				
-				newPos = Maths.add(getPosition(), getVelocity());
-			}
-			
-			lastRotation = getLockedOnto().getRotation();
-			lastVelocity = getLockedOnto().getVelocity();
-		}
-		else
-			newPos = Maths.add(getPosition(), getVelocity());
+		Transform absTrans = getAbsoluteTransform();
 		
-		Location[][][] locations = getUniverse().getBlocksWithin(getPosition(), getHitbox().getBoundingBox());
+		Location[][][] locations = getUniverse().getBlocksWithin(absTrans.getPosition(), getHitbox().getBoundingBox());
 		
 		// For the collision check
 		Transform tempTransform = new Transform(newPos, getRotation());
@@ -93,9 +52,6 @@ public abstract class PhysicalEntity extends Entity
 						
 						locations[z][y][x].setBlock(Blocks.air);
 						
-						Utils.println(locations[z][y][x].getPosition());
-						Utils.println(getPosition());
-						
 						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getTransform(), tempTransform))
 						{
 							Utils.println("Collision!");
@@ -111,7 +67,8 @@ public abstract class PhysicalEntity extends Entity
 			}
 		}
 		
-		setPosition(newPos);
+		getTransform().translate(Maths.invert(getPosition()));
+		getTransform().translate(newPos);
 		
 		return hits;
 	}
@@ -147,15 +104,4 @@ public abstract class PhysicalEntity extends Entity
 
 	public float getElasticity() { return elasticity; }
 	public void setElasticity(float elasticity) { this.elasticity = elasticity; }
-
-	public BlockStructure getLockedOnto() { return lockedOnto; }
-	public void setLockedOnto(BlockStructure lockedOnto)
-	{
-		if(!Utils.equals(lockedOnto, this.lockedOnto))
-		{
-			lastRotation = null;
-			lastVelocity = null;
-		}
-		this.lockedOnto = lockedOnto;
-	}
 }

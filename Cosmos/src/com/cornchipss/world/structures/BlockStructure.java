@@ -3,19 +3,18 @@ package com.cornchipss.world.structures;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-import com.cornchipss.objects.PhysicalObject;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.Model;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.blocks.Block;
+import com.cornchipss.world.objects.PhysicalObject;
 import com.cornchipss.world.sector.Sector;
 
 public abstract class BlockStructure extends PhysicalObject
@@ -41,8 +40,6 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	private int width, height, length;
 	
-	private Transform transform;
-	
 	/**
 	 * The sector the BlockStructure is a part of (wow)
 	 */
@@ -62,8 +59,8 @@ public abstract class BlockStructure extends PhysicalObject
 		this.height = height;
 		this.length = length;
 		
-		transform = new Transform();
-		transform.setRotation(new Vector3f(rx, ry, rz));
+		setRelativeTransform(new Transform());
+		setRotation(new Vector3f(rx, ry, rz));
 	}
 	
 	@Override
@@ -71,19 +68,6 @@ public abstract class BlockStructure extends PhysicalObject
 	{
 		return mass;
 	}
-	
-	public float getRotationX() { return transform.getRotationX(); }
-	public void setRotationX(float rx) { transform.setRotationX(rx); }
-	
-	public float getRotationY() { return transform.getRotationY(); }
-	public void setRotationY(float ry) { transform.setRotationY(ry); }
-	
-	public float getRotationZ() { return transform.getRotationZ(); }
-	public void setRotationZ(float rz) { transform.setRotationZ(rz); }
-	
-	public Matrix4f getRotationXMatrix() { return transform.getRotationMatrixX(); }
-	public Matrix4f getRotationYMatrix() { return transform.getRotationMatrixY(); }
-	public Matrix4f getRotationZMatrix() { return transform.getRotationMatrixZ(); }
 	
 	/**
 	 * Gets the absolute center position of the BlockStructure
@@ -245,7 +229,7 @@ public abstract class BlockStructure extends PhysicalObject
 		
 		changed = changed || !Utils.equals(oldBlock, getBlock(x, y, z));
 		
-		if(updateSurrounding && changed)
+		if(updateSurrounding && changed && isGenerated())
 		{
 			for(int zz = -1; zz <= 1; zz++)
 			{
@@ -572,7 +556,7 @@ public abstract class BlockStructure extends PhysicalObject
 	public void setSectorCoords(float x, float y, float z)
 	{
 		sectorCoords = new Vector3f(x, y, z);
-		transform.setPosition(getAbsolutePosition());
+		setPosition(new Vector3f(getSectorX() * Sector.CHUNK_DIMENSIONS, getSectorY() * Sector.CHUNK_DIMENSIONS, getSectorZ() * Sector.CHUNK_DIMENSIONS));
 	}
 	
 	/**
@@ -627,31 +611,18 @@ public abstract class BlockStructure extends PhysicalObject
 	}
 	
 	/**
-	 * Rotates the BlockStructure
-	 * @param rx The change in x rotation
-	 * @param ry The change in y rotation
-	 * @param rz The change in z rotation
+	 * The relative to the planet's center beginning corner of the planet (+x, +y, +z)
+	 * @return The relative to the planet's center beginning corner of the planet (+x, +y, +z)
 	 */
-	public void rotate(float rx, float ry, float rz)
-	{
-		transform.rotate(rx, ry, rz);
-	}
-
-	public Vector3fc getRotation()
-	{
-		return transform.getRotation();
-	}
-	
-	public Matrix4f getCombinedRotation()
-	{
-		return transform.getCombinedRotation();
-	}
-	
 	public Vector3f getBeginningCorner()
 	{
 		return new Vector3f(getBeginningCornerX(), getBeginningCornerY(), getBeginningCornerZ());
 	}
 	
+	/**
+	 * The relative to the planet's center ending corner of the planet (-x, -y, -z)
+	 * @return The relative to the planet's center ending corner of the planet (-x, -y, -z)
+	 */
 	public Vector3f getEndingCorner()
 	{
 		return new Vector3f(getEndingCornerX(), getEndingCornerY(), getEndingCornerZ());

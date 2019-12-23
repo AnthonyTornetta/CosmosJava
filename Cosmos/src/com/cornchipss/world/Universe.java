@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
-import com.cornchipss.physics.shapes.Rectangle;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
@@ -216,11 +215,6 @@ public class Universe
 		
 		Vector3f chunkCoords = clampSectorCoordsToChunkCoords(clampAbsoluteCoordsToSectorCoords(pos));
 		
-//		chunkCoords = Maths.rotatePoint(planet.getCombinedRotation(), chunkCoords);
-		
-//		Utils.println("CC");
-//		Utils.println(chunkCoords);
-		
 		if(planet.hasBlockAt(chunkCoords))
 			return planet.getBlock(new Vector3i((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z));
 		
@@ -250,6 +244,12 @@ public class Universe
 		}
 	}
 
+	/**
+	 * Gets the blocks around a point with a given dimensions
+	 * @param position The position to get them around
+	 * @param dimensions The dimensions to search in (actual search radius is doubled)
+	 * @return The blocks around a point with a given dimensions
+	 */
 	public Location[][][] getBlocksWithin(Vector3fc position, Vector3fc dimensions)
 	{
 		int cZ = (int)(Math.ceil(Math.abs(dimensions.z()) / 2 + 1));
@@ -287,6 +287,12 @@ public class Universe
 		return locs;
 	}
 	
+	/**
+	 * Gets the blocks between two absolute positions in the universe
+	 * @param a Corner A
+	 * @param b Corner B
+	 * @return The blocks as Locations between the two corners
+	 */
 	public Location[][][] getBlocksBetween(Vector3fc a, Vector3fc b)
 	{		
 		// Makes sure that corner1 has coordinate values smaller than corner2, and if not swaps them
@@ -315,7 +321,6 @@ public class Universe
 		int difY = Math.abs(ceilY - floorY);
 		int difX = Math.abs(ceilX - floorX);
 		
-		
 		Location[][][] blocks = new Location[difZ + 1][difY + 1][difX + 1];
 		
 		for(int z = floorZ; z <= ceilZ; z++)
@@ -336,12 +341,7 @@ public class Universe
 		
 		return blocks;
 	}
-
-	public Location[][][] getBlocksWithin(Rectangle rect)
-	{
-		return getBlocksWithin(rect.getPosition(), rect.getDimensions());
-	}
-
+	
 	public void explode(Location location, int explosionRadius)
 	{
 		for(int dz = -explosionRadius; dz <= explosionRadius; dz++)

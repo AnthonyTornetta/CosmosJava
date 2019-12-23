@@ -1,10 +1,11 @@
-package com.cornchipss.entities;
+package com.cornchipss.world.entities;
 
 import java.util.List;
 
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.physics.raycast.Raycast;
 import com.cornchipss.physics.raycast.RaycastOptions;
@@ -16,14 +17,13 @@ import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.blocks.BlockFace;
-import com.cornchipss.world.planet.Planet;
 
 public class Player extends PhysicalEntity
 {
 	private float sensitivity = 0.0025f;
-	private float maxSlowdown = 1f;
-	private float maxSpeed = 0.25f;
-	private float maxSpeedY = 0.5f;
+	private float maxSlowdown = .1f;
+	private float maxSpeed = 2f;
+	private float maxSpeedY = 5f;
 	
 	public static final float FRICTION = 1f;
 	
@@ -43,30 +43,37 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
-		float speed = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f;
-		float ySpeed = 0.015f;
+		maxSlowdown = .1f;
+		maxSpeed = 100f;
+		maxSpeedY = 100f;
+		
+		float speed = 50 * (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f);
+		float ySpeed = 0.015f * 50;
 		
 		float velX = 0, velY = 0, velZ = 0;
 		
+		float rY = getRotationY() + Maths.PI / 2;
+//		rX = absTrans.getRotationX();
+		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 		{
-			velX += (float) (speed * Math.sin(getRy()));
-			velZ += (float) (-speed * Math.cos(getRy()));
+			velX += (float) (speed * Math.sin(rY));
+			velZ += (float) (-speed * Math.cos(rY));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
 		{
-			velX += (float) (-speed * Math.sin(getRy()));
-			velZ += (float) (speed * Math.cos(getRy()));
+			velX += (float) (-speed * Math.sin(rY));
+			velZ += (float) (speed * Math.cos(rY));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
 		{
-			velX += (float) (-speed * Math.cos(getRy()));
-			velZ += (float) (-speed * Math.sin(getRy()));
+			velX += (float) (-speed * Math.cos(rY));
+			velZ += (float) (-speed * Math.sin(rY));
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
 		{
-			velX += (float) (speed * Math.cos(getRy()));
-			velZ += (float) (speed * Math.sin(getRy()));
+			velX += (float) (speed * Math.cos(rY));
+			velZ += (float) (speed * Math.sin(rY));
 		}
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
@@ -93,41 +100,30 @@ public class Player extends PhysicalEntity
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{			
-			if(getLockedOnto() == null)
-			{
-				setX(0);
-				setY(128);
-				setZ(0);
-				setRotation(0, 0, 0);
-			}
-			else
-			{
-				setPosition(Maths.rotatePoint(getLockedOnto().getCombinedRotation().invert(), Maths.zero().add(0, 128, 0)));
-				setRotation(getLockedOnto().getRotation());
-			}
-			
+			setX(0);
+			setY(0);
+			setZ(0);
+			setRotation(0, 0, 0);
 			setVelocity(Maths.zero());
 		}
-		if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE))
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 		{
-			Planet p = getUniverse().getPlanet(getPosition());
-			setLockedOnto(p);
-		}
-		if(Input.isKeyDown(GLFW.GLFW_KEY_CAPS_LOCK))
-		{
-			setLockedOnto(null);
+			if(hasParent())
+				removeParent();
+			else
+				setParent(getUniverse().getPlanet(getAbsolutePosition()));
 		}
 		
-//		setRx(getRx() + sensitivity * -Input.getMouseDeltaY());
-//		setRy(getRy() + sensitivity * -Input.getMouseDeltaX());
+		setRotationX(getRotationX() + sensitivity * -Input.getMouseDeltaY());
+		setRotationY(getRotationY() + sensitivity * -Input.getMouseDeltaX());
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
 		{
-			setRz(getRz() - Maths.PI / 180f);
+			setRotationZ(getRotationZ() - Maths.PI / 180f);
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
 		{
-			setRz(getRz() + Maths.PI / 180f);
+			setRotationZ(getRotationZ() + Maths.PI / 180f);
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
@@ -169,25 +165,25 @@ public class Player extends PhysicalEntity
 			}
 		}
 		
-		addVelocityY(GRAVITY_ACCEL);
+		accelerateY(GRAVITY_ACCEL);
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * 0.1f);
-			addVelocityY(Utils.clamp(-(getVelocityY() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
-			addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
+			accelerateX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * 0.1f);
+			accelerateY(Utils.clamp(-(getVelocityY() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
+			accelerateZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
 		}
 		
 		List<BlockFace> hits = updatePhysics();
 		
-		addVelocityX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
-		addVelocityZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+		accelerateX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+		accelerateZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
 		
 		if(Utils.contains(hits, BlockFace.TOP))
 		{
 			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
 			{
-				addVelocityY(.2f);
+				accelerateY(.2f);
 			}
 		}
 	}
@@ -198,8 +194,10 @@ public class Player extends PhysicalEntity
 		
 		settings.setBlacklist(Blocks.air);
 		
-		Raycast ray = Raycast.fire(getPosition(), getUniverse(), getRx(), getRy(), lookDist, settings);
-
+		Transform absTransform = getAbsoluteTransform();
+		
+		Raycast ray = Raycast.fire(absTransform.getPosition(), getUniverse(), absTransform.getRotationX(), absTransform.getRotationY(), lookDist, settings);
+		
 		int closest = -1;
 		float closestDist = 0;
 		
@@ -207,7 +205,7 @@ public class Player extends PhysicalEntity
 		{
 			Location l = ray.getNthHit(i);
 			
-			float dist = l.getPosition().distanceSquared(getPosition());
+			float dist = l.getPosition().distanceSquared(absTransform.getPosition());
 			
 			if(closest == -1 || dist < closestDist)
 			{
@@ -224,6 +222,10 @@ public class Player extends PhysicalEntity
 			return new Pair<Location, BlockFace>();
 	}
 	
+	/**
+	 * returns the relative head position of the player
+	 * @return the relative head position of the player
+	 */
 	public Vector3f getHeadPosition()
 	{
 		return Maths.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
