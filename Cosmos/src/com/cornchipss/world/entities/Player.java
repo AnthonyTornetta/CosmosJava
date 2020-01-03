@@ -5,6 +5,7 @@ import java.util.List;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.physics.Axis;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.physics.raycast.Raycast;
@@ -52,39 +53,63 @@ public class Player extends PhysicalEntity
 		
 		float velX = 0, velY = 0, velZ = 0;
 		
-		float rY = getRotationY() + Maths.PI / 2;
-//		rX = absTrans.getRotationX();
+		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
+			setRotation(0, 0, 0);
+		
+		Axis axis = new Axis(getAbsoluteRotation());
+		
+		Vector3f newVecX = axis.vectorInDirection(new Vector3f(speed, 0, 0));
+		Vector3f newVecY = axis.vectorInDirection(new Vector3f(0, speed, 0));
+		Vector3f newVecZ = axis.vectorInDirection(new Vector3f(0, 0, speed));
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 		{
-			velX += (float) (speed * Math.sin(rY));
-			velZ += (float) (-speed * Math.cos(rY));
+			velX -= newVecZ.x;
+			velY -= newVecZ.y;
+			velZ -= newVecZ.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
 		{
-			velX += (float) (-speed * Math.sin(rY));
-			velZ += (float) (speed * Math.cos(rY));
+			velX += newVecZ.x;
+			velY += newVecZ.y;
+			velZ += newVecZ.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
 		{
-			velX += (float) (-speed * Math.cos(rY));
-			velZ += (float) (-speed * Math.sin(rY));
+			velX -= newVecX.x;
+			velY -= newVecX.y;
+			velZ -= newVecX.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
 		{
-			velX += (float) (speed * Math.cos(rY));
-			velZ += (float) (speed * Math.sin(rY));
-		}
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-		{
-			velY += ySpeed;
+			velX += newVecX.x;
+			velY += newVecX.y;
+			velZ += newVecX.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 		{
-			velY += -ySpeed;
+			velX -= newVecY.x;
+			velY -= newVecY.y;
+			velZ -= newVecY.z;
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
+		{
+			velX += newVecY.x;
+			velY += newVecY.y;
+			velZ += newVecY.z;
 		}
 		
+		// normalizes the speed so you dont get a giga boost if you go in 3 directions at once
+		// I didn't use the normalize() method because it divides by 0 if velocity is 0, 0, 0
+		
+		float k = (velX * velX + velY * velY + velZ * velZ) / (speed * speed);
+		if(k != 0)
+		{
+			velX /= k;
+			velY /= k;
+			velZ /= k;
+		}
+			
 		if(Math.abs(getVelocityX() + velX) < Math.abs(getVelocityX()) || Math.abs(getVelocityX()) <= maxSpeed)
 		{
 			getVelocity().x = Utils.clamp(getVelocityX() + velX, -maxSpeed, maxSpeed);

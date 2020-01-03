@@ -352,6 +352,11 @@ public class Maths
 	{
 		return rads * 180f / Maths.PI;
 	}
+	
+	public static Vector3f toDegs(Vector3fc rads)
+	{
+		return new Vector3f(toDegs(rads.x()), toDegs(rads.y()), toDegs(rads.z()));
+	}
 
 	public static Matrix4f identity()
 	{
