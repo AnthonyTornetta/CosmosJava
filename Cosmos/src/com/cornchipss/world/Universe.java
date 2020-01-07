@@ -262,7 +262,7 @@ public class Universe
 		
 		if(p != null)
 		{
-	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(p.getCombinedRotation().invert(), position);
+	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(Maths.invert(p.getRotation()), position);
 			
 			for(int z = -cZ; z < cZ; z++)
 			{

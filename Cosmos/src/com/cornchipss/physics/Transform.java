@@ -1,26 +1,16 @@
 package com.cornchipss.physics;
 
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
 public class Transform
 {
-	private Matrix4f rotationX = new Matrix4f().identity(), rotationY = new Matrix4f().identity(), rotationZ = new Matrix4f().identity();
-	
 	private Vector3f position;
-	
 	private Quaternionf rotation;
-	private Vector3f eulers = Maths.zero();
-	
 	private Vector3f velocity = Maths.zero();
-	
-	private Matrix4f transform = new Matrix4f();
 	
 	public Transform()
 	{
@@ -34,8 +24,6 @@ public class Transform
 	
 	public Transform(Vector3fc position, Quaternionf rotation)
 	{
-		transform = new Matrix4f();
-		
 		setPosition(new Vector3f(position));
 		setRotation(rotation);
 	}
@@ -49,7 +37,7 @@ public class Transform
 	public Transform combine(Transform child)
 	{
 		Transform t = new Transform(
-				Maths.add(getPosition(), Maths.rotatePoint(getCombinedRotation(), child.getPosition())), 
+				Maths.add(getPosition(), Maths.rotatePoint(rotation, child.getPosition())), 
 				Maths.mul(child.rotation, rotation));
 		t.setVelocity(Maths.add(child.velocity, velocity));
 		return t;
@@ -65,7 +53,7 @@ public class Transform
 	public Transform separate(Transform child)
 	{
 		Transform t = new Transform(
-				Maths.sub(Maths.rotatePoint(getCombinedRotation().invert(), child.getPosition()), getPosition()), 
+				Maths.sub(Maths.rotatePoint(Maths.invert(rotation), child.getPosition()), getPosition()), 
 				Maths.div(child.getRotation(), getRotation())); // correct rotation
 		t.setVelocity(Maths.sub(child.velocity, velocity));
 		return t;
@@ -75,7 +63,6 @@ public class Transform
 	public void setPosition(Vector3fc position)
 	{
 		this.position = new Vector3f(position);
-		transform.transform(new Vector4f(position, 0));
 	}
 
 	public void setX(float x) { position.x = x; }
@@ -93,55 +80,125 @@ public class Transform
 		setZ(amt.z() + getZ());
 	}
 	
-	public Vector3fc getEulers() { return eulers; }
 	public Quaternionf getRotation() { return rotation; }
 	public void setRotation(Quaternionf rotation)
 	{
-		Vector3f prevEulers = new Vector3f(getEulers());
-		
 		this.rotation = rotation;
-		rotation.getEulerAnglesXYZ(eulers);
-		
-		/*
-		 * https://open.gl/transformations
-		 */
-		
-		if(this.rotation == null || prevEulers.x != eulers.x)
-			rotationX = Maths.createRotationMatrix(Utils.x(), eulers.x);
-		if(this.rotation == null || prevEulers.y != eulers.y)
-			rotationY = Maths.createRotationMatrix(Utils.y(), eulers.y);
-		if(this.rotation == null || prevEulers.z != eulers.z)
-			rotationZ = Maths.createRotationMatrix(Utils.z(), eulers.z);
 	}
+	
 	public void setRotation(float rx, float ry, float rz)
 	{
-		setRotation(Maths.quaternionFromRotation(rx, ry, rz));
+		rotation = Maths.quaternionFromRotation(rx, ry, rz);
 	}
 	
-	public void rotate(float rx, float ry, float rz)
+	/**
+	 * Rotates the object in the order of X, Y, then Z
+	 * @param rx rotation x
+	 * @param ry rotation y
+	 * @param rz rotation z
+	 */
+	public void rotateXYZ(float rx, float ry, float rz)
 	{
 		rotation.rotateXYZ(rx, ry, rz);
-		setRotation(rotation);
 	}
 	
-	public void rotate(Vector3fc delta)
+	/**
+	 * Rotates the object in the order of Y, X, then Z
+	 * @param rx rotation x
+	 * @param ry rotation y
+	 * @param rz rotation z
+	 */
+	public void rotateYXZ(float rx, float ry, float rz)
 	{
-		rotate(delta.x(), delta.y(), delta.z());
+		rotation.rotateYXZ(rx, ry, rz);
 	}
-
+	
+	/**
+	 * Rotates the object in the order of Z, Y, then X
+	 * @param rx rotation x
+	 * @param ry rotation y
+	 * @param rz rotation z
+	 */
+	public void rotateZYX(float rx, float ry, float rz)
+	{
+		rotation.rotateZYX(rx, ry, rz);
+	}
+	
+	/**
+	 * Rotates about the x axis
+	 * @param rx the radians to rotate
+	 */
+	public void rotateX(float rx)
+	{
+		rotation.rotateX(rx);
+	}
+	
+	/**
+	 * Rotates about the y axis
+	 * @param ry the radians to rotate
+	 */
+	public void rotateY(float ry)
+	{
+		rotation.rotateY(ry);
+	}
+	
+	/**
+	 * Rotates about the z axis
+	 * @param rz the radians to rotate
+	 */
+	public void rotateZ(float rz)
+	{
+		rotation.rotateZ(rz);
+	}
+	
+	/**
+	 * Rotates X, Y then Z
+	 * @param delta The amount to rotate
+	 */
+	public void rotateXYZ(Vector3fc delta)
+	{
+		rotateXYZ(delta.x(), delta.y(), delta.z());
+	}
+	
+	/**
+	 * Take caution when using this
+	 * Sets the rotation X
+	 * @param rx The rotation x
+	 */
+	@Deprecated
 	public void setRotationX(float rx)
 	{
-		setRotation(rx, getRotationY(), getRotationZ());
+		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
+		setRotation(rx, eulers.y(), eulers.z());
 	}
 	
+	/**
+	 * Take caution when using this
+	 * Sets the rotation X
+	 * @param ry The rotation x
+	 */
+	@Deprecated
 	public void setRotationY(float ry)
 	{
-		setRotation(getRotationX(), ry, getRotationZ());
+		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
+		setRotation(eulers.x(), ry, eulers.z());
 	}
 	
+	/**
+	 * Take caution when using this
+	 * Sets the rotation Z
+	 * @param rz The rotation z
+	 */
+	@Deprecated
 	public void setRotationZ(float rz)
 	{
-		setRotation(getRotationX(), getRotationY(), rz);
+		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
+		setRotation(eulers.x(), eulers.y(), rz);
+	}
+	
+	public void resetRotation()
+	{
+		rotation = Maths.blankQuaternion();
 	}
 	
 	/**
@@ -165,50 +222,5 @@ public class Transform
 		velocity.x += amt.x();
 		velocity.y += amt.y();
 		velocity.z += amt.z();
-	}
-	
-	/**
-	 * Gets the rotation in the X direction
-	 * @return the rotation in the X direction 
-	 */
-	public float getRotationX() { return eulers.x(); }
-	
-	/**
-	 * Gets the rotation in the X direction
-	 * @return the rotation in the X direction 
-	 */
-	public float getRotationY() { return eulers.y(); }
-	
-	/**
-	 * Gets the rotation in the Y direction
-	 * @return the rotation in the Y direction 
-	 */
-	public float getRotationZ() { return eulers.z(); }
-	
-	/**
-	 * Gets the rotation matrix for the Z axis
-	 * @return The rotation matrix for the Z axis
-	 */
-	public Matrix4f getRotationMatrixX() { return rotationX; }
-	
-	/**
-	 * Gets the rotation matrix for the Y axis
-	 * @return The rotation matrix for the Y axis
-	 */
-	public Matrix4f getRotationMatrixY() { return rotationY; }
-	
-	/**
-	 * Gets the rotation matrix for the Z axis
-	 * @return The rotation matrix for the Z axis
-	 */
-	public Matrix4f getRotationMatrixZ() { return rotationZ; }
-	
-	/**
-	 * A combination of {@linkplain Transform#getRotationMatrixX()} * {@linkplain Transform#getRotationMatrixY()} * {@linkplain Transform#getRotationMatrixZ()}
-	 * @return A copy of the combination of the 3 rotation vectors
-	 */
-	public Matrix4f getCombinedRotation()
-	{
-		return Maths.mul(rotationX, rotationY).mul(rotationZ);
 	}
 }

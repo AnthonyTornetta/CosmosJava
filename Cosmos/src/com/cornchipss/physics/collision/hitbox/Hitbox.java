@@ -1,6 +1,6 @@
 package com.cornchipss.physics.collision.hitbox;
 
-import org.joml.Matrix4f;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -25,7 +25,7 @@ public abstract class Hitbox // Another name for Hotbox
 	@Deprecated
 	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB)
 	{
-		return isColliding(a, b, positionA, positionB, Maths.identity(), Maths.identity());
+		return isColliding(a, b, positionA, positionB, Maths.blankQuaternion(), Maths.blankQuaternion());
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public abstract class Hitbox // Another name for Hotbox
 	 */
 	public static boolean isColliding(Hitbox a, Hitbox b, Transform transformA, Transform transformB)
 	{
-		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), transformA.getCombinedRotation(), transformB.getCombinedRotation());
+		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), transformA.getRotation(), transformB.getRotation());
 	}
 	
 	/**
@@ -51,7 +51,7 @@ public abstract class Hitbox // Another name for Hotbox
 	 * @param rotationB Rotation of hitbox B
 	 * @return true if two hitboxes are colliding based on the two positions
 	 */
-	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, Matrix4f rotationA, Matrix4f rotationB)
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, Quaternionfc rotationA, Quaternionfc rotationB)
 	{
 		if(a == null || b == null)
 			return false;
@@ -68,13 +68,6 @@ public abstract class Hitbox // Another name for Hotbox
 			{
 				Vector3f cornerRightB = Maths.rotatePoint(rotationB, Maths.add(cornersB[i], positionB));
 				Vector3f cornerLeftB = Maths.rotatePoint(rotationB, Maths.add(cornersB[i + 1], positionB));
-				
-//				Utils.println("==============================================");
-//				Utils.println(cornerRightA);
-//				Utils.println(cornerLeftA);
-//				
-//				Utils.println(cornerRightB);
-//				Utils.println(cornerLeftB);
 				
 				if ((cornerRightA.x > cornerLeftB.x && cornerLeftA.x < cornerRightB.x)
 						&& (cornerRightA.y > cornerLeftB.y && cornerLeftA.y < cornerRightB.y)

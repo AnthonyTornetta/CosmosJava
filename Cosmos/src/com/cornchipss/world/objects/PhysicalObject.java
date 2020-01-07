@@ -3,7 +3,6 @@ package com.cornchipss.world.objects;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -12,7 +11,6 @@ import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.utils.Constants;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 
 public abstract class PhysicalObject
@@ -162,40 +160,7 @@ public abstract class PhysicalObject
 	 * Sets the relative Z of an object to its parent
 	 */
 	public void setZ(float z) { transform.setZ(z); }
-	
-	/**
-	 * Gets the relative Rotation X of an object to its parent
-	 * @return The relative Rotation X of an object to its parent
-	 */
-	public float getRotationX() { return transform.getRotationX(); }
-	
-	/**
-	 * Sets the relative Rotation X of an object to its parent
-	 */
-	public void setRotationX(float x) { transform.setRotationX(x); }
-
-	/**
-	 * Gets the relative Rotation Y of an object to its parent
-	 * @return The relative Rotation Y of an object to its parent
-	 */
-	public float getRotationY() { return transform.getRotationY(); }
-	
-	/**
-	 * Sets the relative Rotation Z of an object to its parent
-	 */
-	public void setRotationY(float y) { transform.setRotationY(y); }
-
-	/**
-	 * Gets the relative Rotation Z of an object to its parent
-	 * @return The relative Rotation Z of an object to its parent
-	 */
-	public float getRotationZ() { return transform.getRotationZ(); }
-	
-	/**
-	 * Sets the relative Rotation Z of an object to its parent
-	 */
-	public void setRotationZ(float z) { transform.setRotationZ(z); }
-	
+		
 	/**
 	 * Gets the relative Rotation of an object to its parent
 	 * @return The relative Rotation of an object to its parent
@@ -208,20 +173,12 @@ public abstract class PhysicalObject
 	public void setRotation(Quaternionf rot) { transform.setRotation(rot); }
 	
 	/**
-	 * Sets the relative Rotation of an object to its parent
-	 * @param x rotation X
-	 * @param y rotation Y
-	 * @param z rotation Z
-	 */
-	public void setRotation(float x, float y, float z) { transform.setRotation(x, y, z); }
-	
-	/**
 	 * Rotates the object's relative rotation by a given amount
 	 * @param amt The amount to rotate the planet by
 	 */
 	public void rotate(Vector3fc amt)
 	{
-		transform.rotate(amt);
+		transform.rotateXYZ(amt);
 	}
 	
 	/**
@@ -232,7 +189,7 @@ public abstract class PhysicalObject
 	 */
 	public void rotate(float rx, float ry, float rz)
 	{
-		transform.rotate(rx, ry, rz);
+		transform.rotateXYZ(rx, ry, rz);
 	}
 	
 	/**
@@ -324,48 +281,5 @@ public abstract class PhysicalObject
 	public Vector3f getAbsoluteVelocity()
 	{
 		return getAbsoluteTransform().getVelocity();
-	}
-	
-	/**
-	 * Gets the ABSOLUTE combined rotation of the object
-	 * @return The ABSOLUTE combined rotation of the object
-	 */
-	public Matrix4f getCombinedRotation()
-	{
-		return Maths.createCombinedRotationMatrix(getAbsoluteEulers());
-	}
-	
-	/**
-	 * Gets the RELATIVE combined rotation of the object
-	 * @return The RELATIVE combined rotation of the object
-	 */
-	public Matrix4f getRelativeCombinedRotation()
-	{
-		return Maths.createCombinedRotationMatrix(getEulers());
-	}
-	
-	public Matrix4f getRotationXMatrix()
-	{
-		return Maths.createRotationMatrix(Utils.x(), getAbsoluteRotation().x());
-	}
-	
-	public Matrix4f getRotationYMatrix()
-	{
-		return Maths.createRotationMatrix(Utils.y(), getAbsoluteRotation().y());
-	}
-	
-	public Matrix4f getRotationZMatrix()
-	{
-		return Maths.createRotationMatrix(Utils.z(), getAbsoluteRotation().z());
-	}
-	
-	public Vector3f getAbsoluteEulers()
-	{
-		return getAbsoluteRotation().getEulerAnglesXYZ(new Vector3f());
-	}
-	
-	public Vector3fc getEulers()
-	{
-		return transform.getEulers();
 	}
 }

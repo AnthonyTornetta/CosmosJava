@@ -74,6 +74,11 @@ public class Maths
         return matrix;
     }
 	
+	public static Matrix4f createRotationMatrix(Quaternionfc q)
+	{
+		return Maths.createCombinedRotationMatrix(q.getEulerAnglesXYZ(new Vector3f()));
+	}
+	
 	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
 	{
 		/*
@@ -128,7 +133,7 @@ public class Maths
 	
 	public static Quaternionf blankQuaternion()
 	{
-		return quaternionFromRotation(0, 0, 0);
+		return new Quaternionf(0, 0, 0, 1);
 	}
 	
 	public static Quaternionf quaternionFromRotation(float rx, float ry, float rz)
@@ -176,6 +181,18 @@ public class Maths
 	{
 		Vector4f vec = new Vector4f(point).mul(combinedRotation);
 		return new Vector3f(vec.x, vec.y, vec.z);
+	}
+	
+	/**
+	 * Calculates the ending point based off the starting position, rotation values, and the total distance
+	 * @param start The starting point
+	 * @param v The rotation (z is ignored)
+	 * @param dist The total distance travelable
+	 * @return The ending point
+	 */
+	public static Vector3f pointAt(Vector3fc start, Vector3fc v, float dist)
+	{
+		return add(toComponents(v.x(), v.y(), dist), start);
 	}
 	
 	/**
@@ -450,5 +467,15 @@ public class Maths
 	public static Quaternionf div(Quaternionfc a, Quaternionfc b)
 	{
 		return a.div(b, new Quaternionf());
+	}
+
+	public static Vector3f rotatePoint(Quaternionfc rotation, Vector3fc position)
+	{
+		return rotation.transform(position, new Vector3f());
+	}
+
+	public static Quaternionfc invert(Quaternionfc q)
+	{
+		return new Quaternionf().invert();
 	}
 }

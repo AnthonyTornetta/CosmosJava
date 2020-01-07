@@ -52,10 +52,7 @@ public class Player extends PhysicalEntity
 //		float ySpeed = 0.015f * 50;
 		
 		float velX = 0, velY = 0, velZ = 0;
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
-			setRotation(0, 0, 0);
-		
+				
 		Axis axis = new Axis(getAbsoluteRotation());
 		
 		Vector3f newVecX = axis.vectorInDirection(new Vector3f(speed, 0, 0));
@@ -123,12 +120,14 @@ public class Player extends PhysicalEntity
 			getVelocity().z = Utils.clamp(getVelocityZ() + velZ, -maxSpeed, maxSpeed);
 		}
 		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
+			getTransform().resetRotation();
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{			
 			setX(0);
 			setY(0);
 			setZ(0);
-			setRotation(0, 0, 0);
+			getTransform().resetRotation();
 			setVelocity(Maths.zero());
 		}
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
@@ -139,16 +138,16 @@ public class Player extends PhysicalEntity
 				setParent(getUniverse().getPlanet(getAbsolutePosition()));
 		}
 		
-		setRotationX(getRotationX() + sensitivity * -Input.getMouseDeltaY());
-		setRotationY(getRotationY() + sensitivity * -Input.getMouseDeltaX());
+		getTransform().rotateX(sensitivity * -Input.getMouseDeltaY());
+		getTransform().rotateY(sensitivity * -Input.getMouseDeltaX());
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
 		{
-			setRotationZ(getRotationZ() - Maths.PI / 180f);
+			getTransform().rotateZ(-Maths.PI / 180f);
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
 		{
-			setRotationZ(getRotationZ() + Maths.PI / 180f);
+			getTransform().rotateZ(Maths.PI / 180f);
 		}
 		
 		for(int i = 0; i < blocks.length; i++)
@@ -221,7 +220,7 @@ public class Player extends PhysicalEntity
 		
 		Transform absTransform = getAbsoluteTransform();
 		
-		Raycast ray = Raycast.fire(absTransform.getPosition(), getUniverse(), absTransform.getRotationX(), absTransform.getRotationY(), lookDist, settings);
+		Raycast ray = Raycast.fire(absTransform.getPosition(), getUniverse(), absTransform.getRotation(), lookDist, settings);
 		
 		int closest = -1;
 		float closestDist = 0;

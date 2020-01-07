@@ -60,7 +60,7 @@ public abstract class BlockStructure extends PhysicalObject
 		this.length = length;
 		
 		setRelativeTransform(new Transform());
-		setRotation(rx, ry, rz);
+		getTransform().setRotation(rx, ry, rz);
 	}
 	
 	@Override

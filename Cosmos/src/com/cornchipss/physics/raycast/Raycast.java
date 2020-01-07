@@ -3,6 +3,7 @@ package com.cornchipss.physics.raycast;
 import java.util.List;
 
 import org.joml.Intersectionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -39,9 +40,9 @@ public class Raycast
 	 * @param maxDist The length of the line to test
 	 * @return A Raycast object storing the parrallel lists of the blocks hit + block faces.
 	 */
-	public static Raycast fire(Vector3fc position, Universe universe, float rx, float ry, float maxDist)
+	public static Raycast fire(Vector3fc position, Universe universe, Quaternionfc rot, float maxDist)
 	{
-		return fire(position, universe, rx, ry, maxDist, new RaycastOptions());
+		return fire(position, universe, rot, maxDist, new RaycastOptions());
 	}
 	
 	/**
@@ -54,9 +55,9 @@ public class Raycast
 	 * @param options Raycast options for a more specific search
 	 * @return A Raycast object storing the parrallel lists of the blocks hit + block faces.
 	 */
-	public static Raycast fire(Vector3fc position, Universe universe, float rx, float ry, float maxDist, RaycastOptions options)
+	public static Raycast fire(Vector3fc position, Universe universe, Quaternionfc rot, float maxDist, RaycastOptions options)
 	{
-		Vector3f endPoint = Maths.pointAt(position, rx, ry, maxDist);
+		Vector3f endPoint = Maths.pointAt(position, rot.getEulerAnglesXYZ(new Vector3f()), maxDist);
 		
 		Location[][][] locs = universe.getBlocksBetween(position, endPoint);
 		

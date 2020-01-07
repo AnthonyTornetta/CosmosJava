@@ -2,7 +2,6 @@ package com.cornchipss.world;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import com.cornchipss.physics.Transform;
 import com.cornchipss.world.blocks.Block;
@@ -33,7 +32,6 @@ public class Location
 	public Transform getTransform() { return trans; }
 	
 	public Quaternionf getRotation() { return trans.getRotation(); }
-	public Vector3fc getEulers() { return trans.getEulers(); }
 	
 	public Vector3f getPosition() { return trans.getPosition(); }
 	public void setPosition(Vector3f position)
