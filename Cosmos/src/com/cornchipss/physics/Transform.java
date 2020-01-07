@@ -1,6 +1,7 @@
 package com.cornchipss.physics;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
@@ -13,22 +14,25 @@ public class Transform
 	private Matrix4f rotationX = new Matrix4f().identity(), rotationY = new Matrix4f().identity(), rotationZ = new Matrix4f().identity();
 	
 	private Vector3f position;
-	private Vector3fc rotation;
+	
+	private Quaternionf rotation;
+	private Vector3f eulers = Maths.zero();
+	
 	private Vector3f velocity = Maths.zero();
 	
 	private Matrix4f transform = new Matrix4f();
 	
 	public Transform()
 	{
-		this(Maths.zero(), Maths.zero());
+		this(Maths.zero());
 	}
 	
 	public Transform(Vector3fc position)
 	{
-		this(position, Maths.zero());
+		this(position, new Quaternionf());
 	}
 	
-	public Transform(Vector3fc position, Vector3fc rotation)
+	public Transform(Vector3fc position, Quaternionf rotation)
 	{
 		transform = new Matrix4f();
 		
@@ -46,7 +50,7 @@ public class Transform
 	{
 		Transform t = new Transform(
 				Maths.add(getPosition(), Maths.rotatePoint(getCombinedRotation(), child.getPosition())), 
-				Maths.add(child.rotation, rotation));
+				Maths.mul(child.rotation, rotation));
 		t.setVelocity(Maths.add(child.velocity, velocity));
 		return t;
 	}
@@ -62,7 +66,7 @@ public class Transform
 	{
 		Transform t = new Transform(
 				Maths.sub(Maths.rotatePoint(getCombinedRotation().invert(), child.getPosition()), getPosition()), 
-				Maths.sub(child.getRotation(), getRotation())); // correct rotation
+				Maths.div(child.getRotation(), getRotation())); // correct rotation
 		t.setVelocity(Maths.sub(child.velocity, velocity));
 		return t;
 	}
@@ -89,35 +93,40 @@ public class Transform
 		setZ(amt.z() + getZ());
 	}
 	
-	public Vector3fc getRotation() { return rotation; }
-	public void setRotation(Vector3fc rotation)
+	public Vector3fc getEulers() { return eulers; }
+	public Quaternionf getRotation() { return rotation; }
+	public void setRotation(Quaternionf rotation)
 	{
-		setRotation(rotation.x(), rotation.y(), rotation.z());
-	}
-	public void setRotation(float rx, float ry, float rz)
-	{
+		Vector3f prevEulers = new Vector3f(getEulers());
+		
+		this.rotation = rotation;
+		rotation.getEulerAnglesXYZ(eulers);
+		
 		/*
 		 * https://open.gl/transformations
 		 */
 		
-		if(this.rotation == null || rx != this.rotation.x())
-			rotationX = Maths.createRotationMatrix(Utils.x(), rx);
-		if(this.rotation == null || ry != this.rotation.y())
-			rotationY = Maths.createRotationMatrix(Utils.y(), ry);
-		if(this.rotation == null || rz != this.rotation.z())
-			rotationZ = Maths.createRotationMatrix(Utils.z(), rz);
-		
-		this.rotation = new Vector3f(rx, ry, rz);	
+		if(this.rotation == null || prevEulers.x != eulers.x)
+			rotationX = Maths.createRotationMatrix(Utils.x(), eulers.x);
+		if(this.rotation == null || prevEulers.y != eulers.y)
+			rotationY = Maths.createRotationMatrix(Utils.y(), eulers.y);
+		if(this.rotation == null || prevEulers.z != eulers.z)
+			rotationZ = Maths.createRotationMatrix(Utils.z(), eulers.z);
+	}
+	public void setRotation(float rx, float ry, float rz)
+	{
+		setRotation(Maths.quaternionFromRotation(rx, ry, rz));
 	}
 	
 	public void rotate(float rx, float ry, float rz)
 	{
-		setRotation(Maths.add(rotation, rx, ry, rz));
+		rotation.rotateXYZ(rx, ry, rz);
+		setRotation(rotation);
 	}
 	
 	public void rotate(Vector3fc delta)
 	{
-		setRotation(Maths.add(rotation, delta));
+		rotate(delta.x(), delta.y(), delta.z());
 	}
 
 	public void setRotationX(float rx)
@@ -162,19 +171,19 @@ public class Transform
 	 * Gets the rotation in the X direction
 	 * @return the rotation in the X direction 
 	 */
-	public float getRotationX() { return rotation.x(); }
+	public float getRotationX() { return eulers.x(); }
 	
 	/**
 	 * Gets the rotation in the X direction
 	 * @return the rotation in the X direction 
 	 */
-	public float getRotationY() { return rotation.y(); }
+	public float getRotationY() { return eulers.y(); }
 	
 	/**
 	 * Gets the rotation in the Y direction
 	 * @return the rotation in the Y direction 
 	 */
-	public float getRotationZ() { return rotation.z(); }
+	public float getRotationZ() { return eulers.z(); }
 	
 	/**
 	 * Gets the rotation matrix for the Z axis

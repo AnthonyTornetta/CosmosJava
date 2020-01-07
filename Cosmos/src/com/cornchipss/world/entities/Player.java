@@ -49,7 +49,7 @@ public class Player extends PhysicalEntity
 		maxSpeedY = 100f;
 		
 		float speed = 50 * (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f);
-		float ySpeed = 0.015f * 50;
+//		float ySpeed = 0.015f * 50;
 		
 		float velX = 0, velY = 0, velZ = 0;
 		

@@ -1,6 +1,8 @@
 package com.cornchipss.utils;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
@@ -8,7 +10,20 @@ import org.joml.Vector4fc;
 
 public class Maths
 {
-	public static float PI = (float)Math.PI;
+	/**
+	 * A float of Math.PI
+	 */
+	public static final float PI = (float)Math.PI;
+	
+	/**
+	 * Maths.PI * 2
+	 */
+	public static final float TAU = PI * 2;
+	
+	/**
+	 * Maths.PI / 2
+	 */
+	public static final float PI2 = PI / 2;	
 	
 	/**
 	 * Creates a view matrix based on coordinates + rotations
@@ -110,7 +125,38 @@ public class Maths
 	{
 		return (float)Math.tan(theta);
 	}
+	
+	public static Quaternionf blankQuaternion()
+	{
+		return quaternionFromRotation(0, 0, 0);
+	}
+	
+	public static Quaternionf quaternionFromRotation(float rx, float ry, float rz)
+	{
+		return new Quaternionf().rotateXYZ(rx, ry, rz);
+	}
+	
+	public static Quaternionf quaternionFromRotation(Vector3fc rot)
+	{
+		return quaternionFromRotation(rot.x(), rot.y(), rot.z());
+	}
+	
+	public static Vector3f rotatePoint(Vector3fc point, Vector3fc rotation)
+	{
+		Quaternionf transQuat = blankQuaternion();
 		
+		Vector3f punto = new Vector3f(point.x(), point.y(), point.z());
+		rotation = mod(rotation, Maths.TAU);
+		
+		Quaternionf rotationQuat = blankQuaternion();
+		
+		rotationQuat.rotateXYZ(rotation.x(), rotation.y(), rotation.z(), transQuat);
+		
+		transQuat.transform(punto);
+		
+		return punto;
+	}
+	
 	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector3fc point)
 	{
 		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX, new Vector4f(point.x(), point.y(), point.z(), 0));
@@ -325,6 +371,17 @@ public class Maths
 	}
 	
 	/**
+	 * Takes the modulus two vectors without modifying either one
+	 * @param a The first vector
+	 * @param b The scalar
+	 * @return A new vector of the two vectors modulus'ed
+	 */
+	public static Vector3f mod(Vector3fc a, float b)
+	{
+		return new Vector3f(a.x() % b, a.y() % b, a.z() % b);
+	}
+	
+	/**
 	 * A Vector3f with all values being 0
 	 * @return a Vector3f with all values being 0
 	 */
@@ -371,5 +428,27 @@ public class Maths
 	public static Vector3f invert(Vector3fc v)
 	{
 		return new Vector3f(-v.x(), -v.y(), -v.z());
+	}
+
+	/**
+	 * Same as rotate a by b
+	 * @param a Thing to rotate
+	 * @param b Thing to be rotated by
+	 * @return The rotated vector
+	 */
+	public static Quaternionf mul(Quaternionfc a, Quaternionfc b)
+	{
+		return a.mul(b, new Quaternionf());
+	}
+
+	/**
+	 * Same as un-rotate a by b
+	 * @param a Thing to un-rotate
+	 * @param b Thing to be un-rotate by
+	 * @return The un-rotate vector
+	 */
+	public static Quaternionf div(Quaternionfc a, Quaternionfc b)
+	{
+		return a.div(b, new Quaternionf());
 	}
 }

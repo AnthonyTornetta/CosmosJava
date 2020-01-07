@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -199,12 +200,12 @@ public abstract class PhysicalObject
 	 * Gets the relative Rotation of an object to its parent
 	 * @return The relative Rotation of an object to its parent
 	 */
-	public Vector3fc getRotation() { return transform.getRotation(); }
+	public Quaternionf getRotation() { return transform.getRotation(); }
 	
 	/**
 	 * Sets the relative Rotation of an object to its parent
 	 */
-	public void setRotation(Vector3fc rot) { transform.setRotation(rot); }
+	public void setRotation(Quaternionf rot) { transform.setRotation(rot); }
 	
 	/**
 	 * Sets the relative Rotation of an object to its parent
@@ -215,12 +216,12 @@ public abstract class PhysicalObject
 	public void setRotation(float x, float y, float z) { transform.setRotation(x, y, z); }
 	
 	/**
-	 * Rotates the planet's relative rotation by a given amount
+	 * Rotates the object's relative rotation by a given amount
 	 * @param amt The amount to rotate the planet by
 	 */
 	public void rotate(Vector3fc amt)
 	{
-		setRotation(Maths.add(getRotation(), amt));
+		transform.rotate(amt);
 	}
 	
 	/**
@@ -231,7 +232,7 @@ public abstract class PhysicalObject
 	 */
 	public void rotate(float rx, float ry, float rz)
 	{
-		setRotation(getRotationX() + rx, getRotationY() + ry, getRotationZ() + rz);
+		transform.rotate(rx, ry, rz);
 	}
 	
 	/**
@@ -315,7 +316,7 @@ public abstract class PhysicalObject
 		return getAbsoluteTransform().getPosition();
 	}
 	
-	public Vector3fc getAbsoluteRotation()
+	public Quaternionf getAbsoluteRotation()
 	{
 		return getAbsoluteTransform().getRotation();
 	}
@@ -331,7 +332,7 @@ public abstract class PhysicalObject
 	 */
 	public Matrix4f getCombinedRotation()
 	{
-		return Maths.createCombinedRotationMatrix(getAbsoluteRotation());
+		return Maths.createCombinedRotationMatrix(getAbsoluteEulers());
 	}
 	
 	/**
@@ -340,7 +341,7 @@ public abstract class PhysicalObject
 	 */
 	public Matrix4f getRelativeCombinedRotation()
 	{
-		return Maths.createCombinedRotationMatrix(getRotation());
+		return Maths.createCombinedRotationMatrix(getEulers());
 	}
 	
 	public Matrix4f getRotationXMatrix()
@@ -356,5 +357,15 @@ public abstract class PhysicalObject
 	public Matrix4f getRotationZMatrix()
 	{
 		return Maths.createRotationMatrix(Utils.z(), getAbsoluteRotation().z());
+	}
+	
+	public Vector3f getAbsoluteEulers()
+	{
+		return getAbsoluteRotation().getEulerAnglesXYZ(new Vector3f());
+	}
+	
+	public Vector3fc getEulers()
+	{
+		return transform.getEulers();
 	}
 }

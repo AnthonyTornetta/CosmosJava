@@ -7,7 +7,6 @@ import org.joml.Vector3i;
 
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
-import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.biospheres.Biosphere;
@@ -74,12 +73,12 @@ public class Sector
 	
 	public void update(Player player)
 	{
-		float r = (float)0.0004f;
-		getPlanet(0, 0, 0).rotate(0, 0, 0);
-		
-		getPlanet(0, 0, 0).setRotationX(0);
-		getPlanet(0, 0, 0).setRotationY(Maths.PI / 2);
-		getPlanet(0, 0, 0).setRotationZ(0);
+//		float r = (float)0.0004f;
+//		getPlanet(0, 0, 0).rotate(0, 0, 0);
+//		
+//		getPlanet(0, 0, 0).setRotationX(0);
+//		getPlanet(0, 0, 0).setRotationY(Maths.PI / 2);
+//		getPlanet(0, 0, 0).setRotationZ(0);
 		
 		if(firstUpdate || player.getX() != lastX || player.getY() != lastY || player.getZ() != lastZ)
 		{

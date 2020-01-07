@@ -42,7 +42,7 @@ public abstract class Renderer
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
 		Maths.createViewMatrix(player.getAbsolutePosition(), 
-				player.getAbsoluteRotation(), getViewMatrix());
+				player.getAbsoluteEulers(), getViewMatrix());
 		
 		getShader().start();
 		getShader().loadUniformMatrix(u_projectionLocation, getProjectionMatrix());
