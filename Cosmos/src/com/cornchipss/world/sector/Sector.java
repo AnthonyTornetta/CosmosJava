@@ -1,12 +1,15 @@
 package com.cornchipss.world.sector;
 
+import java.util.HashSet;
 import java.util.Random;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.rendering.PlanetRenderer;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.biospheres.Biosphere;
@@ -73,22 +76,22 @@ public class Sector
 	
 	public void update(Player player)
 	{
-//		float r = (float)0.0004f;
-//		getPlanet(0, 0, 0).rotate(0, 0, 0);
-//		
-//		getPlanet(0, 0, 0).setRotationX(0);
-//		getPlanet(0, 0, 0).setRotationY(Maths.PI / 2);
-//		getPlanet(0, 0, 0).setRotationZ(0);
+		float r = Maths.PI / 180 * 1;
+//		getPlanet(0, 0, 0).getTransform().rotateX(r);
 		
-		if(firstUpdate || player.getX() != lastX || player.getY() != lastY || player.getZ() != lastZ)
+		float x = player.getTransform().x(), 
+				y = player.getTransform().y(), 
+				z = player.getTransform().z();
+		
+		if(firstUpdate || x != lastX || y != lastY || z != lastZ)
 		{
 			int lastSectorX = chunkAtLocalX(lastX);
 			int lastSectorY = chunkAtLocalX(lastY);
 			int lastSectorZ = chunkAtLocalX(lastZ);
 			
-			lastX = player.getX();
-			lastY = player.getY();
-			lastZ = player.getZ();
+			lastX = x;
+			lastY = y;
+			lastZ = z;
 			
 			int secX = chunkAtLocalX(lastX);
 			int secY = chunkAtLocalX(lastY);
@@ -318,6 +321,12 @@ public class Sector
 	}
 	
 	/**
+	 * Handles the planets that are currently rendering
+	 * TODO: make this system more clear
+	 */
+	private volatile HashSet<Planet> renderers = new HashSet<>();
+	
+	/**
 	 * Renders every planet within a given radius
 	 * @param centerX The coordinate of the center within -CHUNK_OFFSET to CHUNK_OFFSET - 1
 	 * @param centerY The coordinate of the center within -CHUNK_OFFSET to CHUNK_OFFSET - 1
@@ -348,11 +357,26 @@ public class Sector
 			{
 				for(int x = lowX; x <= highX; x++)
 				{
-					if(getPlanet(x, y, z) != null)
+					Planet p = getPlanet(x, y, z);
+					
+					if(p != null)
 					{
 						long mils = System.currentTimeMillis();
 						
-						renderer.render(getPlanet(x, y, z), player);
+						if(!p.isRendered() && !renderers.contains(p))
+						{
+							renderers.add(p);
+							new Thread(() ->
+							{
+								p.render();
+								renderers.remove(p);
+							}).start();
+						}
+						
+						if(p.isRendered())
+						{
+							renderer.render(p, player);
+						}
 						
 						long time = System.currentTimeMillis() - mils;
 						if(time > 16)
@@ -367,7 +391,8 @@ public class Sector
 	
 	public void renderPlanetsWithin(int radius, PlanetRenderer renderer, Player player)
 	{
-		renderPlanetsWithin(chunkAtLocalX(player.getX()), chunkAtLocalY(player.getY()), chunkAtLocalZ(player.getZ()), radius, renderer, player);
+		Transform t = player.getTransform();
+		renderPlanetsWithin(chunkAtLocalX(t.x()), chunkAtLocalY(t.y()), chunkAtLocalZ(t.z()), radius, renderer, player);
 	}
 	
 	public static int chunkAtLocalX(float x)

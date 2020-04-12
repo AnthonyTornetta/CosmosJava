@@ -2,9 +2,13 @@ package com.cornchipss.world.entities;
 
 import java.util.List;
 
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.Game;
 import com.cornchipss.physics.Axis;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
@@ -13,7 +17,6 @@ import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.Block;
@@ -22,135 +25,143 @@ import com.cornchipss.world.blocks.BlockFace;
 public class Player extends PhysicalEntity
 {
 	private float sensitivity = 0.0025f;
-	private float maxSlowdown = .1f;
-	private float maxSpeed = 2f;
-	private float maxSpeedY = 5f;
 	
-	public static final float FRICTION = 1f;
+	// All in KMS units
+	private float maxSpeedXZ = 5f;
+//	private float maxSpeedY = 10;
+	private float accelRate = 100f;
 	
-	public static final float GRAVITY_ACCEL = 0;//-0.01f;
+	public static final float FRICTION = 0;
+	
+	public static final float GRAVITY_ACCEL = 0;//-9.8f;
 	
 	private int blockSelected;
-	private Block[] blocks = new Block[] 
+	private Block[] inventory = new Block[] 
 			{ Blocks.stone, Blocks.glass, Blocks.grass, Blocks.dirt, Blocks.sand, Blocks.snow, Blocks.sandstone, Blocks.snowstone };
 	
 	private final int LOOK_DISTANCE = 10;
-
+	
+	private Transform camera;
+	
 	public Player(float x, float y, float z)
 	{
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f), 0.5f);
+		
+		camera = new Transform(getTransform());
+		
+		camera.parent(getTransform());
 	}
 	
-	@Override
-	public void onUpdate()
+	private void handleNewMovement()
 	{
-		maxSlowdown = .1f;
-		maxSpeed = 100f;
-		maxSpeedY = 100f;
+		Axis axis = camera().axis();
 		
-		float speed = 50 * (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL) ? .025f : .015f);
-//		float ySpeed = 0.015f * 50;
+		Vector3f newVecX = axis.vectorInDirection(new Vector3f(1, 0, 0));
+		Vector3f newVecY = axis.vectorInDirection(new Vector3f(0, 1, 0));
+		Vector3f newVecZ = axis.vectorInDirection(new Vector3f(0, 0, 1));
 		
-		float velX = 0, velY = 0, velZ = 0;
-				
-		Axis axis = new Axis(getAbsoluteRotation());
-		
-		Vector3f newVecX = axis.vectorInDirection(new Vector3f(speed, 0, 0));
-		Vector3f newVecY = axis.vectorInDirection(new Vector3f(0, speed, 0));
-		Vector3f newVecZ = axis.vectorInDirection(new Vector3f(0, 0, speed));
+		Vector3f accel = new Vector3f();
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 		{
-			velX -= newVecZ.x;
-			velY -= newVecZ.y;
-			velZ -= newVecZ.z;
+			accel.x -= newVecZ.x;
+			accel.y -= newVecZ.y;
+			accel.z -= newVecZ.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
 		{
-			velX += newVecZ.x;
-			velY += newVecZ.y;
-			velZ += newVecZ.z;
+			accel.x += newVecZ.x;
+			accel.y += newVecZ.y;
+			accel.z += newVecZ.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
 		{
-			velX -= newVecX.x;
-			velY -= newVecX.y;
-			velZ -= newVecX.z;
+			accel.x -= newVecX.x;
+			accel.y -= newVecX.y;
+			accel.z -= newVecX.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
 		{
-			velX += newVecX.x;
-			velY += newVecX.y;
-			velZ += newVecX.z;
+			accel.x += newVecX.x;
+			accel.y += newVecX.y;
+			accel.z += newVecX.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 		{
-			velX -= newVecY.x;
-			velY -= newVecY.y;
-			velZ -= newVecY.z;
+			accel.x -= newVecY.x;
+			accel.y -= newVecY.y;
+			accel.z -= newVecY.z;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
 		{
-			velX += newVecY.x;
-			velY += newVecY.y;
-			velZ += newVecY.z;
+			accel.x += newVecY.x;
+			accel.y += newVecY.y;
+			accel.z += newVecY.z;
 		}
 		
-		// normalizes the speed so you dont get a giga boost if you go in 3 directions at once
-		// I didn't use the normalize() method because it divides by 0 if velocity is 0, 0, 0
-		
-		float k = (velX * velX + velY * velY + velZ * velZ) / (speed * speed);
-		if(k != 0)
+		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			velX /= k;
-			velY /= k;
-			velZ /= k;
-		}
-			
-		if(Math.abs(getVelocityX() + velX) < Math.abs(getVelocityX()) || Math.abs(getVelocityX()) <= maxSpeed)
-		{
-			getVelocity().x = Utils.clamp(getVelocityX() + velX, -maxSpeed, maxSpeed);
-		}
-		if(Math.abs(getVelocityY() + velY) < Math.abs(getVelocityY()) || Math.abs(getVelocityY()) <= maxSpeedY)
-		{
-			getVelocity().y = Utils.clamp(getVelocityY() + velY, -maxSpeedY, maxSpeedY);
-		}
-		if(Math.abs(getVelocityZ() + velZ) < Math.abs(getVelocityZ()) || Math.abs(getVelocityZ()) <= maxSpeed)
-		{
-			getVelocity().z = Utils.clamp(getVelocityZ() + velZ, -maxSpeed, maxSpeed);
+			Vector3fc vel = getTransform().velocity();
+			accel.x -= vel.x() * .1f;
+			accel.y -= vel.y() * .1f;
+			accel.z -= vel.z() * .1f;
 		}
 		
+		accel.mul(accelRate * Game.deltaTime());
+		
+		getTransform().accelerate(accel);
+//		getTransform().localVelocity(Maths.normalClamp(getTransform().localVelocity(), maxSpeedXZ));
+	}
+	
+	private void handleResets()
+	{
 		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
-			getTransform().resetRotation();
+		{
+			camera().rotation(0, 0, 0);
+		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-		{			
-			setX(0);
-			setY(0);
-			setZ(0);
-			getTransform().resetRotation();
-			setVelocity(Maths.zero());
+		{
+			getTransform().localPosition(new Vector3f(0, 0, 0));
+			camera().localRotation(0, 0, 0);
+			getTransform().removeParent();
+			getTransform().localVelocity(Maths.zero());
 		}
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 		{
-			if(hasParent())
-				removeParent();
+			if(getTransform().hasParent())
+				getTransform().removeParent();
 			else
-				setParent(getUniverse().getPlanet(getAbsolutePosition()));
+				getTransform().parent(
+						getUniverse().getPlanet(
+								getTransform().position()).getTransform());
 		}
+	}
+	
+	private void handleCamera()
+	{
+		Axis axis = camera().axis();
 		
-		getTransform().rotateX(sensitivity * -Input.getMouseDeltaY());
-		getTransform().rotateY(sensitivity * -Input.getMouseDeltaX());
+		Quaternionf quat = Maths.clone(camera.rotation());
 		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-		{
-			getTransform().rotateZ(-Maths.PI / 180f);
-		}
+		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaX() * sensitivity, axis.yEndpoint())).mul(quat, quat);
+		quat.normalize();
+		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaY() * sensitivity, axis.xEndpoint())).mul(quat, quat);
+		quat.normalize();
+		
+		float rotZ = 0;
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
 		{
-			getTransform().rotateZ(Maths.PI / 180f);
+			rotZ -= 1;
+		}
+		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
+		{
+			rotZ += 1;
 		}
 		
-		for(int i = 0; i < blocks.length; i++)
+		new Quaternionf(new AxisAngle4f(rotZ * 0.01f, axis.zEndpoint())).mul(quat, quat);
+		quat.normalize();
+		
+		for(int i = 0; i < inventory.length; i++)
 		{
 			if(Input.isKeyJustDown(GLFW.GLFW_KEY_1 + i))
 			{
@@ -158,6 +169,13 @@ public class Player extends PhysicalEntity
 			}
 		}
 		
+		quat.normalize();
+		
+		camera.rotation(quat);
+	}
+	
+	private void handleBlockInteractions()
+	{
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_RIGHT))
 		{
 			Pair<Location, BlockFace> lookingAt = getBlockLookingAt(10);
@@ -167,7 +185,7 @@ public class Player extends PhysicalEntity
 				BlockFace face = lookingAt.getB();
 				Vector3f dir = face.getRelativePosition();
 				
-				getUniverse().setBlockAt(Maths.add(lookingAt.getA().getPosition(), Maths.mul(2, dir)), blocks[blockSelected]);
+				getUniverse().setBlockAt(Maths.add(lookingAt.getA().getPosition(), Maths.mul(2, dir)), inventory[blockSelected]);
 			}
 		}
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
@@ -188,28 +206,36 @@ public class Player extends PhysicalEntity
 				getUniverse().explode(lookingAt.getA(), 10);
 			}
 		}
-		
-		accelerateY(GRAVITY_ACCEL);
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
-		{
-			accelerateX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * 0.1f);
-			accelerateY(Utils.clamp(-(getVelocityY() - GRAVITY_ACCEL), -maxSlowdown, maxSlowdown) * 0.1f - GRAVITY_ACCEL);
-			accelerateZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * 0.1f);
-		}
-		
+	}
+	
+	private void handleOtherForces()
+	{
+		@SuppressWarnings("unused")
 		List<BlockFace> hits = updatePhysics();
 		
-		accelerateX(Utils.clamp(-getVelocityX(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
-		accelerateZ(Utils.clamp(-getVelocityZ(), -maxSlowdown, maxSlowdown) * (maxSpeed / FRICTION));
+//		if(Utils.contains(hits, BlockFace.TOP))
+//		{
+//			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
+//			{
+//				vely += 10f;
+//			}
+//		}
+//		
+//		getTransform().setRelativeVelocity(velR);
+	}
+	
+	@Override
+	public void onUpdate()
+	{
+		handleCamera();
 		
-		if(Utils.contains(hits, BlockFace.TOP))
-		{
-			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
-			{
-				accelerateY(.2f);
-			}
-		}
+		handleNewMovement();
+		
+		handleResets();
+				
+		handleBlockInteractions();
+		
+		handleOtherForces();
 	}
 	
 	public Pair<Location, BlockFace> getBlockLookingAt(float lookDist)
@@ -218,9 +244,7 @@ public class Player extends PhysicalEntity
 		
 		settings.setBlacklist(Blocks.air);
 		
-		Transform absTransform = getAbsoluteTransform();
-		
-		Raycast ray = Raycast.fire(absTransform.getPosition(), getUniverse(), absTransform.getRotation(), lookDist, settings);
+		Raycast ray = Raycast.fire(getTransform().position(), getUniverse(), getTransform().eulers(), lookDist, settings);
 		
 		int closest = -1;
 		float closestDist = 0;
@@ -229,7 +253,7 @@ public class Player extends PhysicalEntity
 		{
 			Location l = ray.getNthHit(i);
 			
-			float dist = l.getPosition().distanceSquared(absTransform.getPosition());
+			float dist = l.getPosition().distanceSquared(getTransform().position());
 			
 			if(closest == -1 || dist < closestDist)
 			{
@@ -252,12 +276,17 @@ public class Player extends PhysicalEntity
 	 */
 	public Vector3f getHeadPosition()
 	{
-		return Maths.add(getPosition(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
+		return Maths.add(getTransform().position(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
 	}
 
 	@Override
 	public float getMass()
 	{
 		return 80;
+	}
+	
+	public Transform camera()
+	{
+		return camera;
 	}
 }

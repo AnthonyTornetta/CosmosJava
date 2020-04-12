@@ -1,6 +1,12 @@
 package com.cornchipss.physics;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.joml.AxisAngle4f;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -9,218 +15,398 @@ import com.cornchipss.utils.Maths;
 public class Transform
 {
 	private Vector3f position;
+	private Vector3f localPosition;
+	
+	private Vector3f velocity;
+	private Vector3f localVelocity;
+	
 	private Quaternionf rotation;
-	private Vector3f velocity = Maths.zero();
+	private Quaternionf localRotation;
+	
+	/**
+	 * The axis this object sees the world with
+	 */
+	private Axis axis;
+	
+	private Transform parent;
+	private List<Transform> children = new ArrayList<>(0); // most transforms wont have children
 	
 	public Transform()
 	{
 		this(Maths.zero());
 	}
 	
-	public Transform(Vector3fc position)
+	public Transform(Vector3fc loc)
 	{
-		this(position, new Quaternionf());
+		this(loc, Maths.blankQuaternion());
 	}
 	
-	public Transform(Vector3fc position, Quaternionf rotation)
+	public Transform(Vector3fc loc, Vector3fc rot)
 	{
-		setPosition(new Vector3f(position));
-		setRotation(rotation);
+		this(loc, Maths.quaternionFromRotation(rot));
+		
+		updateAxis();
+	}
+	
+	public Transform(Vector3fc loc, Quaternionfc quat)
+	{
+		position = new Vector3f(localPosition = new Vector3f(loc));
+		rotation = new Quaternionf(localRotation = Maths.clone(quat));
+		velocity = new Vector3f(localVelocity = Maths.zero());
+		
+		updateAxis();
+	}
+	
+	public Transform(Transform parent)
+	{
+		position = new Vector3f(parent.position());
+		rotation = Maths.clone(parent.rotation());
+		velocity = new Vector3f(parent.velocity());
+		
+		this.parent = parent;
+		parent.children.add(this);
+		
+		this.localPosition = new Vector3f();
+		this.localRotation = new Quaternionf();
+		this.localVelocity = new Vector3f();
+		
+		updateAxis();
+	}
+	
+	public boolean hasParent()
+	{
+		return parent != null;
+	}
+	
+	public void removeParent()
+	{
+		if(hasParent())
+		{
+			parent.children.remove(this);
+			this.parent = null;
+			
+			// These now represent the same things
+			localPosition = new Vector3f(position);
+			localRotation = new Quaternionf(rotation);
+			localVelocity = new Vector3f(velocity);
+		}
+	}
+	
+	public void parent(Transform p)
+	{
+		removeParent();
+		
+		this.parent = p;
+		parent.children.add(this);
+		
+		// These now represent differing things
+		localPosition = new Vector3f(position);
+		localRotation = new Quaternionf(rotation);
+		localVelocity = new Vector3f(velocity);
+		
+		localRotation.div(parent.rotation());
+		localPosition.sub(parent.position());
+		localVelocity.sub(parent.velocity());
+	}
+	
+	public Transform parent()
+	{
+		return parent;
+	}
+	
+	public Vector3fc velocity()
+	{
+		return velocity;
+	}
+	
+	public void velocity(Vector3fc vel)
+	{
+		accelerate(Maths.sub(vel, velocity));
+	}
+	
+	public void accelerate(Vector3fc accel)
+	{
+		localVelocity.add(accel);
+		
+		applyAcceleration(accel);
+	}
+	
+	public Quaternionfc localRotation()
+	{
+		return localRotation;
+	}
+	
+	public void localRotation(float x, float y, float z)
+	{
+		localRotation(Maths.quaternionFromRotation(x, y, z));
+	}
+	
+	public void localRotation(Vector3fc rot)
+	{
+		localRotation(Maths.quaternionFromRotation(rot));
+	}
+	
+	public void localRotation(Quaternionfc rot)
+	{
+		Quaternionf delta = Maths.div(rot, localRotation);
+		
+		delta.normalize();
+		localRotation.mul(delta);
+		localRotation.normalize();
+		
+		applyRotation(delta);
+	}
+	
+	private void applyRotation(Quaternionfc delta)
+	{
+		delta = delta.normalize(new Quaternionf());
+		
+		for(Transform child : children)
+		{
+			child.applyRotation(delta);
+		}
+		
+		rotation.mul(delta);
+		rotation.normalize();
+		updateAxis();
+	}
+	
+	public Quaternionfc rotation()
+	{
+		return rotation;
+	}
+	
+	public void rotation(Vector3fc rot)
+	{
+		rotation(Maths.quaternionFromRotation(rot));
+	}
+	
+	public void rotation(float x, float y, float z)
+	{
+		rotation(Maths.quaternionFromRotation(x, y, z));
 	}
 	
 	/**
-	 * Combines two other transforms without modifying either one<br>
-	 * Equivilant to <code>return this + other</code> - make sure it's parent + child - not the other way around
-	 * @param child The transform to combine this with
-	 * @return Combination of two other transforms without modifying either one
+	 * Sets the rotation of this transform
+	 * @param rot The rotation to set it to
 	 */
-	public Transform combine(Transform child)
+	public void rotation(Quaternionfc rot)
 	{
-		Transform t = new Transform(
-				Maths.add(getPosition(), Maths.rotatePoint(rotation, child.getPosition())), 
-				Maths.mul(child.rotation, rotation));
-		t.setVelocity(Maths.add(child.velocity, velocity));
-		return t;
+		Quaternionf delta = Maths.div(rot, rotation);
+		delta.normalize();
+		localRotation.mul(delta);
+		
+		applyRotation(delta);
 	}
 	
-	/**
-	 * Separates two other transforms without modifying either one<br>
-	 * The inverse of {@link Transform#combine(Transform)}<br>
-	 * Equivilant to <code>return this - other</code> - make sure it's parent - child - not the other way around
-	 * @param child The transform to seperate this from
-	 * @return Separation of two other transforms without modifying either one
-	 */
-	public Transform separate(Transform child)
+	public void position(float x, float y, float z)
 	{
-		Transform t = new Transform(
-				Maths.sub(Maths.rotatePoint(Maths.invert(rotation), child.getPosition()), getPosition()), 
-				Maths.div(child.getRotation(), getRotation())); // correct rotation
-		t.setVelocity(Maths.sub(child.velocity, velocity));
-		return t;
+		position(new Vector3f(x, y, z));
 	}
 	
-	public Vector3f getPosition() { return position; }
-	public void setPosition(Vector3fc position)
+	public void position(Vector3fc pos)
 	{
-		this.position = new Vector3f(position);
+		Vector3f delta = Maths.sub(pos, position);
+		
+		position.add(delta);
+		localPosition.add(delta);
+		
+		applyPosition(delta);
 	}
-
-	public void setX(float x) { position.x = x; }
-	public void setY(float y) { position.y = y; }
-	public void setZ(float z) { position.z = z; }
 	
-	public float getX() { return position.x; }
-	public float getY() { return position.y; }
-	public float getZ() { return position.z; }
+	public Vector3fc position()
+	{
+		return position;
+	}
+	
+	public void localPosition(float x, float y, float z)
+	{
+		localPosition(new Vector3f(x, y, z));
+	}
+	
+	public void localPosition(Vector3fc pos)
+	{
+		Vector3f delta = Maths.sub(pos, localPosition);
+		localPosition.add(delta);
+		
+		applyPosition(delta);
+	}
+	
+	private void applyPosition(Vector3fc delta)
+	{
+		for(Transform child : children)
+			child.applyPosition(delta);
+		
+		position.add(delta);
+	}
+	
+	public Vector3fc localPosition()
+	{
+		return localPosition;
+	}
+	
+	public void localVelocity(Vector3fc vel)
+	{
+		accelerate(Maths.sub(vel, localVelocity));
+	}
+	
+	public Vector3fc localVelocity()
+	{
+		return localVelocity;
+	}
 	
 	public void translate(Vector3fc amt)
 	{
-		setX(amt.x() + getX());
-		setY(amt.y() + getY());
-		setZ(amt.z() + getZ());
+//		Utils.println(amt);
+		
+		localPosition.add(amt);
+		
+		applyTranslation(amt); // Applys this change to each child's transform's absolute position - not their local
+		
+//		Utils.println(position);
 	}
 	
-	public Quaternionf getRotation() { return rotation; }
-	public void setRotation(Quaternionf rotation)
+	private void applyAcceleration(Vector3fc a)
 	{
-		this.rotation = rotation;
+		for(Transform child : children)
+			child.applyAcceleration(a);
+		
+		velocity.add(a);
 	}
 	
-	public void setRotation(float rx, float ry, float rz)
+	private void applyTranslation(Vector3fc delta)
 	{
-		rotation = Maths.quaternionFromRotation(rx, ry, rz);
+		for(Transform child : children)
+			child.applyTranslation(delta);
+		
+		position.add(delta);
 	}
 	
-	/**
-	 * Rotates the object in the order of X, Y, then Z
-	 * @param rx rotation x
-	 * @param ry rotation y
-	 * @param rz rotation z
-	 */
-	public void rotateXYZ(float rx, float ry, float rz)
+	public void rotate(Quaternionfc rotation)
 	{
-		rotation.rotateXYZ(rx, ry, rz);
-	}
-	
-	/**
-	 * Rotates the object in the order of Y, X, then Z
-	 * @param rx rotation x
-	 * @param ry rotation y
-	 * @param rz rotation z
-	 */
-	public void rotateYXZ(float rx, float ry, float rz)
-	{
-		rotation.rotateYXZ(rx, ry, rz);
+		applyRotation(rotation);
 	}
 	
 	/**
-	 * Rotates the object in the order of Z, Y, then X
-	 * @param rx rotation x
-	 * @param ry rotation y
-	 * @param rz rotation z
+	 * Gets the euler angles from this transform - if you want to apply these to this or another matrix, use {@link Transform#rotateXYZ(Vector3fc)}
+	 * @return The euler angles of this transform
 	 */
-	public void rotateZYX(float rx, float ry, float rz)
+	public Vector3fc eulers()
 	{
-		rotation.rotateZYX(rx, ry, rz);
+		return rotation.getEulerAnglesXYZ(new Vector3f());
+	}
+	
+	public Vector3fc localEulers()
+	{
+		return localRotation.getEulerAnglesXYZ(new Vector3f());
 	}
 	
 	/**
-	 * Rotates about the x axis
-	 * @param rx the radians to rotate
+	 * Rotates the transform in the order of Z -> Y -> X
+	 * @param zyx The rotation in the order of zyx (Vector should still have it as x, y, z)
 	 */
-	public void rotateX(float rx)
+	public void rotateZYX(Vector3fc zyx)
 	{
-		rotation.rotateX(rx);
+		rotation.rotateZYX(zyx.z(), zyx.y(), zyx.x());
+		localRotation.rotateZYX(zyx.z(), zyx.y(), zyx.x());
+		
+		for(Transform child : children)
+			child.rotation.rotateZYX(zyx.z(), zyx.y(), zyx.x());
 	}
 	
-	/**
-	 * Rotates about the y axis
-	 * @param ry the radians to rotate
-	 */
-	public void rotateY(float ry)
+	public void rotateXYZ(Vector3fc xyz)
 	{
-		rotation.rotateY(ry);
+		this.localRotation.rotateXYZ(xyz.x(), xyz.y(), xyz.z());
+		this.rotation.rotateXYZ(xyz.x(), xyz.y(), xyz.z());
+		
+		updateAxis();
+		
+		for(Transform child : children)
+		{
+			child.rotation.rotateXYZ(xyz.x(), xyz.y(), xyz.z());
+			child.updateAxis();
+		}
 	}
 	
-	/**
-	 * Rotates about the z axis
-	 * @param rz the radians to rotate
-	 */
-	public void rotateZ(float rz)
+	public void rotateX(float x)
 	{
-		rotation.rotateZ(rz);
+		this.localRotation.rotateX(x);
+		rotation.rotateX(x);
+		
+		updateAxis();
+		
+		for(Transform child : children)
+		{
+			child.rotation.rotateX(x);
+			child.updateAxis();
+		}
 	}
 	
-	/**
-	 * Rotates X, Y then Z
-	 * @param delta The amount to rotate
-	 */
-	public void rotateXYZ(Vector3fc delta)
+	public void rotateY(float y)
 	{
-		rotateXYZ(delta.x(), delta.y(), delta.z());
+		this.localRotation.rotateY(y);
+		rotation.rotateY(y);
+		
+		updateAxis();
+		
+		for(Transform child : children)
+		{
+			child.rotation.rotateY(y);
+			child.updateAxis();
+		}
 	}
 	
-	/**
-	 * Take caution when using this
-	 * Sets the rotation X
-	 * @param rx The rotation x
-	 */
-	@Deprecated
-	public void setRotationX(float rx)
+	public void rotateZ(float z)
 	{
-		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
-		setRotation(rx, eulers.y(), eulers.z());
+		this.localRotation.rotateZ(z);
+		rotation.rotateZ(z);
+		
+		updateAxis();
+		
+		for(Transform child : children)
+		{
+			child.rotation.rotateZ(z);
+			child.updateAxis();
+		}
 	}
 	
-	/**
-	 * Take caution when using this
-	 * Sets the rotation X
-	 * @param ry The rotation x
-	 */
-	@Deprecated
-	public void setRotationY(float ry)
+	private void updateAxis()
 	{
-		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
-		setRotation(eulers.x(), ry, eulers.z());
+		axis = new Axis(rotation);
 	}
-	
-	/**
-	 * Take caution when using this
-	 * Sets the rotation Z
-	 * @param rz The rotation z
-	 */
-	@Deprecated
-	public void setRotationZ(float rz)
+
+	public float x()
 	{
-		Vector3f eulers = rotation.getEulerAnglesXYZ(new Vector3f());
-		setRotation(eulers.x(), eulers.y(), rz);
+		return position().x();
 	}
-	
-	public void resetRotation()
+
+	public float y()
 	{
-		rotation = Maths.blankQuaternion();
+		return position().y();
 	}
-	
-	/**
-	 * Gets the velocity
-	 * @return the velocity
-	 */
-	public Vector3f getVelocity() { return velocity; }
-	
-	/**
-	 * Stores velocity - does not change the position
-	 * @param v the velocity value to store
-	 */
-	public void setVelocity(Vector3f v) { velocity = v; }
-	
-	/**
-	 * Adds the the velocity
-	 * @param amt The amount to add to the velocity
-	 */
-	public void accelerate(Vector3fc amt)
+
+	public float z()
 	{
-		velocity.x += amt.x();
-		velocity.y += amt.y();
-		velocity.z += amt.z();
+		return position().z();
+	}
+
+	public Axis axis()
+	{
+		return axis;
+	}
+
+	public float distanceSqrd(Transform transform)
+	{
+		return Maths.dist(rotation().transform(position(), new Vector3f()), transform.rotation().transform(position(), new Vector3f()));
+	}
+
+	public Matrix4fc rotationMatrix()
+	{
+		return Maths.createRotationMatrix(rotation);
+	}
+
+	public Quaternionf rotate(AxisAngle4f axisAngle)
+	{
+		return null;
 	}
 }

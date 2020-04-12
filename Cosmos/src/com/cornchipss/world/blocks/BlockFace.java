@@ -1,6 +1,7 @@
 package com.cornchipss.world.blocks;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
 
@@ -75,7 +76,7 @@ public enum BlockFace
 		return Maths.mul(2, getRelativePosition());
 	}
 
-	public static BlockFace getClosestFace(Vector3f start, Vector3f block)
+	public static BlockFace getClosestFace(Vector3fc start, Vector3fc block)
 	{
 		BlockFace closest = fromFaceIndex(0);
 		float dist = Maths.add(block, closest.getRelativePosition()).distanceSquared(start);

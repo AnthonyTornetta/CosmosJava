@@ -1,7 +1,6 @@
 package com.cornchipss.rendering;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
@@ -42,8 +41,8 @@ public abstract class Renderer
 	{
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
-		Maths.createViewMatrix(player.getAbsolutePosition(), 
-				player.getAbsoluteTransform().getRotation().getEulerAnglesXYZ(new Vector3f()), getViewMatrix());
+		Maths.createViewMatrix(player.camera().position(),
+				player.camera().eulers(), getViewMatrix());
 		
 		getShader().start();
 		getShader().loadUniformMatrix(u_projectionLocation, getProjectionMatrix());

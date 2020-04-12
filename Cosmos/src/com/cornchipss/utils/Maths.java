@@ -1,12 +1,16 @@
 package com.cornchipss.utils;
 
+import java.nio.FloatBuffer;
+
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
+import org.lwjgl.BufferUtils;
 
 public class Maths
 {
@@ -24,6 +28,11 @@ public class Maths
 	 * Maths.PI / 2
 	 */
 	public static final float PI2 = PI / 2;	
+	
+	/**
+	 * How the equals function handles floats
+	 */
+	public static final float EQUALS_PRECISION = 0.0001f;
 	
 	/**
 	 * Creates a view matrix based on coordinates + rotations
@@ -57,12 +66,12 @@ public class Maths
 		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), dest);
 	}
 	
-	public static Matrix4f createTransformationMatrix(Vector3f pos, float rx, float ry, float rz)
+	public static Matrix4f createTransformationMatrix(Vector3fc position, float rx, float ry, float rz)
 	{
-		return createTransformationMatrix(pos, rx, ry, rz, 1);
+		return createTransformationMatrix(position, rx, ry, rz, 1);
 	}
 	
-	public static Matrix4f createTransformationMatrix(Vector3f pos, float rx, float ry, float rz, float scale)
+	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx, float ry, float rz, float scale)
 	{
         Matrix4f matrix = new Matrix4f();
         matrix.identity();
@@ -76,7 +85,9 @@ public class Maths
 	
 	public static Matrix4f createRotationMatrix(Quaternionfc q)
 	{
-		return Maths.createCombinedRotationMatrix(q.getEulerAnglesXYZ(new Vector3f()));
+		FloatBuffer buf = BufferUtils.createFloatBuffer(16);
+		q.getAsMatrix4f(buf);
+		return new Matrix4f(buf);
 	}
 	
 	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
@@ -103,12 +114,12 @@ public class Maths
 		return createRotationMatrix(Utils.x(), rotation.x()).mul(createRotationMatrix(Utils.y(), rotation.y()).mul(createRotationMatrix(Utils.z(), rotation.z())));
 	}
 	
-	public static Vector3f getPositionActual(Vector3f pos, Matrix4f... rotations)
+	public static Vector3f getPositionActual(Vector3f pos, Matrix4fc... rotations)
 	{
 		Matrix4f rotationFinal = new Matrix4f();
 		rotationFinal.identity();
 		
-		for(Matrix4f rot : rotations)
+		for(Matrix4fc rot : rotations)
 			rotationFinal.mul(rot);
 		
 		Vector4f vec = new Vector4f(pos.x, pos.y, pos.z, 0).mul(rotationFinal);
@@ -162,22 +173,22 @@ public class Maths
 		return punto;
 	}
 	
-	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector3fc point)
+	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector3fc point)
 	{
 		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX, new Vector4f(point.x(), point.y(), point.z(), 0));
 	}
 	
-	public static Vector3f rotatePoint(Matrix4f rotationMatrixX, Matrix4f rotationMatrixY, Matrix4f rotationMatrixZ, Vector4fc point)
+	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector4fc point)
 	{
 		return rotatePoint(Maths.mul(rotationMatrixX, rotationMatrixY).mul(rotationMatrixZ), point);
 	}
 	
-	public static Vector3f rotatePoint(Matrix4f combinedRotation, Vector3fc point)
+	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector3fc point)
 	{
 		return rotatePoint(combinedRotation, new Vector4f(point.x(), point.y(), point.z(), 0));
 	}
 	
-	public static Vector3f rotatePoint(Matrix4f combinedRotation, Vector4fc point)
+	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector4fc point)
 	{
 		Vector4f vec = new Vector4f(point).mul(combinedRotation);
 		return new Vector3f(vec.x, vec.y, vec.z);
@@ -437,7 +448,7 @@ public class Maths
 		return new Matrix4f().identity();
 	}
 
-	public static Matrix4f mul(Matrix4f a, Matrix4f b) 
+	public static Matrix4f mul(Matrix4fc a, Matrix4fc b) 
 	{
 		return new Matrix4f().identity().mul(a).mul(b);
 	}
@@ -477,5 +488,121 @@ public class Maths
 	public static Quaternionfc invert(Quaternionfc q)
 	{
 		return new Quaternionf().invert();
+	}
+
+	public static float clamp(float x, float min, float max)
+	{
+		return x > max ? max : x < min ? min : x;
+	}
+
+	public static Vector3f x(float x)
+	{
+		return new Vector3f(x, 0, 0);
+	}
+	
+	public static Vector3f y(float y)
+	{
+		return new Vector3f(0, y, 0);
+	}
+	
+	public static Vector3f z(float z)
+	{
+		return new Vector3f(0, 0, z);
+	}
+
+	public static Quaternionf clone(Quaternionfc rotation)
+	{
+		return new Quaternionf(rotation.x(), rotation.y(), rotation.z(), rotation.w());
+	}
+	
+	/**
+	 * Normalizes a vector ({@link Vector3f#normalize(float)}), but keeps it 0,0,0 if every value is 0
+	 * @param vec The vector to normalize
+	 * @param max The amount to normalize it to (generally 1)
+	 * @return A normalized version of the vector
+	 */
+	public static Vector3f safeNormalize(Vector3fc vec, float max)
+	{
+		return safeNormalize(vec.x(), vec.y(), vec.z(), max);
+	}
+	
+	public static Vector3f safeNormalize(float x, float y, float z, float max)
+	{
+		float k = (x * x + y * y + z * z) / (max * max);
+		if(k != 0)
+		{
+			x /= k;
+			y /= k;
+			z /= k;
+		}
+		return new Vector3f(x, y, z);
+	}
+	
+	public static Vector3f safeNormalizeXZ(Vector3fc v, float max)
+	{
+		Vector3fc xzVec = new Vector3f(v.x(), 0, v.z());
+		xzVec = safeNormalize(xzVec, max);
+		return new Vector3f(xzVec.x(), v.y(), xzVec.z());
+	}
+
+	public static Vector3f mul(Vector3fc v, float s)
+	{
+		return new Vector3f(v.x() * s, v.y() * s, v.z() * s);
+	}
+	
+	public static float sqrt(float x)
+	{
+		return (float)Math.sqrt(x);
+	}
+	
+	public static float magnitude(Vector3fc v)
+	{
+		return Maths.sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
+	}
+	
+	public static Vector3f normalClamp(Vector3fc v, float max)
+	{
+		if(magnitude(v) > max)
+			return safeNormalize(v, max);
+		else
+			return new Vector3f(v);
+	}
+
+	public static float magnitudeXZ(Vector3fc v)
+	{
+		return Maths.sqrt(v.x() * v.x() + v.z() * v.z());
+	}
+
+	public static Vector3f normalClampXZ(Vector3fc v, float max)
+	{
+		if(magnitudeXZ(v) > max)
+			return safeNormalizeXZ(v, max);
+		else
+			return new Vector3f(v);
+	}
+
+	public static Matrix4fc invert(Matrix4fc mat)
+	{
+		return new Matrix4f(mat).invert();
+	}
+
+	public static boolean equals(float a, float b)
+	{
+		float amb = a - b;
+		return amb <= EQUALS_PRECISION && amb >= -EQUALS_PRECISION;
+	}
+	
+	public static boolean equals(Quaternionfc a, Quaternionfc b)
+	{
+		return equals(a.x(), b.x()) && equals(a.y(), b.y()) && equals(a.z(), b.z()) && equals(a.w(), b.w());
+	}
+
+	public static float dist(Vector3fc a, Vector3fc b)
+	{
+		float x = a.x() - b.x();
+		float y = a.y() - b.y();
+		float z = a.z() - b.z();
+		
+		return x * x + y * y + z * z;
 	}
 }

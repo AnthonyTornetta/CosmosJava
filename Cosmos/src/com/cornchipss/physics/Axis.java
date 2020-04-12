@@ -1,13 +1,16 @@
 package com.cornchipss.physics;
 
-import org.joml.Quaternionf;
+import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 
 /**
- * Immutable class that represents an axis along a quaternion
+ * Immutable class that represents an axis along a quaternion<br>
+ * Useful for easy vector direction math
  */
 public final class Axis
 {
@@ -33,17 +36,16 @@ public final class Axis
 	 * Immutable class that represents an axis along a quaternion
 	 * @param q the quaternion to rotate the axis by
 	 */
-	public Axis(Quaternionf q)
+	public Axis(Quaternionfc q)
 	{
-//		xEndpoint = Maths.rotatePoint(new Vector3f(1, 0, 0), new Vector3f(rotation.x(), rotation.y(), rotation.z()));
-//		yEndpoint = Maths.rotatePoint(new Vector3f(0, 1, 0), rotation);
-//		zEndpoint = Maths.rotatePoint(new Vector3f(0, 0, 1), rotation);
-		
-		this.xEndpoint = q.transform(new Vector3f(1, 0, 0));
-		this.yEndpoint = q.transform(new Vector3f(0, 1, 0));
-		this.zEndpoint = q.transform(new Vector3f(0, 0, 1));
-		
-		Utils.println(xEndpoint);
+		this(Maths.createRotationMatrix(q));
+	}
+	
+	public Axis(Matrix4fc rot)
+	{
+		this.xEndpoint = new Vector3f(rot.m00(), rot.m10(), rot.m20());
+		this.yEndpoint = new Vector3f(rot.m01(), rot.m11(), rot.m21());
+		this.zEndpoint = new Vector3f(rot.m02(), rot.m12(), rot.m22());
 	}
 	
 	/**
@@ -104,4 +106,10 @@ public final class Axis
 	public Vector3fc xEndpoint() { return xEndpoint; }
 	public Vector3fc yEndpoint() { return yEndpoint; }
 	public Vector3fc zEndpoint() { return zEndpoint; }
+	
+	@Override
+	public String toString()
+	{
+		return "AXIS (x: " + Utils.toEasyString(xEndpoint) + " y: " + Utils.toEasyString(yEndpoint) + " z: " + Utils.toEasyString(zEndpoint) + ")";
+	}
 }

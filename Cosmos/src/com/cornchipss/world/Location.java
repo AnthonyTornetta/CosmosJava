@@ -1,9 +1,10 @@
 package com.cornchipss.world;
 
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.physics.Transform;
+import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 
@@ -24,19 +25,22 @@ public class Location
 		this.universe = universe;
 		
 		Planet p = universe.getPlanet(position);
-		trans = new Transform(position, p != null ? p.getRotation() : new Quaternionf()); // TODO: get rotation for other entities such as ships (loop thru each entity and find closest one i guess)
+		trans = new Transform(position, p != null ? 
+					p.getTransform().eulers() : 
+					Maths.zero()); 
+		// TODO: get rotation for other entities such as ships (loop thru each entity and find closest one i guess)
 		
 		block = getUniverse().getBlockAt(position);
 	}
 	
 	public Transform getTransform() { return trans; }
 	
-	public Quaternionf getRotation() { return trans.getRotation(); }
+	public Vector3fc getRotation() { return trans.eulers(); }
 	
-	public Vector3f getPosition() { return trans.getPosition(); }
+	public Vector3fc getPosition() { return trans.position(); }
 	public void setPosition(Vector3f position)
 	{
-		trans.setPosition(position);
+		trans.position(position);
 		this.block = getUniverse().getBlockAt(getPosition());
 	}
 	
@@ -51,6 +55,6 @@ public class Location
 	public void setUniverse(Universe universe)
 	{
 		this.universe = universe;
-		block = universe.getBlockAt(trans.getPosition());
+		block = universe.getBlockAt(trans.position());
 	}
 }

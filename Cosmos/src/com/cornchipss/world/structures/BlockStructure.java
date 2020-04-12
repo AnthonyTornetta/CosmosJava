@@ -51,7 +51,11 @@ public abstract class BlockStructure extends PhysicalObject
 	private Map<Model, Vector3fList> modelsList = new HashMap<>();
 	private Map<Vector3i, Model> modelsCoords = new HashMap<>();
 	
-	private boolean generated = false;
+	/**
+	 * So the renderer knows when to call the render() function
+	 * TODO: fix this mess
+	 */
+	private boolean generated = false, rendered = false, isRenderable = false;
 	
 	public BlockStructure(int width, int height, int length, float rx, float ry, float rz)
 	{
@@ -59,8 +63,8 @@ public abstract class BlockStructure extends PhysicalObject
 		this.height = height;
 		this.length = length;
 		
-		setRelativeTransform(new Transform());
-		getTransform().setRotation(rx, ry, rz);
+		setTransform(new Transform());
+		getTransform().rotation(rx, ry, rz);
 	}
 	
 	@Override
@@ -189,61 +193,42 @@ public abstract class BlockStructure extends PhysicalObject
 	 * @return If the model was changed at all
 	 */
 	public boolean updateModel(int x, int y, int z, Block oldBlock, boolean updateSurrounding)
-	{
-		boolean nextToClear = false;
+	{		
+		if(!isGenerated() || !isRendered())
+			return false; // If either of these are false, calling this function will cause a stack overflow - we have to wait for the render() function to render this first.
 		
-		big:
-		for(int zz = -1; zz <= 1; zz++)
+		// I could write a for loop for this stuff, but it takes more processing time than it's worth
+		
+		boolean nextToClear =
+				(!within(x - 1, y, z) || !getBlock(x - 1, y, z).isOpaque()) ||
+				(!within(x + 1, y, z) || !getBlock(x + 1, y, z).isOpaque()) ||
+				(!within(x, y - 1, z) || !getBlock(x, y - 1, z).isOpaque()) ||
+				(!within(x, y + 1, z) || !getBlock(x, y + 1, z).isOpaque()) ||
+				(!within(x, y, z - 1) || !getBlock(x, y, z - 1).isOpaque()) ||
+				(!within(x, y, z + 1) || !getBlock(x, y, z + 1).isOpaque());
+		
+		// We remove this model if you can't see it anyway
+		Model setTo = nextToClear ? getBlock(x, y, z).getModel() : null;
+		
+		boolean changed = setModel(x, y, z, setTo) || 
+				!Utils.equals(oldBlock, getBlock(x, y, z));
+		
+		if(updateSurrounding && changed)
 		{
-			for(int yy = -1; yy <= 1; yy++)
-			{
-				for(int xx = -1; xx <= 1; xx++)
-				{
-					if(within(xx + x, yy + y, zz + z))
-					{
-						if(!getBlock(xx + x, yy + y, zz + z).isOpaque())
-						{
-							nextToClear = true;
-							break big;
-						}
-					}
-					else
-					{
-						nextToClear = true;
-						break big;
-					}
-				}
-			}
-		}
-		
-		boolean changed = false;
-		
-		if(nextToClear)
-		{
-			changed = setModel(x, y, z, getBlock(x, y, z).getModel());
-		}
-		else
-		{
-			changed = setModel(x, y, z, null);
-		}
-		
-		changed = changed || !Utils.equals(oldBlock, getBlock(x, y, z));
-		
-		if(updateSurrounding && changed && isGenerated())
-		{
-			for(int zz = -1; zz <= 1; zz++)
-			{
-				for(int yy = -1; yy <= 1; yy++)
-				{
-					for(int xx = -1; xx <= 1; xx++)
-					{
-						if(within(xx + x, yy + y, zz + z))
-						{
-							updateModel(new Vector3i(x + xx, y + yy, z + zz), getBlock(xx + x, yy + y, zz + z));
-						}
-					}
-				}
-			}
+			if(within(x - 1, y, z))
+				updateModel(new Vector3i(x - 1, y, z), getBlock(x - 1, y, z));
+			if(within(x + 1, y, z))
+				updateModel(new Vector3i(x + 1, y, z), getBlock(x + 1, y, z));
+			
+			if(within(x, y - 1, z))
+				updateModel(new Vector3i(x, y - 1, z), getBlock(x, y - 1, z));
+			if(within(x, y + 1, z))
+				updateModel(new Vector3i(x, y + 1, z), getBlock(x, y + 1, z));
+			
+			if(within(x, y, z - 1))
+				updateModel(new Vector3i(x, y, z - 1), getBlock(x, y, z - 1));
+			if(within(x, y, z + 1))
+				updateModel(new Vector3i(x, y, z + 1), getBlock(x, y, z + 1));
 		}
 		
 		return changed;
@@ -319,13 +304,27 @@ public abstract class BlockStructure extends PhysicalObject
 	/**
 	 * <p>Updates every model in the BlockStructure, so call sparingly.</p>
 	 */
-	public void render()
+	public boolean render()
 	{
-		for(int z = getBeginningCornerZ(); z < getEndingCornerX(); z++)
-		{
-			for(int y = getBeginningCornerY(); y < getEndingCornerY(); y++)
+		if(!isGenerated())
+			return false;
+		
+		rendered = true;
+		
+		final int begZ = getBeginningCornerZ();
+		final int endZ = getEndingCornerZ();
+		
+		final int begY = getBeginningCornerY();
+		final int endY = getEndingCornerY();
+		
+		final int begX = getBeginningCornerX();
+		final int endX = getEndingCornerX();
+		
+		for(int z = begZ; z < endZ; z++)
+		{			
+			for(int y = begY; y < endY; y++)
 			{
-				for(int x = getBeginningCornerX(); x < getEndingCornerX(); x++)
+				for(int x = begX; x < endX; x++)
 				{
 					updateModel(x, y, z, null, false);
 				}
@@ -334,6 +333,10 @@ public abstract class BlockStructure extends PhysicalObject
 		
 		for(Model m : modelsList.keySet())
 			modelsList.get(m).shrink(); // Saves memory
+		
+		isRenderable = true;
+		
+		return true;
 	}
 	
 	/**
@@ -556,7 +559,10 @@ public abstract class BlockStructure extends PhysicalObject
 	public void setSectorCoords(float x, float y, float z)
 	{
 		sectorCoords = new Vector3f(x, y, z);
-		setPosition(new Vector3f(getSectorX() * Sector.CHUNK_DIMENSIONS, getSectorY() * Sector.CHUNK_DIMENSIONS, getSectorZ() * Sector.CHUNK_DIMENSIONS));
+		getTransform().position(
+				new Vector3f(getSectorX() * Sector.CHUNK_DIMENSIONS, 
+						getSectorY() * Sector.CHUNK_DIMENSIONS, 
+						getSectorZ() * Sector.CHUNK_DIMENSIONS));
 	}
 	
 	/**
@@ -600,13 +606,17 @@ public abstract class BlockStructure extends PhysicalObject
 	 * @return If the BlockStructure has been generated or not
 	 */
 	public boolean isGenerated() { return generated; }
-
+	
+	public boolean isRendered() { return rendered; }
+	
+	public boolean isRenderable() { return isRenderable; }
+	
 	/**
 	 * Sets if the BlockStructure has been generated
 	 * @param b Whether or not it has
 	 */
 	public void setGenerated(boolean b) 
-	{ 
+	{
 		this.generated = b;
 	}
 	

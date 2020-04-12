@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
+import com.cornchipss.Game;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
-import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.BlockFace;
 
@@ -29,74 +28,81 @@ public abstract class PhysicalEntity extends Entity
 	
 	public List<BlockFace> updatePhysics()
 	{
-		Vector3f newPos = Maths.add(getPosition(), getVelocity());
+		Transform t = getTransform();
 		
-		Transform absTrans = getAbsoluteTransform();
+//		Utils.println(t.velocity());
 		
-		Location[][][] locations = getUniverse().getBlocksWithin(absTrans.getPosition(), getHitbox().getBoundingBox());
-		
-		// For the collision check
-		Transform tempTransform = new Transform(newPos, getRotation());
-		
+		Vector3f newPos = Maths.add(t.position(), Maths.mul(t.velocity(), Game.deltaTime()));
+//		
+//		Location[][][] locations = getUniverse().getBlocksWithin(t.position(), getHitbox().getBoundingBox());
+//		
+//		// For the collision check
+//		Transform tempTransform = new Transform(newPos, t.rotation());
+//		
 		List<BlockFace> hits = new ArrayList<>(6);
+//		
+//		for(int z = 0; z < locations.length; z++)
+//		{
+//			for(int y = 0; y < locations[z].length; y++)
+//			{
+//				for(int x = 0; x < locations[z][y].length; x++)
+//				{	
+//					if(locations[z][y][x] != null && locations[z][y][x].getBlock().isInteractable())
+//					{
+//						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
+//						
+////						locations[z][y][x].setBlock(Blocks.air);
+//						
+//						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getTransform(), tempTransform))
+//						{
+//							Utils.println("Collision!");
+//							
+//							BlockFace f = BlockFace.getClosestFace(t.position(), locations[z][y][x].getPosition());
+//							
+//							newPos = onCollide(locations[z][y][x], f);
+//							
+//							hits.add(f);
+//						}
+//					}
+//				}
+//			}
+//		}
 		
-		for(int z = 0; z < locations.length; z++)
-		{
-			for(int y = 0; y < locations[z].length; y++)
-			{
-				for(int x = 0; x < locations[z][y].length; x++)
-				{	
-					if(locations[z][y][x] != null && locations[z][y][x].getBlock().isInteractable())
-					{
-						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
-						
-						locations[z][y][x].setBlock(Blocks.air);
-						
-						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getTransform(), tempTransform))
-						{
-							Utils.println("Collision!");
-							
-							BlockFace f = BlockFace.getClosestFace(getPosition(), locations[z][y][x].getPosition());
-							
-							newPos = onCollide(locations[z][y][x], f);
-							
-							hits.add(f);
-						}
-					}
-				}
-			}
-		}
+//		Utils.println(newPos);
 		
-		getTransform().translate(Maths.invert(getPosition()));
-		getTransform().translate(newPos);
+		getTransform().position(newPos);
 		
 		return hits;
 	}
 	
 	public Vector3f onCollide(Location l, BlockFace face)
 	{
+		Transform t = getTransform();
+		
 		Vector3f direction = face.getDirection();
-		float newX = getX() + getVelocityX(), newY = getY() + getVelocityY(), newZ = getZ() + getVelocityZ();
+		float newX = t.x() + t.velocity().x(), newY = t.y() + t.velocity().y(), newZ = t.z() + t.velocity().z();
 		
 		Vector3f displacement = Maths.mul(face.getDirection(), Maths.div(getHitbox().getBoundingBox(), 2), Maths.negative());
 		
+		Vector3f newVel = Maths.zero();
+		
 		if(direction.x() != 0)
 		{
-			getVelocity().x = Math.abs(getVelocityX()) * face.getDirection().x * elasticity;
+			newVel.x = Math.abs(t.velocity().x()) * face.getDirection().x * elasticity;
 			
-			newX = getVelocityX() + displacement.x + l.getPosition().x + face.getRelativePosition().x;
+			newX = newVel.x + displacement.x + l.getPosition().x() + face.getRelativePosition().x;
 		}
 		if(direction.y() != 0)
 		{
-			getVelocity().y = Math.abs(getVelocityY()) * face.getDirection().y * elasticity;
+			newVel.y = Math.abs(t.velocity().y()) * face.getDirection().y * elasticity;
 			
-			newY = getVelocityY() + displacement.y + l.getPosition().y + face.getRelativePosition().y;
+			newY = newVel.y + displacement.y + l.getPosition().y() + face.getRelativePosition().y;
 		}
 		if(direction.z() != 0)
 		{
-			getVelocity().z = Math.abs(getVelocityZ()) * face.getDirection().z * elasticity;
+			newVel.z = Math.abs(t.velocity().z()) * face.getDirection().z * elasticity;
 			
-			newZ = getVelocityZ() + displacement.z + l.getPosition().z + face.getRelativePosition().z;
+			newZ = newVel.z + displacement.z + l.getPosition().z() + face.getRelativePosition().z;
 		}
 		
 		return new Vector3f(newX, newY, newZ);

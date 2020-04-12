@@ -3,7 +3,7 @@ package com.cornchipss.utils;
 import java.nio.FloatBuffer;
 import java.util.List;
 
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3dc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -44,6 +44,23 @@ public class Utils
 		String clazz = trace.getClassName();
 
 		System.out.print(clazz.substring(clazz.lastIndexOf(".") + 1) + " (" + trace.getLineNumber() + ")> " + s);
+	}
+	
+	public static void printCaller()
+	{
+		printraw(caller() + "\n");
+	}
+	
+	public static String caller()
+	{
+		StackTraceElement trace = Thread.currentThread().getStackTrace()[4];
+		String clazz = trace.getClassName();
+		return clazz.substring(clazz.lastIndexOf(".") + 1) + " (" + trace.getLineNumber() + ")";
+	}
+	
+	public static void printStackTrace()
+	{
+		Thread.dumpStack();
 	}
 	
 	/**
@@ -148,7 +165,7 @@ public class Utils
 	 * @param mat The Matrix to use
 	 * @return The matrix in a FloatBuffer
 	 */
-	public static FloatBuffer toFloatBuffer(Matrix4f mat)
+	public static FloatBuffer toFloatBuffer(Matrix4fc mat)
 	{
 		mat.get(matrixBuffer);
 		return matrixBuffer;
@@ -229,4 +246,14 @@ public class Utils
 	public static Vector3fc x() { return X_VECTOR; }
 	public static Vector3fc y() { return Y_VECTOR; }
 	public static Vector3fc z() { return Z_VECTOR; }
+	
+	public static String toEasyString(Vector3fc v)
+	{
+		return "[" + toEasyString(v.x()) + ", " + toEasyString(v.y()) + ", " + toEasyString(v.z()) + "]";
+	}
+	
+	public static String toEasyString(float f)
+	{
+		return (Math.round(f * 10) / 10.0f) + "";
+	}
 }

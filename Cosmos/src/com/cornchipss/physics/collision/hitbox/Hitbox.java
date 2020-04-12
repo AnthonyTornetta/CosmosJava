@@ -1,6 +1,5 @@
 package com.cornchipss.physics.collision.hitbox;
 
-import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -25,7 +24,7 @@ public abstract class Hitbox // Another name for Hotbox
 	@Deprecated
 	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB)
 	{
-		return isColliding(a, b, positionA, positionB, Maths.blankQuaternion(), Maths.blankQuaternion());
+		return isColliding(a, b, positionA, positionB, Maths.zero(), Maths.zero());
 	}
 	
 	/**
@@ -38,7 +37,7 @@ public abstract class Hitbox // Another name for Hotbox
 	 */
 	public static boolean isColliding(Hitbox a, Hitbox b, Transform transformA, Transform transformB)
 	{
-		return isColliding(a, b, transformA.getPosition(), transformB.getPosition(), transformA.getRotation(), transformB.getRotation());
+		return isColliding(a, b, transformA.position(), transformB.position(), transformA.eulers(), transformB.eulers());
 	}
 	
 	/**
@@ -51,7 +50,7 @@ public abstract class Hitbox // Another name for Hotbox
 	 * @param rotationB Rotation of hitbox B
 	 * @return true if two hitboxes are colliding based on the two positions
 	 */
-	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, Quaternionfc rotationA, Quaternionfc rotationB)
+	public static boolean isColliding(Hitbox a, Hitbox b, Vector3fc positionA, Vector3fc positionB, Vector3fc rotationA, Vector3fc rotationB)
 	{
 		if(a == null || b == null)
 			return false;

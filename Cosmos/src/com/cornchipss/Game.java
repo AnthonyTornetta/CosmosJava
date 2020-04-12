@@ -27,7 +27,19 @@ public class Game implements Runnable
 	
 	private static Game instance;
 	
+	/**
+	 * Max frames per second
+	 */
 	public static final int FPS_CAP = 60;
+	
+	private static long lastTimeTicked;
+	private static float delta;
+	
+	/**
+	 * Gets the time since last tick in seconds
+	 * @return The time since last tick in seconds (approx {@link Game#FPS_CAP} / 1000)
+	 */
+	public static float deltaTime() { return delta; }
 	
 	public Game()
 	{
@@ -51,7 +63,7 @@ public class Game implements Runnable
 	
 	@Override
 	public void run()
-	{		
+	{
 		window = new Window(startWidth, startHeight, "Cosmos");
 		Input.setWindow(window);
 		
@@ -83,6 +95,8 @@ public class Game implements Runnable
 		
 		Input.update();
 		
+		lastTimeTicked = System.nanoTime();
+		
 		while(!window.shouldClose() && !Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 		{
 			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
@@ -90,8 +104,10 @@ public class Game implements Runnable
 			
 			while(updateTimer.getDeltaMillis() >= 1000 / FPS_CAP)
 			{
+				delta = (System.nanoTime() - lastTimeTicked) / (float)1e9;
 				sector.update(player);
 				player.onUpdate();
+				lastTimeTicked = System.nanoTime();
 				
 				updateTimer.subtractTimeMilli(1000 / FPS_CAP);
 				ups++;

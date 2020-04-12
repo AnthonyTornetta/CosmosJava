@@ -42,10 +42,10 @@ public class DefaultPlanetGenerator
 			}
 		}
 		
+		planet.setGenerated(true);
+		
 		if(render)
 			planet.render(); // Update the final model
-		
-		planet.setGenerated(true);
 	}
 	
 	private static int noise(SimplexNoise noiseMaker, int x, int z, float frequency, float amplitude)

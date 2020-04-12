@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.PlanetShader;
-import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
@@ -78,9 +77,9 @@ public class PlanetRenderer extends Renderer
 		if(planet == null)
 			throw new IllegalArgumentException("Cannot render a null planet!");
 		
-		if(planet.isGenerated())
+		if(planet.isRenderable())
 		{
-			Matrix4f combined = Maths.createRotationMatrix(planet.getRotation());
+			Matrix4fc combined = planet.getTransform().rotationMatrix();
 			getShader().loadUniformMatrix(rotLoc, combined);
 			
 			Vector3fc planetPos = planet.getUniverseCoords();

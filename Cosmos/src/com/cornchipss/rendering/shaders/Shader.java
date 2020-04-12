@@ -4,7 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -46,7 +46,7 @@ public class Shader
 		GL30.glUniform3f(location, x, y, z);
 	}
 	
-	public void loadUniformMatrix(int location, Matrix4f mat)
+	public void loadUniformMatrix(int location, Matrix4fc mat)
 	{
 		GL30.glUniformMatrix4fv(location, false, Utils.toFloatBuffer(mat));
 	}

@@ -226,7 +226,7 @@ public class Universe
 	 * @param pos The position to set
 	 * @param block The block to set it to
 	 */
-	public void setBlockAt(Vector3f pos, Block block)
+	public void setBlockAt(Vector3fc pos, Block block)
 	{
 		if(pos == null)
 			throw new IllegalArgumentException("Position for the block cannot be null!");
@@ -262,7 +262,7 @@ public class Universe
 		
 		if(p != null)
 		{
-	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(Maths.invert(p.getRotation()), position);
+	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(Maths.invert(p.getTransform().eulers()), position);
 			
 			for(int z = -cZ; z < cZ; z++)
 			{
