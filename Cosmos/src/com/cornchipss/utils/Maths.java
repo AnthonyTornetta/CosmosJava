@@ -597,7 +597,7 @@ public class Maths
 		return equals(a.x(), b.x()) && equals(a.y(), b.y()) && equals(a.z(), b.z()) && equals(a.w(), b.w());
 	}
 
-	public static float dist(Vector3fc a, Vector3fc b)
+	public static float distSqrd(Vector3fc a, Vector3fc b)
 	{
 		float x = a.x() - b.x();
 		float y = a.y() - b.y();

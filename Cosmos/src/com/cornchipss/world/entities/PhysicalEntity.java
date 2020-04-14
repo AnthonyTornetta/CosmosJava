@@ -9,6 +9,7 @@ import com.cornchipss.Game;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.BlockFace;
 
@@ -30,43 +31,41 @@ public abstract class PhysicalEntity extends Entity
 	{
 		Transform t = getTransform();
 		
-//		Utils.println(t.velocity());
-		
 		Vector3f newPos = Maths.add(t.position(), Maths.mul(t.velocity(), Game.deltaTime()));
-//		
-//		Location[][][] locations = getUniverse().getBlocksWithin(t.position(), getHitbox().getBoundingBox());
-//		
-//		// For the collision check
-//		Transform tempTransform = new Transform(newPos, t.rotation());
+
+		Location[][][] locations = getUniverse().getBlocksWithin(t.position(), getHitbox().getBoundingBox());
+		
+		// For the collision check
+		Transform tempTransform = new Transform(newPos, t.rotation());
 //		
 		List<BlockFace> hits = new ArrayList<>(6);
-//		
-//		for(int z = 0; z < locations.length; z++)
-//		{
-//			for(int y = 0; y < locations[z].length; y++)
-//			{
-//				for(int x = 0; x < locations[z][y].length; x++)
-//				{	
-//					if(locations[z][y][x] != null && locations[z][y][x].getBlock().isInteractable())
-//					{
-//						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
-//						
-////						locations[z][y][x].setBlock(Blocks.air);
-//						
-//						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getTransform(), tempTransform))
-//						{
-//							Utils.println("Collision!");
-//							
-//							BlockFace f = BlockFace.getClosestFace(t.position(), locations[z][y][x].getPosition());
-//							
+		
+		for(int z = 0; z < locations.length; z++)
+		{
+			for(int y = 0; y < locations[z].length; y++)
+			{
+				for(int x = 0; x < locations[z][y].length; x++)
+				{	
+					if(locations[z][y][x] != null && locations[z][y][x].getBlock().isInteractable())
+					{
+						Hitbox hb = locations[z][y][x].getBlock().getHitbox();
+						
+						//locations[z][y][x].setBlock(Blocks.air);
+						
+						if(Hitbox.isColliding(hb, getHitbox(), locations[z][y][x].getTransform(), tempTransform))
+						{
+							Utils.println("Collision!");
+							
+							BlockFace f = BlockFace.getClosestFace(t.position(), locations[z][y][x].getPosition());
+							
 //							newPos = onCollide(locations[z][y][x], f);
-//							
-//							hits.add(f);
-//						}
-//					}
-//				}
-//			}
-//		}
+							
+							hits.add(f);
+						}
+					}
+				}
+			}
+		}
 		
 //		Utils.println(newPos);
 		

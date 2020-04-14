@@ -76,8 +76,8 @@ public class Sector
 	
 	public void update(Player player)
 	{
-		float r = Maths.PI / 180 * 1;
-//		getPlanet(0, 0, 0).getTransform().rotateX(r);
+		float r = Maths.PI / 180 * 0.01f;
+		getPlanet(0, 0, 0).getTransform().rotateX(r);
 		
 		float x = player.getTransform().x(), 
 				y = player.getTransform().y(), 

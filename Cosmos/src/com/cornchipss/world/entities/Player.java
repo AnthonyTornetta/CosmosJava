@@ -17,6 +17,7 @@ import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Pair;
 import com.cornchipss.world.Location;
 import com.cornchipss.world.blocks.Block;
@@ -121,9 +122,9 @@ public class Player extends PhysicalEntity
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{
-			getTransform().localPosition(new Vector3f(0, 0, 0));
+			getTransform().position(new Vector3f(0, 0, 0));
 			camera().localRotation(0, 0, 0);
-			getTransform().removeParent();
+			//getTransform().removeParent();
 			getTransform().localVelocity(Maths.zero());
 		}
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
@@ -210,18 +211,15 @@ public class Player extends PhysicalEntity
 	
 	private void handleOtherForces()
 	{
-		@SuppressWarnings("unused")
 		List<BlockFace> hits = updatePhysics();
 		
-//		if(Utils.contains(hits, BlockFace.TOP))
-//		{
-//			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
-//			{
-//				vely += 10f;
-//			}
-//		}
-//		
-//		getTransform().setRelativeVelocity(velR);
+		if(Utils.contains(hits, BlockFace.TOP))
+		{
+			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
+			{
+				getTransform().accelerate(new Vector3f(0, 10, 0));
+			}
+		}
 	}
 	
 	@Override
