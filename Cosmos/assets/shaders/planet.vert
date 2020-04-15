@@ -2,11 +2,10 @@
 
 uniform float u_time;
 
-uniform vec3 chunkLocation;
 uniform mat4 projection;
 uniform mat4 view;
 
-uniform mat4 u_rotation_matrix;
+uniform mat4 u_transformation_matrix;
 
 // For animated textures (todo for later)
 uniform float u_max_uv;
@@ -32,6 +31,6 @@ void main()
 
 	uv = in_uv;
 
-	gl_Position = projection * view * u_rotation_matrix * vec4(in_translation + in_position + chunkLocation, 1.0);
+	gl_Position = projection * view * u_transformation_matrix * vec4(in_translation + in_position, 1.0);
 	color = in_color;
 }

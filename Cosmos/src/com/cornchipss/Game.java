@@ -7,7 +7,7 @@ import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.DebugRenderer;
-import com.cornchipss.rendering.PlanetRenderer;
+import com.cornchipss.rendering.BlockStructureRenderer;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
@@ -82,7 +82,7 @@ public class Game implements Runnable
 		Player player = new Player(0, 128, 0);
 		player.setUniverse(universe);
 		
-		PlanetRenderer renderer = new PlanetRenderer();
+		BlockStructureRenderer renderer = new BlockStructureRenderer();
 		debug = new DebugRenderer();
 		
 		Timer updateTimer = new Timer();

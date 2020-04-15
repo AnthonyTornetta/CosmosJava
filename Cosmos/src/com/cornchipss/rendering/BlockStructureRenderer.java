@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.joml.Matrix4fc;
-import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -16,20 +15,20 @@ import org.lwjgl.opengl.GL33;
 import com.cornchipss.rendering.shaders.PlanetShader;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.entities.Player;
-import com.cornchipss.world.planet.Planet;
+import com.cornchipss.world.structures.BlockStructure;
 
-public class PlanetRenderer extends Renderer
+public class BlockStructureRenderer extends Renderer
 {
-	private int timeLocation, chunkLocation;
+	private int timeLocation;
 	
-	private int rotLoc;
+	private int matrixLocation;
 	
 	private Texture atlas;
 	
 	// Used for mass rendering models
 	private int positionsVBO;
 	
-	public PlanetRenderer()
+	public BlockStructureRenderer()
 	{
 		super(new PlanetShader());
 		
@@ -55,9 +54,8 @@ public class PlanetRenderer extends Renderer
 	public void loadUniformLocations()
 	{
 		timeLocation = getShader().getUniformLocation("u_time");
-		chunkLocation = getShader().getUniformLocation("chunkLocation");
 		
-		rotLoc = getShader().getUniformLocation("u_rotation_matrix");
+		matrixLocation = getShader().getUniformLocation("u_transformation_matrix");
 	}
 	
 	@Override
@@ -72,21 +70,17 @@ public class PlanetRenderer extends Renderer
 		atlas.bind();
 	}
 	
-	public void render(Planet planet, Player player)
+	public void render(BlockStructure structure, Player player)
 	{
-		if(planet == null)
+		if(structure == null)
 			throw new IllegalArgumentException("Cannot render a null planet!");
 		
-		if(planet.isRenderable())
+		if(structure.isRenderable())
 		{
-			Matrix4fc combined = planet.getTransform().rotationMatrix();
-			getShader().loadUniformMatrix(rotLoc, combined);
+			Matrix4fc transformationMatrix = structure.getTransform().asMatrix();
+			getShader().loadUniformMatrix(matrixLocation, transformationMatrix);
 			
-			Vector3fc planetPos = planet.getUniverseCoords();
-			
-			getShader().setUniformVector(chunkLocation, planetPos.x(), planetPos.y(), planetPos.z());
-			
-			Map<Model, Vector3fList> modelsAndPositions = planet.getModelsAndPositions();
+			Map<Model, Vector3fList> modelsAndPositions = structure.getModelsAndPositions();
 			
 			List<Model> transparentModels = new LinkedList<>();
 			
@@ -98,7 +92,9 @@ public class PlanetRenderer extends Renderer
 				if(m.isTransparent())
 					transparentModels.add(m);
 				else
+				{
 					renderModel(m, modelsAndPositions.get(m));
+				}
 			}
 			
 //			GL11.glEnable(GL11.GL_BLEND);

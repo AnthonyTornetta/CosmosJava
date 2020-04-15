@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.AxisAngle4f;
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
@@ -190,13 +191,14 @@ public class Transform
 		if(hasParent())
 		{
 			Vector3fc parentPos = parent().position();
-			Quaternionfc parentRot = parent().rotation();
 			
+			Matrix4f parentTransform = parent().asMatrix();
+			return Maths.rotatePoint(parentTransform, localPosition()).add(parentPos);
 //			setPosition(Maths.rotatePoint(getLockedOnto().getCombinedRotation().invert(), Maths.zero().add(0, 128, 0)));
 			
-			return Maths.rotatePoint(
-					parentRot.invert(new Quaternionf()), parentPos)
-					.add(localPosition, new Vector3f());
+//			return Maths.rotatePoint(
+//					parentRot.invert(new Quaternionf()), parentPos)
+//					.add(localPosition, new Vector3f());
 		}
 		
 		return localPosition();
@@ -314,5 +316,11 @@ public class Transform
 		new Quaternionf(axisAngle).mul(localRotation(), localRotation);
 		
 		updateAxis();
+	}
+
+	public Matrix4f asMatrix()
+	{
+		Vector3f eulers = rotation().getEulerAnglesXYZ(new Vector3f());
+		return Maths.createTransformationMatrix(position(), eulers.x(), eulers.y(), eulers.z());
 	}
 }

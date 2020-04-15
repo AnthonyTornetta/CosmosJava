@@ -181,7 +181,7 @@ public class Universe
 		}
 		
 		if(closestBlock != null)
-			closestBlock.add(planet.getUniverseCoords());
+			closestBlock.add(planet.getTransform().position());
 		
 		return closestBlock;
 	}

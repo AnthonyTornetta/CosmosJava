@@ -6,15 +6,18 @@ import java.util.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.Game;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Biospheres;
-import com.cornchipss.rendering.PlanetRenderer;
+import com.cornchipss.registry.Blocks;
+import com.cornchipss.rendering.BlockStructureRenderer;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
 import com.cornchipss.world.biospheres.Biosphere;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.planet.Planet;
+import com.cornchipss.world.structures.BlockStructure;
 
 import libs.noise.SimplexNoise;
 
@@ -74,14 +77,57 @@ public class Sector
 	private boolean firstUpdate = true;
 	private float lastX = 0, lastY = 0, lastZ = 0;
 	
+	private BlockStructure sa, sb;
+	
 	public void update(Player player)
 	{
 		float r = Maths.PI / 180 * 0.01f;
-		getPlanet(0, 0, 0).getTransform().rotateX(r);
+//		getPlanet(0, 0, 0).getTransform().rotateX(r);
 		
 		float x = player.getTransform().x(), 
 				y = player.getTransform().y(), 
 				z = player.getTransform().z();
+		
+		if(firstUpdate)
+		{
+			sa = new BlockStructure(2, 2, 2, 0, 0, 0)
+			{
+				@Override
+				public boolean createsGravity()
+				{
+					return false;
+				}
+			};
+			
+			sb = new BlockStructure(2, 2, 2, 0, 0, 0)
+			{
+				@Override
+				public boolean createsGravity()
+				{
+					return false;
+				}
+			};
+			
+			sa.setBlock(0, 0, 0, Blocks.snowstone);
+			sb.setBlock(0, 0, 0, Blocks.grass);
+			
+			sa.setGenerated(true);
+			sb.setGenerated(true);
+			
+			sa.render();
+			sb.render();
+			
+			sa.setSector(this);
+			sb.setSector(this);
+			
+			sa.setSectorCoords(0, 0, 0);
+			sb.setSectorCoords(0, 0, 0);
+			
+			sb.getTransform().parent(sa.getTransform());
+			
+			sa.getTransform().position(0, 128, 0);
+			sb.getTransform().localPosition(0, 3, 0);
+		}
 		
 		if(firstUpdate || x != lastX || y != lastY || z != lastZ)
 		{
@@ -116,8 +162,12 @@ public class Sector
 	public void setPlanet(int x, int y, int z, Planet planet)
 	{
 		planets[z + CHUNK_OFFSET][y + CHUNK_OFFSET][x + CHUNK_OFFSET] = planet;
-		planet.setSector(this);
-		planet.setSectorCoords(x, y, z);
+		
+		if(planet != null)
+		{
+			planet.setSector(this);
+			planet.setSectorCoords(x, y, z);
+		}
 	}
 	
 	/**
@@ -335,7 +385,7 @@ public class Sector
 	 * @param renderer The renderer to use to render them
 	 * @param player The player to render them all around
 	 */
-	public void renderPlanetsWithin(int centerX, int centerY, int centerZ, int radius, PlanetRenderer renderer, Player player)
+	public void renderPlanetsWithin(int centerX, int centerY, int centerZ, int radius, BlockStructureRenderer renderer, Player player)
 	{
 		renderer.setupRender(player);
 		
@@ -351,6 +401,8 @@ public class Sector
 		lowX = (int)Math.max(centerX - radius, -CHUNK_OFFSET);
 		highX = (int)Math.min(centerX + radius, CHUNK_OFFSET - 1);
 		
+		
+		
 		for(int z = lowZ; z <= highZ; z++)
 		{
 			for(int y = lowY; y <= highY; y++)
@@ -365,6 +417,7 @@ public class Sector
 						
 						if(!p.isRendered() && !renderers.contains(p))
 						{
+							// If need be, the planet's models are initialized & stored in memory
 							renderers.add(p);
 							new Thread(() ->
 							{
@@ -373,6 +426,7 @@ public class Sector
 							}).start();
 						}
 						
+						// Once it's models are created & ready, draw it to the screen
 						if(p.isRendered())
 						{
 							renderer.render(p, player);
@@ -386,10 +440,27 @@ public class Sector
 			}
 		}
 		
+		if(sa != null && sb != null)
+		{
+			renderer.render(sa, player);
+			renderer.render(sb, player);
+			
+//			sa.getTransform().velocity(0.01f);
+					
+			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
+			sa.getTransform().rotateX(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			
+//			Utils.println(sa.getTransform().position());
+//			Utils.println(sb.getTransform().position());
+//			Utils.println(sa.getTransform().position());
+//			sb.getTransform().localPosition(0, 5, 0);
+//			Utils.println(sb.getTransform().position());
+		}
+		
 		renderer.stopRender();
 	}
 	
-	public void renderPlanetsWithin(int radius, PlanetRenderer renderer, Player player)
+	public void renderPlanetsWithin(int radius, BlockStructureRenderer renderer, Player player)
 	{
 		Transform t = player.getTransform();
 		renderPlanetsWithin(chunkAtLocalX(t.x()), chunkAtLocalY(t.y()), chunkAtLocalZ(t.z()), radius, renderer, player);
@@ -428,16 +499,18 @@ public class Sector
 			{
 				for(int x = -CHUNK_OFFSET; x < CHUNK_OFFSET; x++)
 				{
-					if(x == 0 && y == 0 && z == 0 || random.nextInt(3) == 0)
+					if(x == 0 && y == 0 && z == 0 || random.nextInt(7) == 0)
 					{
 						int xz = random.nextInt(100) + 100;
 						if(xz % 2 != 0)
 							xz++;
 						String id = Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size()));
-						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance(id)));
+//						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance(id)));
 					}
 				}
 			}
 		}
+		
+		setPlanet(0, 0, 0, null); // debug
 	}
 }

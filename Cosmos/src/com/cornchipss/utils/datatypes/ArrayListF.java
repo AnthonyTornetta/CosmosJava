@@ -1,6 +1,7 @@
 package com.cornchipss.utils.datatypes;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.RandomAccess;
 
 /**
@@ -8,7 +9,7 @@ import java.util.RandomAccess;
  * <p>Main benefit is the {@link ArrayListF#asArray} being quite fast.</p>
  * @author Cornchip
  */
-public class ArrayListF implements Serializable, RandomAccess, Cloneable
+public class ArrayListF implements Serializable, RandomAccess, Cloneable, Iterable<Float>
 {
 	private static final long serialVersionUID = -6294067774439727369L;
 	
@@ -185,6 +186,36 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable
 			throw new IndexOutOfBoundsException("Argument len cannot be larger than size() (" + len + " > " + size() + ")");
 		
 		size -= len;
+	}
+	
+	private static class Itr implements Iterator<Float>
+	{
+		int i = 0;
+		private ArrayListF inst;
+		
+		private Itr(ArrayListF instance)
+		{
+			inst = instance;
+		}
+		
+		@Override
+		public boolean hasNext()
+		{
+			return i != inst.size();
+		}
+
+		@Override
+		public Float next()
+		{
+			i++;
+			return inst.list[i - 1];
+		}
+	}
+
+	@Override
+	public Iterator<Float> iterator()
+	{
+		return new Itr(this);
 	}
 
 }

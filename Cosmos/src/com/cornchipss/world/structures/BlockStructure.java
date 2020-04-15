@@ -74,51 +74,6 @@ public abstract class BlockStructure extends PhysicalObject
 	}
 	
 	/**
-	 * Gets the absolute center position of the BlockStructure
-	 * @return The absolute center position of the BlockStructure
-	 */
-	private float getAbsoluteX()
-	{
-		return getSector().getAbsoluteX() + getSectorX() * Sector.CHUNK_DIMENSIONS;
-	}
-	
-	/**
-	 * Gets the absolute center position of the BlockStructure
-	 * @return The absolute center position of the BlockStructure
-	 */
-	private float getAbsoluteY()
-	{
-		return getSector().getAbsoluteY() + getSectorY() * Sector.CHUNK_DIMENSIONS;
-	}
-	
-	/**
-	 * Gets the absolute center position of the BlockStructure
-	 * @return The absolute center position of the BlockStructure
-	 */
-	private float getAbsoluteZ()
-	{
-		return getSector().getAbsoluteZ() + getSectorZ() * Sector.CHUNK_DIMENSIONS;
-	}
-	
-	/**
-	 * Gets the absolute center position of the BlockStructure
-	 * @return The absolute center position of the BlockStructure
-	 */
-	public Vector3f getAbsolutePosition()
-	{
-		return new Vector3f(getAbsoluteX(), getAbsoluteY(), getAbsoluteZ());
-	}
-	
-	/**
-	 * Gets the absolute center position of the BlockStructure
-	 * @return The absolute center position of the BlockStructure
-	 */
-	public Vector3fc getUniverseCoords()
-	{
-		return new Vector3f(getAbsoluteX(), getAbsoluteY(), getAbsoluteZ());
-	}
-	
-	/**
 	 * <p>Sets the sector that the BlockStructure is a part of</p>
 	 * <p>Make sure to update variables such as the BlockStructure's position in the sector!</p>
 	 * @param sector The sector to set it to

@@ -129,4 +129,18 @@ public class Vector3fList
 	{
 		return indicies.containsKey(vec);
 	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuilder builder = new StringBuilder("[ ");
+		for(float f : floats)
+		{
+			builder.append(f);
+			builder.append(" ");
+		}
+		builder.append("]");
+		
+		return builder.toString();
+	}
 }

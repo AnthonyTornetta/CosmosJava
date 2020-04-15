@@ -11,7 +11,7 @@ import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.DebugShader;
 
-public class DebugRenderer extends Renderer
+public class DebugRenderer extends Renderer // TODO
 {
 	private List<Model> models = new LinkedList<>();
 	
