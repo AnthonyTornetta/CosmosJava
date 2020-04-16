@@ -446,9 +446,11 @@ public class Sector
 			renderer.render(sb, player);
 			
 //			sa.getTransform().velocity(0.01f);
-					
-			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
-			sa.getTransform().rotateX(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			DBG_TIME += Game.deltaTime();
+//			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
+			sa.getTransform().rotateY(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			
+//			sb.getTransform().translate(new Vector3f(0, Maths.sin(DBG_TIME), 0));
 			
 //			Utils.println(sa.getTransform().position());
 //			Utils.println(sb.getTransform().position());
@@ -459,6 +461,8 @@ public class Sector
 		
 		renderer.stopRender();
 	}
+	
+	private float DBG_TIME = 0;
 	
 	public void renderPlanetsWithin(int radius, BlockStructureRenderer renderer, Player player)
 	{
@@ -510,7 +514,10 @@ public class Sector
 				}
 			}
 		}
-		
-		setPlanet(0, 0, 0, null); // debug
+	}
+	
+	public BlockStructure sa()
+	{
+		return sa;
 	}
 }

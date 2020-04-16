@@ -48,9 +48,11 @@ public class Player extends PhysicalEntity
 	{
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f), 0.5f);
 		
-		camera = new Transform(getTransform());
+//		camera = new Transform(getTransform());
 		
-		camera.parent(getTransform());
+//		camera.parent(getTransform());
+		
+		camera = getTransform();
 	}
 	
 	private void handleNewMovement()
@@ -116,13 +118,15 @@ public class Player extends PhysicalEntity
 	
 	private void handleResets()
 	{
+		Utils.println(camera.rotation());
+		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
 		{
-			camera().rotation(0, 0, 0);
+			camera().localRotation(0, 0, 0);
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{
-			getTransform().position(new Vector3f(0, 0, 0));
+			getTransform().localPosition(new Vector3f(0, 0, 0));
 			camera().localRotation(0, 0, 0);
 			//getTransform().removeParent();
 			getTransform().localVelocity(Maths.zero());
@@ -132,9 +136,10 @@ public class Player extends PhysicalEntity
 			if(getTransform().hasParent())
 				getTransform().removeParent();
 			else
-				getTransform().parent(
-						getUniverse().getPlanet(
-								getTransform().position()).getTransform());
+//				getTransform().parent(
+//						getUniverse().getPlanet(
+//								getTransform().position()).getTransform());
+				getTransform().parent(getUniverse().getSector(0, 0, 0).sa().getTransform());
 		}
 	}
 	

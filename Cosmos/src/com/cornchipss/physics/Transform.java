@@ -76,7 +76,12 @@ public class Transform
 	{
 		if(hasParent())
 		{
+			localPosition.set(position());
+			localRotation.set(rotation());
+			localVelocity.set(velocity());
+			
 			parent.children.remove(this);
+			
 			this.parent = null;
 		}
 	}
@@ -84,14 +89,18 @@ public class Transform
 	public void parent(Transform p)
 	{
 		removeParent();
-		
+				
 		this.parent = p;
-		parent.children.add(this);
 		
-		// These now represent differing things
-		localPosition = new Vector3f();
-		localRotation = new Quaternionf();
-		localVelocity = new Vector3f();
+		if(p != null)
+		{
+			parent.children.add(this);
+			
+			// These now represent differing things
+			localPosition = Maths.sub(localPosition(), parent.position());
+			localRotation = Maths.div(localRotation(), parent.rotation());
+			localVelocity = Maths.sub(localVelocity(), parent.velocity());
+		}
 	}
 	
 	public Transform parent()

@@ -4,6 +4,7 @@ import java.nio.FloatBuffer;
 import java.util.List;
 
 import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import org.joml.Vector3dc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -102,6 +103,13 @@ public class Utils
 		{
 			Object[] arr = (Object[])obj;
 			return arrayToString(arr);
+		}
+		
+		if(obj instanceof Quaternionfc)
+		{
+			Quaternionfc q = (Quaternionfc)obj;
+			Vector3fc eulers = q.getEulerAnglesXYZ(new Vector3f());
+			return toString(Maths.toDegs(eulers));
 		}
 		
 		if(obj instanceof Vector3fc)
