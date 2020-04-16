@@ -6,7 +6,7 @@ import java.util.Random;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import com.cornchipss.Game;
+import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
@@ -447,8 +447,8 @@ public class Sector
 			
 //			sa.getTransform().velocity(0.01f);
 					
-			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
-			sa.getTransform().rotateX(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			sa.getTransform().translate(new Vector3f(1f * Cosmos.deltaTime(), 0, 0));
+			sa.getTransform().rotateX(1 / 8.0f * Maths.TAU * Cosmos.deltaTime());
 			
 //			Utils.println(sa.getTransform().position());
 //			Utils.println(sb.getTransform().position());
@@ -505,7 +505,7 @@ public class Sector
 						if(xz % 2 != 0)
 							xz++;
 						String id = Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size()));
-//						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance(id)));
+						setPlanet(x, y, z, new Planet(xz, 256, xz, Biospheres.newInstance(id)));
 					}
 				}
 			}

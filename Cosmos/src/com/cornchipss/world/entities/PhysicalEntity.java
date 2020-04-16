@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
-import com.cornchipss.Game;
+import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.Hitbox;
 import com.cornchipss.utils.Maths;
@@ -31,7 +31,7 @@ public abstract class PhysicalEntity extends Entity
 	{
 		Transform t = getTransform();
 		
-		Vector3f newPos = Maths.add(t.position(), Maths.mul(t.velocity(), Game.deltaTime()));
+		Vector3f newPos = Maths.add(t.position(), Maths.mul(t.velocity(), Cosmos.deltaTime()));
 
 		Location[][][] locations = getUniverse().getBlocksWithin(t.position(), getHitbox().getBoundingBox());
 		

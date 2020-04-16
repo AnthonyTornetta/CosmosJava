@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
-import com.cornchipss.Game;
+import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Axis;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
@@ -108,7 +108,7 @@ public class Player extends PhysicalEntity
 			accel.z -= vel.z() * .1f;
 		}
 		
-		accel.mul(accelRate * Game.deltaTime());
+		accel.mul(accelRate * Cosmos.deltaTime());
 		
 		getTransform().accelerate(accel);
 //		getTransform().localVelocity(Maths.normalClamp(getTransform().localVelocity(), maxSpeedXZ));

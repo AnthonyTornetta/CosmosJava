@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
-import com.cornchipss.Game;
+import com.cornchipss.Cosmos;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.shaders.Shader;
 import com.cornchipss.utils.Maths;
@@ -24,8 +24,8 @@ public abstract class Renderer
 		
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
-				Game.getInstance().getWindow().getWidth() / 
-				(float)Game.getInstance().getWindow().getHeight(), 
+				Cosmos.getInstance().getWindow().getWidth() / 
+				(float)Cosmos.getInstance().getWindow().getHeight(), 
 				0.1f, Options.getIntOption("cosmos:render_distance"));	
 		
 		viewMatrix = new Matrix4f();
