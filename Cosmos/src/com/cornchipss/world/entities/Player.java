@@ -118,8 +118,6 @@ public class Player extends PhysicalEntity
 	
 	private void handleResets()
 	{
-		Utils.println(camera.rotation());
-		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
 		{
 			camera().localRotation(0, 0, 0);

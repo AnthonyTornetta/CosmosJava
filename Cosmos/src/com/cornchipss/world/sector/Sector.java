@@ -446,9 +446,9 @@ public class Sector
 			renderer.render(sb, player);
 			
 //			sa.getTransform().velocity(0.01f);
-			DBG_TIME += Game.deltaTime();
+			DBG_TIME += Cosmos.deltaTime();
 //			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
-			sa.getTransform().rotateY(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			sa.getTransform().rotateY(1 / 8.0f * Maths.TAU * Cosmos.deltaTime());
 			
 //			sb.getTransform().translate(new Vector3f(0, Game.deltaTime() * Maths.sin(DBG_TIME), 0));
 			

@@ -31,6 +31,12 @@ void main()
 
 	uv = in_uv;
 
-	gl_Position = projection * view * u_transformation_matrix * vec4(in_translation + in_position, 1.0);
-	color = in_color;
+	vec4 relativeToCamera = view * u_transformation_matrix * vec4(in_translation + in_position, 1.0);
+
+	float dist = -relativeToCamera.z;
+	float col = max(1 - dist / 1000.0f, 0);
+	//col = 0;
+	color = in_color * vec3(col, col, col);
+
+	gl_Position = projection * relativeToCamera;
 }
