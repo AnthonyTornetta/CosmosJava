@@ -64,7 +64,7 @@ public abstract class BlockStructure extends PhysicalObject
 		this.length = length;
 		
 		setTransform(new Transform());
-		getTransform().rotation(rx, ry, rz);
+		transform().rotation(rx, ry, rz);
 	}
 	
 	@Override
@@ -148,7 +148,7 @@ public abstract class BlockStructure extends PhysicalObject
 	 * @return If the model was changed at all
 	 */
 	public boolean updateModel(int x, int y, int z, Block oldBlock, boolean updateSurrounding)
-	{		
+	{
 		if(!isGenerated() || !isRendered())
 			return false; // If either of these are false, calling this function will cause a stack overflow - we have to wait for the render() function to render this first.
 		
@@ -457,7 +457,10 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	public int getEndingCornerX()
 	{
-		return getWidth() / 2;
+		if(getWidth() % 2 == 0)
+			return getWidth() / 2;
+		else
+			return getWidth() / 2 + 1;
 	}
 	
 	/**
@@ -466,7 +469,10 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	public int getEndingCornerY()
 	{
-		return getHeight() / 2;
+		if(getHeight() % 2 == 0)
+			return getHeight() / 2;
+		else
+			return getHeight() / 2 + 1;
 	}
 	
 	/**
@@ -475,7 +481,10 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	public int getEndingCornerZ()
 	{
-		return getLength() / 2;
+		if(getLength() % 2 == 0)
+			return getLength() / 2;
+		else
+			return getLength() / 2 + 1;
 	}
 	
 	/**
@@ -514,7 +523,7 @@ public abstract class BlockStructure extends PhysicalObject
 	public void setSectorCoords(float x, float y, float z)
 	{
 		sectorCoords = new Vector3f(x, y, z);
-		getTransform().position(
+		transform().position(
 				new Vector3f(getSectorX() * Sector.CHUNK_DIMENSIONS, 
 						getSectorY() * Sector.CHUNK_DIMENSIONS, 
 						getSectorZ() * Sector.CHUNK_DIMENSIONS));

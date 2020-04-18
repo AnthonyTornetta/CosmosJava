@@ -8,6 +8,7 @@ import com.cornchipss.Cosmos;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.shaders.Shader;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.entities.Player;
 
 public abstract class Renderer
@@ -41,8 +42,16 @@ public abstract class Renderer
 	{
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
-		Maths.createViewMatrix(player.camera().position(),
-				player.camera().eulers(), getViewMatrix());
+		getViewMatrix().identity();
+		getViewMatrix().rotate(player.camera().rotation());
+		getViewMatrix().translate(Maths.mul(player.camera().position(), -1));
+		
+//		getViewMatrix().set(player.camera().asMatrix());
+//		
+//		getViewMatrix().translate(Maths.mul(player.camera().position(), -2));
+		
+//		Maths.createViewMatrix(player.camera().position(),
+//				player.camera().rotation(), getViewMatrix());
 		
 		getShader().start();
 		getShader().loadUniformMatrix(u_projectionLocation, getProjectionMatrix());

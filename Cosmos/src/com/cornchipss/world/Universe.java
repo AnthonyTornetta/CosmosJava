@@ -181,7 +181,7 @@ public class Universe
 		}
 		
 		if(closestBlock != null)
-			closestBlock.add(planet.getTransform().position());
+			closestBlock.add(planet.transform().position());
 		
 		return closestBlock;
 	}
@@ -262,7 +262,7 @@ public class Universe
 		
 		if(p != null)
 		{
-	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(Maths.invert(p.getTransform().eulers()), position);
+	  		Vector3f relativeToPlanetPos = Maths.rotatePoint(Maths.invert(p.transform().eulers()), position);
 			
 			for(int z = -cZ; z < cZ; z++)
 			{

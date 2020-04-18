@@ -29,7 +29,7 @@ public abstract class PhysicalEntity extends Entity
 	
 	public List<BlockFace> updatePhysics()
 	{
-		Transform t = getTransform();
+		Transform t = transform();
 		
 		Vector3f newPos = Maths.add(t.position(), Maths.mul(t.velocity(), Cosmos.deltaTime()));
 
@@ -69,14 +69,14 @@ public abstract class PhysicalEntity extends Entity
 		
 //		Utils.println(newPos);
 		
-		getTransform().position(newPos);
+		transform().position(newPos);
 		
 		return hits;
 	}
 	
 	public Vector3f onCollide(Location l, BlockFace face)
 	{
-		Transform t = getTransform();
+		Transform t = transform();
 		
 		Vector3f direction = face.getDirection();
 		float newX = t.x() + t.velocity().x(), newY = t.y() + t.velocity().y(), newZ = t.z() + t.velocity().z();

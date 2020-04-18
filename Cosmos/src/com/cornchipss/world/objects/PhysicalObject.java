@@ -52,7 +52,7 @@ public abstract class PhysicalObject
 		if(!createsGravity())
 			return 0;
 		
-		return Constants.GRAVITATIONAL_CONSTANT * getMass() * obj.getMass() / getTransform().distanceSqrd(obj.getTransform());
+		return Constants.GRAVITATIONAL_CONSTANT * getMass() * obj.getMass() / transform().distanceSqrd(obj.transform());
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public abstract class PhysicalObject
 	 */
 	public abstract boolean createsGravity();
 
-	public Transform getTransform() { return transform; }
+	public Transform transform() { return transform; }
 	public void setTransform(Transform transform) { this.transform = transform; }
 
 	public Hitbox getHitbox() { return hitbox; }

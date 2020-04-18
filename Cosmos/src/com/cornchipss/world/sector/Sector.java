@@ -5,12 +5,14 @@ import java.util.Random;
 
 import org.joml.Vector3f;
 import org.joml.Vector3i;
+import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Biospheres;
 import com.cornchipss.registry.Blocks;
 import com.cornchipss.rendering.BlockStructureRenderer;
+import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 import com.cornchipss.world.Universe;
@@ -77,20 +79,20 @@ public class Sector
 	private boolean firstUpdate = true;
 	private float lastX = 0, lastY = 0, lastZ = 0;
 	
-	private BlockStructure sa, sb;
+	private BlockStructure sa, sb, sc;
 	
 	public void update(Player player)
 	{
 		float r = Maths.PI / 180 * 0.01f;
 //		getPlanet(0, 0, 0).getTransform().rotateX(r);
 		
-		float x = player.getTransform().x(), 
-				y = player.getTransform().y(), 
-				z = player.getTransform().z();
+		float x = player.transform().x(), 
+				y = player.transform().y(), 
+				z = player.transform().z();
 		
 		if(firstUpdate)
 		{
-			sa = new BlockStructure(2, 2, 2, 0, 0, 0)
+			sa = new BlockStructure(1, 1, 1, 0, 0, 0)
 			{
 				@Override
 				public boolean createsGravity()
@@ -99,7 +101,16 @@ public class Sector
 				}
 			};
 			
-			sb = new BlockStructure(2, 2, 2, 0, 0, 0)
+			sb = new BlockStructure(1, 1, 1, 0, 0, 0)
+			{
+				@Override
+				public boolean createsGravity()
+				{
+					return false;
+				}
+			};
+			
+			sc = new BlockStructure(1, 1, 1, 0, 0, 0)
 			{
 				@Override
 				public boolean createsGravity()
@@ -110,23 +121,30 @@ public class Sector
 			
 			sa.setBlock(0, 0, 0, Blocks.snowstone);
 			sb.setBlock(0, 0, 0, Blocks.grass);
+			sc.setBlock(0, 0, 0, Blocks.sandstone);
 			
 			sa.setGenerated(true);
 			sb.setGenerated(true);
+			sc.setGenerated(true);
 			
 			sa.render();
 			sb.render();
+			sc.render();
 			
 			sa.setSector(this);
 			sb.setSector(this);
+			sc.setSector(this);
 			
 			sa.setSectorCoords(0, 0, 0);
 			sb.setSectorCoords(0, 0, 0);
+			sc.setSectorCoords(0, 0, 0);
 			
-			sb.getTransform().parent(sa.getTransform());
+			sb.transform().parent(sa.transform());
+			sc.transform().parent(sb.transform());
 			
-			sa.getTransform().position(0, 128, 0);
-			sb.getTransform().localPosition(0, 3, 0);
+			sa.transform().position(0, 128, 0);
+			sb.transform().localPosition(0, 3, 0);
+			sc.transform().localPosition(2, 0, 0);
 		}
 		
 		if(firstUpdate || x != lastX || y != lastY || z != lastZ)
@@ -149,6 +167,14 @@ public class Sector
 				
 				firstUpdate = false;
 			}
+		}
+		
+		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+		{
+			if(sb.transform().hasParent())
+				sb.transform().removeParent();
+			else
+				sb.transform().parent(sa.transform());
 		}
 	}
 	
@@ -444,11 +470,16 @@ public class Sector
 		{
 			renderer.render(sa, player);
 			renderer.render(sb, player);
+			renderer.render(sc, player);
 			
 //			sa.getTransform().velocity(0.01f);
-			DBG_TIME += Game.deltaTime();
+			DBG_TIME += Cosmos.deltaTime();
 //			sa.getTransform().translate(new Vector3f(1f * Game.deltaTime(), 0, 0));
-			sa.getTransform().rotateY(1 / 8.0f * Maths.TAU * Game.deltaTime());
+			
+			sa.transform().rotateX(1 / 8.0f * Maths.TAU * Cosmos.deltaTime());
+
+			//			sb.transform().rotateY(1 / 8.0f * Maths.TAU * Cosmos.deltaTime());
+//			sb.transform().rotateZ(1 / 4.0f * Maths.TAU * Cosmos.deltaTime());
 			
 //			sb.getTransform().translate(new Vector3f(0, Game.deltaTime() * Maths.sin(DBG_TIME), 0));
 			
@@ -466,7 +497,7 @@ public class Sector
 	
 	public void renderPlanetsWithin(int radius, BlockStructureRenderer renderer, Player player)
 	{
-		Transform t = player.getTransform();
+		Transform t = player.transform();
 		renderPlanetsWithin(chunkAtLocalX(t.x()), chunkAtLocalY(t.y()), chunkAtLocalZ(t.z()), radius, renderer, player);
 	}
 	

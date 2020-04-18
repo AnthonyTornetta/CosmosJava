@@ -12,6 +12,8 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
 
+import com.cornchipss.physics.Transform;
+
 public class Maths
 {
 	/**
@@ -55,6 +57,15 @@ public class Maths
 		dest.translate(-x, -y, -z);
 	}
 	
+	public static void createViewMatrix(Vector3fc position, Quaternionfc rotation, Matrix4f dest)
+	{
+		dest.identity();
+		
+		dest.rotate(rotation);
+		
+		dest.translate(-position.x(), -position.y(), -position.z());
+	}
+	
 	/**
 	 * Creates a view matrix based on coordinates + rotations
 	 * @param pos Position
@@ -82,6 +93,15 @@ public class Maths
         matrix.scale(new Vector3f(scale, scale, scale));
         return matrix;
     }
+	
+	public static Matrix4f createTransformationMatrix(Vector3fc pos, Quaternionfc rot)
+	{
+		Matrix4f matrix = new Matrix4f();
+        matrix.identity();
+        matrix.rotate(rot);
+        matrix.translate(pos);
+        return matrix;
+	}
 	
 	public static Matrix4f createRotationMatrix(Quaternionfc q)
 	{

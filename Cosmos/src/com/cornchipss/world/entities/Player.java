@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
@@ -48,11 +49,25 @@ public class Player extends PhysicalEntity
 	{
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f), 0.5f);
 		
-//		camera = new Transform(getTransform());
+		// TODO: figure out why it works like this
+		setTransform(new Transform(new Vector3f(x, y, z))
+				{
+					@Override
+					public Quaternionfc rotation()
+					{
+						if(hasParent())
+						{
+							Quaternionfc parentRot = parent().rotation();
+							return localRotation().mul(parentRot.invert(new Quaternionf()), new Quaternionf());
+						}
+						
+						return localRotation();
+					}
+				});
 		
-//		camera.parent(getTransform());
+		camera = new Transform(transform());
 		
-		camera = getTransform();
+//		camera = transform();
 	}
 	
 	private void handleNewMovement()
@@ -104,7 +119,7 @@ public class Player extends PhysicalEntity
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 		{
-			Vector3fc vel = getTransform().velocity();
+			Vector3fc vel = transform().velocity();
 			accel.x -= vel.x() * .1f;
 			accel.y -= vel.y() * .1f;
 			accel.z -= vel.z() * .1f;
@@ -112,34 +127,32 @@ public class Player extends PhysicalEntity
 		
 		accel.mul(accelRate * Cosmos.deltaTime());
 		
-		getTransform().accelerate(accel);
+		transform().accelerate(accel);
 //		getTransform().localVelocity(Maths.normalClamp(getTransform().localVelocity(), maxSpeedXZ));
 	}
 	
 	private void handleResets()
 	{
-		Utils.println(camera.rotation());
-		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
 		{
 			camera().localRotation(0, 0, 0);
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{
-			getTransform().localPosition(new Vector3f(0, 0, 0));
+			transform().localPosition(new Vector3f(0, 0, 0));
 			camera().localRotation(0, 0, 0);
 			//getTransform().removeParent();
-			getTransform().localVelocity(Maths.zero());
+			transform().localVelocity(Maths.zero());
 		}
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 		{
-			if(getTransform().hasParent())
-				getTransform().removeParent();
+			if(transform().hasParent())
+				transform().removeParent();
 			else
 //				getTransform().parent(
 //						getUniverse().getPlanet(
 //								getTransform().position()).getTransform());
-				getTransform().parent(getUniverse().getSector(0, 0, 0).sa().getTransform());
+				transform().parent(getUniverse().getSector(0, 0, 0).sa().transform());
 		}
 	}
 	
@@ -222,7 +235,7 @@ public class Player extends PhysicalEntity
 		{
 			if(Input.isKeyDown(GLFW.GLFW_KEY_SPACE)) // hits.size() == 1 prevents wall jumping
 			{
-				getTransform().accelerate(new Vector3f(0, 10, 0));
+				transform().accelerate(new Vector3f(0, 10, 0));
 			}
 		}
 	}
@@ -247,7 +260,7 @@ public class Player extends PhysicalEntity
 		
 		settings.setBlacklist(Blocks.air);
 		
-		Raycast ray = Raycast.fire(getTransform().position(), getUniverse(), getTransform().eulers(), lookDist, settings);
+		Raycast ray = Raycast.fire(transform().position(), getUniverse(), transform().eulers(), lookDist, settings);
 		
 		int closest = -1;
 		float closestDist = 0;
@@ -256,7 +269,7 @@ public class Player extends PhysicalEntity
 		{
 			Location l = ray.getNthHit(i);
 			
-			float dist = l.getPosition().distanceSquared(getTransform().position());
+			float dist = l.getPosition().distanceSquared(transform().position());
 			
 			if(closest == -1 || dist < closestDist)
 			{
@@ -279,7 +292,7 @@ public class Player extends PhysicalEntity
 	 */
 	public Vector3f getHeadPosition()
 	{
-		return Maths.add(getTransform().position(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
+		return Maths.add(transform().position(), new Vector3f(0, getHitbox().getBoundingBox().y(), 0));
 	}
 
 	@Override

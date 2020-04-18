@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -13,6 +14,7 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.PlanetShader;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.structures.BlockStructure;
@@ -77,8 +79,12 @@ public class BlockStructureRenderer extends Renderer
 		
 		if(structure.isRenderable())
 		{
-			Matrix4fc transformationMatrix = structure.getTransform().asMatrix();
-			getShader().loadUniformMatrix(matrixLocation, transformationMatrix);
+			Matrix4f openglMatrix = new Matrix4f();
+			openglMatrix.identity();
+			openglMatrix.translate(structure.transform().position());
+			openglMatrix.rotate(structure.transform().rotation());
+
+			getShader().loadUniformMatrix(matrixLocation, openglMatrix);
 			
 			Map<Model, Vector3fList> modelsAndPositions = structure.getModelsAndPositions();
 			

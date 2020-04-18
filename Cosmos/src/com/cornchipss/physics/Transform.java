@@ -1,8 +1,5 @@
 package com.cornchipss.physics;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.joml.AxisAngle4f;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -12,6 +9,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 public class Transform
 {
@@ -27,7 +25,6 @@ public class Transform
 	private Axis axis;
 	
 	private Transform parent;
-	private List<Transform> children = new ArrayList<>(0); // most transforms wont have children
 	
 	public Transform()
 	{
@@ -58,7 +55,6 @@ public class Transform
 	public Transform(Transform parent)
 	{
 		this.parent = parent;
-		parent.children.add(this);
 		
 		this.localPosition = new Vector3f();
 		this.localRotation = new Quaternionf();
@@ -80,8 +76,6 @@ public class Transform
 			localRotation.set(rotation());
 			localVelocity.set(velocity());
 			
-			parent.children.remove(this);
-			
 			this.parent = null;
 		}
 	}
@@ -94,8 +88,6 @@ public class Transform
 		
 		if(p != null)
 		{
-			parent.children.add(this);
-			
 			// These now represent differing things
 			localPosition = Maths.sub(localPosition(), parent.position());
 			localRotation = Maths.div(localRotation(), parent.rotation());
@@ -155,6 +147,7 @@ public class Transform
 		{
 			Quaternionfc parentRot = parent().rotation();
 			return localRotation.mul(parentRot, new Quaternionf());
+//			return localRotation();
 		}
 		
 		return localRotation();
@@ -200,14 +193,10 @@ public class Transform
 		if(hasParent())
 		{
 			Vector3fc parentPos = parent().position();
+			Quaternionfc parentRot = parent().rotation();
 			
-			Matrix4f parentTransform = parent().asMatrix();
+			Matrix4f parentTransform = Maths.createTransformationMatrix(parentPos, parentRot);
 			return Maths.rotatePoint(parentTransform, localPosition()).add(parentPos);
-//			setPosition(Maths.rotatePoint(getLockedOnto().getCombinedRotation().invert(), Maths.zero().add(0, 128, 0)));
-			
-//			return Maths.rotatePoint(
-//					parentRot.invert(new Quaternionf()), parentPos)
-//					.add(localPosition, new Vector3f());
 		}
 		
 		return localPosition();
@@ -329,7 +318,6 @@ public class Transform
 
 	public Matrix4f asMatrix()
 	{
-		Vector3f eulers = rotation().getEulerAnglesXYZ(new Vector3f());
-		return Maths.createTransformationMatrix(position(), eulers.x(), eulers.y(), eulers.z());
+		return Maths.createTransformationMatrix(position(), rotation());
 	}
 }

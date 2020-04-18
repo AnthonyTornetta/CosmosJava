@@ -26,7 +26,7 @@ public class Location
 		
 		Planet p = universe.getPlanet(position);
 		trans = new Transform(position, p != null ? 
-					p.getTransform().eulers() : 
+					p.transform().eulers() : 
 					Maths.zero()); 
 		// TODO: get rotation for other entities such as ships (loop thru each entity and find closest one i guess)
 		
