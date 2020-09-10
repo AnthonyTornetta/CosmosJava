@@ -9,12 +9,12 @@ import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Utils;
 
-public class InitializationState implements GameState
+public class LoadingState implements State
 {
 	private volatile float progress = 0;
 	
 	private float delta = 0;
-	private final float WAIT_TIME = 0.5f;
+	private final float WAIT_TIME = .5f;
 	
 	@Override
 	public void start()
@@ -40,7 +40,7 @@ public class InitializationState implements GameState
 		{
 			if(delta >= WAIT_TIME)
 			{
-				Cosmos.state(new PlayingState());
+				Cosmos.state(new GameState());
 			}
 			else
 			{
@@ -56,7 +56,7 @@ public class InitializationState implements GameState
 			window.clear(1 - progress, 1 - progress, 1 - progress, 1);
 		else
 		{
-			Color c = PlayingState.CLEAR_COLOR;
+			Color c = GameState.CLEAR_COLOR;
 			float ratio = delta / WAIT_TIME;
 			window.clear(ratio * c.r, ratio * c.g, ratio * c.b, 1);
 		}

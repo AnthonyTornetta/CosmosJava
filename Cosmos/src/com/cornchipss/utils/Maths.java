@@ -12,8 +12,6 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
 
-import com.cornchipss.physics.Transform;
-
 public class Maths
 {
 	/**

@@ -1,6 +1,7 @@
 package com.cornchipss.utils.datatypes;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.RandomAccess;
 
 /**
@@ -8,7 +9,7 @@ import java.util.RandomAccess;
  * <p>Main benifit is the {@link ArrayListI#asArray} being quite fast.</p>
  * @author Cornchip
  */
-public class ArrayListI implements Serializable, RandomAccess, Cloneable
+public class ArrayListI implements Serializable, RandomAccess, Cloneable, Iterable<Integer>
 {	
 	private static final long serialVersionUID = -4624129838906945316L;
 	
@@ -144,5 +145,35 @@ public class ArrayListI implements Serializable, RandomAccess, Cloneable
 	{
 		list = new int[newSize];
 		size = 0;
+	}
+
+	private static class ArrayListInterator implements Iterator<Integer> // see what i did there
+	{
+		int i = 0;
+		private ArrayListI inst;
+		
+		private ArrayListInterator(ArrayListI instance)
+		{
+			inst = instance;
+		}
+		
+		@Override
+		public boolean hasNext()
+		{
+			return i != inst.size();
+		}
+
+		@Override
+		public Integer next()
+		{
+			i++;
+			return inst.list[i - 1];
+		}
+	}
+	
+	@Override
+	public Iterator<Integer> iterator()
+	{
+		return new ArrayListInterator(this);
 	}
 }

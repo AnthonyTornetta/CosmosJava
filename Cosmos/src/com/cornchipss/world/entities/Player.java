@@ -3,11 +3,10 @@ package com.cornchipss.world.entities;
 import java.util.List;
 
 import org.joml.AxisAngle4f;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
+import org.newdawn.slick.Color;
 
 import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Axis;
@@ -16,6 +15,8 @@ import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.physics.raycast.Raycast;
 import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
+import com.cornchipss.rendering.debug.DebugLine;
+import com.cornchipss.rendering.debug.DebugRenderer;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
@@ -50,21 +51,21 @@ public class Player extends PhysicalEntity
 		super(x, y, z, new RectangleHitbox(0.45f, 0.9f, 0.45f), 0.5f);
 		
 		// TODO: figure out why it works like this
-		setTransform(new Transform(new Vector3f(x, y, z))
-				{
-					@Override
-					public Quaternionfc rotation()
-					{
-						if(hasParent())
-						{
-							Quaternionfc parentRot = parent().rotation();
-							return localRotation().mul(parentRot.invert(new Quaternionf()), new Quaternionf());
-						}
-						
-						return localRotation();
-					}
-				});
-		
+//		setTransform(new Transform(new Vector3f(x, y, z))
+//				{
+//					@Override
+//					public Quaternionfc rotation()
+//					{
+//						if(hasParent())
+//						{
+//							Quaternionfc parentRot = parent().rotation();
+//							return localRotation().mul(parentRot.invert(new Quaternionf()), new Quaternionf());
+//						}
+//						
+//						return localRotation();
+//					}
+//				});
+//		
 		camera = new Transform(transform());
 		
 //		camera = transform();
@@ -140,6 +141,7 @@ public class Player extends PhysicalEntity
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{
 			transform().localPosition(new Vector3f(0, 0, 0));
+			transform().localRotation(0, 0, 0);
 			camera().localRotation(0, 0, 0);
 			//getTransform().removeParent();
 			transform().localVelocity(Maths.zero());
@@ -149,10 +151,10 @@ public class Player extends PhysicalEntity
 			if(transform().hasParent())
 				transform().removeParent();
 			else
-//				getTransform().parent(
-//						getUniverse().getPlanet(
-//								getTransform().position()).getTransform());
-				transform().parent(getUniverse().getSector(0, 0, 0).sa().transform());
+				transform().parent(
+						getUniverse().getPlanet(
+								transform().position()).transform());
+				//transform().parent(getUniverse().getSector(0, 0, 0).sa().transform());
 		}
 	}
 	
@@ -160,37 +162,50 @@ public class Player extends PhysicalEntity
 	{
 		Axis axis = camera().axis();
 		
-		Quaternionf quat = Maths.clone(camera.rotation());
+		float rz = Input.isKeyDown(GLFW.GLFW_KEY_Z) ? 1 : 0;
+		rz -= Input.isKeyDown(GLFW.GLFW_KEY_C) ? 1 : 0;
+		rz *= 0.01f;
 		
-		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaX() * sensitivity, axis.yEndpoint())).mul(quat, quat);
-		quat.normalize();
-		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaY() * sensitivity, axis.xEndpoint())).mul(quat, quat);
-		quat.normalize();
+		camera().rotate(new AxisAngle4f(rz, axis.zEndpoint()));
 		
-		float rotZ = 0;
-		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
-		{
-			rotZ -= 1;
-		}
-		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-		{
-			rotZ += 1;
-		}
+		float ry = -Input.getMouseDeltaX() * sensitivity;
+		camera().rotate(new AxisAngle4f(ry, axis.yEndpoint()));
 		
-		new Quaternionf(new AxisAngle4f(rotZ * 0.01f, axis.zEndpoint())).mul(quat, quat);
-		quat.normalize();
-		
-		for(int i = 0; i < inventory.length; i++)
-		{
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_1 + i))
-			{
-				blockSelected = i;
-			}
-		}
-		
-		quat.normalize();
-		
-		camera.rotation(quat);
+		float rx = -Input.getMouseDeltaY() * sensitivity;
+		camera().rotate(new AxisAngle4f(rx, axis.xEndpoint()));
+//		Utils.println(axis);
+//		
+//		Quaternionf quat = Maths.clone(camera.rotation());
+//		
+//		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaX() * sensitivity, axis.yEndpoint())).mul(quat, quat);
+//		quat.normalize();
+//		new Quaternionf(new AxisAngle4f(-Input.getMouseDeltaY() * sensitivity, axis.xEndpoint())).mul(quat, quat);
+//		quat.normalize();
+//		
+//		float rotZ = 0;
+//		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
+//		{
+//			rotZ -= 1;
+//		}
+//		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
+//		{
+//			rotZ += 1;
+//		}
+//		
+//		new Quaternionf(new AxisAngle4f(rotZ * 0.01f, axis.zEndpoint())).mul(quat, quat);
+//		quat.normalize();
+//		
+//		for(int i = 0; i < inventory.length; i++)
+//		{
+//			if(Input.isKeyJustDown(GLFW.GLFW_KEY_1 + i))
+//			{
+//				blockSelected = i;
+//			}
+//		}
+//		
+//		quat.normalize();
+//		
+//		camera.rotation(quat);
 	}
 	
 	private void handleBlockInteractions()
@@ -243,6 +258,11 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
+		
+		Vector3f pos = new Vector3f(transform().position());
+		
+		DebugRenderer.drawLine(new Vector3f(0, 0, 0), pos, Color.blue);
+
 		handleCamera();
 		
 		handleNewMovement();

@@ -9,7 +9,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
 public class Transform
 {
@@ -18,11 +17,6 @@ public class Transform
 	private Vector3f localVelocity;
 	
 	private Quaternionf localRotation;
-	
-	/**
-	 * The axis this object sees the world with
-	 */
-	private Axis axis;
 	
 	private Transform parent;
 	
@@ -39,8 +33,6 @@ public class Transform
 	public Transform(Vector3fc loc, Vector3fc rot)
 	{
 		this(loc, Maths.quaternionFromRotation(rot));
-		
-		updateAxis();
 	}
 	
 	public Transform(Vector3fc loc, Quaternionfc quat)
@@ -48,8 +40,6 @@ public class Transform
 		localPosition = new Vector3f(loc);
 		localRotation = Maths.clone(quat);
 		localVelocity = Maths.zero();
-		
-		updateAxis();
 	}
 	
 	public Transform(Transform parent)
@@ -59,8 +49,6 @@ public class Transform
 		this.localPosition = new Vector3f();
 		this.localRotation = new Quaternionf();
 		this.localVelocity = new Vector3f();
-		
-		updateAxis();
 	}
 	
 	public boolean hasParent()
@@ -149,8 +137,8 @@ public class Transform
 			return localRotation.mul(parentRot, new Quaternionf());
 //			return localRotation();
 		}
-		
-		return localRotation();
+		else
+			return localRotation();
 	}
 	
 	public void rotation(Vector3fc rot)
@@ -172,8 +160,6 @@ public class Transform
 		Quaternionf delta = rot.div(rotation(), new Quaternionf());
 		delta.normalize();
 		localRotation.mul(delta);
-		
-		updateAxis();
 	}
 	
 	public void position(float x, float y, float z)
@@ -235,8 +221,6 @@ public class Transform
 	public void rotate(Quaternionfc rotation)
 	{
 		localRotation.mul(rotation);
-		
-		updateAxis();
 	}
 
 	/**
@@ -255,30 +239,19 @@ public class Transform
 	
 	public void rotateX(float x)
 	{
-		new Quaternionf(new AxisAngle4f(x, axis.xEndpoint())).mul(localRotation(), localRotation);
-		
-		updateAxis();
+		new Quaternionf(new AxisAngle4f(x, axis().xEndpoint())).mul(localRotation(), localRotation);
 	}
 	
 	public void rotateY(float y)
 	{
-		new Quaternionf(new AxisAngle4f(y, axis.yEndpoint())).mul(localRotation(), localRotation);
-		
-		updateAxis();
+		new Quaternionf(new AxisAngle4f(y, axis().yEndpoint())).mul(localRotation(), localRotation);
 	}
 	
 	public void rotateZ(float z)
 	{
-		new Quaternionf(new AxisAngle4f(z, axis.zEndpoint())).mul(localRotation(), localRotation);
-		
-		updateAxis();
+		new Quaternionf(new AxisAngle4f(z, axis().zEndpoint())).mul(localRotation(), localRotation);
 	}
 	
-	private void updateAxis()
-	{
-		axis = new Axis(rotation());
-	}
-
 	public float x()
 	{
 		return position().x();
@@ -296,7 +269,7 @@ public class Transform
 
 	public Axis axis()
 	{
-		return axis;
+		return new Axis(rotation());
 	}
 
 	public float distanceSqrd(Transform transform)
@@ -312,8 +285,6 @@ public class Transform
 	public void rotate(AxisAngle4f axisAngle)
 	{
 		new Quaternionf(axisAngle).mul(localRotation(), localRotation);
-		
-		updateAxis();
 	}
 
 	public Matrix4f asMatrix()

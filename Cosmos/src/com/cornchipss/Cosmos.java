@@ -3,8 +3,8 @@ package com.cornchipss;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.rendering.Window;
-import com.cornchipss.states.GameState;
-import com.cornchipss.states.InitializationState;
+import com.cornchipss.states.State;
+import com.cornchipss.states.LoadingState;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Timer;
 import com.cornchipss.utils.Utils;
@@ -16,14 +16,14 @@ public class Cosmos
 {
 	private static int startWidth = 1024, startHeight = 720;
 	private static Window window;
-	private static GameState state;
+	private static State state;
 	
-	public static GameState state() 
+	public static State state() 
 	{
 		return state;
 	}
 	
-	public static void state(GameState s)
+	public static void state(State s)
 	{
 		if(state != null)
 			state.end();
@@ -78,7 +78,7 @@ public class Cosmos
 		
 		lastTimeTicked = System.nanoTime();
 		
-		state(new InitializationState());
+		state(new LoadingState());
 		
 		while(!window.shouldClose() && !Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 		{

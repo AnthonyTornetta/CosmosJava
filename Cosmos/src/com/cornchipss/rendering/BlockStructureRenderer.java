@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
@@ -14,7 +13,6 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.opengl.GL33;
 
 import com.cornchipss.rendering.shaders.PlanetShader;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.utils.datatypes.Vector3fList;
 import com.cornchipss.world.entities.Player;
 import com.cornchipss.world.structures.BlockStructure;
@@ -41,9 +39,6 @@ public class BlockStructureRenderer extends Renderer
 		// For use w/ storing positions of where models are
 		// This is initialized here just to minimize interactions w/ the GPU to save some performace (i think that's how it works)
 		positionsVBO = GL15.glGenBuffers();
-		
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, positionsVBO);
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
 	
 	@Override

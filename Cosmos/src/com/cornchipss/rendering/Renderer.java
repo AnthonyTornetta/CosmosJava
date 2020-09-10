@@ -1,10 +1,13 @@
 package com.cornchipss.rendering;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Quaternionfc;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import com.cornchipss.Cosmos;
+import com.cornchipss.physics.Transform;
 import com.cornchipss.registry.Options;
 import com.cornchipss.rendering.shaders.Shader;
 import com.cornchipss.utils.Maths;
@@ -28,6 +31,8 @@ public abstract class Renderer
 				Cosmos.getInstance().getWindow().getWidth() / 
 				(float)Cosmos.getInstance().getWindow().getHeight(), 
 				0.1f, Options.getIntOption("cosmos:render_distance"));	
+			
+		Utils.println(projectionMatrix);
 		
 		viewMatrix = new Matrix4f();
 		
@@ -42,9 +47,22 @@ public abstract class Renderer
 	{
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
-		getViewMatrix().identity();
-		getViewMatrix().rotate(player.camera().rotation());
-		getViewMatrix().translate(Maths.mul(player.camera().position(), -1));
+		Transform camTrans = player.camera();
+		Transform playerTrans = player.transform();
+		Quaternionfc parentRot = playerTrans.hasParent() 
+				? playerTrans.parent().rotation() 
+				: Maths.blankQuaternion();
+		
+		Quaternionf rot = playerTrans.localRotation().mul(parentRot.invert(new Quaternionf()), new Quaternionf());
+		rot = camTrans.localRotation().mul(rot, new Quaternionf());
+		
+		Maths.createViewMatrix(camTrans.position(), rot, getViewMatrix());
+		
+//		Maths.createViewMatrix(player.camera().position(), player.camera().eulers(), getViewMatrix());
+		
+//		getViewMatrix().identity();
+//		getViewMatrix().rotate(player.camera().rotation());
+//		getViewMatrix().translate(Maths.mul(player.camera().position(), -1));
 		
 //		getViewMatrix().set(player.camera().asMatrix());
 //		

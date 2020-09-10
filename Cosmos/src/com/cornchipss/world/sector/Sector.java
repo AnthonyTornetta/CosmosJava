@@ -83,9 +83,22 @@ public class Sector
 
 	public void update(Player player)
 	{
-		float r = Maths.PI / 180 * 0.01f;
-//		getPlanet(0, 0, 0).getTransform().rotateX(r);
-
+		float r = Maths.PI / 180 * 0.1f;
+		
+		for(int z = 0; z < planets.length; z++)
+		{
+			for(int y = 0; y < planets[z].length; y++)
+			{
+				for(int x = 0; x < planets[z][y].length; x++)
+				{
+					if(planets[z][y][x] != null)
+					{
+						planets[z][y][x].transform().rotateY(r);
+					}
+				}
+			}
+		}
+		
 		float x = player.transform().x(),
 				y = player.transform().y(),
 				z = player.transform().z();
