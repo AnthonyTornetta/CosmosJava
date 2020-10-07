@@ -25,10 +25,10 @@ public class DebugLine implements DebugShape
 	{
 		// TODO: make this not use outdated stuff
 		GL11.glLineWidth(10.5f);
-		GL11.glColor3f(1.0f, 0.5f, 0.2f);
+		GL11.glColor3f(color.r / 255.0f, color.g / 255.0f, color.b / 255.0f);
 		GL11.glBegin(GL11.GL_LINES);
-		GL11.glVertex3f(start.x(), start.y(), start.z());
-		GL11.glVertex3f(end.x(), end.y(), end.z());
+			GL11.glVertex3f(start.x(), start.y(), start.z());
+			GL11.glVertex3f(end.x(), end.y(), end.z());
 		GL11.glEnd();
 	}
 

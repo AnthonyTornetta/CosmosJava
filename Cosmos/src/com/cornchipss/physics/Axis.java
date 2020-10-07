@@ -38,7 +38,9 @@ public final class Axis
 	 */
 	public Axis(Quaternionfc q)
 	{
-		this(Maths.createRotationMatrix(q));
+		this.xEndpoint = q.transform(new Vector3f(1, 0, 0));
+		this.yEndpoint = q.transform(new Vector3f(0, 1, 0));
+		this.zEndpoint = q.transform(new Vector3f(0, 0, 1));
 	}
 	
 	public Axis(Matrix4fc rot)

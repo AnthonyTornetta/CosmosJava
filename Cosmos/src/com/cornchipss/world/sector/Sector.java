@@ -362,7 +362,7 @@ public class Sector
 					throw new IllegalArgumentException("No planet found at " + x + ", " + y + ", " + z + ".");
 
 				Biosphere bio = Biospheres.newInstance(Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size())));
-				bio.setPlanet(getPlanet(x, y, z));
+				bio.planet(getPlanet(x, y, z));
 				bio.generate(render, 30, noiseMaker);
 			}
 		});

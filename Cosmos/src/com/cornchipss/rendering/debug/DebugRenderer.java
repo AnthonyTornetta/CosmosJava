@@ -85,4 +85,9 @@ public class DebugRenderer extends Renderer
 	{
 		transformMatrixLoc = getShader().getUniformLocation("u_transformation_matrix");
 	}
+
+	public static void drawShape(DebugShape x)
+	{
+		shapes.add(x);
+	}
 }

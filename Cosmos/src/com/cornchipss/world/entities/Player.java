@@ -3,6 +3,7 @@ package com.cornchipss.world.entities;
 import java.util.List;
 
 import org.joml.AxisAngle4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
@@ -15,7 +16,7 @@ import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.physics.raycast.Raycast;
 import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
-import com.cornchipss.rendering.debug.DebugLine;
+import com.cornchipss.rendering.debug.DebugRectangle;
 import com.cornchipss.rendering.debug.DebugRenderer;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
@@ -258,11 +259,8 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
+		Utils.println(camera.axis());
 		
-		Vector3f pos = new Vector3f(transform().position());
-		
-		DebugRenderer.drawLine(new Vector3f(0, 0, 0), pos, Color.blue);
-
 		handleCamera();
 		
 		handleNewMovement();
