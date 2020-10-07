@@ -363,7 +363,10 @@ public class Sector
 
 				Biosphere bio = Biospheres.newInstance(Biospheres.getBiosphereIds().get((int)(Math.random() * Biospheres.getBiosphereIds().size())));
 				bio.planet(getPlanet(x, y, z));
-				bio.generate(render, 30, noiseMaker);
+				bio.random(new Random((int)(x * y * z * noiseMaker.noise(x, y))));
+				bio.noise(noiseMaker);
+				bio.generate();
+				bio.planet().render();
 			}
 		});
 

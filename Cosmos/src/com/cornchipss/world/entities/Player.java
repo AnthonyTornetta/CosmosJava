@@ -259,8 +259,6 @@ public class Player extends PhysicalEntity
 	@Override
 	public void onUpdate()
 	{
-		Utils.println(camera.axis());
-		
 		handleCamera();
 		
 		handleNewMovement();

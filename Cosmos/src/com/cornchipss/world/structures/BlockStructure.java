@@ -212,6 +212,15 @@ public abstract class BlockStructure extends PhysicalObject
 		return modelsCoords.get(v);
 	}
 	
+	/**
+	 * Sets the model at a given location
+	 * @param x The position (relative to structure center)
+	 * @param y The position (relative to structure center)
+	 * @param z The position (relative to structure center)
+	 * @param m The model (null to remove the model)
+	 * @param oldList The old l ist that model was a part of
+	 * @return True if the model was changed, false if not
+	 */
 	public boolean setModel(int x, int y, int z, Model m, Vector3fList oldList)
 	{
 		Vector3i pos = new Vector3i(x, y, z);
@@ -251,9 +260,9 @@ public abstract class BlockStructure extends PhysicalObject
 	
 	private boolean within(int x, int y, int z)
 	{
-		return x >= getBeginningCornerX() && x < getEndingCornerX() &&
-				y >= getBeginningCornerY() && y < getEndingCornerY() &&
-				z >= getBeginningCornerZ() && z < getEndingCornerZ();
+		return x >= getBeginningCornerX() && x <= getEndingCornerX() &&
+				y >= getBeginningCornerY() && y <= getEndingCornerY() &&
+				z >= getBeginningCornerZ() && z <= getEndingCornerZ();
 	}
 	
 	/**
@@ -275,11 +284,11 @@ public abstract class BlockStructure extends PhysicalObject
 		final int begX = getBeginningCornerX();
 		final int endX = getEndingCornerX();
 		
-		for(int z = begZ; z < endZ; z++)
+		for(int z = begZ; z <= endZ; z++)
 		{			
-			for(int y = begY; y < endY; y++)
+			for(int y = begY; y <= endY; y++)
 			{
-				for(int x = begX; x < endX; x++)
+				for(int x = begX; x <= endX; x++)
 				{
 					updateModel(x, y, z, null, false);
 				}
@@ -303,6 +312,13 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	public Block getBlock(int x, int y, int z)
 	{
+		if(x < getBeginningCornerX() || x > getEndingCornerX())
+			throw new IndexOutOfBoundsException("X (" + x + ") is out of the planet's bounds! (" + getBeginningCornerX() + " to " + getEndingCornerX() + ")");
+		if(y < getBeginningCornerY() || y > getEndingCornerY())
+			throw new IndexOutOfBoundsException("Y (" + y + ") is out of the planet's bounds! (" + getBeginningCornerY() + " to " + getEndingCornerY() + ")");
+		if(z < getBeginningCornerZ() || z > getEndingCornerZ())
+			throw new IndexOutOfBoundsException("Z (" + z + ") is out of the planet's bounds! (" + getBeginningCornerZ() + " to " + getEndingCornerZ() + ")");
+		
 		if(blocks == null)
 			return null;
 		
@@ -402,6 +418,13 @@ public abstract class BlockStructure extends PhysicalObject
 	 */
 	public void setBlock(int x, int y, int z, boolean setModel, short id)
 	{
+		if(x < getBeginningCornerX() || x > getEndingCornerX())
+			throw new IndexOutOfBoundsException("X (" + x + ") is out of the planet's bounds! (" + getBeginningCornerX() + " to " + getEndingCornerX() + ")");
+		if(y < getBeginningCornerY() || y > getEndingCornerY())
+			throw new IndexOutOfBoundsException("Y (" + y + ") is out of the planet's bounds! (" + getBeginningCornerY() + " to " + getEndingCornerY() + ")");
+		if(z < getBeginningCornerZ() || z > getEndingCornerZ())
+			throw new IndexOutOfBoundsException("Z (" + z + ") is out of the planet's bounds! (" + getBeginningCornerZ() + " to " + getEndingCornerZ() + ")");
+
 		if(blocks == null)
 			initBlocks();
 		
@@ -458,9 +481,9 @@ public abstract class BlockStructure extends PhysicalObject
 	public int getEndingCornerX()
 	{
 		if(getWidth() % 2 == 0)
-			return getWidth() / 2;
+			return getWidth() / 2 - 1;
 		else
-			return getWidth() / 2 + 1;
+			return getWidth() / 2;
 	}
 	
 	/**
@@ -470,9 +493,9 @@ public abstract class BlockStructure extends PhysicalObject
 	public int getEndingCornerY()
 	{
 		if(getHeight() % 2 == 0)
-			return getHeight() / 2;
+			return getHeight() / 2 - 1;
 		else
-			return getHeight() / 2 + 1;
+			return getHeight() / 2;
 	}
 	
 	/**
@@ -482,9 +505,9 @@ public abstract class BlockStructure extends PhysicalObject
 	public int getEndingCornerZ()
 	{
 		if(getLength() % 2 == 0)
-			return getLength() / 2;
+			return getLength() / 2 - 1;
 		else
-			return getLength() / 2 + 1;
+			return getLength() / 2;
 	}
 	
 	/**

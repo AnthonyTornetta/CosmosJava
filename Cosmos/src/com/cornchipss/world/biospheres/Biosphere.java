@@ -1,5 +1,7 @@
 package com.cornchipss.world.biospheres;
 
+import java.util.Random;
+
 import com.cornchipss.world.blocks.Block;
 import com.cornchipss.world.planet.Planet;
 
@@ -9,14 +11,20 @@ public abstract class Biosphere
 {
 	private Planet planet;
 	private SimplexNoise noise;
+	private Random random;
+		
+	public abstract void generate();
 	
-	public abstract void generate(boolean render, int delay, SimplexNoise noiseMaker);
+	public Planet planet() { return planet; }
+	public void planet(Planet planet) { this.planet = planet; }
 	
-	public Planet getPlanet() { return planet; }
-	public void setPlanet(Planet planet) { this.planet = planet; }
-
-	public SimplexNoise getNoise() { return noise; }
-
+	public void noise(SimplexNoise n) { noise = n; }
+	public void random(Random r) { random = r; }
+	
+	public SimplexNoise noise() { return noise; }
+	public Random random() { return random; }
+	
+	/*
 	public abstract Block getBlockY(int y, int maxY);
 
 	public int minGenerationLevel()
@@ -38,4 +46,5 @@ public abstract class Biosphere
 	{
 		return 64;
 	}
+	*/
 }

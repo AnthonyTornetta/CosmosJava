@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.RandomAccess;
 
+import com.cornchipss.utils.Utils;
+
 /**
  * <p>A way faster version of the standard {@link java.util.ArrayList} just for primitive floats</p>
  * <p>Main benefit is the {@link ArrayListF#asArray} being quite fast.</p>
@@ -53,20 +55,35 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable, Iterab
 	
 	private void expand(int amt)
 	{
-		if(amt != 0)
+		float[] temp = null;
+		try
 		{
-			float[] temp = new float[list.length + amt];
-			System.arraycopy(list, 0, temp, 0, size());
-			list = temp;
+			if(amt != 0)
+			{
+				amt = Math.abs(amt);
+				temp = new float[Math.max(size(), list.length) + amt];
+				System.arraycopy(list, 0, temp, 0, size() > list.length ? list.length : size());
+				list = temp;
+			}
+		}
+		catch(ArrayIndexOutOfBoundsException ex)
+		{
+			Utils.println(list.length);
+			Utils.println(temp.length);
+			Utils.println("Logic? " + (temp.length > list.length)); // This is false??????
+			Utils.println(size());
+			Utils.println(amt);
+			
+			throw ex;
 		}
 	}
 	
 	public void add(int i, float f)
 	{
-		while(i + 1 >= list.length)
+		while(size + icrAmount >= list.length)
 			expand(icrAmount);
 		
-		if(i != size())
+		if(i < size())
 			System.arraycopy(list, i, list, i + 1, size - i);
 		list[i] = f;
 		
