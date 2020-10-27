@@ -101,8 +101,15 @@ public class Utils
 		
 		if(obj.getClass().isArray())
 		{
-			Object[] arr = (Object[])obj;
-			return arrayToString(arr);
+			try
+			{
+				Object[] arr = (Object[])obj;
+				return arrayToString(arr);
+			}
+			catch(ClassCastException ex)
+			{
+				return obj.toString();
+			}
 		}
 		
 		if(obj instanceof Quaternionfc)

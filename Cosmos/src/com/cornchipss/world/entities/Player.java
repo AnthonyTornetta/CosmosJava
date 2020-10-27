@@ -3,11 +3,9 @@ package com.cornchipss.world.entities;
 import java.util.List;
 
 import org.joml.AxisAngle4f;
-import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
-import org.newdawn.slick.Color;
 
 import com.cornchipss.Cosmos;
 import com.cornchipss.physics.Axis;
@@ -16,8 +14,6 @@ import com.cornchipss.physics.collision.hitbox.RectangleHitbox;
 import com.cornchipss.physics.raycast.Raycast;
 import com.cornchipss.physics.raycast.RaycastOptions;
 import com.cornchipss.registry.Blocks;
-import com.cornchipss.rendering.debug.DebugRectangle;
-import com.cornchipss.rendering.debug.DebugRenderer;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
@@ -46,6 +42,7 @@ public class Player extends PhysicalEntity
 	private final int LOOK_DISTANCE = 10;
 	
 	private Transform camera;
+	private float rx = 0, ry = 0;
 	
 	public Player(float x, float y, float z)
 	{
@@ -138,6 +135,8 @@ public class Player extends PhysicalEntity
 		if(Input.isKeyDown(GLFW.GLFW_KEY_V))
 		{
 			camera().localRotation(0, 0, 0);
+			rx = 0;
+			ry = 0;
 		}
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 		{
@@ -161,7 +160,11 @@ public class Player extends PhysicalEntity
 	
 	private void handleCamera()
 	{
-		Axis axis = camera().axis();
+		rx += -Input.getMouseDeltaY() * sensitivity;
+		ry += -Input.getMouseDeltaX() * sensitivity;
+		
+		camera.localRotation(new Vector3f(rx, ry, 0));		
+		/*Axis axis = camera().axis();
 		
 		float rz = Input.isKeyDown(GLFW.GLFW_KEY_Z) ? 1 : 0;
 		rz -= Input.isKeyDown(GLFW.GLFW_KEY_C) ? 1 : 0;
@@ -173,7 +176,7 @@ public class Player extends PhysicalEntity
 		camera().rotate(new AxisAngle4f(ry, axis.yEndpoint()));
 		
 		float rx = -Input.getMouseDeltaY() * sensitivity;
-		camera().rotate(new AxisAngle4f(rx, axis.xEndpoint()));
+		camera().rotate(new AxisAngle4f(rx, axis.xEndpoint()));*/
 //		Utils.println(axis);
 //		
 //		Quaternionf quat = Maths.clone(camera.rotation());

@@ -12,18 +12,18 @@ public class GlassPlanetBiosphere extends Biosphere
 	{
 		Planet p = planet();
 		
-		int averageHeight = 64;// + random().nextInt(24) - 12;
+		int averageHeight = 5;// + random().nextInt(24) - 12;
 		
-		for(int z = p.getBeginningCornerZ(); z <= p.getEndingCornerZ(); z++)
+		for(int z = p.beginningCornerZ(); z <= p.endingCornerZ(); z++)
 		{
-			for(int x = p.getBeginningCornerX(); x <= p.getEndingCornerX(); x++)
+			for(int x = p.beginningCornerX(); x <= p.endingCornerX(); x++)
 			{
 				int heightHere = averageHeight;// + noise(x, z, 0.01f, 4);// + noise(x, z, 0.1f, 4);
 				
-				for(int y = p.getBeginningCornerY(); 
-						y <= p.getBeginningCornerY() + heightHere; y++)
+				for(int y = p.beginningCornerY(); 
+						y <= p.beginningCornerY() + heightHere; y++)
 				{
-					p.setBlock(x, y, z, false, Blocks.grass);
+					p.setBlock(x, y, z, true, Blocks.grass);
 				}
 			}
 		}

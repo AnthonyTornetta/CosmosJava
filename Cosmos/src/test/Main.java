@@ -174,11 +174,60 @@ public class Main
 				0.0f, 0.0f, 1.0f,
 				1.0f, 1.0f, 0,0f
 			};
-			
-		Mesh mesh = Mesh.createMesh(vertices, indices);
-		GL30.glBindVertexArray(mesh.vao());
-		mesh.storeData(1, 3, cols);
-		GL30.glBindVertexArray(0);
+		BulkModel beeg = new BulkModel("XXXXXXXXXXXXX".length(), 5, 5);
+		
+		beeg.parse("XXXXXXXXXXXXX\n"
+				+  "X           X\n"
+				+  "X XXXXXXXXX X\n"
+				+  "X           X\n"
+				+  "XXXXXXXXXXXXX\n", 0);
+//		
+		
+		beeg.parse("XXXXXXXXXXXXX\n"
+				+  "X           X\n"
+				+  "X XXXXXXXXX X\n"
+				+  "X           X\n"
+				+  "XXXXXXXXXXXXX\n", 1);
+		
+		beeg.parse("XXXXXXXXXXXXX\n"
+				+  "X           X\n"
+				+  "X XXXXXXXXX X\n"
+				+  "X           X\n"
+				+  "XXXXXXXXXXXXX\n", 2);
+		
+		beeg.parse("XXXXXXXXXXXXX\n"
+				+  "X           X\n"
+				+  "X XXXXXXXXX X\n"
+				+  "X           X\n"
+				+  "XXXXXXXXXXXXX\n", 3);
+		
+		beeg.parse("XXXXXXXXXXXXX\n"
+				+  "X           X\n"
+				+  "X XXXXXXXXX X\n"
+				+  "X           X\n"
+				+  "XXXXXXXXXXXXX\n", 4);
+//		
+//		beeg.parse("XXXXXXXXXXXXX\n"
+//				+  "XXXXXXXXXXXXX\n"
+//				+  " XXXX XXXX XX\n"
+//				+  " XX      X XX\n"
+//				+  " XXXX X     X\n", 2);
+//		
+//		beeg.parse("XXXXXXXXXXXXX\n"
+//				+  "XXXXXXXXXXXXX\n"
+//				+  " XXXX XXXX XX\n"
+//				+  " XX      X XX\n"
+//				+  " XXXX X     X\n", 3);
+//		
+//		beeg.parse("XXXXXXXXXXXXX\n"
+//				+  "XXXXXXXXXXXXX\n"
+//				+  " XXXX XXXX XX\n"
+//				+  " XX      X XX\n"
+//				+  " XXXX X     X\n", 4);
+		
+		
+		beeg.render();
+		
 		
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
@@ -189,7 +238,7 @@ public class Main
 		
 		Matrix4f meshMatrix = new Matrix4f();
 		
-		meshMatrix.translate(new Vector3f(0, 0, 0f));
+		meshMatrix.translate(new Vector3f(0, 0, 2f));
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
@@ -205,6 +254,14 @@ public class Main
 		while(!window.shouldClose())
 		{
 			update();
+
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			render();
 								
 			GL30.glUseProgram(shaderProgram);
@@ -213,17 +270,17 @@ public class Main
 			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(new float[16]));
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-				pos.z -= 0.001f;
+				pos.z -= 0.1f;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-				pos.z += 0.001f;
+				pos.z += 0.1f;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-				pos.x += 0.001f;
+				pos.x += 0.1f;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-				pos.x -= 0.001f;
+				pos.x -= 0.1f;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-				pos.y += 0.001f;
+				pos.y += 0.1f;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-				pos.y -= 0.001f;
+				pos.y -= 0.1f;
 			
 			Maths.createViewMatrix(pos, new Vector3f(0, 0, 0), cameraMatrix);
 			
@@ -234,15 +291,19 @@ public class Main
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);
 			
-			GL30.glBindVertexArray(mesh.vao());
-			GL20.glEnableVertexAttribArray(0);
-			GL20.glEnableVertexAttribArray(1);
-			GL11.glDrawElements(GL20.GL_TRIANGLES, mesh.verticies(), GL11.GL_UNSIGNED_INT, 0);
-			GL20.glDisableVertexAttribArray(1);
-			GL20.glDisableVertexAttribArray(0);
-			GL30.glBindVertexArray(0);
+			for(Mesh mesh : beeg.meshes)
+			{
+				GL30.glBindVertexArray(mesh.vao());
+				GL20.glEnableVertexAttribArray(0);
+				GL20.glEnableVertexAttribArray(1);
+				GL11.glDrawElements(GL20.GL_TRIANGLES, mesh.verticies(), GL11.GL_UNSIGNED_INT, 0);
+				GL20.glDisableVertexAttribArray(1);
+				GL20.glDisableVertexAttribArray(0);
+				GL30.glBindVertexArray(0);
+			}
 			
 			window.update();
+
 		}
 		
 		window.destroy();

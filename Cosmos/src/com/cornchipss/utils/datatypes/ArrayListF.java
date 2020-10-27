@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.RandomAccess;
 
-import com.cornchipss.utils.Utils;
-
 /**
  * <p>A way faster version of the standard {@link java.util.ArrayList} just for primitive floats</p>
  * <p>Main benefit is the {@link ArrayListF#asArray} being quite fast.</p>
@@ -55,47 +53,43 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable, Iterab
 	
 	private void expand(int amt)
 	{
-		float[] temp = null;
-		try
+		assert amt >= 0;
+		
+		if(amt != 0)
 		{
-			if(amt != 0)
-			{
-				amt = Math.abs(amt);
-				temp = new float[Math.max(size(), list.length) + amt];
-				System.arraycopy(list, 0, temp, 0, size() > list.length ? list.length : size());
-				list = temp;
-			}
-		}
-		catch(ArrayIndexOutOfBoundsException ex)
-		{
-			Utils.println(list.length);
-			Utils.println(temp.length);
-			Utils.println("Logic? " + (temp.length > list.length)); // This is false??????
-			Utils.println(size());
-			Utils.println(amt);
-			
-			throw ex;
+			float[] temp = new float[list.length + amt];
+			System.arraycopy(list, 0, temp, 0, Math.min(size(), list.length));
+			list = temp;
 		}
 	}
 	
 	public void add(int i, float f)
 	{
-		while(size + icrAmount >= list.length)
+		while(size() >= list.length)
 			expand(icrAmount);
 		
-		if(i < size())
-			System.arraycopy(list, i, list, i + 1, size - i);
+		while(i >= list.length)
+			expand(icrAmount);
+		
+		if(i != size())
+		{
+			for(int j = size(); j > i; j--)
+			{
+				list[j] = list[j - 1];
+			}
+		}
+		
 		list[i] = f;
 		
-		size++;
+		size = Math.max(i + 1, size + 1);
 	}
-	
+
 	public void set(int index, float f)
 	{
-		if(index >= size())
-			expand(index - size() + 1);
-		
-		list[index] = f;
+		if(index < size())
+			list[index] = f;
+		else
+			add(index, f);
 	}
 
 	public void remove(int i)
@@ -105,12 +99,8 @@ public class ArrayListF implements Serializable, RandomAccess, Cloneable, Iterab
 	
 	public void remove(int start, int len)
 	{
-		if(start + len > size() || start < 0)
-			throw new IndexOutOfBoundsException("Cannot remove index " + start + " to " + (start + len) + " from list of size " + size());
-		
-		System.arraycopy(list, start + len, list, start, list.length - (start + len));
-		
-		size -= len;
+		if(len != 0)
+			System.arraycopy(list, start + len, list, start, list.length - len - start);
 	}
 	
 	public void shrink()

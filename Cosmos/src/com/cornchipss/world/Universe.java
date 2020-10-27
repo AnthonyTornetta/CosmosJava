@@ -216,7 +216,7 @@ public class Universe
 		Vector3f chunkCoords = clampSectorCoordsToChunkCoords(clampAbsoluteCoordsToSectorCoords(pos));
 		
 		if(planet.hasBlockAt(chunkCoords))
-			return planet.getBlock(new Vector3i((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z));
+			return planet.blockAt(new Vector3i((int)chunkCoords.x, (int)chunkCoords.y, (int)chunkCoords.z));
 		
 		return null;
 	}

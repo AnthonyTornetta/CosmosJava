@@ -144,9 +144,9 @@ public class Sector
 			sb.render();
 			sc.render();
 
-			sa.setSector(this);
-			sb.setSector(this);
-			sc.setSector(this);
+			sa.sector(this);
+			sb.sector(this);
+			sc.sector(this);
 
 			sa.setSectorCoords(0, 0, 0);
 			sb.setSectorCoords(0, 0, 0);
@@ -204,7 +204,7 @@ public class Sector
 
 		if(planet != null)
 		{
-			planet.setSector(this);
+			planet.sector(this);
 			planet.setSectorCoords(x, y, z);
 		}
 	}
