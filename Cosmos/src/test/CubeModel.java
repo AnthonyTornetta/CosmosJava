@@ -46,4 +46,13 @@ public class CubeModel
 			0.0f, 0.0f, 1.0f,
 			1.0f, 1.0f, 0,0f
 		};
+	
+	public static final float TEXTURE_DIMENSIONS = 16.0f / 256.0f;
+	public final float U, V;
+	
+	public CubeModel(float u, float v)
+	{
+		this.U = u;
+		this.V = v;
+	}
 }

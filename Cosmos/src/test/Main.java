@@ -2,14 +2,17 @@ package test;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.util.Random;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
@@ -174,61 +177,32 @@ public class Main
 				0.0f, 0.0f, 1.0f,
 				1.0f, 1.0f, 0,0f
 			};
-		BulkModel beeg = new BulkModel("XXXXXXXXXXXXX".length(), 5, 5);
 		
-		beeg.parse("XXXXXXXXXXXXX\n"
-				+  "X           X\n"
-				+  "X XXXXXXXXX X\n"
-				+  "X           X\n"
-				+  "XXXXXXXXXXXXX\n", 0);
-//		
 		
-		beeg.parse("XXXXXXXXXXXXX\n"
-				+  "X           X\n"
-				+  "X XXXXXXXXX X\n"
-				+  "X           X\n"
-				+  "XXXXXXXXXXXXX\n", 1);
+		BulkModel beeg = new BulkModel(50, 50, 50);
 		
-		beeg.parse("XXXXXXXXXXXXX\n"
-				+  "X           X\n"
-				+  "X XXXXXXXXX X\n"
-				+  "X           X\n"
-				+  "XXXXXXXXXXXXX\n", 2);
+		CubeModel model = new CubeModel(0, 0);
 		
-		beeg.parse("XXXXXXXXXXXXX\n"
-				+  "X           X\n"
-				+  "X XXXXXXXXX X\n"
-				+  "X           X\n"
-				+  "XXXXXXXXXXXXX\n", 3);
+		int count = 0;
 		
-		beeg.parse("XXXXXXXXXXXXX\n"
-				+  "X           X\n"
-				+  "X XXXXXXXXX X\n"
-				+  "X           X\n"
-				+  "XXXXXXXXXXXXX\n", 4);
-//		
-//		beeg.parse("XXXXXXXXXXXXX\n"
-//				+  "XXXXXXXXXXXXX\n"
-//				+  " XXXX XXXX XX\n"
-//				+  " XX      X XX\n"
-//				+  " XXXX X     X\n", 2);
-//		
-//		beeg.parse("XXXXXXXXXXXXX\n"
-//				+  "XXXXXXXXXXXXX\n"
-//				+  " XXXX XXXX XX\n"
-//				+  " XX      X XX\n"
-//				+  " XXXX X     X\n", 3);
-//		
-//		beeg.parse("XXXXXXXXXXXXX\n"
-//				+  "XXXXXXXXXXXXX\n"
-//				+  " XXXX XXXX XX\n"
-//				+  " XX      X XX\n"
-//				+  " XXXX X     X\n", 4);
+		Random rdm = new Random();
 		
+		for(int z = 0; z < 50; z++)
+		{
+			for(int x = 0; x < 50; x++)
+			{
+				for(int y = 0; y < rdm.nextInt(20) + 30; y++)
+				{
+					beeg.setModel(x, y, z, model);
+					count++;
+				}
+			}
+		}
 		
 		beeg.render();
 		
-		
+		System.out.println(beeg.meshes.size() + " VS " + count * 6);
+
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
 		int transLoc = GL20.glGetUniformLocation(shaderProgram, "u_transform");
@@ -238,34 +212,46 @@ public class Main
 		
 		Matrix4f meshMatrix = new Matrix4f();
 		
-		meshMatrix.translate(new Vector3f(0, 0, 2f));
+		meshMatrix.translate(new Vector3f(0, 0, -20f));
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
-
+		
+		Texture tex = Texture.loadTexture("atlas/main.png");
+		
 		Utils.println(projectionMatrix);
 		
 		Input.setWindow(window);
 		
 		Vector3f pos = new Vector3f();
+		Vector3f rot = new Vector3f();
+		
+		int i = 0;
 		
 		while(!window.shouldClose())
 		{
 			update();
-
+			
+			if(++i == 1000)
+			{
+				i = 0;
+				beeg.render();
+			}
 			try {
-				Thread.sleep(5);
+				Thread.sleep(1);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			
+			GL11.glEnable(GL13.GL_TEXTURE0);
+			
 			render();
-								
+			
 			GL30.glUseProgram(shaderProgram);
 			GL20.glUniform1f(timeLoc, (float)GLFW.glfwGetTime());
+			tex.bind();
 			
 			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(new float[16]));
 			
@@ -282,7 +268,17 @@ public class Main
 			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 				pos.y -= 0.1f;
 			
-			Maths.createViewMatrix(pos, new Vector3f(0, 0, 0), cameraMatrix);
+			if(Input.isKeyDown(GLFW.GLFW_KEY_C))
+				rot.y += 0.01f;
+			if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
+				rot.y -= 0.01f;
+			
+			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
+				rot.x += 0.01f;
+			if(Input.isKeyDown(GLFW.GLFW_KEY_T))
+				rot.x -= 0.01f;
+			
+			Maths.createViewMatrix(pos, rot, cameraMatrix);
 			
 			GL20.glUniformMatrix4fv(camLoc, false, cameraMatrix.get(new float[16]));
 			
@@ -291,16 +287,17 @@ public class Main
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);
 			
-			for(Mesh mesh : beeg.meshes)
-			{
-				GL30.glBindVertexArray(mesh.vao());
-				GL20.glEnableVertexAttribArray(0);
-				GL20.glEnableVertexAttribArray(1);
-				GL11.glDrawElements(GL20.GL_TRIANGLES, mesh.verticies(), GL11.GL_UNSIGNED_INT, 0);
-				GL20.glDisableVertexAttribArray(1);
-				GL20.glDisableVertexAttribArray(0);
-				GL30.glBindVertexArray(0);
-			}
+			GL30.glBindVertexArray(beeg.beeg.vao());
+			GL20.glEnableVertexAttribArray(0);
+			GL20.glEnableVertexAttribArray(1);
+			GL20.glEnableVertexAttribArray(2);
+			GL11.glDrawElements(GL20.GL_TRIANGLES, beeg.beeg.verticies(), GL11.GL_UNSIGNED_INT, 0);
+			GL20.glDisableVertexAttribArray(2);
+			GL20.glDisableVertexAttribArray(1);
+			GL20.glDisableVertexAttribArray(0);
+			GL30.glBindVertexArray(0);
+			
+			Texture.unbind();
 			
 			window.update();
 

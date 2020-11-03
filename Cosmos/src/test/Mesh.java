@@ -46,20 +46,24 @@ public class Mesh
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW);
 	}
 	
-	public static Mesh createMesh(float[] verticies, int[] indicies)
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uv)
 	{
 		Mesh m = new Mesh(indicies.length);
 		
 		GL30.glBindVertexArray(m.vao());
 		
 		m.storeData(0, 3, verticies);
+		
+		// color is index 1. I ignore this in frag shader
+		m.storeData(2, 4, uv);
+
 		m.storeIndicies(indicies);
 		
 		GL30.glBindVertexArray(0);
 		
 		return m;
 	}
-	
+
 	public int vao()
 	{
 		return vao;
