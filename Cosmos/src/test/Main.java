@@ -18,6 +18,11 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 
+import test.models.CubeModel;
+import test.models.DirtModel;
+import test.models.GrassModel;
+import test.models.StoneModel;
+
 public class Main
 {
 	private Window window;
@@ -179,30 +184,32 @@ public class Main
 			};
 		
 		
-		BulkModel beeg = new BulkModel(50, 50, 50);
+		BulkModel beeg = new BulkModel(100, 100, 100);
 		
-		CubeModel model = new CubeModel(0, 0);
-		
-		int count = 0;
-		
+		CubeModel grass = new GrassModel();
+		CubeModel dirt  = new DirtModel();
+		CubeModel stone = new StoneModel();
 		Random rdm = new Random();
 		
 		for(int z = 0; z < 50; z++)
 		{
 			for(int x = 0; x < 50; x++)
 			{
-				for(int y = 0; y < rdm.nextInt(20) + 30; y++)
+				int yEnd = rdm.nextInt(2) + 30;
+				for(int y = 0; y < 1; y++)
 				{
-					beeg.setModel(x, y, z, model);
-					count++;
+					if(y == yEnd - 1)
+						beeg.setModel(x, y, z, grass);
+					else if(y > yEnd)
+						beeg.setModel(x, y, z, dirt);
+					else
+						beeg.setModel(x, y, z, stone);
 				}
 			}
 		}
 		
 		beeg.render();
 		
-		System.out.println(beeg.meshes.size() + " VS " + count * 6);
-
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
 		int transLoc = GL20.glGetUniformLocation(shaderProgram, "u_transform");

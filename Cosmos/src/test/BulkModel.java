@@ -7,6 +7,10 @@ import java.util.Map;
 
 import com.cornchipss.utils.Utils;
 
+import test.models.BlockSide;
+import test.models.CubeModel;
+import test.models.GrassModel;
+
 public class BulkModel
 {
 	CubeModel[][][] cubes;
@@ -14,7 +18,237 @@ public class BulkModel
 	Map<CubeModel, Mesh> meshses;
 	Mesh beeg;
 	
-	private boolean debug;
+	private static Axis botTop = new Axis() 
+	{
+		@Override
+		public float zOff(int delta)
+		{
+			return -0.5f;
+		}
+		
+		@Override
+		public float yOff(int delta)
+		{
+			return delta * 0.5f;
+		}
+		
+		@Override
+		public float xOff(int delta)
+		{
+			return 0;
+		}
+		
+		@Override
+		public BlockSide side(int delta)
+		{
+			return delta < 0 ? BlockSide.BOTTOM : BlockSide.TOP;
+		}
+		
+		@Override
+		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		{
+			return getModelAt(m, x, y, z + delta);
+		}
+		
+		@Override
+		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		{
+			return m.within(x, z, y) ? m.cubes[y][z][x] : null;
+		}
+		
+		@Override
+		public int ZLEN(BulkModel m)
+		{
+			return m.cubes[0].length;
+		}
+		
+		@Override
+		public int YLEN(BulkModel m)
+		{
+			return m.cubes.length;
+		}
+		
+		@Override
+		public int XLEN(BulkModel m)
+		{
+			return m.cubes[0][0].length;
+		}
+		
+		@Override
+		public void addPlane(List<Float> verticies, Plane p)
+		{
+			verticies.add(p.x);
+			verticies.add(p.y);
+			verticies.add(p.z);
+			
+			verticies.add(p.x);
+			verticies.add(p.y);
+			verticies.add(p.z + p.height);
+			
+			verticies.add(p.x + p.width);
+			verticies.add(p.y);
+			verticies.add(p.z + p.height);
+			
+			verticies.add(p.x + p.width);
+			verticies.add(p.y);
+			verticies.add(p.z);
+		}
+	},
+	
+	backFront = new Axis() 
+	{
+		@Override
+		public float zOff(int delta)
+		{
+			return delta * 0.5f;
+		}
+		
+		@Override
+		public float yOff(int delta)
+		{
+			return -0.5f;
+		}
+		
+		@Override
+		public float xOff(int delta)
+		{
+			return 0;
+		}
+		
+		@Override
+		public BlockSide side(int delta)
+		{
+			return delta < 0 ? BlockSide.BACK : BlockSide.FRONT;
+		}
+		
+		@Override
+		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		{
+			return getModelAt(m, x, y, z + delta);
+		}
+		
+		@Override
+		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		{
+			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
+		}
+		
+		@Override
+		public int ZLEN(BulkModel m)
+		{
+			return m.cubes[0][0].length;
+		}
+		
+		@Override
+		public int YLEN(BulkModel m)
+		{
+			return m.cubes[0].length;
+		}
+		
+		@Override
+		public int XLEN(BulkModel m)
+		{
+			return m.cubes.length;
+		}
+		
+		@Override
+		public void addPlane(List<Float> verticies, Plane p)
+		{
+			verticies.add(p.x);
+			verticies.add(p.y);
+			verticies.add(p.z);
+			
+			verticies.add(p.x);
+			verticies.add(p.y + p.height);
+			verticies.add(p.z);
+			
+			verticies.add(p.x + p.width);
+			verticies.add(p.y + p.height);
+			verticies.add(p.z);
+			
+			verticies.add(p.x + p.width);
+			verticies.add(p.y);
+			verticies.add(p.z);
+		}
+	},
+	
+	leftRight = new Axis() 
+	{
+		@Override
+		public float zOff(int delta)
+		{
+			return delta < 0 ? 0 : 1;
+		}
+		
+		@Override
+		public float yOff(int delta)
+		{
+			return -0.5f;
+		}
+		
+		@Override
+		public float xOff(int delta)
+		{
+			return -0.5f;
+		}
+		
+		@Override
+		public BlockSide side(int delta)
+		{
+			return delta < 0 ? BlockSide.LEFT : BlockSide.RIGHT;
+		}
+		
+		@Override
+		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		{
+			return getModelAt(m, x, y, z + delta);
+		}
+		
+		@Override
+		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		{
+			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
+		}
+		
+		@Override
+		public int ZLEN(BulkModel m)
+		{
+			return m.cubes[0][0].length;
+		}
+		
+		@Override
+		public int YLEN(BulkModel m)
+		{
+			return m.cubes[0].length;
+		}
+		
+		@Override
+		public int XLEN(BulkModel m)
+		{
+			return m.cubes.length;
+		}
+		
+		@Override
+		public void addPlane(List<Float> verticies, Plane p)
+		{
+			verticies.add(p.z);
+			verticies.add(p.y);
+			verticies.add(p.x);
+			
+			verticies.add(p.z);
+			verticies.add(p.y + p.height);
+			verticies.add(p.x);
+			
+			verticies.add(p.z);
+			verticies.add(p.y + p.height);
+			verticies.add(p.x + p.width);
+			
+			verticies.add(p.z);
+			verticies.add(p.y);
+			verticies.add(p.x + p.width);
+		}
+	};
+		
 	
 	List<Integer> indicies = new LinkedList<>();
 	List<Float> verticies = new LinkedList<>();
@@ -50,14 +284,16 @@ public class BulkModel
 	{
 		float x, y, z, width, height;
 		
+		BlockSide side;
 		CubeModel model;
 		
-		Plane(float x, float y, float z, CubeModel model)
+		Plane(float x, float y, float z, CubeModel model, BlockSide side)
 		{
 			this.x = x;
 			this.y = y;
 			this.z = z;
 			this.model = model;
+			this.side = side;
 		}
 		
 		public String toString()
@@ -66,658 +302,213 @@ public class BulkModel
 		}
 	}
 	
-	private void renderLeftsAndRights()
+	private static abstract interface Axis
+	{
+		int ZLEN(BulkModel m);
+		int YLEN(BulkModel m);
+		int XLEN(BulkModel m);
+		CubeModel getModelAt(BulkModel m, int x, int y, int z);
+		CubeModel nextModel(BulkModel m, int x, int y, int z, int delta);
+		BlockSide side(int delta);
+		
+		float xOff(int delta);
+		float yOff(int delta);
+		float zOff(int delta);
+		
+		void addPlane(List<Float> verticies, Plane p);
+	}
+	
+	public void renderAxis(Axis axis)
 	{
 		// step 1: generate verticle cross section
 		// step 2: generate horizontal cross section (https://0fps.files.wordpress.com/2012/06/slices.png?w=595&h=242)
 		// step 3: turn those all into meshes
 		
-		int ZLEN = cubes.length;
-		int YLEN = cubes[0].length;
-		int XLEN = cubes[0][0].length;
+		int widthNeg = 0, widthPos = 0;
+		int lenNeg = 0, lenPos = 0;
 		
-		List<Plane> horizontalPlanes = new LinkedList<>();
+		int recomputingNeg = 0;
+		int recomputingPos = 0;
 		
-		// assume a null block is a transparent block
+		Plane negPlane = null, posPlane = null;
 		
-		int widthLeft = 0;
-		int lenLeft = 0;
+		List<Plane> planes = new LinkedList<>();
 		
-		int widthRight = 0;
-		int lenRight = 0;
-		
-		Plane leftPlane = null;
-		Plane rightPlane = null;
-		
-		int recomputingRight = 0;
-		int recomputingLeft = 0;
-		
-		for(int x = 0; x < XLEN; x++)
+		for(int z = 0; z < axis.ZLEN(this); z++) // y
 		{
-			if(leftPlane != null)
+			for(int y = 0; y < axis.YLEN(this); y++) // z
 			{
-				leftPlane.width = widthLeft;
-				leftPlane.height = lenLeft;
-				horizontalPlanes.add(leftPlane);
-				leftPlane = null;
-			}
-			
-			if(rightPlane != null)
-			{
-				rightPlane.width = widthRight;
-				rightPlane.height = lenRight;
-				horizontalPlanes.add(rightPlane);
-				rightPlane = null;
-			}
-			
-			for(int y = 0; y < YLEN; y++)
-			{
-				lenLeft = Math.min(lenLeft + 1, YLEN);
-				lenRight = Math.min(lenRight + 1, YLEN);
+				lenNeg = Math.min(lenNeg + 1, axis.YLEN(this));
+				lenPos = Math.min(lenPos + 1, axis.YLEN(this));
 				
-				for(int z = 0; z < ZLEN; z++)
+				for(int x = 0; x < axis.XLEN(this); x++) // x
 				{
-					if(recomputingRight == 0)
+					if(recomputingPos == 0)
 					{
-						recomputingLeft = Math.max(0, recomputingLeft - 1);
+						recomputingPos = Math.max(0, recomputingPos - 1);
 						
-						if(cubes[z][y][x] != null && (!within(x - 1, y, z) || cubes[z][y][x - 1] == null))
+						CubeModel modelHere = axis.getModelAt(this, x, y, z);
+						
+						if(modelHere != null && axis.nextModel(this, x, y, z, -1) == null 
+								&& (negPlane == null || Utils.equals(negPlane.model, modelHere)))
 						{
-							if(leftPlane == null)
+							if(negPlane == null)
 							{
-								lenLeft = 1;
-								widthLeft = 0;
+								lenNeg = 1;
+								widthNeg = 0;
 								
-								leftPlane = new Plane(x, y - 0.5f, z - 0.5f, cubes[z][y][x]);
+								negPlane = new Plane(x + axis.xOff(-1), y + axis.yOff(-1), z + axis.zOff(-1), modelHere, axis.side(-1));
 							}
-							widthLeft = Math.min(widthLeft + 1, ZLEN);
+							
+							widthNeg = Math.min(widthNeg + 1, axis.XLEN(this));
 						}
-						else if(leftPlane != null)
+						else if(negPlane != null)
 						{
-							if(lenLeft == 1)
+							if(lenNeg == 1)
 							{
-								if(widthLeft == 0)
+								if(widthNeg == 0)
 									continue;
-								
-								leftPlane.width = widthLeft;
-								leftPlane.height = 1;
-								
-								horizontalPlanes.add(leftPlane);
-								
-								leftPlane = null;
+								else
+								{
+									negPlane.width = widthNeg;
+									negPlane.height = 1;
+									
+									planes.add(negPlane);
+									negPlane = null;
+								}
 							}
 							else
 							{
-								leftPlane.width = widthLeft;
-								leftPlane.height = lenLeft - 1;
+								negPlane.width = widthNeg;
+								negPlane.height = lenNeg - 1;
 								
-								horizontalPlanes.add(leftPlane);
+								planes.add(negPlane);
+								negPlane = null;
 								
-								leftPlane = null;
-								
-								recomputingLeft = z + 1;
-								z = -1;
+								recomputingNeg = x + 1;
+								x = -1;
 							}
 						}
 					}
 					
-					if(recomputingLeft == 0)
+					if(recomputingNeg == 0)
 					{
-						recomputingRight = Math.max(0, recomputingRight - 1);
+						recomputingNeg = Math.max(0, recomputingNeg - 1);
 						
-						if(cubes[z][y][x] != null && (!within(x + 1, y, z) || cubes[z][y][x + 1] == null))
+						CubeModel modelHere = axis.getModelAt(this, x, y, z);
+
+						if(modelHere != null && axis.nextModel(this, x, y, z, 1) == null 
+								&& (posPlane == null || Utils.equals(posPlane.model, modelHere)))
 						{
-							if(rightPlane == null)
+							if(posPlane == null)
 							{
-								lenRight = 1;
-								widthRight = 0;
+								lenPos = 1;
+								widthPos = 0;
 								
-								rightPlane = new Plane(x + 1, y - 0.5f, z - 0.5f, cubes[z][y][x]);
+								posPlane = new Plane(x + axis.xOff(1), y + axis.yOff(1), z + axis.zOff(1), modelHere, axis.side(1));
 							}
-							widthRight = Math.min(widthRight + 1, ZLEN);
+							
+							widthPos = Math.min(widthPos + 1, axis.XLEN(this));
 						}
-						else if(rightPlane != null)
+						else if(posPlane != null)
 						{
-							if(lenRight == 1)
+							if(lenPos == 1)
 							{
-								if(widthRight == 0)
+								if(widthPos == 0)
 									continue;
-								
-								rightPlane.width = widthRight;
-								rightPlane.height = 1;
-								
-								horizontalPlanes.add(rightPlane);
-								
-								rightPlane = null;
+								else
+								{
+									posPlane.width = widthPos;
+									posPlane.height = 1;
+									
+									planes.add(posPlane);
+									posPlane = null;
+								}
 							}
 							else
 							{
-								rightPlane.width = widthRight;
-								rightPlane.height = lenRight - 1;
+								posPlane.width = widthPos;
+								posPlane.height = lenPos - 1;
 								
-								horizontalPlanes.add(rightPlane);
+								planes.add(posPlane);
+								posPlane = null;
 								
-								rightPlane = null;
-								
-								recomputingRight = z + 1;
-								z = -1;
+								recomputingPos = x + 1;
+								x = -1;
 							}
 						}
 					}
 				}
-				
-				if(leftPlane != null && leftPlane.z != -0.5f)
-				{
-					leftPlane.width = widthLeft;
-					leftPlane.height = 1;
-					horizontalPlanes.add(leftPlane);
-					leftPlane = null;
-				}
-				
-				if(rightPlane != null && rightPlane.z != -0.5f)
-				{
-					rightPlane.width = widthRight;
-					rightPlane.height = 1;
-					horizontalPlanes.add(rightPlane);
-					rightPlane = null;
-				}
 			}
-			
 		}
 		
-		if(leftPlane != null)
+		if(negPlane != null)
 		{
-			leftPlane.width = widthLeft;
-			leftPlane.height = lenLeft;
-			horizontalPlanes.add(leftPlane);
-			leftPlane = null;
+			negPlane.width = widthNeg;
+			negPlane.height = lenNeg;
+			planes.add(negPlane);
+			negPlane = null;
 		}
 		
-		if(rightPlane != null)
+		if(posPlane != null)
 		{
-			rightPlane.width = widthRight;
-			rightPlane.height = lenRight;
-			horizontalPlanes.add(rightPlane);
-			rightPlane = null;
+			posPlane.width = widthPos;
+			posPlane.height = lenPos;
+			planes.add(posPlane);
+			posPlane = null;
 		}
 		
-		for(Plane p : horizontalPlanes)
+		for(Plane p : planes)
 		{
-			processPlane(p);
-			
-			if(debug)
-				Utils.println(p);
+			p.z -= 0.5f;
+			p.x -= 0.5f;
 			
 			maxIndex = indiciesAndUvs(p, maxIndex);
 			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z);
-			
-			verticies.add(p.x);
-			verticies.add(p.y + p.height);
-			verticies.add(p.z);
-			
-			verticies.add(p.x);
-			verticies.add(p.y + p.height);
-			verticies.add(p.z + p.width);
-			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z + p.width);
+			axis.addPlane(verticies, p);
 		}
 	}
 	
 	private int indiciesAndUvs(Plane p, int maxIndex)
 	{
-		indicies.add(maxIndex);
-		indicies.add(maxIndex + 1);
-		indicies.add(maxIndex + 2);
-		indicies.add(maxIndex + 2);
-		indicies.add(maxIndex + 3);
-		indicies.add(maxIndex);	
+		int[] indiciesArr = p.model.indicies(p.side);
+		int max = -1;
+		
+		for(int index : indiciesArr)
+		{
+			indicies.add(index + maxIndex);
+			if(max < index)
+				max = index;
+		}
 		  
-		float uEnd = p.model.U + CubeModel.TEXTURE_DIMENSIONS * p.width;
-		float vEnd = p.model.V + CubeModel.TEXTURE_DIMENSIONS * p.height;
+		float u = p.model.u(p.side);
+		float v = p.model.v(p.side);
+		
+		float uEnd = u + CubeModel.TEXTURE_DIMENSIONS * p.width;
+		float vEnd = v + CubeModel.TEXTURE_DIMENSIONS * p.height;
 		
 		uvs.add(uEnd);
 		uvs.add(vEnd);
-		uvs.add(p.model.U);
-		uvs.add(p.model.V);
-
+		uvs.add(u);
+		uvs.add(v);
+		
 		uvs.add(uEnd);
-		uvs.add(p.model.V);
-		uvs.add(p.model.U);
-		uvs.add(p.model.V);
+		uvs.add(v);
+		uvs.add(u);
+		uvs.add(v);
 
 
-		uvs.add(p.model.U);
-		uvs.add(p.model.V);
-		uvs.add(p.model.U);
-		uvs.add(p.model.V);
+		uvs.add(u);
+		uvs.add(v);
+		uvs.add(u);
+		uvs.add(v);
 
-		uvs.add(p.model.U);
+		uvs.add(u);
 		uvs.add(vEnd);
-		uvs.add(p.model.U);
-		uvs.add(p.model.V);
+		uvs.add(u);
+		uvs.add(v);
 
-		return maxIndex + 4;
-	}
-	
-	private void renderBacksAndForwards()
-	{
-		// step 1: generate verticle cross section
-		// step 2: generate horizontal cross section (https://0fps.files.wordpress.com/2012/06/slices.png?w=595&h=242)
-		// step 3: turn those all into meshes
-		
-		int ZLEN = cubes.length;
-		int YLEN = cubes[0].length;
-		int XLEN = cubes[0][0].length;
-		
-		List<Plane> horizontalPlanes = new LinkedList<>();
-		
-		// assume a null block is a transparent block
-		
-		int widthBack = 0;
-		int lenBack = 0;
-		
-		int widthForward = 0;
-		int lenForward = 0;
-		
-		Plane backPlane = null;
-		Plane forwardPlane = null;
-		
-		int recomputingForward = 0;
-		int recomputingBack = 0;
-		
-		for(int z = 0; z < ZLEN; z++)
-		{
-			if(backPlane != null)
-			{
-				backPlane.width = widthBack;
-				backPlane.height = lenBack;
-				horizontalPlanes.add(backPlane);
-				backPlane = null;
-			}
-			
-			if(forwardPlane != null)
-			{
-				forwardPlane.width = widthForward;
-				forwardPlane.height = lenForward;
-				horizontalPlanes.add(forwardPlane);
-				forwardPlane = null;
-			}
-			
-			for(int y = 0; y < YLEN; y++)
-			{
-				lenBack = Math.min(lenBack + 1, YLEN);
-				lenForward = Math.min(lenForward + 1, YLEN);
-				
-				for(int x = 0; x < XLEN; x++)
-				{
-					if(recomputingForward == 0)
-					{
-						recomputingBack = Math.max(0, recomputingBack - 1);
-						
-						if(cubes[z][y][x] != null && (!within(x, y, z - 1) || cubes[z - 1][y][x] == null))
-						{
-							if(backPlane == null)
-							{
-								lenBack = 1;
-								widthBack = 0;
-								
-								backPlane = new Plane(x, y - 0.5f, z - 0.5f, cubes[z][y][x]);
-							}
-							widthBack = Math.min(widthBack + 1, XLEN);
-						}
-						else if(backPlane != null)
-						{
-							if(lenBack == 1)
-							{
-								if(widthBack == 0)
-									continue;
-								
-								backPlane.width = widthBack;
-								backPlane.height = 1;
-								
-								horizontalPlanes.add(backPlane);
-								
-								backPlane = null;
-							}
-							else
-							{
-								backPlane.width = widthBack;
-								backPlane.height = lenBack - 1;
-								
-								horizontalPlanes.add(backPlane);
-								
-								backPlane = null;
-								
-								recomputingBack = x + 1;
-								x = -1;
-							}
-						}
-					}
-					
-					if(recomputingBack == 0)
-					{
-						recomputingForward = Math.max(0, recomputingForward - 1);
-						
-						if(cubes[z][y][x] != null && (!within(x, y, z + 1) || cubes[z + 1][y][x] == null))
-						{
-							if(forwardPlane == null)
-							{
-								lenForward = 1;
-								widthForward = 0;
-								
-								forwardPlane = new Plane(x, y - 0.5f, z + 0.5f, cubes[z][y][x]);
-							}
-							
-							widthForward = Math.min(widthForward + 1, XLEN);
-						}
-						else if(forwardPlane != null)
-						{
-							if(lenForward == 1)
-							{
-								if(widthForward == 0)
-									continue;
-								
-								forwardPlane.width = widthForward;
-								forwardPlane.height = 1;
-								
-								horizontalPlanes.add(forwardPlane);
-								
-								forwardPlane = null;
-							}
-							else
-							{
-								forwardPlane.width = widthForward;
-								forwardPlane.height = lenForward - 1;
-								
-								horizontalPlanes.add(forwardPlane);
-								
-								forwardPlane = null;
-								
-								recomputingForward = x + 1;
-								x = -1;
-							}
-						}
-					}
-				}
-				
-				if(backPlane != null && backPlane.x != 0)
-				{
-					backPlane.width = widthBack;
-					backPlane.height = 1;
-					horizontalPlanes.add(backPlane);
-					backPlane = null;
-				}
-				
-				if(forwardPlane != null && forwardPlane.x != 0)
-				{
-					forwardPlane.width = widthForward;
-					forwardPlane.height = 1;
-					horizontalPlanes.add(forwardPlane);
-					forwardPlane = null;
-				}
-			}
-			
-		}
-		
-		if(backPlane != null)
-		{
-			backPlane.width = widthBack;
-			backPlane.height = lenBack;
-			horizontalPlanes.add(backPlane);
-			backPlane = null;
-		}
-		
-		if(forwardPlane != null)
-		{
-			forwardPlane.width = widthForward;
-			forwardPlane.height = lenForward;
-			horizontalPlanes.add(forwardPlane);
-			forwardPlane = null;
-		}
-		
-		for(Plane p : horizontalPlanes)
-		{
-			processPlane(p);
-			
-			if(debug)
-				Utils.println(p);
-			
-			maxIndex = indiciesAndUvs(p, maxIndex);
-			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z);
-			
-			verticies.add(p.x);
-			verticies.add(p.y + p.height);
-			verticies.add(p.z);
-			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y + p.height);
-			verticies.add(p.z);
-			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y);
-			verticies.add(p.z);
-		}
-	}
-	
-	/**
-	 * why? idk
-	 * @param p
-	 */
-	private void processPlane(Plane p)
-	{
-		p.z -= 0.5f;
-		p.x -= 0.5f;
-	}
-	
-	private void renderBottomsAndTops()
-	{
-		// step 1: generate verticle cross section
-		// step 2: generate horizontal cross section (https://0fps.files.wordpress.com/2012/06/slices.png?w=595&h=242)
-		// step 3: turn those all into meshes
-		
-		int ZLEN = cubes.length;
-		int YLEN = cubes[0].length;
-		int XLEN = cubes[0][0].length;
-		
-		List<Plane> horizontalPlanes = new LinkedList<>();
-		
-		// assume a null block is a transparent block
-		
-		int widthBot = 0;
-		int lenBot = 0;
-		
-		int widthTop = 0;
-		int lenTop = 0;
-		
-		Plane bottomPlane = null;
-		Plane topPlane = null;
-		
-		int recomputingTop = 0;
-		int recomputingBot = 0;
-		
-		for(int y = 0; y < YLEN; y++)
-		{
-			if(bottomPlane != null)
-			{
-				bottomPlane.width = widthBot;
-				bottomPlane.height = lenBot;
-				horizontalPlanes.add(bottomPlane);
-				bottomPlane = null;
-			}
-			
-			if(topPlane != null)
-			{
-				topPlane.width = widthTop;
-				topPlane.height = lenTop;
-				horizontalPlanes.add(topPlane);
-				topPlane = null;
-			}
-			
-			for(int z = 0; z < ZLEN; z++)
-			{
-				lenBot = Math.min(lenBot + 1, ZLEN);
-				lenTop = Math.min(lenTop + 1, ZLEN);
-				
-				for(int x = 0; x < XLEN; x++)
-				{
-					if(recomputingTop == 0)
-					{
-						recomputingBot = Math.max(0, recomputingBot - 1);
-						
-						if(cubes[z][y][x] != null && (!within(x, y - 1, z) || cubes[z][y - 1][x] == null))
-						{
-							if(bottomPlane == null)
-							{
-								lenBot = 1;
-								widthBot = 0;
-								
-								bottomPlane = new Plane(x, y - 0.5f, z - 0.5f, cubes[z][y][x]);
-							}
-							widthBot = Math.min(widthBot + 1, XLEN);
-						}
-						else if(bottomPlane != null)
-						{
-							if(lenBot == 1)
-							{
-								if(widthBot == 0)
-									continue;
-								
-								bottomPlane.width = widthBot;
-								bottomPlane.height = 1;
-								
-								horizontalPlanes.add(bottomPlane);
-								
-								bottomPlane = null;
-							}
-							else
-							{
-								bottomPlane.width = widthBot;
-								bottomPlane.height = lenBot - 1;
-								
-								horizontalPlanes.add(bottomPlane);
-								
-								bottomPlane = null;
-								
-								recomputingBot = x + 1;
-								x = -1;
-							}
-						}
-					}
-					
-					if(recomputingBot == 0)
-					{
-						recomputingTop = Math.max(0, recomputingTop - 1);
-						
-						if(cubes[z][y][x] != null && (!within(x, y + 1, z) || cubes[z][y + 1][x] == null))
-						{
-							if(topPlane == null)
-							{
-								lenTop = 1;
-								widthTop = 0;
-								
-								topPlane = new Plane(x, y + 0.5f, z - 0.5f, cubes[z][y][x]);
-							}
-							
-							widthTop = Math.min(widthTop + 1, XLEN);
-						}
-						else if(topPlane != null)
-						{
-							if(lenTop == 1)
-							{
-								if(widthTop == 0)
-									continue;
-								
-								topPlane.width = widthTop;
-								topPlane.height = 1;
-								
-								horizontalPlanes.add(topPlane);
-								
-								topPlane = null;
-							}
-							else
-							{
-								topPlane.width = widthTop;
-								topPlane.height = lenTop - 1;
-								
-								horizontalPlanes.add(topPlane);
-								
-								topPlane = null;
-								
-								recomputingTop = x + 1;
-								x = -1;
-							}
-						}
-					}
-				}
-				
-				if(bottomPlane != null && bottomPlane.x != 0)
-				{
-					bottomPlane.width = widthBot;
-					bottomPlane.height = 1;
-					horizontalPlanes.add(bottomPlane);
-					bottomPlane = null;
-				}
-				
-				if(topPlane != null && topPlane.x != 0)
-				{
-					topPlane.width = widthTop;
-					topPlane.height = 1;
-					horizontalPlanes.add(topPlane);
-					topPlane = null;
-				}
-			}
-			
-		}
-		
-		if(bottomPlane != null)
-		{
-			bottomPlane.width = widthBot;
-			bottomPlane.height = lenBot;
-			horizontalPlanes.add(bottomPlane);
-			bottomPlane = null;
-		}
-		
-		if(topPlane != null)
-		{
-			topPlane.width = widthTop;
-			topPlane.height = lenTop;
-			horizontalPlanes.add(topPlane);
-			topPlane = null;
-		}
-		
-		for(Plane p : horizontalPlanes)
-		{
-			processPlane(p);
-			
-			if(debug)
-				Utils.println(p);
-			
-			maxIndex = indiciesAndUvs(p, maxIndex);
-			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z);
-			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z + p.height);
-			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y);
-			verticies.add(p.z + p.height);
-			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y);
-			verticies.add(p.z);
-		}
+		return maxIndex + max + 1;
 	}
 	
 	/**
@@ -732,15 +523,15 @@ public class BulkModel
 		maxIndex = 0;
 		meshses.clear();
 		
-		renderBottomsAndTops();
-		renderBacksAndForwards();
-		renderLeftsAndRights();
+		renderAxis(botTop);
+		renderAxis(backFront);
+		renderAxis(leftRight);
 		
 		int i = 0;
 		int[] indiciesArr = new int[indicies.size()];
 		for(int index : indicies)
 			indiciesArr[i++] = index;
-		
+
 		i = 0;
 		float[] verticiesArr = new float[verticies.size()];
 		for(float vertex : verticies)
@@ -762,13 +553,8 @@ public class BulkModel
 			for(int x = 0; x < splt[y].length(); x++)
 			{
 				if(splt[y].charAt(x) == 'X')
-					setModel(x, yLevel, y, new CubeModel(0, 0));
+					setModel(x, yLevel, y, new GrassModel());
 			}
 		}
-	}
-
-	public void debug(boolean b)
-	{
-		debug = b;
 	}
 }
