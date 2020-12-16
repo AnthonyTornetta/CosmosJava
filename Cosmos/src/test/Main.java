@@ -129,9 +129,9 @@ public class Main
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16 * 10, 16 * 2, 16 * 10);
+		Structure s = new Structure(new Transform(Maths.zero()), 16 * 2, 16 * 2, 16 * 2);
 		
-		s.transform().translate(new Vector3f(-16 * 5, -16, -16 * 5));
+		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
 		Random rdm = new Random();
 		

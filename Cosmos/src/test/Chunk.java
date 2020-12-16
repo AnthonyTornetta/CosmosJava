@@ -16,6 +16,61 @@ public class Chunk
 	
 	private Block[][][] blocks;
 	
+	/**
+	 * Neighbors
+	 */
+	private Chunk left, right, top, bottom, front, back;
+	
+	public void leftNeighbor(Chunk c)
+	{
+		left = c;
+	}
+	public void rightNeighbor(Chunk c)
+	{
+		right = c;
+	}
+	public void topNeighbor(Chunk c)
+	{
+		top = c;
+	}
+	public void bottomNeighbor(Chunk c)
+	{
+		bottom = c;
+	}
+	public void frontNeighbor(Chunk c)
+	{
+		front = c;
+	}
+	public void backNeighbor(Chunk c)
+	{
+		back = c;
+	}
+	
+	public Chunk leftNeighbor()
+	{
+		return left;
+	}
+	public Chunk rightNeighbor()
+	{
+		return right;
+	}
+	public Chunk topNeighbor()
+	{
+		return top;
+	}
+	public Chunk bottomNeighbor()
+	{
+		return bottom;
+	}
+	public Chunk frontNeighbor()
+	{
+		return front;
+	}
+	public Chunk backNeighbor()
+	{
+		return back;
+	}
+	
 	private Matrix4f transformMatrix;
 	
 	public Chunk()
@@ -39,8 +94,8 @@ public class Chunk
 		{
 			blocks[z][y][x] = block;
 			
-			if(rendered)
-				model.render();
+			if(rendered) // only if the chunk has been rendered at least 1 time before
+				render(); // update the chunk's model for the new block
 		}
 	}
 	
@@ -52,7 +107,13 @@ public class Chunk
 	{
 		rendered = true;
 		
-		model.render();
+		model.render(
+				left != null ? left.model : null, 
+				right != null ? right.model : null, 
+				top != null ? top.model : null, 
+				bottom != null ? bottom.model : null, 
+				front != null ? front.model : null, 
+				back != null ? back.model : null);
 	}
 	
 	/**

@@ -47,7 +47,9 @@ public class BulkModel
 		}
 		
 		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
+				BulkModel left, BulkModel right, BulkModel top, 
+				BulkModel bottom, BulkModel front, BulkModel back)
 		{
 			return getModelAt(m, x, y, z + delta);
 		}
@@ -126,7 +128,9 @@ public class BulkModel
 		}
 		
 		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
+				BulkModel left, BulkModel right, BulkModel top, 
+				BulkModel bottom, BulkModel front, BulkModel back)
 		{
 			return getModelAt(m, x + delta, y, z);
 		}
@@ -203,9 +207,35 @@ public class BulkModel
 		}
 		
 		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
+				BulkModel left, BulkModel right, BulkModel top, 
+				BulkModel bottom, BulkModel front, BulkModel back)
 		{
-			return getModelAt(m, x, y, z + delta);
+			if(!m.within(z + delta, y, x))
+			{
+				if(delta == -1)
+				{
+					if(left != null)
+					{
+						return left.cubes[x][y][left.cubes[0][0].length - 1];
+					}
+					else
+						return null;
+				}
+				else if(delta == 1)
+				{
+					if(right != null)
+					{
+						return right.cubes[x][y][0];
+					}
+					else
+						return null;
+				}
+				else
+					throw new IllegalArgumentException("Delta must be -1 or 1!");
+			}
+			else
+				return getModelAt(m, x, y, z + delta);
 		}
 		
 		@Override
@@ -298,7 +328,9 @@ public class BulkModel
 		int YLEN(BulkModel m);
 		int XLEN(BulkModel m);
 		IHasModel getModelAt(BulkModel m, int x, int y, int z);
-		IHasModel nextModel(BulkModel m, int x, int y, int z, int delta);
+		IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
+				BulkModel left, BulkModel right, BulkModel top, 
+				BulkModel bottom, BulkModel front, BulkModel back);
 		BlockSide side(int delta);
 		
 		float xOff(int delta);
@@ -308,13 +340,15 @@ public class BulkModel
 		void addPlane(List<Float> verticies, Plane p);
 	}
 	
-	private Plane handlePlane(int x, int y, int z, Axis axis, int delta, Plane plane)
+	private Plane handlePlane(int x, int y, int z, Axis axis, int delta, Plane plane,
+			BulkModel left, BulkModel right, BulkModel top, 
+			BulkModel bottom, BulkModel front, BulkModel back)
 	{
 		IHasModel model = axis.getModelAt(this, x, y, z);
 		
 		if(model != null)
 		{
-			IHasModel nextModel = axis.nextModel(this, x, y, z, delta);
+			IHasModel nextModel = axis.nextModel(this, x, y, z, delta, left, right, top, bottom, front, back);
 			
 			if(plane == null && nextModel == null)
 			{
@@ -360,32 +394,34 @@ public class BulkModel
 		return plane;
 	}
 	
-	public void renderAxis(Axis axis)
+	public void renderAxis(Axis axis,
+			BulkModel left, BulkModel right, BulkModel top, 
+			BulkModel bottom, BulkModel front, BulkModel back)
 	{
 		for(int z = 0; z < axis.ZLEN(this); z++)
 		{
 			for(int y = 0; y < axis.YLEN(this); y++)
 			{
-				Plane top = null, bot = null;
+				Plane positivePlane = null, negativePlane = null;
 				
 				for(int x = 0; x < axis.XLEN(this); x++)
 				{
-					top = handlePlane(x, y, z, axis, 1, top);
-					bot = handlePlane(x, y, z, axis, -1, bot);
+					positivePlane = handlePlane(x, y, z, axis, 1, positivePlane, left, right, top, bottom, front, back);
+					negativePlane = handlePlane(x, y, z, axis, -1, negativePlane, left, right, top, bottom, front, back);
 				}
 				
-				if(top != null)
+				if(positivePlane != null)
 				{
-					axis.addPlane(verticies, top);
-					maxIndex = indiciesAndUvs(top, maxIndex);
-					top = null;
+					axis.addPlane(verticies, positivePlane);
+					maxIndex = indiciesAndUvs(positivePlane, maxIndex);
+					positivePlane = null;
 				}
 				
-				if(bot != null)
+				if(negativePlane != null)
 				{
-					axis.addPlane(verticies, bot);
-					maxIndex = indiciesAndUvs(bot, maxIndex);
-					bot = null;
+					axis.addPlane(verticies, negativePlane);
+					maxIndex = indiciesAndUvs(negativePlane, maxIndex);
+					negativePlane = null;
 				}
 			}
 		}
@@ -432,10 +468,20 @@ public class BulkModel
 		return maxIndex + max + 1;
 	}
 	
+
 	/**
 	 * "Greedy meshing algorithm" kinda
 	 */
 	void render()
+	{
+		render(null, null, null, null, null, null);
+	}
+	
+	/**
+	 * "Greedy meshing algorithm" kinda
+	 */
+	void render(BulkModel left, BulkModel right, BulkModel top, 
+			BulkModel bottom, BulkModel front, BulkModel back)
 	{
 		verticies.clear();
 		indicies.clear();
@@ -443,9 +489,9 @@ public class BulkModel
 		
 		maxIndex = 0;
 		
-		renderAxis(botTop);
-		renderAxis(backFront);
-		renderAxis(leftRight);
+		renderAxis(botTop, left, right, top, bottom, front, back);
+		renderAxis(backFront, left, right, top, bottom, front, back);
+		renderAxis(leftRight, left, right, top, bottom, front, back);
 		
 		int i = 0;
 		int[] indiciesArr = new int[indicies.size()];

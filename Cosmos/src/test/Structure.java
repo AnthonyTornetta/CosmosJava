@@ -105,6 +105,36 @@ public class Structure
 				}
 			}
 		}
+		
+		for(int z = 0; z < chunksLength(); z++)
+		{
+			for(int y = 0; y < chunksHeight(); y++)
+			{
+				for(int x = 0; x < chunksWidth(); x++)
+				{
+					int i = flatten(x, y, z);
+					
+					chunks[i].leftNeighbor(
+							within(x - 1, y, z) ? chunks[flatten(x - 1, y, z)] : null);
+					chunks[i].rightNeighbor(
+							within(x + 1, y, z) ? chunks[flatten(x + 1, y, z)] : null);
+					chunks[i].topNeighbor(
+							within(x, y + 1, z) ? chunks[flatten(x, y + 1, z)] : null);
+					chunks[i].bottomNeighbor(
+							within(x, y - 1, z) ? chunks[flatten(x, y - 1, z)] : null);
+					chunks[i].frontNeighbor(
+							within(x, y, z + 1) ? chunks[flatten(x, y, z + 1)] : null);
+					chunks[i].backNeighbor(
+							within(x, y, z - 1) ? chunks[flatten(x, y, z - 1)] : null);
+					
+				}
+			}
+		}
+	}
+	
+	public boolean within(int x, int y, int z)
+	{
+		return x >= 0 && x < cWidth && y >= 0 && y < cHeight && z >= 0 && z < cLength;
 	}
 	
 	public void block(int x, int y, int z, Block b)
