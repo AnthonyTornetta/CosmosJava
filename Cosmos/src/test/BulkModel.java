@@ -51,7 +51,27 @@ public class BulkModel
 				BulkModel left, BulkModel right, BulkModel top, 
 				BulkModel bottom, BulkModel front, BulkModel back)
 		{
-			return getModelAt(m, x, y, z + delta);
+			if(!m.within(x, z + delta, y))
+			{
+				if(delta == -1)
+				{
+					if(bottom != null)
+						return bottom.cubes[y][bottom.cubes[0].length - 1][x];
+					else
+						return null;
+				}
+				else if(delta == 1)
+				{
+					if(top != null)
+						return top.cubes[y][0][x];
+					else
+						return null;
+				}
+				else
+					throw new IllegalArgumentException("Delta must be -1 or 1!");
+			}
+			else
+				return getModelAt(m, x, y, z + delta);
 		}
 		
 		@Override
@@ -132,7 +152,27 @@ public class BulkModel
 				BulkModel left, BulkModel right, BulkModel top, 
 				BulkModel bottom, BulkModel front, BulkModel back)
 		{
-			return getModelAt(m, x + delta, y, z);
+			if(!m.within(z, y, x + delta))
+			{
+				if(delta == -1)
+				{
+					if(back != null)
+						return back.cubes[back.cubes.length - 1][y][z];
+					else
+						return null;
+				}
+				else if(delta == 1)
+				{
+					if(front != null)
+						return front.cubes[0][y][z];
+					else
+						return null;
+				}
+				else
+					throw new IllegalArgumentException("Delta must be -1 or 1!");
+			}
+			else
+				return getModelAt(m, x + delta, y, z);
 		}
 		
 		@Override
@@ -216,18 +256,14 @@ public class BulkModel
 				if(delta == -1)
 				{
 					if(left != null)
-					{
 						return left.cubes[x][y][left.cubes[0][0].length - 1];
-					}
 					else
 						return null;
 				}
 				else if(delta == 1)
 				{
 					if(right != null)
-					{
 						return right.cubes[x][y][0];
-					}
 					else
 						return null;
 				}
