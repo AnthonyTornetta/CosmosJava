@@ -2,7 +2,6 @@ package test.models;
 
 public class DirtModel extends CubeModel
 {
-
 	@Override
 	public float u(BlockSide side)
 	{

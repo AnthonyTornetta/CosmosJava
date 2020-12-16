@@ -1,35 +1,37 @@
 package test;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import com.cornchipss.utils.Utils;
 
 import test.models.BlockSide;
 import test.models.CubeModel;
-import test.models.GrassModel;
+import test.models.IHasModel;
 
 public class BulkModel
 {
-	CubeModel[][][] cubes;
+	private IHasModel[][][] cubes;
+
+	public void setModels(IHasModel[][][] blocks)
+	{
+		this.cubes = blocks;
+	}
 	
-	Map<CubeModel, Mesh> meshses;
-	Mesh beeg;
+	private Mesh combinedModel;
 	
 	private static Axis botTop = new Axis() 
 	{
 		@Override
 		public float zOff(int delta)
 		{
-			return -0.5f;
+			return delta == 1 ? 1 : 0;
 		}
 		
 		@Override
 		public float yOff(int delta)
 		{
-			return delta * 0.5f;
+			return 0;
 		}
 		
 		@Override
@@ -45,13 +47,13 @@ public class BulkModel
 		}
 		
 		@Override
-		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
 		{
 			return getModelAt(m, x, y, z + delta);
 		}
 		
 		@Override
-		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
 		{
 			return m.within(x, z, y) ? m.cubes[y][z][x] : null;
 		}
@@ -77,21 +79,23 @@ public class BulkModel
 		@Override
 		public void addPlane(List<Float> verticies, Plane p)
 		{
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z);
+			float x = p.x, z = p.y, y = p.z;
 			
-			verticies.add(p.x);
-			verticies.add(p.y);
-			verticies.add(p.z + p.height);
+			verticies.add(x);
+			verticies.add(y);
+			verticies.add(z);
 			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y);
-			verticies.add(p.z + p.height);
+			verticies.add(x);
+			verticies.add(y);
+			verticies.add(z + p.height);
 			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y);
-			verticies.add(p.z);
+			verticies.add(x + p.width);
+			verticies.add(y);
+			verticies.add(z + p.height);
+			
+			verticies.add(x + p.width);
+			verticies.add(y);
+			verticies.add(z);
 		}
 	},
 	
@@ -100,19 +104,19 @@ public class BulkModel
 		@Override
 		public float zOff(int delta)
 		{
-			return delta * 0.5f;
+			return 0;
 		}
 		
 		@Override
 		public float yOff(int delta)
 		{
-			return -0.5f;
+			return 0;
 		}
 		
 		@Override
 		public float xOff(int delta)
 		{
-			return 0;
+			return 0.5f + (delta * 0.5f);
 		}
 		
 		@Override
@@ -122,13 +126,13 @@ public class BulkModel
 		}
 		
 		@Override
-		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
 		{
-			return getModelAt(m, x, y, z + delta);
+			return getModelAt(m, x + delta, y, z);
 		}
 		
 		@Override
-		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
 		{
 			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
 		}
@@ -154,21 +158,21 @@ public class BulkModel
 		@Override
 		public void addPlane(List<Float> verticies, Plane p)
 		{
-			verticies.add(p.x);
+			verticies.add(p.z);
 			verticies.add(p.y);
-			verticies.add(p.z);
-			
 			verticies.add(p.x);
-			verticies.add(p.y + p.height);
-			verticies.add(p.z);
 			
-			verticies.add(p.x + p.width);
-			verticies.add(p.y + p.height);
 			verticies.add(p.z);
+			verticies.add(p.y + p.height);
+			verticies.add(p.x);
 			
-			verticies.add(p.x + p.width);
+			verticies.add(p.z + p.width);
+			verticies.add(p.y + p.height);
+			verticies.add(p.x);
+			
+			verticies.add(p.z + p.width);
 			verticies.add(p.y);
-			verticies.add(p.z);
+			verticies.add(p.x);
 		}
 	},
 	
@@ -183,13 +187,13 @@ public class BulkModel
 		@Override
 		public float yOff(int delta)
 		{
-			return -0.5f;
+			return 0;
 		}
 		
 		@Override
 		public float xOff(int delta)
 		{
-			return -0.5f;
+			return 0;
 		}
 		
 		@Override
@@ -199,13 +203,13 @@ public class BulkModel
 		}
 		
 		@Override
-		public CubeModel nextModel(BulkModel m, int x, int y, int z, int delta)
+		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta)
 		{
 			return getModelAt(m, x, y, z + delta);
 		}
 		
 		@Override
-		public CubeModel getModelAt(BulkModel m, int x, int y, int z)
+		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
 		{
 			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
 		}
@@ -249,17 +253,14 @@ public class BulkModel
 		}
 	};
 		
-	
 	List<Integer> indicies = new LinkedList<>();
 	List<Float> verticies = new LinkedList<>();
 	List<Float> uvs = new LinkedList<>();
 	int maxIndex = 0;
 	
-	public BulkModel(int w, int h, int l)
+	public BulkModel(IHasModel[][][] models)
 	{
-		cubes = new CubeModel[l][h][w];
-		
-		meshses = new HashMap<>();
+		cubes = models;
 	}
 	
 	boolean within(int x, int y, int z)
@@ -267,17 +268,6 @@ public class BulkModel
 		return z >= 0 && z < cubes.length
 				&& y >= 0 && y < cubes[z].length
 				&& x >= 0 && x < cubes[z][y].length;
-	}
-	
-	void setModel(int x, int y, int z, CubeModel model)
-	{
-		if(!within(x, y, z))
-			return;
-		
-		if(!Utils.equals(cubes[z][y][x], model))
-		{
-			cubes[z][y][x] = model;
-		}
 	}
 	
 	private static class Plane
@@ -307,8 +297,8 @@ public class BulkModel
 		int ZLEN(BulkModel m);
 		int YLEN(BulkModel m);
 		int XLEN(BulkModel m);
-		CubeModel getModelAt(BulkModel m, int x, int y, int z);
-		CubeModel nextModel(BulkModel m, int x, int y, int z, int delta);
+		IHasModel getModelAt(BulkModel m, int x, int y, int z);
+		IHasModel nextModel(BulkModel m, int x, int y, int z, int delta);
 		BlockSide side(int delta);
 		
 		float xOff(int delta);
@@ -318,154 +308,86 @@ public class BulkModel
 		void addPlane(List<Float> verticies, Plane p);
 	}
 	
-	public void renderAxis(Axis axis)
+	private Plane handlePlane(int x, int y, int z, Axis axis, int delta, Plane plane)
 	{
-		// step 1: generate verticle cross section
-		// step 2: generate horizontal cross section (https://0fps.files.wordpress.com/2012/06/slices.png?w=595&h=242)
-		// step 3: turn those all into meshes
+		IHasModel model = axis.getModelAt(this, x, y, z);
 		
-		int widthNeg = 0, widthPos = 0;
-		int lenNeg = 0, lenPos = 0;
-		
-		int recomputingNeg = 0;
-		int recomputingPos = 0;
-		
-		Plane negPlane = null, posPlane = null;
-		
-		List<Plane> planes = new LinkedList<>();
-		
-		for(int z = 0; z < axis.ZLEN(this); z++) // y
+		if(model != null)
 		{
-			for(int y = 0; y < axis.YLEN(this); y++) // z
+			IHasModel nextModel = axis.nextModel(this, x, y, z, delta);
+			
+			if(plane == null && nextModel == null)
 			{
-				lenNeg = Math.min(lenNeg + 1, axis.YLEN(this));
-				lenPos = Math.min(lenPos + 1, axis.YLEN(this));
+				plane = new Plane(
+						x + axis.xOff(delta), 
+						y + axis.yOff(delta), 
+						z + axis.zOff(delta), 
+						model.model(), axis.side(delta));
+				plane.width = 0;
+				plane.height = 1;
+			}
+			else if(plane != null && nextModel != null)
+			{
+				axis.addPlane(verticies, plane);
+				maxIndex = indiciesAndUvs(plane, maxIndex);
 				
-				for(int x = 0; x < axis.XLEN(this); x++) // x
-				{
-					if(recomputingPos == 0)
-					{
-						recomputingPos = Math.max(0, recomputingPos - 1);
-						
-						CubeModel modelHere = axis.getModelAt(this, x, y, z);
-						
-						if(modelHere != null && axis.nextModel(this, x, y, z, -1) == null 
-								&& (negPlane == null || Utils.equals(negPlane.model, modelHere)))
-						{
-							if(negPlane == null)
-							{
-								lenNeg = 1;
-								widthNeg = 0;
-								
-								negPlane = new Plane(x + axis.xOff(-1), y + axis.yOff(-1), z + axis.zOff(-1), modelHere, axis.side(-1));
-							}
-							
-							widthNeg = Math.min(widthNeg + 1, axis.XLEN(this));
-						}
-						else if(negPlane != null)
-						{
-							if(lenNeg == 1)
-							{
-								if(widthNeg == 0)
-									continue;
-								else
-								{
-									negPlane.width = widthNeg;
-									negPlane.height = 1;
-									
-									planes.add(negPlane);
-									negPlane = null;
-								}
-							}
-							else
-							{
-								negPlane.width = widthNeg;
-								negPlane.height = lenNeg - 1;
-								
-								planes.add(negPlane);
-								negPlane = null;
-								
-								recomputingNeg = x + 1;
-								x = -1;
-							}
-						}
-					}
-					
-					if(recomputingNeg == 0)
-					{
-						recomputingNeg = Math.max(0, recomputingNeg - 1);
-						
-						CubeModel modelHere = axis.getModelAt(this, x, y, z);
-
-						if(modelHere != null && axis.nextModel(this, x, y, z, 1) == null 
-								&& (posPlane == null || Utils.equals(posPlane.model, modelHere)))
-						{
-							if(posPlane == null)
-							{
-								lenPos = 1;
-								widthPos = 0;
-								
-								posPlane = new Plane(x + axis.xOff(1), y + axis.yOff(1), z + axis.zOff(1), modelHere, axis.side(1));
-							}
-							
-							widthPos = Math.min(widthPos + 1, axis.XLEN(this));
-						}
-						else if(posPlane != null)
-						{
-							if(lenPos == 1)
-							{
-								if(widthPos == 0)
-									continue;
-								else
-								{
-									posPlane.width = widthPos;
-									posPlane.height = 1;
-									
-									planes.add(posPlane);
-									posPlane = null;
-								}
-							}
-							else
-							{
-								posPlane.width = widthPos;
-								posPlane.height = lenPos - 1;
-								
-								planes.add(posPlane);
-								posPlane = null;
-								
-								recomputingPos = x + 1;
-								x = -1;
-							}
-						}
-					}
-				}
+				plane = null;
+			}
+			else if(plane != null && !Utils.equals(plane.model, model))
+			{
+				axis.addPlane(verticies, plane);
+				maxIndex = indiciesAndUvs(plane, maxIndex);
+				
+				plane = new Plane(
+						x + axis.xOff(delta), 
+						y + axis.yOff(delta), 
+						z + axis.zOff(delta), 
+						model.model(), axis.side(delta));
+				plane.width = 0;
+				plane.height = 1;
 			}
 		}
-		
-		if(negPlane != null)
+		else if(plane != null)
 		{
-			negPlane.width = widthNeg;
-			negPlane.height = lenNeg;
-			planes.add(negPlane);
-			negPlane = null;
+			axis.addPlane(verticies, plane);
+			maxIndex = indiciesAndUvs(plane, maxIndex);
+			plane = null;
 		}
 		
-		if(posPlane != null)
-		{
-			posPlane.width = widthPos;
-			posPlane.height = lenPos;
-			planes.add(posPlane);
-			posPlane = null;
-		}
+		if(plane != null)
+			plane.width++;
 		
-		for(Plane p : planes)
+		return plane;
+	}
+	
+	public void renderAxis(Axis axis)
+	{
+		for(int z = 0; z < axis.ZLEN(this); z++)
 		{
-			p.z -= 0.5f;
-			p.x -= 0.5f;
-			
-			maxIndex = indiciesAndUvs(p, maxIndex);
-			
-			axis.addPlane(verticies, p);
+			for(int y = 0; y < axis.YLEN(this); y++)
+			{
+				Plane top = null, bot = null;
+				
+				for(int x = 0; x < axis.XLEN(this); x++)
+				{
+					top = handlePlane(x, y, z, axis, 1, top);
+					bot = handlePlane(x, y, z, axis, -1, bot);
+				}
+				
+				if(top != null)
+				{
+					axis.addPlane(verticies, top);
+					maxIndex = indiciesAndUvs(top, maxIndex);
+					top = null;
+				}
+				
+				if(bot != null)
+				{
+					axis.addPlane(verticies, bot);
+					maxIndex = indiciesAndUvs(bot, maxIndex);
+					bot = null;
+				}
+			}
 		}
 	}
 	
@@ -496,8 +418,7 @@ public class BulkModel
 		uvs.add(v);
 		uvs.add(u);
 		uvs.add(v);
-
-
+		
 		uvs.add(u);
 		uvs.add(v);
 		uvs.add(u);
@@ -512,7 +433,7 @@ public class BulkModel
 	}
 	
 	/**
-	 * Greedy meshing algorithm
+	 * "Greedy meshing algorithm" kinda
 	 */
 	void render()
 	{
@@ -521,7 +442,6 @@ public class BulkModel
 		uvs.clear();
 		
 		maxIndex = 0;
-		meshses.clear();
 		
 		renderAxis(botTop);
 		renderAxis(backFront);
@@ -534,27 +454,25 @@ public class BulkModel
 
 		i = 0;
 		float[] verticiesArr = new float[verticies.size()];
+		
+//		float dz = cubes.length / 2.0f;
+//		float dy = cubes[(int)dz].length / 2.0f;
+//		float dx = cubes[(int)dz][(int)dy].length / 2.0f;
+		
+		// verticies must be in the order of x,y,z
 		for(float vertex : verticies)
-			verticiesArr[i++] = vertex;
+			verticiesArr[i++] = vertex;// - (i % 3 == 0 ? dx : (i % 3 == 1 ? dy : dz)); // centers everything around the center of the bulk model's 0,0
 		
 		i = 0;
 		float[] uvsArr = new float[uvs.size()];
 		for(float uv : uvs)
 			uvsArr[i++] = uv;
 		
-		beeg = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr);
+		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr);
 	}
-
-	public void parse(String string, int yLevel)
+	
+	public Mesh mesh()
 	{
-		String[] splt = string.split(("\n"));
-		for(int y = 0; y < splt.length; y++)
-		{
-			for(int x = 0; x < splt[y].length(); x++)
-			{
-				if(splt[y].charAt(x) == 'X')
-					setModel(x, yLevel, y, new GrassModel());
-			}
-		}
+		return combinedModel;
 	}
 }

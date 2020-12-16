@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.util.Random;
 
 import org.joml.Matrix4f;
+import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -12,16 +13,13 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import com.cornchipss.physics.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
-import test.models.CubeModel;
-import test.models.DirtModel;
-import test.models.GrassModel;
-import test.models.StoneModel;
+import test.blocks.Blocks;
 
 public class Main
 {
@@ -38,7 +36,7 @@ public class Main
 		BufferedReader br = null;
 		try
 		{
-			br = new BufferedReader(new FileReader("./assets/shaders/test.vert"));
+			br = new BufferedReader(new FileReader("./assets/shaders/chunk.vert"));
 			
 			for(String line = br.readLine(); line != null; line = br.readLine())
 			{
@@ -70,7 +68,7 @@ public class Main
 		shaderCode = new StringBuilder();
 		try
 		{
-			br = new BufferedReader(new FileReader("./assets/shaders/test.frag"));
+			br = new BufferedReader(new FileReader("./assets/shaders/chunk.frag"));
 			
 			for(String line = br.readLine(); line != null; line = br.readLine())
 			{
@@ -127,88 +125,35 @@ public class Main
 
 	private void run()
 	{
-		window = new Window(1024, 720, "mgay");
+		window = new Window(1024, 720, "wack simulator 2020");
 		
 		int shaderProgram = loadShaders();
-				
-//		float[] vertices = {// first triangle
-//			     0.5f,  0.5f, 0.0f,  // top right
-//			     0.5f, -0.5f, 0.0f,  // bottom right
-//			    -0.5f,  0.5f, 0.0f,  // top left 
-//			    -0.5f, -0.5f, 0.0f,  // bottom left
-//		};
 		
-		float[] vertices = {// first triangle
-				// front
-			    -0.5f, -0.5f,  0.5f,
-			     0.5f, -0.5f,  0.5f,
-			     0.5f,  0.5f,  0.5f,
-			    -0.5f,  0.5f,  0.5f,
-			    // back
-			    -0.5f, -0.5f, -0.5f,
-			     0.5f, -0.5f, -0.5f,
-			     0.5f,  0.5f, -0.5f,
-			    -0.5f,  0.5f, -0.5f
-		};
+		Structure s = new Structure(new Transform(Maths.zero()), 16 * 10, 16 * 2, 16 * 10);
 		
-		int[] indices = 
-			{
-					// front
-					0, 1, 2,
-					2, 3, 0,
-					// right
-					1, 5, 6,
-					6, 2, 1,
-					// back
-					7, 6, 5,
-					5, 4, 7,
-					// left
-					4, 0, 3,
-					3, 7, 4,
-					// bottom
-					4, 5, 1,
-					1, 0, 4,
-					// top
-					3, 2, 6,
-					6, 7, 3
-			};
+		s.transform().translate(new Vector3f(-16 * 5, -16, -16 * 5));
 		
-		float[] cols = 
-			{
-				1.0f, 1.0f, 1.0f,
-				1.0f, 1.0f, 1.0f,
-				1.0f, 0.0f, 0.0f,
-				0.0f, 1.0f, 0.0f,
-				0.0f, 0.0f, 1.0f,
-				1.0f, 1.0f, 0,0f
-			};
-		
-		
-		BulkModel beeg = new BulkModel(100, 100, 100);
-		
-		CubeModel grass = new GrassModel();
-		CubeModel dirt  = new DirtModel();
-		CubeModel stone = new StoneModel();
 		Random rdm = new Random();
 		
-		for(int z = 0; z < 50; z++)
+		for(int z = 0; z < s.length(); z++)
 		{
-			for(int x = 0; x < 50; x++)
+			for(int x = 0; x < s.width(); x++)
 			{
-				int yEnd = rdm.nextInt(2) + 30;
-				for(int y = 0; y < 1; y++)
+				int h = s.height() - rdm.nextInt(2);
+				for(int y = 0; y < h; y++)
 				{
-					if(y == yEnd - 1)
-						beeg.setModel(x, y, z, grass);
-					else if(y > yEnd)
-						beeg.setModel(x, y, z, dirt);
+					if(y == h - 1)
+						s.block(x, y, z, Blocks.GRASS);
+					else if(h - y < 5)
+						s.block(x, y, z, Blocks.DIRT);
 					else
-						beeg.setModel(x, y, z, stone);
+						s.block(x, y, z, Blocks.STONE);
 				}
 			}
 		}
 		
-		beeg.render();
+		for(Chunk c : s.chunks())
+			c.render();
 		
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
@@ -217,35 +162,24 @@ public class Main
 		
 		Matrix4f cameraMatrix = new Matrix4f();
 		
-		Matrix4f meshMatrix = new Matrix4f();
-		
-		meshMatrix.translate(new Vector3f(0, 0, -20f));
-		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
 		
 		Texture tex = Texture.loadTexture("atlas/main.png");
-		
-		Utils.println(projectionMatrix);
-		
+				
 		Input.setWindow(window);
 		
 		Vector3f pos = new Vector3f();
 		Vector3f rot = new Vector3f();
 		
-		int i = 0;
+		float[] floatBuf = new float[16];
 		
 		while(!window.shouldClose())
 		{
 			update();
-			
-			if(++i == 1000)
-			{
-				i = 0;
-				beeg.render();
-			}
+
 			try {
 				Thread.sleep(1);
 			} catch (InterruptedException e) {
@@ -260,7 +194,7 @@ public class Main
 			GL20.glUniform1f(timeLoc, (float)GLFW.glfwGetTime());
 			tex.bind();
 			
-			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(new float[16]));
+			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(floatBuf));
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 				pos.z -= 0.1f;
@@ -287,22 +221,29 @@ public class Main
 			
 			Maths.createViewMatrix(pos, rot, cameraMatrix);
 			
-			GL20.glUniformMatrix4fv(camLoc, false, cameraMatrix.get(new float[16]));
-			
-			GL20.glUniformMatrix4fv(transLoc, false, meshMatrix.get(new float[16]));
+			GL20.glUniformMatrix4fv(camLoc, false, cameraMatrix.get(floatBuf));
 			
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);
 			
-			GL30.glBindVertexArray(beeg.beeg.vao());
-			GL20.glEnableVertexAttribArray(0);
-			GL20.glEnableVertexAttribArray(1);
-			GL20.glEnableVertexAttribArray(2);
-			GL11.glDrawElements(GL20.GL_TRIANGLES, beeg.beeg.verticies(), GL11.GL_UNSIGNED_INT, 0);
-			GL20.glDisableVertexAttribArray(2);
-			GL20.glDisableVertexAttribArray(1);
-			GL20.glDisableVertexAttribArray(0);
-			GL30.glBindVertexArray(0);
+			for(Chunk chunk : s.chunks())
+			{
+				Matrix4f transform = new Matrix4f();
+				Matrix4fc t = s.transformMatrix();
+				t.mul(chunk.transformMatrix(), transform);
+				
+				GL20.glUniformMatrix4fv(transLoc, false, transform.get(floatBuf));
+				
+				GL30.glBindVertexArray(chunk.mesh().vao());
+				GL20.glEnableVertexAttribArray(0);
+				GL20.glEnableVertexAttribArray(1);
+				GL20.glEnableVertexAttribArray(2);
+				GL11.glDrawElements(GL20.GL_TRIANGLES, chunk.mesh().verticies(), GL11.GL_UNSIGNED_INT, 0);
+				GL20.glDisableVertexAttribArray(2);
+				GL20.glDisableVertexAttribArray(1);
+				GL20.glDisableVertexAttribArray(0);
+				GL30.glBindVertexArray(0);
+			}
 			
 			Texture.unbind();
 			
