@@ -176,19 +176,51 @@ public class Main
 		
 		float[] floatBuf = new float[16];
 		
+		long t = System.currentTimeMillis();
+		
+		final int UPS_TARGET = 70;
+		
+		final int MILLIS_WAIT = 1000 / UPS_TARGET;
+		
+		long lastSecond = t;
+		
+		int ups = 0;
+		
 		while(!window.shouldClose())
 		{
-			update();
-
-			try {
-				Thread.sleep(1);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			float delta = System.currentTimeMillis() - t;
+			
+			if(delta < MILLIS_WAIT)
+			{
+				try
+				{
+					Thread.sleep(MILLIS_WAIT - (int)delta);
+					
+					delta = (System.currentTimeMillis() - t);
+				}
+				catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
 			}
+			
+			delta /= 1000.0f;
+			
+			t = System.currentTimeMillis();
+			
+			if(lastSecond / 1000 != t / 1000)
+			{
+				System.out.println("UPS: " + ups);
+				lastSecond = t;
+				ups = 0;
+			}
+			ups++;
+			
+			update(delta);
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
-			render();
+			render(delta);
 			
 			GL30.glUseProgram(shaderProgram);
 			GL20.glUniform1f(timeLoc, (float)GLFW.glfwGetTime());
@@ -197,27 +229,27 @@ public class Main
 			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(floatBuf));
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-				pos.z -= 0.1f;
+				pos.z -= 10f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-				pos.z += 0.1f;
+				pos.z += 10f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-				pos.x += 0.1f;
+				pos.x += 10f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-				pos.x -= 0.1f;
+				pos.x -= 10f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-				pos.y += 0.1f;
+				pos.y += 10f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-				pos.y -= 0.1f;
+				pos.y -= 10f * delta;
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-				rot.y += 0.01f;
+				rot.y += 1f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
-				rot.y -= 0.01f;
+				rot.y -= 1f * delta;
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-				rot.x += 0.01f;
+				rot.x += 1f * delta;
 			if(Input.isKeyDown(GLFW.GLFW_KEY_T))
-				rot.x -= 0.01f;
+				rot.x -= 1f * delta;
 			
 			Maths.createViewMatrix(pos, rot, cameraMatrix);
 			
@@ -229,20 +261,14 @@ public class Main
 			for(Chunk chunk : s.chunks())
 			{
 				Matrix4f transform = new Matrix4f();
-				Matrix4fc t = s.transformMatrix();
-				t.mul(chunk.transformMatrix(), transform);
+				Matrix4fc trans = s.transformMatrix();
+				trans.mul(chunk.transformMatrix(), transform);
 				
 				GL20.glUniformMatrix4fv(transLoc, false, transform.get(floatBuf));
 				
-				GL30.glBindVertexArray(chunk.mesh().vao());
-				GL20.glEnableVertexAttribArray(0);
-				GL20.glEnableVertexAttribArray(1);
-				GL20.glEnableVertexAttribArray(2);
-				GL11.glDrawElements(GL20.GL_TRIANGLES, chunk.mesh().verticies(), GL11.GL_UNSIGNED_INT, 0);
-				GL20.glDisableVertexAttribArray(2);
-				GL20.glDisableVertexAttribArray(1);
-				GL20.glDisableVertexAttribArray(0);
-				GL30.glBindVertexArray(0);
+				chunk.mesh().prepare();
+				chunk.mesh().draw();
+				chunk.mesh().finish();
 			}
 			
 			Texture.unbind();
@@ -254,11 +280,11 @@ public class Main
 		window.destroy();
 	}
 	
-	private void update()
+	private void update(float delta)
 	{
 	}
 	
-	private void render()
+	private void render(float delta)
 	{
 		window.clear(33 / 255.0f, 33 / 255.0f, 33 / 255.0f, 1.0f);
 		

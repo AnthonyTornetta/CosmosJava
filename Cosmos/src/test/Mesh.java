@@ -6,10 +6,16 @@ import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 public class Mesh
 {
+	public static final int VERTEX_INDEX = 0;
+	public static final int COLOR_INDEX  = 1;
+	public static final int UV_INDEX     = 2;
+	public static final int LIGHT_INDEX  = 3;
+	
 	final private int vao;
 	final private int verticies;
 	
@@ -46,20 +52,24 @@ public class Mesh
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW);
 	}
 	
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uv)
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr)
 	{
 		Mesh m = new Mesh(indicies.length);
 		
 		GL30.glBindVertexArray(m.vao());
 		
-		m.storeData(0, 3, verticies);
+		m.storeData(VERTEX_INDEX, 3, verticies);
 		
-		// color is index 1. I ignore this in frag shader
-		m.storeData(2, 4, uv);
-
 		m.storeIndicies(indicies);
 		
+		m.storeData(UV_INDEX, 4, uvs);
+		
+		m.storeData(LIGHT_INDEX, 3, lightsArr);
+		
+		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
+
 		GL30.glBindVertexArray(0);
+
 		
 		return m;
 	}
@@ -72,5 +82,31 @@ public class Mesh
 	public int verticies()
 	{
 		return verticies;
+	}
+
+	public void prepare()
+	{
+		GL30.glBindVertexArray(vao());
+		
+		GL20.glEnableVertexAttribArray(0);
+		GL20.glEnableVertexAttribArray(1);
+		GL20.glEnableVertexAttribArray(2);
+		GL20.glEnableVertexAttribArray(2);
+		GL20.glEnableVertexAttribArray(3);
+	}
+
+	public void finish()
+	{
+		GL20.glDisableVertexAttribArray(3);
+		GL20.glDisableVertexAttribArray(2);
+		GL20.glDisableVertexAttribArray(1);
+		GL20.glDisableVertexAttribArray(0);
+		
+		GL30.glBindVertexArray(0);
+	}
+	
+	public void draw()
+	{
+		GL11.glDrawElements(GL20.GL_TRIANGLES, verticies(), GL11.GL_UNSIGNED_INT, 0);
 	}
 }

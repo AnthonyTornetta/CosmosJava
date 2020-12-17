@@ -96,7 +96,30 @@ public class Chunk
 			
 			if(rendered) // only if the chunk has been rendered at least 1 time before
 				render(); // update the chunk's model for the new block
+			
+			// Make sure if this block is neighboring another chunk, that chunk updates aswell
+			if(x == 0 && left != null)
+				left.potentiallyRender();
+			if(x + 1 == Chunk.WIDTH && right != null)
+				right.potentiallyRender();
+			
+			if(y == 0 && bottom != null)
+				bottom.potentiallyRender();
+			if(y + 1 == Chunk.HEIGHT && top != null)
+				top.potentiallyRender();
+			
+			if(z == 0 && back != null)
+				back.potentiallyRender();
+			if(z + 1 == Chunk.LENGTH && front != null)
+				front.potentiallyRender();
 		}
+	}
+	
+	private boolean potentiallyRender()
+	{
+		if(rendered)
+			render();
+		return rendered;
 	}
 	
 	/**
@@ -107,6 +130,7 @@ public class Chunk
 	{
 		rendered = true;
 		
+		long start = System.currentTimeMillis();
 		model.render(
 				left != null ? left.model : null, 
 				right != null ? right.model : null, 
@@ -114,6 +138,7 @@ public class Chunk
 				bottom != null ? bottom.model : null, 
 				front != null ? front.model : null, 
 				back != null ? back.model : null);
+		System.out.println(System.currentTimeMillis() - start  + "ms to render chunk");
 	}
 	
 	/**

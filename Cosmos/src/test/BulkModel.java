@@ -322,6 +322,8 @@ public class BulkModel
 	List<Integer> indicies = new LinkedList<>();
 	List<Float> verticies = new LinkedList<>();
 	List<Float> uvs = new LinkedList<>();
+	List<Float> lights = new LinkedList<>();
+	
 	int maxIndex = 0;
 	
 	public BulkModel(IHasModel[][][] models)
@@ -500,7 +502,29 @@ public class BulkModel
 		uvs.add(vEnd);
 		uvs.add(u);
 		uvs.add(v);
-
+		
+		if(p.width != 1)
+			System.out.println(p.width);
+		
+		// TODO: this but with actual processing
+		float r = (float)Math.random();
+		lights.add(r);
+		lights.add(r);
+		lights.add(r);
+		
+		lights.add(r);
+		lights.add(r);
+		lights.add(r);
+		
+		lights.add(r);
+		lights.add(r);
+		lights.add(r);
+		
+		lights.add(r);
+		lights.add(r);
+		lights.add(r);
+		
+		
 		return maxIndex + max + 1;
 	}
 	
@@ -550,7 +574,12 @@ public class BulkModel
 		for(float uv : uvs)
 			uvsArr[i++] = uv;
 		
-		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr);
+		i = 0;
+		float[] lightsArr = new float[lights.size()];
+		for(float l : lights)
+			lightsArr[i++] = l;
+		
+		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr);
 	}
 	
 	public Mesh mesh()
