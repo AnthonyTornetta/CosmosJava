@@ -1,17 +1,29 @@
 package test;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+
+import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 
+import test.lights.LightSource;
 import test.models.BlockSide;
 import test.models.CubeModel;
 import test.models.IHasModel;
 
 public class BulkModel
 {
+	private boolean renderedOnce = false;
+	
 	private IHasModel[][][] cubes;
+	
+	private Map<Vector3i, LightSource> lightSources = new HashMap<>();
 
 	public void setModels(IHasModel[][][] blocks)
 	{
@@ -44,6 +56,14 @@ public class BulkModel
 		public BlockSide side(int delta)
 		{
 			return delta < 0 ? BlockSide.BOTTOM : BlockSide.TOP;
+		}
+		
+
+		@Override
+		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
+		{
+			return new Vector3i((int)p.x, (int)p.z * delta, (int)p.y);
+//			return new Vector3i(Maths.floor(p.x), Maths.floor(p.z) + delta, Maths.floor(p.y));
 		}
 		
 		@Override
@@ -174,6 +194,12 @@ public class BulkModel
 			else
 				return getModelAt(m, x + delta, y, z);
 		}
+
+		@Override
+		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
+		{
+			return new Vector3i(Maths.floor(p.z), Maths.floor(p.y), Maths.floor(p.x) + delta);
+		}
 		
 		@Override
 		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
@@ -273,6 +299,12 @@ public class BulkModel
 			else
 				return getModelAt(m, x, y, z + delta);
 		}
+
+		@Override
+		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
+		{
+			return new Vector3i(Maths.floor(p.z) + delta, Maths.floor(p.y), Maths.floor(p.x) + delta);
+		}
 		
 		@Override
 		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
@@ -369,6 +401,8 @@ public class BulkModel
 		IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
 				BulkModel left, BulkModel right, BulkModel top, 
 				BulkModel bottom, BulkModel front, BulkModel back);
+		Vector3ic nextCoord(Plane p, Axis axis, int delta);
+
 		BlockSide side(int delta);
 		
 		float xOff(int delta);
@@ -380,7 +414,8 @@ public class BulkModel
 	
 	private Plane handlePlane(int x, int y, int z, Axis axis, int delta, Plane plane,
 			BulkModel left, BulkModel right, BulkModel top, 
-			BulkModel bottom, BulkModel front, BulkModel back)
+			BulkModel bottom, BulkModel front, BulkModel back,
+			int offX, int offY, int offZ, float[][][] lightMap)
 	{
 		IHasModel model = axis.getModelAt(this, x, y, z);
 		
@@ -402,6 +437,7 @@ public class BulkModel
 			{
 				axis.addPlane(verticies, plane);
 				maxIndex = indiciesAndUvs(plane, maxIndex);
+				lighting(plane, axis, delta, offX, offY, offZ, lightMap);
 				
 				plane = null;
 			}
@@ -409,6 +445,7 @@ public class BulkModel
 			{
 				axis.addPlane(verticies, plane);
 				maxIndex = indiciesAndUvs(plane, maxIndex);
+				lighting(plane, axis, delta, offX, offY, offZ, lightMap);
 				
 				plane = new Plane(
 						x + axis.xOff(delta), 
@@ -423,6 +460,7 @@ public class BulkModel
 		{
 			axis.addPlane(verticies, plane);
 			maxIndex = indiciesAndUvs(plane, maxIndex);
+			lighting(plane, axis, delta, offX, offY, offZ, lightMap);
 			plane = null;
 		}
 		
@@ -434,7 +472,8 @@ public class BulkModel
 	
 	public void renderAxis(Axis axis,
 			BulkModel left, BulkModel right, BulkModel top, 
-			BulkModel bottom, BulkModel front, BulkModel back)
+			BulkModel bottom, BulkModel front, BulkModel back,
+			int offX, int offY, int offZ, float[][][] lightMap)
 	{
 		for(int z = 0; z < axis.ZLEN(this); z++)
 		{
@@ -444,14 +483,15 @@ public class BulkModel
 				
 				for(int x = 0; x < axis.XLEN(this); x++)
 				{
-					positivePlane = handlePlane(x, y, z, axis, 1, positivePlane, left, right, top, bottom, front, back);
-					negativePlane = handlePlane(x, y, z, axis, -1, negativePlane, left, right, top, bottom, front, back);
+					positivePlane = handlePlane(x, y, z, axis, 1, positivePlane, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
+					negativePlane = handlePlane(x, y, z, axis, -1, negativePlane, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
 				}
 				
 				if(positivePlane != null)
 				{
 					axis.addPlane(verticies, positivePlane);
 					maxIndex = indiciesAndUvs(positivePlane, maxIndex);
+					lighting(positivePlane, axis, 1, offX, offY, offZ, lightMap);
 					positivePlane = null;
 				}
 				
@@ -459,12 +499,42 @@ public class BulkModel
 				{
 					axis.addPlane(verticies, negativePlane);
 					maxIndex = indiciesAndUvs(negativePlane, maxIndex);
+					lighting(negativePlane, axis, -1, offX, offY, offZ, lightMap);
 					negativePlane = null;
 				}
 			}
 		}
 	}
 	
+	private void lighting(Plane p, Axis axis, int delta, int offX, int offY, int offZ, float[][][] lightMap)
+	{
+		Vector3ic coord = axis.nextCoord(p, axis, delta);
+		
+		float col = -1;
+		
+		if(withinLightmap(offX, offY, offZ, lightMap, coord.x(), coord.y(), coord.z()))
+		{
+			col = lightMap[offZ + coord.z()][offY + coord.y()][offX + coord.x()];
+		}
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+	}
+	
+
 	private int indiciesAndUvs(Plane p, int maxIndex)
 	{
 		int[] indiciesArr = p.model.indicies(p.side);
@@ -503,55 +573,188 @@ public class BulkModel
 		uvs.add(u);
 		uvs.add(v);
 		
-		if(p.width != 1)
-			System.out.println(p.width);
-		
-		// TODO: this but with actual processing
-		float r = (float)Math.random();
-		lights.add(r);
-		lights.add(r);
-		lights.add(r);
-		
-		lights.add(r);
-		lights.add(r);
-		lights.add(r);
-		
-		lights.add(r);
-		lights.add(r);
-		lights.add(r);
-		
-		lights.add(r);
-		lights.add(r);
-		lights.add(r);
-		
-		
 		return maxIndex + max + 1;
 	}
 	
-
-	/**
-	 * "Greedy meshing algorithm" kinda
-	 */
-	void render()
+	public void calculateLightMap(int offX, int offY, int offZ, float[][][] lightMap)
 	{
-		render(null, null, null, null, null, null);
+		
+		
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					lightMap[z + offZ][y + offY][x + offX] = 1.0f;
+				}
+			}
+		}
+		
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					if(cubes[z][y][x] != null)
+						lightMap[z + offZ][y + offY][x + offX] = -1; // marks where the blocks are in the light map
+				}
+			}
+		}
+		
+//		for(Vector3i pos : lightSources.keySet())
+//		{
+//			LightSource src = lightSources.get(pos);
+//			
+//			lightMap[pos.z() + offZ][pos.y() + offY][pos.x() + offX] = 1;
+//			
+//			doTheThing(src, pos, lightMap, offX, offY, offZ, 1);
+//			doTheThing(src, pos, lightMap, offX, offY, offZ, -1);
+//			
+////			light(offX, offY, offZ, lightMap, pos.x(), pos.y(), pos.z(), src);
+//		}
+	}
+	
+	private void doTheThing(LightSource src, Vector3ic pos, float[][][] lightMap, int offX, int offY, int offZ, int dir)
+	{
+		for(int dz = 0; dz <= src.strength(); dz++)
+		{
+			for(int dy = 0; dy <= src.strength(); dy++)
+			{
+				for(int dx = 0; dx <= src.strength(); dx++)
+				{
+					if(dz == 0 && dy == 0 && dx == 0)
+						continue;
+					
+					int xx = pos.x() + dir * dx + offX;
+					int yy = pos.y() + dir * dy + offY;
+					int zz = pos.z() + dir * dz + offZ;
+					
+//					if(withinLightmap(offX, offY, offZ, lightMap, pos.x() + dir * dx, pos.y() + dir * yy, pos.z() + dir * zz))
+					{
+//						float here = lightMap[zz][yy][xx];
+						
+						try
+						{
+							lightMap[zz][yy][xx] = 1;
+						}
+						catch(ArrayIndexOutOfBoundsException ex)
+						{
+							
+						}
+//						if(here != -1)
+//						{
+//							float max = 0;
+//							
+//							if(withinLightmap(xx + 1, yy, zz, lightMap))
+//								max = Maths.max(lightMap[zz][yy][xx + 1], max);
+//							if(withinLightmap(xx - 1, yy, zz, lightMap))
+//								max = Maths.max(lightMap[zz][yy][xx - 1], max);
+//							
+//							if(withinLightmap(xx, yy + 1, zz, lightMap))
+//								max = Maths.max(lightMap[zz][yy + 1][xx], max);
+//							if(withinLightmap( xx, yy - 1, zz, lightMap))
+//								max = Maths.max(lightMap[zz][yy - 1][xx], max);
+//							
+//							if(withinLightmap(xx, yy, zz + 1, lightMap))
+//								max = Maths.max(lightMap[zz + 1][yy][xx], max);
+//							if(withinLightmap(xx, yy, zz - 1, lightMap))
+//								max = Maths.max(lightMap[zz - 1][yy][xx], max);
+//							
+//							max -= 1.0f / src.strength();
+//							
+//							lightMap[pos.z() + offZ][yy][pos.x() + offX] = 100;//Maths.max(max, here);
+//						}
+					}
+				}
+			}
+		}
+	}
+	
+	private boolean withinLightmap(int offX, int offY, int offZ, float[][][] lightMap, int x, int y, int z)
+	{
+		return withinLightmap(x + offX, y + offY, z + offZ, lightMap);			
+	}
+	
+	private boolean withinLightmap(int x, int y, int z, float[][][] lightMap)
+	{
+		return z >= 0 && z < lightMap.length &&
+				y >= 0 && y < lightMap[z].length &&
+				x >= 0 && x < lightMap[z][y].length;
+				
+	}
+	
+	private void light(int offX, int offY, int offZ, float[][][] lightMap, int startX, int startY, int startZ, LightSource src)
+	{
+		float startingStren = lightMap[startZ + offZ][startY + offY][startX + offX];
+		
+		if(startingStren <= 1)
+			return;
+		
+		for(int dz = -src.strength(); dz <= src.strength(); dz++)
+		{
+			for(int dy = -src.strength(); dy <= src.strength(); dy++)
+			{
+				for(int dx = -src.strength(); dx <= src.strength(); dx++)
+				{
+					if(!withinLightmap(offX, offY, offZ, lightMap, startX + dx, dy + startY, dz + startZ))
+						break;
+					
+					lightMap[offZ + dz + startZ]
+							[offY + dy + startY]
+							[offX + dx + startX] = 1.0f;//1.0f - Math.max(Math.max(Math.abs(dx), Math.abs(dy)), Math.abs(dz)) / (float)src.strength();
+				}
+			}
+		}
+		
+//		for(int y = 1; y < startingStren; y++)
+//		{			
+//			if(!withinLightmap(offX, offY, offZ, lightMap, startX, y + startY, startZ))
+//				break;
+//			
+//			float here = lightMap[offX + startX][offY + y + startY][offZ + startZ];
+//			float stren = (startingStren - y) / (float)src.strength();
+//			
+//			if(here == -1 || here >= stren)
+//				break;
+//			
+//			lightMap[offZ + startZ][offY + y + startY][offX + startX] = stren;
+//		}
+//		
+//		for(int y = 1; y < startingStren; y++)
+//		{
+//			if(!withinLightmap(offX, offY, offZ, lightMap, startX, -y + startY, startZ))
+//				break;
+//			
+//			float here = lightMap[offX + startX][offY + -y + startY][offZ + startZ];
+//			float stren = (startingStren - y) / (float)src.strength();
+//			
+//			if(here == -1 || here >= stren)
+//				break;
+//			
+//			lightMap[offZ + startZ][offY + -y + startY][offX + startX] = stren;
+//		}
 	}
 	
 	/**
-	 * "Greedy meshing algorithm" kinda
+	 * "<s>Greedy meshing</s> algorithm" kinda
 	 */
 	void render(BulkModel left, BulkModel right, BulkModel top, 
-			BulkModel bottom, BulkModel front, BulkModel back)
+			BulkModel bottom, BulkModel front, BulkModel back,
+			int offX, int offY, int offZ, float[][][] lightMap)
 	{
+		Utils.println(offX + " " + offY + " " + offZ);
+		
 		verticies.clear();
 		indicies.clear();
 		uvs.clear();
 		
 		maxIndex = 0;
 		
-		renderAxis(botTop, left, right, top, bottom, front, back);
-		renderAxis(backFront, left, right, top, bottom, front, back);
-		renderAxis(leftRight, left, right, top, bottom, front, back);
+		renderAxis(botTop, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
+		renderAxis(backFront, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
+		renderAxis(leftRight, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
 		
 		int i = 0;
 		int[] indiciesArr = new int[indicies.size()];
@@ -580,10 +783,36 @@ public class BulkModel
 			lightsArr[i++] = l;
 		
 		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr);
+		
+		renderedOnce = true;
+	}
+	
+	public void addLight(LightSource light, Vector3fc pos) // relative to chunk's 0,0,0
+	{
+		int x = Maths.floor(pos.x());
+		int y = Maths.floor(pos.y());
+		int z = Maths.floor(pos.z());
+		
+		lightSources.put(new Vector3i(x, y, z), light);
 	}
 	
 	public Mesh mesh()
 	{
 		return combinedModel;
+	}
+	
+	public int width()
+	{
+		return cubes[0][0].length;
+	}
+	
+	public int height()
+	{
+		return cubes[0].length;
+	}
+	
+	public int length()
+	{
+		return cubes.length;
 	}
 }

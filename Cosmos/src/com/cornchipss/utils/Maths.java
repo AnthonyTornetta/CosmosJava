@@ -623,4 +623,19 @@ public class Maths
 		
 		return x * x + y * y + z * z;
 	}
+
+	public static int floor(float x)
+	{
+		return (int)Math.floor(x);
+	}
+
+	public static float min(float a, float b)
+	{
+		return a < b ? a : b;
+	}
+	
+	public static float max(float a, float b)
+	{
+		return a > b ? a : b;
+	}
 }

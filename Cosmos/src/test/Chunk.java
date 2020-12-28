@@ -1,10 +1,14 @@
 package test;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
+import test.lights.LightSource;
 
 public class Chunk
 {
@@ -15,6 +19,27 @@ public class Chunk
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
 	
 	private Block[][][] blocks;
+	
+	/**
+	 * Offset relative to block structure's 0,0,0
+	 */
+	private Vector3ic offset;
+	
+	/**
+	 * block structure it's a part of
+	 */
+	private Structure structure;
+	
+	public Chunk(int offX, int offY, int offZ, Structure s)
+	{
+		this.offset = new Vector3i(offX, offY, offZ);
+		
+		this.structure = s;
+		
+		rendered = false;
+		blocks = new Block[LENGTH][HEIGHT][WIDTH];
+		model = new BulkModel(blocks);
+	}
 	
 	/**
 	 * Neighbors
@@ -72,14 +97,7 @@ public class Chunk
 	}
 	
 	private Matrix4f transformMatrix;
-	
-	public Chunk()
-	{
-		rendered = false;
-		blocks = new Block[LENGTH][HEIGHT][WIDTH];
-		model = new BulkModel(blocks);
-	}
-	
+
 	/**
 	 * <p>Sets the block at the given coordinates relative to this chunk.</p>
 	 * <p>If {@link Chunk#render()} has been called previously, this will also call it.</p>
@@ -137,8 +155,10 @@ public class Chunk
 				top != null ? top.model : null, 
 				bottom != null ? bottom.model : null, 
 				front != null ? front.model : null, 
-				back != null ? back.model : null);
-		System.out.println(System.currentTimeMillis() - start  + "ms to render chunk");
+				back != null ? back.model : null,
+						offset.x(), offset.y(), offset.z(), structure.lightMap());
+		
+		Utils.println(System.currentTimeMillis() - start  + "ms to render chunk");
 	}
 	
 	/**
@@ -174,5 +194,29 @@ public class Chunk
 	public Matrix4f transformMatrix()
 	{
 		return transformMatrix;
+	}
+	public void addLight(LightSource lightSource, Vector3f pos)
+	{
+		model.addLight(lightSource, pos);
+	}
+	
+	public BulkModel model()
+	{
+		return model;
+	}
+	
+	public Vector3ic offset()
+	{
+		return offset;
+	}
+	
+	public Structure structure()
+	{
+		return structure;
+	}
+	
+	public void calculateLightMap()
+	{
+		model.calculateLightMap(offset.x(), offset.y(), offset.z(), structure.lightMap());
 	}
 }

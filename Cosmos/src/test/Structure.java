@@ -5,6 +5,7 @@ import org.joml.Vector3f;
 
 import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 
@@ -20,6 +21,8 @@ public class Structure
 	
 	private Transform transform;
 	
+	private float[][][] lightMap;
+	
 	public Structure(Transform trans, int width, int height, int length)
 	{
 		if(width <= 0 || height <= 0 || length <= 0)
@@ -34,6 +37,8 @@ public class Structure
 		cLength = (int)Math.ceil((float)length / Chunk.LENGTH);
 		cHeight = (int)Math.ceil((float)height / Chunk.HEIGHT);
 		cWidth = (int)Math.ceil((float)width / Chunk.WIDTH);
+		
+		lightMap = new float[length][height][width];
 		
 		chunks = new Chunk[cLength * cHeight * cWidth];
 	}
@@ -92,7 +97,7 @@ public class Structure
 				for(int x = 0; x < chunksWidth(); x++)
 				{
 					int i = flatten(x, y, z);
-					chunks[i] = new Chunk();
+					chunks[i] = new Chunk(x * Chunk.WIDTH, y * Chunk.HEIGHT, z * Chunk.LENGTH, this);
 					
 					chunks[i].transformMatrix(
 							Maths.createTransformationMatrix(
@@ -130,6 +135,24 @@ public class Structure
 				}
 			}
 		}
+	}
+	
+	public void calculateLights()
+	{
+		long start = System.currentTimeMillis();
+		
+		for(int z = 0; z < cLength; z++)
+		{
+			for(int y = 0; y < cHeight; y++)
+			{
+				for(int x = 0; x < cWidth; x++)
+				{
+					chunks[flatten(x, y, z)].calculateLightMap();
+				}
+			}
+		}
+		
+		Utils.println(System.currentTimeMillis() - start + "ms to calculate light map");
 	}
 	
 	public boolean within(int x, int y, int z)
@@ -186,5 +209,10 @@ public class Structure
 	public Transform transform()
 	{
 		return transform;
+	}
+
+	public float[][][] lightMap()
+	{
+		return lightMap;
 	}
 }

@@ -20,6 +20,7 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Blocks;
+import test.lights.LightSource;
 
 public class Main
 {
@@ -32,7 +33,6 @@ public class Main
 	private int loadShaders()
 	{
 		StringBuilder shaderCode = new StringBuilder();
-		
 		BufferedReader br = null;
 		try
 		{
@@ -129,7 +129,7 @@ public class Main
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero()), 16,16,16);//16 * 2, 16 * 2, 16 * 2);
 		
 		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
@@ -139,7 +139,7 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - rdm.nextInt(2);
+				int h = s.height() - 4;//- rdm.nextInt(2) - 4;
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
@@ -151,6 +151,17 @@ public class Main
 				}
 			}
 		}
+		
+		s.block(8, s.height() - 4, 8, Blocks.GRASS);
+		
+		for(Chunk c : s.chunks())
+		{
+			if(Math.random() < 0.25)
+				c.addLight(new LightSource(20), new Vector3f(8, 14, 8));
+			c.block(8, 14, 8, Blocks.STONE);
+		}
+		
+		s.calculateLights();
 		
 		for(Chunk c : s.chunks())
 			c.render();
