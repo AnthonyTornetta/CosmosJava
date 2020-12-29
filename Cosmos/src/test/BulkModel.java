@@ -323,19 +323,20 @@ public class BulkModel
 					originPos.y() + offY, 
 					originPos.z() + offZ));
 			
-			// makes it now -1 so this progresses - will be overridden in first iteration of below code
+			// makes it not -1 so this progresses - will be overridden in first iteration of below code
 			lightMap[originPos.z() + offZ][originPos.y() + offY][originPos.x() + offX] = 0.0f;
 			
 			while(positions.size() != 0 && stren > 0)
 			{
-				List<Vector3ic> newPositions = new LinkedList<Vector3ic>();
-				
 				float nextStren = stren - 1.0f / src.strength();
 				
-				while(positions.size() != 0)
+				int oldSize = positions.size();
+				
+				while(oldSize != 0)
 				{
 					Vector3ic pos = positions.remove(0);
-					
+					oldSize--;
+
 					int x = pos.x(), y = pos.y(), z = pos.z();
 					
 					if(isGood(x, y, z, stren, lightMap))
@@ -343,21 +344,19 @@ public class BulkModel
 						lightMap[z][y][x] = stren;
 						
 						if(isGood(x + 1, y, z, nextStren, lightMap))
-							newPositions.add(new Vector3i(x + 1, y, z));
+							positions.add(new Vector3i(x + 1, y, z));
 						if(isGood(x - 1, y, z, nextStren, lightMap))
-							newPositions.add(new Vector3i(x - 1, y, z));
+							positions.add(new Vector3i(x - 1, y, z));
 						if(isGood(x, y + 1, z, nextStren, lightMap))
-							newPositions.add(new Vector3i(x, y + 1, z));
+							positions.add(new Vector3i(x, y + 1, z));
 						if(isGood(x, y - 1, z, nextStren, lightMap))
-							newPositions.add(new Vector3i(x, y - 1, z));
+							positions.add(new Vector3i(x, y - 1, z));
 						if(isGood(x, y, z + 1, nextStren, lightMap))
-							newPositions.add(new Vector3i(x, y, z + 1));
+							positions.add(new Vector3i(x, y, z + 1));
 						if(isGood(x, y, z - 1, nextStren, lightMap))
-							newPositions.add(new Vector3i(x, y, z - 1));
+							positions.add(new Vector3i(x, y, z - 1));
 					}
 				}
-				
-				positions = newPositions;
 				
 				stren = nextStren;
 			}	
@@ -374,7 +373,6 @@ public class BulkModel
 		return z >= 0 && z < lightMap.length &&
 				y >= 0 && y < lightMap[z].length &&
 				x >= 0 && x < lightMap[z][y].length;
-				
 	}
 		
 	/**

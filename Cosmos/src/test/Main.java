@@ -20,7 +20,6 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Blocks;
-import test.lights.LightSource;
 
 public class Main
 {
