@@ -139,7 +139,7 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - 8;//- rdm.nextInt(2) - 4;
+				int h = s.height() - rdm.nextInt(8) - 4;
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
@@ -156,11 +156,7 @@ public class Main
 		
 		for(Chunk c : s.chunks())
 		{
-			c.addLight(new LightSource(16), new Vector3f(4, 14, 4));
-			c.addLight(new LightSource(16), new Vector3f(12, 14, 4));
-			c.addLight(new LightSource(16), new Vector3f(4, 14, 12));
-			c.addLight(new LightSource(16), new Vector3f(12, 14, 12));
-			c.block(8, 14, 8, Blocks.STONE);
+			c.block(8, 14 - 6, 8, Blocks.LIGHT);
 		}
 		
 		s.calculateLights();

@@ -5,7 +5,7 @@ import org.joml.Vector3fc;
 
 public class LightSource
 {
-	private int dist;
+	private final int dist;
 	
 	/**
 	 * Not yet implemented

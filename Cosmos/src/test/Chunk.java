@@ -1,13 +1,13 @@
 package test;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
+import test.blocks.LitBlock;
 import test.lights.LightSource;
 
 public class Chunk
@@ -111,6 +111,14 @@ public class Chunk
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
 			blocks[z][y][x] = block;
+						
+			if(block instanceof LitBlock)
+			{
+				addLight(((LitBlock) block).lightSource(), new Vector3i(x, y, z));
+				
+				if(rendered)
+					calculateLightMap();
+			}
 			
 			if(rendered) // only if the chunk has been rendered at least 1 time before
 				render(); // update the chunk's model for the new block
@@ -195,7 +203,7 @@ public class Chunk
 	{
 		return transformMatrix;
 	}
-	public void addLight(LightSource lightSource, Vector3f pos)
+	public void addLight(LightSource lightSource, Vector3i pos)
 	{
 		model.addLight(lightSource, pos);
 	}
