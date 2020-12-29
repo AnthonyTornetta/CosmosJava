@@ -31,325 +31,6 @@ public class BulkModel
 	}
 	
 	private Mesh combinedModel;
-	
-	private static Axis botTop = new Axis() 
-	{
-		@Override
-		public float zOff(int delta)
-		{
-			return delta == 1 ? 1 : 0;
-		}
-		
-		@Override
-		public float yOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public float xOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public BlockSide side(int delta)
-		{
-			return delta < 0 ? BlockSide.BOTTOM : BlockSide.TOP;
-		}
-		
-
-		@Override
-		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
-		{
-			return new Vector3i((int)p.x, (int)p.z * delta, (int)p.y);
-//			return new Vector3i(Maths.floor(p.x), Maths.floor(p.z) + delta, Maths.floor(p.y));
-		}
-		
-		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
-				BulkModel left, BulkModel right, BulkModel top, 
-				BulkModel bottom, BulkModel front, BulkModel back)
-		{
-			if(!m.within(x, z + delta, y))
-			{
-				if(delta == -1)
-				{
-					if(bottom != null)
-						return bottom.cubes[y][bottom.cubes[0].length - 1][x];
-					else
-						return null;
-				}
-				else if(delta == 1)
-				{
-					if(top != null)
-						return top.cubes[y][0][x];
-					else
-						return null;
-				}
-				else
-					throw new IllegalArgumentException("Delta must be -1 or 1!");
-			}
-			else
-				return getModelAt(m, x, y, z + delta);
-		}
-		
-		@Override
-		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
-		{
-			return m.within(x, z, y) ? m.cubes[y][z][x] : null;
-		}
-		
-		@Override
-		public int ZLEN(BulkModel m)
-		{
-			return m.cubes[0].length;
-		}
-		
-		@Override
-		public int YLEN(BulkModel m)
-		{
-			return m.cubes.length;
-		}
-		
-		@Override
-		public int XLEN(BulkModel m)
-		{
-			return m.cubes[0][0].length;
-		}
-		
-		@Override
-		public void addPlane(List<Float> verticies, Plane p)
-		{
-			float x = p.x, z = p.y, y = p.z;
-			
-			verticies.add(x);
-			verticies.add(y);
-			verticies.add(z);
-			
-			verticies.add(x);
-			verticies.add(y);
-			verticies.add(z + p.height);
-			
-			verticies.add(x + p.width);
-			verticies.add(y);
-			verticies.add(z + p.height);
-			
-			verticies.add(x + p.width);
-			verticies.add(y);
-			verticies.add(z);
-		}
-	},
-	
-	backFront = new Axis() 
-	{
-		@Override
-		public float zOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public float yOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public float xOff(int delta)
-		{
-			return 0.5f + (delta * 0.5f);
-		}
-		
-		@Override
-		public BlockSide side(int delta)
-		{
-			return delta < 0 ? BlockSide.BACK : BlockSide.FRONT;
-		}
-		
-		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
-				BulkModel left, BulkModel right, BulkModel top, 
-				BulkModel bottom, BulkModel front, BulkModel back)
-		{
-			if(!m.within(z, y, x + delta))
-			{
-				if(delta == -1)
-				{
-					if(back != null)
-						return back.cubes[back.cubes.length - 1][y][z];
-					else
-						return null;
-				}
-				else if(delta == 1)
-				{
-					if(front != null)
-						return front.cubes[0][y][z];
-					else
-						return null;
-				}
-				else
-					throw new IllegalArgumentException("Delta must be -1 or 1!");
-			}
-			else
-				return getModelAt(m, x + delta, y, z);
-		}
-
-		@Override
-		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
-		{
-			return new Vector3i(Maths.floor(p.z), Maths.floor(p.y), Maths.floor(p.x) + delta);
-		}
-		
-		@Override
-		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
-		{
-			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
-		}
-		
-		@Override
-		public int ZLEN(BulkModel m)
-		{
-			return m.cubes[0][0].length;
-		}
-		
-		@Override
-		public int YLEN(BulkModel m)
-		{
-			return m.cubes[0].length;
-		}
-		
-		@Override
-		public int XLEN(BulkModel m)
-		{
-			return m.cubes.length;
-		}
-		
-		@Override
-		public void addPlane(List<Float> verticies, Plane p)
-		{
-			verticies.add(p.z);
-			verticies.add(p.y);
-			verticies.add(p.x);
-			
-			verticies.add(p.z);
-			verticies.add(p.y + p.height);
-			verticies.add(p.x);
-			
-			verticies.add(p.z + p.width);
-			verticies.add(p.y + p.height);
-			verticies.add(p.x);
-			
-			verticies.add(p.z + p.width);
-			verticies.add(p.y);
-			verticies.add(p.x);
-		}
-	},
-	
-	leftRight = new Axis() 
-	{
-		@Override
-		public float zOff(int delta)
-		{
-			return delta < 0 ? 0 : 1;
-		}
-		
-		@Override
-		public float yOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public float xOff(int delta)
-		{
-			return 0;
-		}
-		
-		@Override
-		public BlockSide side(int delta)
-		{
-			return delta < 0 ? BlockSide.LEFT : BlockSide.RIGHT;
-		}
-		
-		@Override
-		public IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
-				BulkModel left, BulkModel right, BulkModel top, 
-				BulkModel bottom, BulkModel front, BulkModel back)
-		{
-			if(!m.within(z + delta, y, x))
-			{
-				if(delta == -1)
-				{
-					if(left != null)
-						return left.cubes[x][y][left.cubes[0][0].length - 1];
-					else
-						return null;
-				}
-				else if(delta == 1)
-				{
-					if(right != null)
-						return right.cubes[x][y][0];
-					else
-						return null;
-				}
-				else
-					throw new IllegalArgumentException("Delta must be -1 or 1!");
-			}
-			else
-				return getModelAt(m, x, y, z + delta);
-		}
-
-		@Override
-		public Vector3ic nextCoord(Plane p, Axis axis, int delta)
-		{
-			return new Vector3i(Maths.floor(p.z) + delta, Maths.floor(p.y), Maths.floor(p.x) + delta);
-		}
-		
-		@Override
-		public IHasModel getModelAt(BulkModel m, int x, int y, int z)
-		{
-			return m.within(z, y, x) ? m.cubes[x][y][z] : null;
-		}
-		
-		@Override
-		public int ZLEN(BulkModel m)
-		{
-			return m.cubes[0][0].length;
-		}
-		
-		@Override
-		public int YLEN(BulkModel m)
-		{
-			return m.cubes[0].length;
-		}
-		
-		@Override
-		public int XLEN(BulkModel m)
-		{
-			return m.cubes.length;
-		}
-		
-		@Override
-		public void addPlane(List<Float> verticies, Plane p)
-		{
-			verticies.add(p.z);
-			verticies.add(p.y);
-			verticies.add(p.x);
-			
-			verticies.add(p.z);
-			verticies.add(p.y + p.height);
-			verticies.add(p.x);
-			
-			verticies.add(p.z);
-			verticies.add(p.y + p.height);
-			verticies.add(p.x + p.width);
-			
-			verticies.add(p.z);
-			verticies.add(p.y);
-			verticies.add(p.x + p.width);
-		}
-	};
 		
 	List<Integer> indicies = new LinkedList<>();
 	List<Float> verticies = new LinkedList<>();
@@ -370,174 +51,223 @@ public class BulkModel
 				&& x >= 0 && x < cubes[z][y].length;
 	}
 	
-	private static class Plane
-	{
-		float x, y, z, width, height;
-		
-		BlockSide side;
-		CubeModel model;
-		
-		Plane(float x, float y, float z, CubeModel model, BlockSide side)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-			this.model = model;
-			this.side = side;
-		}
-		
-		public String toString()
-		{
-			return "[" + x + "," + y + "," + z + "|" + width + "x" + height + "]";
-		}
-	}
-	
-	private static abstract interface Axis
-	{
-		int ZLEN(BulkModel m);
-		int YLEN(BulkModel m);
-		int XLEN(BulkModel m);
-		IHasModel getModelAt(BulkModel m, int x, int y, int z);
-		IHasModel nextModel(BulkModel m, int x, int y, int z, int delta,
-				BulkModel left, BulkModel right, BulkModel top, 
-				BulkModel bottom, BulkModel front, BulkModel back);
-		Vector3ic nextCoord(Plane p, Axis axis, int delta);
-
-		BlockSide side(int delta);
-		
-		float xOff(int delta);
-		float yOff(int delta);
-		float zOff(int delta);
-		
-		void addPlane(List<Float> verticies, Plane p);
-	}
-	
-	private Plane handlePlane(int x, int y, int z, Axis axis, int delta, Plane plane,
-			BulkModel left, BulkModel right, BulkModel top, 
+	private void computeEverything(BulkModel left, BulkModel right, BulkModel top, 
 			BulkModel bottom, BulkModel front, BulkModel back,
 			int offX, int offY, int offZ, float[][][] lightMap)
 	{
-		IHasModel model = axis.getModelAt(this, x, y, z);
-		
-		if(model != null)
+		for(int z = 0; z < length(); z++)
 		{
-			IHasModel nextModel = axis.nextModel(this, x, y, z, delta, left, right, top, bottom, front, back);
-			
-			if(plane == null && nextModel == null)
+			for(int y = 0; y < height(); y++)
 			{
-				plane = new Plane(
-						x + axis.xOff(delta), 
-						y + axis.yOff(delta), 
-						z + axis.zOff(delta), 
-						model.model(), axis.side(delta));
-				plane.width = 0;
-				plane.height = 1;
-			}
-			else if(plane != null && nextModel != null)
-			{
-				axis.addPlane(verticies, plane);
-				maxIndex = indiciesAndUvs(plane, maxIndex);
-				lighting(plane, axis, delta, offX, offY, offZ, lightMap);
-				
-				plane = null;
-			}
-			else if(plane != null && !Utils.equals(plane.model, model))
-			{
-				axis.addPlane(verticies, plane);
-				maxIndex = indiciesAndUvs(plane, maxIndex);
-				lighting(plane, axis, delta, offX, offY, offZ, lightMap);
-				
-				plane = new Plane(
-						x + axis.xOff(delta), 
-						y + axis.yOff(delta), 
-						z + axis.zOff(delta), 
-						model.model(), axis.side(delta));
-				plane.width = 0;
-				plane.height = 1;
-			}
-		}
-		else if(plane != null)
-		{
-			axis.addPlane(verticies, plane);
-			maxIndex = indiciesAndUvs(plane, maxIndex);
-			lighting(plane, axis, delta, offX, offY, offZ, lightMap);
-			plane = null;
-		}
-		
-		if(plane != null)
-			plane.width++;
-		
-		return plane;
-	}
-	
-	public void renderAxis(Axis axis,
-			BulkModel left, BulkModel right, BulkModel top, 
-			BulkModel bottom, BulkModel front, BulkModel back,
-			int offX, int offY, int offZ, float[][][] lightMap)
-	{
-		for(int z = 0; z < axis.ZLEN(this); z++)
-		{
-			for(int y = 0; y < axis.YLEN(this); y++)
-			{
-				Plane positivePlane = null, negativePlane = null;
-				
-				for(int x = 0; x < axis.XLEN(this); x++)
+				for(int x = 0; x < width(); x++)
 				{
-					positivePlane = handlePlane(x, y, z, axis, 1, positivePlane, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
-					negativePlane = handlePlane(x, y, z, axis, -1, negativePlane, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
-				}
-				
-				if(positivePlane != null)
-				{
-					axis.addPlane(verticies, positivePlane);
-					maxIndex = indiciesAndUvs(positivePlane, maxIndex);
-					lighting(positivePlane, axis, 1, offX, offY, offZ, lightMap);
-					positivePlane = null;
-				}
-				
-				if(negativePlane != null)
-				{
-					axis.addPlane(verticies, negativePlane);
-					maxIndex = indiciesAndUvs(negativePlane, maxIndex);
-					lighting(negativePlane, axis, -1, offX, offY, offZ, lightMap);
-					negativePlane = null;
-				}
-			}
-		}
-	}
-	
-	private void lighting(Plane p, Axis axis, int delta, int offX, int offY, int offZ, float[][][] lightMap)
-	{
-		Vector3ic coord = axis.nextCoord(p, axis, delta);
-		
-		float col = -1;
-		
-		if(withinLightmap(offX, offY, offZ, lightMap, coord.x(), coord.y(), coord.z()))
-		{
-			col = lightMap[offZ + coord.z()][offY + coord.y()][offX + coord.x()];
-		}
-		
-		lights.add(col);
-		lights.add(col);
-		lights.add(col);
-		
-		lights.add(col);
-		lights.add(col);
-		lights.add(col);
-		
-		lights.add(col);
-		lights.add(col);
-		lights.add(col);
-		
-		lights.add(col);
-		lights.add(col);
-		lights.add(col);
-	}
-	
+					if(cubes[z][y][x] != null)
+					{
+						boolean withinB;
+						
+						if((!(withinB = within(x, y + 1, z)) &&
+							(top == null || top.cubes[z][0][x] == null)) 
+								|| withinB && cubes[z][y + 1][x] == null)
+						{
+							float xx = (float)x;
+							float yy = (float)y + 1;
+							float zz = (float)z;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							maxIndex = indiciesAndUvs(BlockSide.TOP, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x, y + 1, z, lightMap);
+						}
+						if((!(withinB = within(x, y - 1, z)) &&
+								(bottom == null || bottom.cubes[z][bottom.height() - 1][x] == null)) 
+									|| withinB && cubes[z][y - 1][x] == null)
+						{
+							float xx = (float)x;
+							float yy = (float)y;
+							float zz = (float)z;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							maxIndex = indiciesAndUvs(BlockSide.BOTTOM, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x, y - 1, z, lightMap);
+						}
+						
+						if((!(withinB = within(x, y, z + 1)) &&
+								(front == null || front.cubes[0][y][x] == null)) 
+									|| withinB && cubes[z + 1][y][x] == null)
+						{
+							float xx = (float)x;
+							float yy = (float)y;
+							float zz = (float)z + 1;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							maxIndex = indiciesAndUvs(BlockSide.FRONT, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x, y, z + 1, lightMap);
+						}
+						if((!(withinB = within(x, y, z - 1)) &&
+								(back == null || back.cubes[back.length() - 1][y][x] == null)) 
+									|| withinB && cubes[z - 1][y][x] == null)
+						{
+							float xx = (float)x;
+							float yy = (float)y;
+							float zz = (float)z;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx + 1);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							maxIndex = indiciesAndUvs(BlockSide.BACK, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x, y, z - 1, lightMap);
+						}
+						
 
-	private int indiciesAndUvs(Plane p, int maxIndex)
+						if((!(withinB = within(x + 1, y, z)) &&
+								(right == null || right.cubes[z][y][0] == null)) 
+									|| withinB && cubes[z][y][x + 1] == null)
+						{
+							float xx = (float)x + 1;
+							float yy = (float)y;
+							float zz = (float)z;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							maxIndex = indiciesAndUvs(BlockSide.RIGHT, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x + 1, y, z, lightMap);
+						}
+						if((!(withinB = within(x - 1, y, z)) &&
+								(left == null || left.cubes[z][y][left.width() - 1] == null)) 
+									|| withinB && cubes[z][y][x - 1] == null)
+						{
+							float xx = (float)x;
+							float yy = (float)y;
+							float zz = (float)z;
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz);
+							
+							verticies.add(xx);
+							verticies.add(yy + 1);
+							verticies.add(zz + 1);
+							
+							verticies.add(xx);
+							verticies.add(yy);
+							verticies.add(zz + 1);
+							
+							maxIndex = indiciesAndUvs(BlockSide.LEFT, cubes[z][y][x].model());
+							
+							lighting(offX, offY, offZ, x - 1, y, z, lightMap);
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	private void lighting(int offX, int offY, int offZ, int x, int y, int z, float[][][] lightMap)
 	{
-		int[] indiciesArr = p.model.indicies(p.side);
+		float col = 0;
+		if(withinLightmap(offX, offY, offZ, lightMap, x, y, z))
+			col = lightMap[z + offZ][y + offY][x + offX];
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+		
+		lights.add(col);
+		lights.add(col);
+		lights.add(col);
+	}
+	
+	private int indiciesAndUvs(BlockSide side, CubeModel model)
+	{
+		int[] indiciesArr = model.indicies(side);
 		int max = -1;
 		
 		for(int index : indiciesArr)
@@ -547,50 +277,29 @@ public class BulkModel
 				max = index;
 		}
 		  
-		float u = p.model.u(p.side);
-		float v = p.model.v(p.side);
+		float u = model.u(side);
+		float v = model.v(side);
 		
-		float uEnd = u + CubeModel.TEXTURE_DIMENSIONS * p.width;
-		float vEnd = v + CubeModel.TEXTURE_DIMENSIONS * p.height;
+		float uEnd = u + CubeModel.TEXTURE_DIMENSIONS;
+		float vEnd = v + CubeModel.TEXTURE_DIMENSIONS;
 		
 		uvs.add(uEnd);
 		uvs.add(vEnd);
-		uvs.add(u);
-		uvs.add(v);
 		
 		uvs.add(uEnd);
 		uvs.add(v);
-		uvs.add(u);
-		uvs.add(v);
 		
-		uvs.add(u);
-		uvs.add(v);
 		uvs.add(u);
 		uvs.add(v);
 
 		uvs.add(u);
 		uvs.add(vEnd);
-		uvs.add(u);
-		uvs.add(v);
 		
 		return maxIndex + max + 1;
 	}
 	
 	public void calculateLightMap(int offX, int offY, int offZ, float[][][] lightMap)
 	{
-		
-		
-		for(int z = 0; z < length(); z++)
-		{
-			for(int y = 0; y < height(); y++)
-			{
-				for(int x = 0; x < width(); x++)
-				{
-					lightMap[z + offZ][y + offY][x + offX] = 1.0f;
-				}
-			}
-		}
-		
 		for(int z = 0; z < length(); z++)
 		{
 			for(int y = 0; y < height(); y++)
@@ -603,72 +312,59 @@ public class BulkModel
 			}
 		}
 		
-//		for(Vector3i pos : lightSources.keySet())
-//		{
-//			LightSource src = lightSources.get(pos);
-//			
-//			lightMap[pos.z() + offZ][pos.y() + offY][pos.x() + offX] = 1;
-//			
-//			doTheThing(src, pos, lightMap, offX, offY, offZ, 1);
-//			doTheThing(src, pos, lightMap, offX, offY, offZ, -1);
-//			
-////			light(offX, offY, offZ, lightMap, pos.x(), pos.y(), pos.z(), src);
-//		}
-	}
-	
-	private void doTheThing(LightSource src, Vector3ic pos, float[][][] lightMap, int offX, int offY, int offZ, int dir)
-	{
-		for(int dz = 0; dz <= src.strength(); dz++)
+		for(Vector3i pos : lightSources.keySet())
 		{
-			for(int dy = 0; dy <= src.strength(); dy++)
+			LightSource src = lightSources.get(pos);
+			
+			lightMap[pos.z() + offZ][pos.y() + offY][pos.x() + offX] = 1.0f;
+			
+			for(int delta = -1; delta <= 1; delta += 2)
 			{
-				for(int dx = 0; dx <= src.strength(); dx++)
+				for(int z = -src.strength(); z <= src.strength(); z++)
 				{
-					if(dz == 0 && dy == 0 && dx == 0)
-						continue;
-					
-					int xx = pos.x() + dir * dx + offX;
-					int yy = pos.y() + dir * dy + offY;
-					int zz = pos.z() + dir * dz + offZ;
-					
-//					if(withinLightmap(offX, offY, offZ, lightMap, pos.x() + dir * dx, pos.y() + dir * yy, pos.z() + dir * zz))
+					for(int y = -src.strength(); y <= src.strength(); y++)
 					{
-//						float here = lightMap[zz][yy][xx];
-						
-						try
+						for(int x = -src.strength(); x <= src.strength(); x++)
 						{
-							lightMap[zz][yy][xx] = 1;
-						}
-						catch(ArrayIndexOutOfBoundsException ex)
-						{
+							if(x == 0 && y == 0 && z == 0)
+								continue;
 							
+							int xx = pos.x() + offX + x * delta;
+							int yy = pos.y() + offY + y * delta;
+							int zz = pos.z() + offZ + z * delta;
+							
+							if(!withinLightmap(xx, yy, zz, lightMap))
+								continue;
+							
+							if(lightMap[zz][yy][xx] == -1)
+								continue;
+							
+							float highest = 0;
+							
+							if(withinLightmap(xx - 1, yy, zz, lightMap))
+								highest = Maths.max(highest, lightMap[zz][yy][xx - 1]);
+							if(withinLightmap(xx + 1, yy, zz, lightMap))
+								highest = Maths.max(highest, lightMap[zz][yy][xx + 1]);
+							if(withinLightmap(xx, yy - 1, zz, lightMap))
+								highest = Maths.max(highest, lightMap[zz][yy - 1][xx]);
+							if(withinLightmap(xx, yy + 1, zz, lightMap))
+								highest = Maths.max(highest, lightMap[zz][yy + 1][xx]);
+							if(withinLightmap(xx, yy, zz - 1, lightMap))
+								highest = Maths.max(highest, lightMap[zz - 1][yy][xx]);
+							if(withinLightmap(xx, yy, zz + 1, lightMap))
+								highest = Maths.max(highest, lightMap[zz + 1][yy][xx]);
+							
+							if(highest > 0)
+								lightMap[zz][yy][xx] = Math.max(lightMap[zz][yy][xx], highest - 1.0f / src.strength());
 						}
-//						if(here != -1)
-//						{
-//							float max = 0;
-//							
-//							if(withinLightmap(xx + 1, yy, zz, lightMap))
-//								max = Maths.max(lightMap[zz][yy][xx + 1], max);
-//							if(withinLightmap(xx - 1, yy, zz, lightMap))
-//								max = Maths.max(lightMap[zz][yy][xx - 1], max);
-//							
-//							if(withinLightmap(xx, yy + 1, zz, lightMap))
-//								max = Maths.max(lightMap[zz][yy + 1][xx], max);
-//							if(withinLightmap( xx, yy - 1, zz, lightMap))
-//								max = Maths.max(lightMap[zz][yy - 1][xx], max);
-//							
-//							if(withinLightmap(xx, yy, zz + 1, lightMap))
-//								max = Maths.max(lightMap[zz + 1][yy][xx], max);
-//							if(withinLightmap(xx, yy, zz - 1, lightMap))
-//								max = Maths.max(lightMap[zz - 1][yy][xx], max);
-//							
-//							max -= 1.0f / src.strength();
-//							
-//							lightMap[pos.z() + offZ][yy][pos.x() + offX] = 100;//Maths.max(max, here);
-//						}
 					}
 				}
 			}
+			
+//			doTheThing(src, pos, lightMap, offX, offY, offZ, 1);
+//			doTheThing(src, pos, lightMap, offX, offY, offZ, -1);
+//			
+//			light(offX, offY, offZ, lightMap, pos.x(), pos.y(), pos.z(), src);
 		}
 	}
 	
@@ -752,9 +448,7 @@ public class BulkModel
 		
 		maxIndex = 0;
 		
-		renderAxis(botTop, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
-		renderAxis(backFront, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
-		renderAxis(leftRight, left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
+		computeEverything(left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
 		
 		int i = 0;
 		int[] indiciesArr = new int[indicies.size()];

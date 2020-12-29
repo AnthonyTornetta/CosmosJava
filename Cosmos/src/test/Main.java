@@ -129,9 +129,9 @@ public class Main
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16,16,16);//16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero()), 16*4,16,16*4);//16 * 2, 16 * 2, 16 * 2);
 		
-		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
+//		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
 		Random rdm = new Random();
 		
@@ -139,7 +139,7 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - 4;//- rdm.nextInt(2) - 4;
+				int h = s.height() - 8;//- rdm.nextInt(2) - 4;
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
@@ -156,8 +156,10 @@ public class Main
 		
 		for(Chunk c : s.chunks())
 		{
-			if(Math.random() < 0.25)
-				c.addLight(new LightSource(20), new Vector3f(8, 14, 8));
+			c.addLight(new LightSource(16), new Vector3f(4, 14, 4));
+			c.addLight(new LightSource(16), new Vector3f(12, 14, 4));
+			c.addLight(new LightSource(16), new Vector3f(4, 14, 12));
+			c.addLight(new LightSource(16), new Vector3f(12, 14, 12));
 			c.block(8, 14, 8, Blocks.STONE);
 		}
 		

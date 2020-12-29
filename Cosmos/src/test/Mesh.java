@@ -62,7 +62,7 @@ public class Mesh
 		
 		m.storeIndicies(indicies);
 		
-		m.storeData(UV_INDEX, 4, uvs);
+		m.storeData(UV_INDEX, 2, uvs);
 		
 		m.storeData(LIGHT_INDEX, 3, lightsArr);
 		
