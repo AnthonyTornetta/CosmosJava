@@ -18,9 +18,9 @@ import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
 import test.blocks.Blocks;
+import test.utils.Logger;
 
 public class Main
 {
@@ -28,7 +28,7 @@ public class Main
 	
 	/**
 	 * Loads the shaders + returns the program ID they are linked to
-	 * @return
+	 * @return the program ID they are linked to	
 	 */
 	private int loadShaders()
 	{
@@ -58,8 +58,8 @@ public class Main
 		if(success == 0)
 		{
 			String log = GL30.glGetShaderInfoLog(vertexShader);
-			System.err.println("Vertex Shader Compilation Error!!!");
-			System.err.print(log);
+			Logger.LOGGER.error("Vertex Shader Compilation Error!!!");
+			Logger.LOGGER.error(log);
 			System.exit(-1);
 		}
 		
@@ -89,8 +89,8 @@ public class Main
 		if(success == 0)
 		{
 			String log = GL30.glGetShaderInfoLog(fragShader);
-			System.err.println("Fragment Shader Compilation Error!!!");
-			System.err.print(log);
+			Logger.LOGGER.error("Fragment Shader Compilation Error!!!");
+			Logger.LOGGER.error(log);
 			System.exit(-1);
 		}
 		
@@ -101,13 +101,13 @@ public class Main
 		GL30.glLinkProgram(shaderProgram);
 		GL20.glValidateProgram(shaderProgram);
 		
-		System.out.println("Shader Loader > " + GL30.glGetProgramInfoLog(shaderProgram));
+		Logger.LOGGER.info("Shader Loader > " + GL30.glGetProgramInfoLog(shaderProgram));
 		
 		if(GL30.glGetProgrami(shaderProgram, GL30.GL_LINK_STATUS) == 0)
 		{
 			String log = GL30.glGetProgramInfoLog(shaderProgram);
-			System.err.println("Shader Program Linking Error!!!");
-			System.err.print(log);
+			Logger.LOGGER.error("Shader Program Linking Error!!!");
+			Logger.LOGGER.error(log);
 			System.exit(-1);
 		}
 		
@@ -125,13 +125,15 @@ public class Main
 
 	private void run()
 	{
+		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
+		
 		window = new Window(1024, 720, "wack simulator 2020");
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero()), 16*20,16,16*20);//16 * 2, 16 * 2, 16 * 2);
 		
-//		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
+		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
 		Random rdm = new Random();
 		
@@ -144,8 +146,10 @@ public class Main
 				{
 					if(y == h - 1)
 					{
-						s.block(x, y, z, Blocks.GRASS);
-						
+						if(rdm.nextFloat() < 0.999f)
+							s.block(x, y, z, Blocks.GRASS);
+						else
+							s.block(x, y, z, Blocks.LIGHT);
 //						if(x % 8 == 0 && z % 8 == 0)
 //							s.block(x, y + 3, z, Blocks.LIGHT);
 //						if(x % 16 == 0 && z % 16 == 0)
@@ -244,7 +248,7 @@ public class Main
 			
 			if(lastSecond / 1000 != t / 1000)
 			{
-				System.out.println("UPS: " + ups);
+				Logger.LOGGER.info("UPS: " + ups);
 				lastSecond = t;
 				ups = 0;
 			}

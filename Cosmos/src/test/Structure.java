@@ -10,6 +10,7 @@ import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.lights.LightMap;
+import test.utils.Logger;
 
 public class Structure
 {
@@ -149,7 +150,7 @@ public class Structure
 		
 		long end = System.currentTimeMillis();
 		
-		Utils.println(end - start + "ms to calculate light map");
+		Logger.LOGGER.debug(end - start + "ms to calculate light map");
 		
 		if(render)
 		{
@@ -175,8 +176,6 @@ public class Structure
 					{
 						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
 						{
-							Utils.println(cz + ", " + cy + ", " + cx);
-							
 							chunks[flatten(cx, cy, cz)].render();
 							updates++;
 						}
@@ -184,7 +183,7 @@ public class Structure
 				}
 			}
 			
-			Utils.println("Chunk Re-Renders: " + updates);
+			Logger.LOGGER.debug("Chunk Re-Renders: " + updates);
 		}
 	}
 	
