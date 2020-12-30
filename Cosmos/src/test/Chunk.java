@@ -8,7 +8,7 @@ import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.blocks.LitBlock;
-import test.lights.LightSource;
+import test.lights.LightMap;
 
 public class Chunk
 {
@@ -111,13 +111,37 @@ public class Chunk
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
 			blocks[z][y][x] = block;
-						
+			
+			float mapVal = structure.lightMap().at(x + offset.x(), y + offset.y(), z + offset.z());
+
+			if(block != null)
+				structure.lightMap().addBlocking(x + offset.x(), y + offset.y(), z + offset.z());
+			else
+				structure.lightMap().removeBlocking(x + offset.x(), y + offset.y(), z + offset.z());
+			
 			if(block instanceof LitBlock)
 			{
-				addLight(((LitBlock) block).lightSource(), new Vector3i(x, y, z));
+				// remove it if there is already one
+				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
+				
+				structure.lightMap().lightSource(x + offset.x(), y + offset.y(), z + offset.z(), 
+							((LitBlock) block).lightSource());
 				
 				if(rendered)
-					calculateLightMap();
+				{
+					structure.calculateLights(true);
+				}
+			}
+			else if(structure.lightMap().hasLightSource(x + offset.x(), y + offset.y(), z + offset.z()))
+			{
+				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
+				
+				if(rendered)
+					structure.calculateLights(true);
+			}
+			else if(mapVal != LightMap.BLOCKED && mapVal != 0.0f && rendered)
+			{
+				structure.calculateLights(true);
 			}
 			
 			if(rendered) // only if the chunk has been rendered at least 1 time before
@@ -156,7 +180,6 @@ public class Chunk
 	{
 		rendered = true;
 		
-		long start = System.currentTimeMillis();
 		model.render(
 				left != null ? left.model : null, 
 				right != null ? right.model : null, 
@@ -165,8 +188,6 @@ public class Chunk
 				front != null ? front.model : null, 
 				back != null ? back.model : null,
 						offset.x(), offset.y(), offset.z(), structure.lightMap());
-		
-		Utils.println(System.currentTimeMillis() - start  + "ms to render chunk");
 	}
 	
 	/**
@@ -203,10 +224,6 @@ public class Chunk
 	{
 		return transformMatrix;
 	}
-	public void addLight(LightSource lightSource, Vector3i pos)
-	{
-		model.addLight(lightSource, pos);
-	}
 	
 	public BulkModel model()
 	{
@@ -221,10 +238,5 @@ public class Chunk
 	public Structure structure()
 	{
 		return structure;
-	}
-	
-	public void calculateLightMap()
-	{
-		model.calculateLightMap(offset.x(), offset.y(), offset.z(), structure.lightMap());
 	}
 }

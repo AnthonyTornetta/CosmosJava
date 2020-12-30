@@ -2,12 +2,14 @@ package test;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
+import test.lights.LightMap;
 
 public class Structure
 {
@@ -21,7 +23,7 @@ public class Structure
 	
 	private Transform transform;
 	
-	private float[][][] lightMap;
+	private LightMap lightMap;
 	
 	public Structure(Transform trans, int width, int height, int length)
 	{
@@ -38,7 +40,7 @@ public class Structure
 		cHeight = (int)Math.ceil((float)height / Chunk.HEIGHT);
 		cWidth = (int)Math.ceil((float)width / Chunk.WIDTH);
 		
-		lightMap = new float[length][height][width];
+		lightMap = new LightMap(width + 2, height + 2, length + 2);
 		
 		chunks = new Chunk[cLength * cHeight * cWidth];
 	}
@@ -63,6 +65,8 @@ public class Structure
 	
 	private int flatten(int x, int y, int z)
 	{
+		if(!within(x, y, z))
+			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " is out of bounds.");
 		return x + cWidth * (y + cHeight * z);
 	}
 	
@@ -97,7 +101,7 @@ public class Structure
 				for(int x = 0; x < chunksWidth(); x++)
 				{
 					int i = flatten(x, y, z);
-					chunks[i] = new Chunk(x * Chunk.WIDTH, y * Chunk.HEIGHT, z * Chunk.LENGTH, this);
+					chunks[i] = new Chunk(x * Chunk.WIDTH + 1, y * Chunk.HEIGHT + 1, z * Chunk.LENGTH + 1, this);
 					
 					chunks[i].transformMatrix(
 							Maths.createTransformationMatrix(
@@ -137,22 +141,51 @@ public class Structure
 		}
 	}
 	
-	public void calculateLights()
+	public void calculateLights(boolean render)
 	{
 		long start = System.currentTimeMillis();
 		
-		for(int z = 0; z < cLength; z++)
+		Vector3i[] changedArea = lightMap.calculateLightMap();
+		
+		long end = System.currentTimeMillis();
+		
+		Utils.println(end - start + "ms to calculate light map");
+		
+		if(render)
 		{
-			for(int y = 0; y < cHeight; y++)
+			Vector3i extremeNeg = changedArea[0];
+			Vector3i extremePos = changedArea[1];
+			
+			int updates = 0;
+			
+			if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
 			{
-				for(int x = 0; x < cWidth; x++)
+				// Account for the +2 size of the light map
+				extremeNeg.x += 1;
+				extremeNeg.y += 1;
+				extremeNeg.z += 1;
+				
+				extremePos.x -= 1;
+				extremePos.y -= 1;
+				extremePos.z -= 1;
+				
+				for(int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
 				{
-					chunks[flatten(x, y, z)].calculateLightMap();
+					for(int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
+					{
+						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
+						{
+							Utils.println(cz + ", " + cy + ", " + cx);
+							
+							chunks[flatten(cx, cy, cz)].render();
+							updates++;
+						}
+					}
 				}
 			}
+			
+			Utils.println("Chunk Re-Renders: " + updates);
 		}
-		
-		Utils.println(System.currentTimeMillis() - start + "ms to calculate light map");
 	}
 	
 	public boolean within(int x, int y, int z)
@@ -160,12 +193,17 @@ public class Structure
 		return x >= 0 && x < cWidth && y >= 0 && y < cHeight && z >= 0 && z < cLength;
 	}
 	
+	public boolean withinBlocks(int x, int y, int z)
+	{
+		return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
+	}
+	
 	public void block(int x, int y, int z, Block b)
 	{
 		if(!initialized)
 			init();
 		
-		if(x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length)
+		if(withinBlocks(x, y, z))
 		{
 			Chunk c = chunk(x, y, z);
 			
@@ -211,8 +249,13 @@ public class Structure
 		return transform;
 	}
 
-	public float[][][] lightMap()
+	public LightMap lightMap()
 	{
 		return lightMap;
+	}
+
+	public void removeBlock(int x, int y, int z)
+	{
+		block(x, y, z, null);
 	}
 }

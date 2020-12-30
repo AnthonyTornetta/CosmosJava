@@ -1,16 +1,9 @@
 package test;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
-import org.joml.Vector3i;
-import org.joml.Vector3ic;
-
-import com.cornchipss.utils.Utils;
-
-import test.lights.LightSource;
+import test.lights.LightMap;
 import test.models.BlockSide;
 import test.models.CubeModel;
 import test.models.IHasModel;
@@ -21,8 +14,6 @@ public class BulkModel
 	
 	private IHasModel[][][] cubes;
 	
-	private Map<Vector3ic, LightSource> lightSources = new HashMap<>();
-
 	public void setModels(IHasModel[][][] blocks)
 	{
 		this.cubes = blocks;
@@ -51,7 +42,7 @@ public class BulkModel
 	
 	private void computeEverything(BulkModel left, BulkModel right, BulkModel top, 
 			BulkModel bottom, BulkModel front, BulkModel back,
-			int offX, int offY, int offZ, float[][][] lightMap)
+			int offX, int offY, int offZ, LightMap lightMap)
 	{
 		for(int z = 0; z < length(); z++)
 		{
@@ -240,11 +231,11 @@ public class BulkModel
 		}
 	}
 	
-	private void lighting(int offX, int offY, int offZ, int x, int y, int z, float[][][] lightMap)
+	private void lighting(int offX, int offY, int offZ, int x, int y, int z, LightMap lightMap)
 	{
 		float col = 0;
-		if(withinLightmap(offX + x, offY + y, offZ + z, lightMap))
-			col = lightMap[z + offZ][y + offY][x + offX];
+		if(lightMap.within(offX + x, offY + y, offZ + z))
+			col = lightMap.at(x, y, z, offX, offY, offZ);
 		
 		lights.add(col);
 		lights.add(col);
@@ -296,97 +287,17 @@ public class BulkModel
 		return maxIndex + max + 1;
 	}
 	
-	public void calculateLightMap(int offX, int offY, int offZ, float[][][] lightMap)
-	{
-		for(int z = 0; z < length(); z++)
-		{
-			for(int y = 0; y < height(); y++)
-			{
-				for(int x = 0; x < width(); x++)
-				{
-					if(cubes[z][y][x] != null)
-						lightMap[z + offZ][y + offY][x + offX] = -1; // marks where the blocks are in the light map
-				}
-			}
-		}
-		
-		for(Vector3ic originPos : lightSources.keySet())
-		{
-			LightSource src = lightSources.get(originPos);
-			
-			List<Vector3ic> positions = new LinkedList<>();
-			
-			float stren = 1.0f;
-			
-			positions.add(new Vector3i(
-					originPos.x() + offX, 
-					originPos.y() + offY, 
-					originPos.z() + offZ));
-			
-			// makes it not -1 so this progresses - will be overridden in first iteration of below code
-			lightMap[originPos.z() + offZ][originPos.y() + offY][originPos.x() + offX] = 0.0f;
-			
-			while(positions.size() != 0 && stren > 0)
-			{
-				float nextStren = stren - 1.0f / src.strength();
-				
-				int oldSize = positions.size();
-				
-				while(oldSize != 0)
-				{
-					Vector3ic pos = positions.remove(0);
-					oldSize--;
-
-					int x = pos.x(), y = pos.y(), z = pos.z();
-					
-					if(isGood(x, y, z, stren, lightMap))
-					{
-						lightMap[z][y][x] = stren;
-						
-						if(isGood(x + 1, y, z, nextStren, lightMap))
-							positions.add(new Vector3i(x + 1, y, z));
-						if(isGood(x - 1, y, z, nextStren, lightMap))
-							positions.add(new Vector3i(x - 1, y, z));
-						if(isGood(x, y + 1, z, nextStren, lightMap))
-							positions.add(new Vector3i(x, y + 1, z));
-						if(isGood(x, y - 1, z, nextStren, lightMap))
-							positions.add(new Vector3i(x, y - 1, z));
-						if(isGood(x, y, z + 1, nextStren, lightMap))
-							positions.add(new Vector3i(x, y, z + 1));
-						if(isGood(x, y, z - 1, nextStren, lightMap))
-							positions.add(new Vector3i(x, y, z - 1));
-					}
-				}
-				
-				stren = nextStren;
-			}	
-		}
-	}
-	
-	private boolean isGood(int x, int y, int z, float stren, float[][][] lightMap)
-	{
-		return stren > 0 && withinLightmap(x, y, z, lightMap) && (lightMap[z][y][x] < stren && (lightMap[z][y][x] != -1));
-	}
-	
-	private boolean withinLightmap(int x, int y, int z, float[][][] lightMap)
-	{
-		return z >= 0 && z < lightMap.length &&
-				y >= 0 && y < lightMap[z].length &&
-				x >= 0 && x < lightMap[z][y].length;
-	}
-		
 	/**
 	 * algorithm kinda
 	 */
 	void render(BulkModel left, BulkModel right, BulkModel top, 
 			BulkModel bottom, BulkModel front, BulkModel back,
-			int offX, int offY, int offZ, float[][][] lightMap)
+			int offX, int offY, int offZ, LightMap lightMap)
 	{
-		Utils.println(offX + " " + offY + " " + offZ);
-		
 		verticies.clear();
 		indicies.clear();
 		uvs.clear();
+		lights.clear();
 		
 		maxIndex = 0;
 		
@@ -396,7 +307,7 @@ public class BulkModel
 		int[] indiciesArr = new int[indicies.size()];
 		for(int index : indicies)
 			indiciesArr[i++] = index;
-
+		
 		i = 0;
 		float[] verticiesArr = new float[verticies.size()];
 		
@@ -421,11 +332,6 @@ public class BulkModel
 		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr);
 		
 		renderedOnce = true;
-	}
-	
-	public void addLight(LightSource light, Vector3ic pos) // relative to chunk's 0,0,0
-	{
-		lightSources.put(pos, light);
 	}
 	
 	public Mesh mesh()

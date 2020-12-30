@@ -18,6 +18,7 @@ import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.blocks.Blocks;
 
@@ -128,7 +129,7 @@ public class Main
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16*4,16,16*4);//16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
 		
 //		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
@@ -138,11 +139,18 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - rdm.nextInt(8) - 4;
+				int h = s.height() - 5;//s.height() -4;//- rdm.nextInt(8) - 4;
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
+					{
 						s.block(x, y, z, Blocks.GRASS);
+						
+//						if(x % 8 == 0 && z % 8 == 0)
+//							s.block(x, y + 3, z, Blocks.LIGHT);
+//						if(x % 16 == 0 && z % 16 == 0)
+//							s.removeBlock(x, y + 3, z);
+					}
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
 					else
@@ -151,17 +159,14 @@ public class Main
 			}
 		}
 		
-		s.block(8, s.height() - 4, 8, Blocks.GRASS);
-		
-		for(Chunk c : s.chunks())
-		{
-			c.block(8, 14 - 6, 8, Blocks.LIGHT);
-		}
-		
-		s.calculateLights();
+		s.calculateLights(false);
 		
 		for(Chunk c : s.chunks())
 			c.render();
+		
+		for(int dx = -4; dx <= 4; dx++)
+			for(int dz = -4; dz <= 4; dz++)
+				s.block(8 + dx, s.height() - 1 - 1, 8 + dz, Blocks.STONE);
 		
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
@@ -197,6 +202,27 @@ public class Main
 		while(!window.shouldClose())
 		{
 			float delta = System.currentTimeMillis() - t;
+			
+			if(rdm.nextFloat() < 0.01f)
+			{
+				int x = rdm.nextInt(s.width());
+				int y = s.height() - 2;
+				int z = rdm.nextInt(s.length());
+				
+				for(int dz = -1; dz <= 1; dz++)
+				{
+					for(int dy = -1; dy <= 1; dy++)
+					{
+						for(int dx = -1; dx <= 1; dx++)
+						{
+							if(dx == 0 && dy == 0 && dz == 0)
+								s.block(x, y, z, Blocks.LIGHT);
+							else if(s.withinBlocks(x + dx, y + dy, z + dz) && Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 1)
+								s.block(x + dx, y + dy, z + dz, Blocks.STONE);
+						}
+					}
+				}
+			}
 			
 			if(delta < MILLIS_WAIT)
 			{
