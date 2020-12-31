@@ -8,8 +8,6 @@ import java.util.Map;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-import com.cornchipss.utils.Utils;
-
 public class LightMap
 {
 	public static final float BLOCKED = -1;
@@ -41,7 +39,7 @@ public class LightMap
 	}
 	
 	public boolean calculated() { return calculated; }
-	
+		
 	/**
 	 * Calculates the light map from scratch - overrides any previous light values
 	 * Keeps anything in the light map marked as {@linkplain LightMap#BLOCKED}

@@ -125,13 +125,13 @@ public class Main
 
 	private void run()
 	{
-		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
+		Logger.LOGGER.setLevel(Logger.LogLevel.INFO);
 		
 		window = new Window(1024, 720, "wack simulator 2020");
 		
 		int shaderProgram = loadShaders();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16*20,16,16*20);//16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
 		
 		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
 		
@@ -146,10 +146,8 @@ public class Main
 				{
 					if(y == h - 1)
 					{
-						if(rdm.nextFloat() < 0.999f)
-							s.block(x, y, z, Blocks.GRASS);
-						else
-							s.block(x, y, z, Blocks.LIGHT);
+						s.block(x, y, z, Blocks.GRASS);
+						
 //						if(x % 8 == 0 && z % 8 == 0)
 //							s.block(x, y + 3, z, Blocks.LIGHT);
 //						if(x % 16 == 0 && z % 16 == 0)
@@ -202,30 +200,31 @@ public class Main
 		long lastSecond = t;
 		
 		int ups = 0;
+		float variance = 0;
 		
 		while(!window.shouldClose())
 		{
 			float delta = System.currentTimeMillis() - t;
 			
-			if(rdm.nextFloat() < 0.01f)
+			if(rdm.nextFloat() < 0.05f)
 			{
 				int x = rdm.nextInt(s.width());
 				int y = s.height() - 2;
 				int z = rdm.nextInt(s.length());
 				
-				for(int dz = -1; dz <= 1; dz++)
-				{
-					for(int dy = -1; dy <= 1; dy++)
-					{
-						for(int dx = -1; dx <= 1; dx++)
-						{
-							if(dx == 0 && dy == 0 && dz == 0)
+//				for(int dz = -1; dz <= 1; dz++)
+//				{
+//					for(int dy = -1; dy <= 1; dy++)
+//					{
+//						for(int dx = -1; dx <= 1; dx++)
+//						{
+//							if(dx == 0 && dy == 0 && dz == 0)
 								s.block(x, y, z, Blocks.LIGHT);
-							else if(s.withinBlocks(x + dx, y + dy, z + dz) && Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 1)
-								s.block(x + dx, y + dy, z + dz, Blocks.STONE);
-						}
-					}
-				}
+//							else if(s.withinBlocks(x + dx, y + dy, z + dz) && Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 1)
+//								s.block(x + dx, y + dy, z + dz, Blocks.STONE);
+//						}
+//					}
+//				}
 			}
 			
 			if(delta < MILLIS_WAIT)
@@ -244,13 +243,17 @@ public class Main
 			
 			delta /= 1000.0f;
 			
+			if(delta > variance)
+				variance = delta;
+			
 			t = System.currentTimeMillis();
 			
 			if(lastSecond / 1000 != t / 1000)
 			{
-				Logger.LOGGER.info("UPS: " + ups);
+				Logger.LOGGER.info("UPS: " + ups + "; Max Variance: " + variance + "ms");
 				lastSecond = t;
 				ups = 0;
+				variance = 0;
 			}
 			ups++;
 			
