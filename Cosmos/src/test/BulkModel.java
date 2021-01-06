@@ -10,8 +10,6 @@ import test.models.IHasModel;
 
 public class BulkModel
 {
-	private boolean renderedOnce = false;
-	
 	private IHasModel[][][] cubes;
 	
 	public void setModels(IHasModel[][][] blocks)
@@ -330,8 +328,6 @@ public class BulkModel
 			lightsArr[i++] = l;
 		
 		combinedModel = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr);
-		
-		renderedOnce = true;
 	}
 	
 	public Mesh mesh()

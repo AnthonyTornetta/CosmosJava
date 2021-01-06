@@ -122,7 +122,7 @@ public class Main
 	{
 		new Main().run();
 	}
-
+	
 	private void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.INFO);
@@ -145,14 +145,7 @@ public class Main
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
-					{
-						s.block(x, y, z, Blocks.GRASS);
-						
-//						if(x % 8 == 0 && z % 8 == 0)
-//							s.block(x, y + 3, z, Blocks.LIGHT);
-//						if(x % 16 == 0 && z % 16 == 0)
-//							s.removeBlock(x, y + 3, z);
-					}
+						s.block(x, y, z, rdm.nextFloat() < 0.01f ? Blocks.LIGHT : Blocks.GRASS);
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
 					else
@@ -166,16 +159,10 @@ public class Main
 		for(Chunk c : s.chunks())
 			c.render();
 		
-		for(int dx = -4; dx <= 4; dx++)
-			for(int dz = -4; dz <= 4; dz++)
-				s.block(8 + dx, s.height() - 1 - 1, 8 + dz, Blocks.STONE);
-		
 		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
 		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
 		int transLoc = GL20.glGetUniformLocation(shaderProgram, "u_transform");
 		int projLoc = GL20.glGetUniformLocation(shaderProgram, "u_proj");
-		
-		Matrix4f cameraMatrix = new Matrix4f();
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
@@ -185,9 +172,6 @@ public class Main
 		Texture tex = Texture.loadTexture("atlas/main.png");
 				
 		Input.setWindow(window);
-		
-		Vector3f pos = new Vector3f();
-		Vector3f rot = new Vector3f();
 		
 		float[] floatBuf = new float[16];
 		
@@ -202,30 +186,11 @@ public class Main
 		int ups = 0;
 		float variance = 0;
 		
+		Ployer p = new Ployer();
+		
 		while(!window.shouldClose())
 		{
 			float delta = System.currentTimeMillis() - t;
-			
-			if(rdm.nextFloat() < 0.05f)
-			{
-				int x = rdm.nextInt(s.width());
-				int y = s.height() - 2;
-				int z = rdm.nextInt(s.length());
-				
-//				for(int dz = -1; dz <= 1; dz++)
-//				{
-//					for(int dy = -1; dy <= 1; dy++)
-//					{
-//						for(int dx = -1; dx <= 1; dx++)
-//						{
-//							if(dx == 0 && dy == 0 && dz == 0)
-								s.block(x, y, z, Blocks.LIGHT);
-//							else if(s.withinBlocks(x + dx, y + dy, z + dz) && Math.abs(dx) + Math.abs(dy) + Math.abs(dz) == 1)
-//								s.block(x + dx, y + dy, z + dz, Blocks.STONE);
-//						}
-//					}
-//				}
-			}
 			
 			if(delta < MILLIS_WAIT)
 			{
@@ -242,6 +207,8 @@ public class Main
 			}
 			
 			delta /= 1000.0f;
+			
+//			s.transform().rotateY(delta);
 			
 			if(delta > variance)
 				variance = delta;
@@ -269,32 +236,9 @@ public class Main
 			
 			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(floatBuf));
 			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-				pos.z -= 10f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-				pos.z += 10f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-				pos.x += 10f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-				pos.x -= 10f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-				pos.y += 10f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-				pos.y -= 10f * delta;
+			p.update(delta);
 			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-				rot.y += 1f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
-				rot.y -= 1f * delta;
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-				rot.x += 1f * delta;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_T))
-				rot.x -= 1f * delta;
-			
-			Maths.createViewMatrix(pos, rot, cameraMatrix);
-			
-			GL20.glUniformMatrix4fv(camLoc, false, cameraMatrix.get(floatBuf));
+			GL20.glUniformMatrix4fv(camLoc, false, p.camera().viewMatrix().get(floatBuf));
 			
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);

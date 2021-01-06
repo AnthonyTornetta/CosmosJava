@@ -165,9 +165,21 @@ public class Maths
 		return new Quaternionf(0, 0, 0, 1);
 	}
 	
-	public static Quaternionf quaternionFromRotation(float rx, float ry, float rz)
+	public static Quaternionf quaternionFromRotation(float z, float y, float x)
 	{
-		return new Quaternionf().rotateXYZ(rx, ry, rz);
+		float sx = Maths.sin(x / 2);
+		float cx = Maths.cos(x / 2);
+		float sy = Maths.sin(y / 2);
+		float cy = Maths.cos(y / 2);
+		float sz = Maths.sin(z / 2);
+		float cz = Maths.cos(z / 2);
+		
+		float qx = sz * cy * cx - cz * sy * sx;
+		float qy = cz * sy * cx + sz * cy * sx;
+		float qz = cz * cy * sx - sz * sy * cx;
+		float qw = cz * cy * cx + sz * sy * sx;
+		
+		return new Quaternionf(qx, qy, qz, qw);
 	}
 	
 	public static Quaternionf quaternionFromRotation(Vector3fc rot)
