@@ -1,7 +1,5 @@
 package test;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.util.Random;
 
 import org.joml.Matrix4f;
@@ -10,113 +8,21 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import com.cornchipss.physics.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Blocks;
+import test.physx.Transform;
+import test.shaders.Shader;
 import test.utils.Logger;
 
 public class Main
 {
 	private Window window;
-	
-	/**
-	 * Loads the shaders + returns the program ID they are linked to
-	 * @return the program ID they are linked to	
-	 */
-	private int loadShaders()
-	{
-		StringBuilder shaderCode = new StringBuilder();
-		BufferedReader br = null;
-		try
-		{
-			br = new BufferedReader(new FileReader("./assets/shaders/chunk.vert"));
-			
-			for(String line = br.readLine(); line != null; line = br.readLine())
-			{
-				shaderCode.append(line + System.lineSeparator());
-			}
-			
-			br.close();
-		}
-		catch(Exception ex)
-		{
-			throw new RuntimeException(ex);
-		}
-		
-		int vertexShader = GL30.glCreateShader(GL30.GL_VERTEX_SHADER);
-		GL30.glShaderSource(vertexShader, shaderCode.toString());
-		GL30.glCompileShader(vertexShader);
-		
-		int success = GL30.glGetShaderi(vertexShader, GL30.GL_COMPILE_STATUS);
-		if(success == 0)
-		{
-			String log = GL30.glGetShaderInfoLog(vertexShader);
-			Logger.LOGGER.error("Vertex Shader Compilation Error!!!");
-			Logger.LOGGER.error(log);
-			System.exit(-1);
-		}
-		
-		// Fragment Shader
-		
-		shaderCode = new StringBuilder();
-		try
-		{
-			br = new BufferedReader(new FileReader("./assets/shaders/chunk.frag"));
-			
-			for(String line = br.readLine(); line != null; line = br.readLine())
-			{
-				shaderCode.append(line + System.lineSeparator());
-			}
-			
-			br.close();
-		}
-		catch(Exception ex)
-		{
-			throw new RuntimeException(ex);
-		}
-		int fragShader = GL30.glCreateShader(GL30.GL_FRAGMENT_SHADER);
-		GL30.glShaderSource(fragShader, shaderCode.toString());
-		GL30.glCompileShader(fragShader);
-		
-		success = GL30.glGetShaderi(fragShader, GL30.GL_COMPILE_STATUS);
-		if(success == 0)
-		{
-			String log = GL30.glGetShaderInfoLog(fragShader);
-			Logger.LOGGER.error("Fragment Shader Compilation Error!!!");
-			Logger.LOGGER.error(log);
-			System.exit(-1);
-		}
-		
-		
-		int shaderProgram = GL30.glCreateProgram();
-		GL30.glAttachShader(shaderProgram, vertexShader);
-		GL30.glAttachShader(shaderProgram, fragShader);
-		GL30.glLinkProgram(shaderProgram);
-		GL20.glValidateProgram(shaderProgram);
-		
-		Logger.LOGGER.info("Shader Loader > " + GL30.glGetProgramInfoLog(shaderProgram));
-		
-		if(GL30.glGetProgrami(shaderProgram, GL30.GL_LINK_STATUS) == 0)
-		{
-			String log = GL30.glGetProgramInfoLog(shaderProgram);
-			Logger.LOGGER.error("Shader Program Linking Error!!!");
-			Logger.LOGGER.error(log);
-			System.exit(-1);
-		}
-		
-		// Once they are linked to the program, we do not need them anymore.
-		GL30.glDeleteShader(vertexShader);
-		GL30.glDeleteShader(fragShader);
-		
-		return shaderProgram;
-	}
 	
 	public static void main(String[] args)
 	{
@@ -129,11 +35,13 @@ public class Main
 		
 		window = new Window(1024, 720, "wack simulator 2020");
 		
-		int shaderProgram = loadShaders();
+		Shader defaultShader = new Shader("assets/shaders/chunk");
+		defaultShader.init();
 		
-		Structure s = new Structure(new Transform(Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
+		Structure s = new Structure(new Transform(Maths.zero(), Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
 		
-		s.transform().translate(new Vector3f(-s.width() / 2, -s.height() / 2, -s.length() / 2));
+		s.transform().translate(new Vector3f(-s.width() / 2.0f, -s.height() / 2.0f, -s.length() / 2.0f));
+		s.transform().dimensions(new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f));
 		
 		Random rdm = new Random();
 		
@@ -159,10 +67,10 @@ public class Main
 		for(Chunk c : s.chunks())
 			c.render();
 		
-		int timeLoc = GL20.glGetUniformLocation(shaderProgram, "time");
-		int camLoc = GL20.glGetUniformLocation(shaderProgram, "u_camera");
-		int transLoc = GL20.glGetUniformLocation(shaderProgram, "u_transform");
-		int projLoc = GL20.glGetUniformLocation(shaderProgram, "u_proj");
+		int timeLoc = defaultShader.uniformLocation("time");
+		int camLoc = defaultShader.uniformLocation("u_camera");
+		int transLoc = defaultShader.uniformLocation("u_transform");
+		int projLoc = defaultShader.uniformLocation("u_proj");
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
@@ -172,8 +80,6 @@ public class Main
 		Texture tex = Texture.loadTexture("atlas/main.png");
 				
 		Input.setWindow(window);
-		
-		float[] floatBuf = new float[16];
 		
 		long t = System.currentTimeMillis();
 		
@@ -188,7 +94,17 @@ public class Main
 		
 		Ployer p = new Ployer();
 		
-		while(!window.shouldClose())
+		Input.hideCursor(true);
+		
+		Input.update();
+		
+		boolean running = true;
+		
+		Transform structureTrans = 
+				new Transform(new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f), 
+						new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f));
+		
+		while(!window.shouldClose() && running)
 		{
 			float delta = System.currentTimeMillis() - t;
 			
@@ -208,8 +124,6 @@ public class Main
 			
 			delta /= 1000.0f;
 			
-//			s.transform().rotateY(delta);
-			
 			if(delta > variance)
 				variance = delta;
 			
@@ -224,21 +138,31 @@ public class Main
 			}
 			ups++;
 			
+			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
+				Input.toggleCursor();
+			
+			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
+				running = false;
+
 			update(delta);
+			
+			p.update(delta);
+			
+			p.transform().update(delta, structureTrans);
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
 			render(delta);
 			
-			GL30.glUseProgram(shaderProgram);
-			GL20.glUniform1f(timeLoc, (float)GLFW.glfwGetTime());
+			Input.update();
+
+			defaultShader.use();
+			defaultShader.setUniformF(timeLoc, (float)GLFW.glfwGetTime());
 			tex.bind();
 			
-			GL20.glUniformMatrix4fv(projLoc, false, projectionMatrix.get(floatBuf));
+			defaultShader.setUniformMatrix(projLoc, projectionMatrix);
 			
-			p.update(delta);
-			
-			GL20.glUniformMatrix4fv(camLoc, false, p.camera().viewMatrix().get(floatBuf));
+			defaultShader.setUniformMatrix(camLoc, p.camera().viewMatrix());
 			
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);
@@ -249,7 +173,7 @@ public class Main
 				Matrix4fc trans = s.transformMatrix();
 				trans.mul(chunk.transformMatrix(), transform);
 				
-				GL20.glUniformMatrix4fv(transLoc, false, transform.get(floatBuf));
+				defaultShader.setUniformMatrix(transLoc, transform);
 				
 				chunk.mesh().prepare();
 				chunk.mesh().draw();
@@ -258,11 +182,14 @@ public class Main
 			
 			Texture.unbind();
 			
+			defaultShader.stop();
+			
 			window.update();
-
 		}
 		
 		window.destroy();
+		
+		Logger.LOGGER.info("Successfully closed.");
 	}
 	
 	private void update(float delta)

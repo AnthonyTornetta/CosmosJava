@@ -1,0 +1,7 @@
+Credits
+
+ReactPhysics3D - Daniel Chappuis (https://github.com/DanielChappuis)
+jReactPhysics3D - Jason Sorensen (https://github.com/kovertopz)
+SimplexNoise - Stefan Gustavson (stegu@itn.liu.se) + Peter Eastman (peastman@drizzle.stanford.edu)
+
+Cosmos - Anthony Tornetta (https://github.com/Cornchipss)

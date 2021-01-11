@@ -4,11 +4,11 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import com.cornchipss.physics.Transform;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Block;
 import test.lights.LightMap;
+import test.physx.Transform;
 import test.utils.Logger;
 
 public class Structure
@@ -239,7 +239,7 @@ public class Structure
 
 	public Matrix4fc transformMatrix()
 	{
-		return transform.asMatrix();
+		return transform.matrix();
 	}
 	
 	public Transform transform()

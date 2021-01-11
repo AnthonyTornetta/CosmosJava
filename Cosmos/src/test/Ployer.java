@@ -4,13 +4,15 @@ import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.utils.Input;
+import com.cornchipss.utils.Maths;
 
-import test.physx.Camera;
-import test.physx.GimbalLockCamera;
+import test.cameras.Camera;
+import test.cameras.GimbalLockCamera;
+import test.physx.Transform;
 
 public class Ployer
 {
-	private Vector3f pos;
+	private Transform transform;
 	
 	private GimbalLockCamera cam;
 	
@@ -21,50 +23,53 @@ public class Ployer
 	
 	public Ployer(int x, int y, int z)
 	{
-		pos = new Vector3f(x, y, z);
-		cam = new GimbalLockCamera(pos);
+		transform = new Transform(new Vector3f(x, y, z), new Vector3f(0.4f, .95f, 0.4f));
+		cam = new GimbalLockCamera(transform);
 	}
 	
-	public Vector3f position()
+	public Transform transform()
 	{
-		return pos;
+		return transform;
 	}
 
 	public void update(float delta)
 	{
-		Vector3f dPos = new Vector3f();
+		Vector3f dVel = new Vector3f();
 	    
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-			dPos.add(cam.forward());
+			dVel.add(cam.forward());
 		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-			dPos.sub(cam.forward());
+			dVel.sub(cam.forward());
 		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-			dPos.add(cam.right());
+			dVel.add(cam.right());
 		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-			dPos.sub(cam.right());
+			dVel.sub(cam.right());
 		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-			dPos.add(cam.up());
+			dVel.add(cam.up());
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-			dPos.sub(cam.up());
+			dVel.sub(cam.up());
 		
-		dPos.mul(10 * delta);
+		dVel.mul(delta * 1000);
 		
 		Vector3f dRot = new Vector3f();
-
-		if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-			dRot.y += 1f;
-		if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
-			dRot.y -= 1f;
 		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-			dRot.x += 1f;
-		if(Input.isKeyDown(GLFW.GLFW_KEY_T))
-			dRot.x -= 1f;
+		dRot.y -= Input.getMouseDeltaX() * 0.1f;
+		
+		dRot.x -= Input.getMouseDeltaY() * 0.1f;
 		
 		dRot.mul(delta);
 		
 		cam.rotate(dRot);
-		pos.add(dPos);
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
+			cam.rotation(Maths.zero());
+		
+		Vector3f vel = transform.getVelocity();
+		
+		vel.add(dVel);
+		Maths.safeNormalize(vel, 2.0f);
+		
+		transform.setVelocity(vel);
 	}
 
 	public Camera camera()

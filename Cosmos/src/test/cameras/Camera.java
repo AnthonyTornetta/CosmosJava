@@ -1,4 +1,4 @@
-package test.physx;
+package test.cameras;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;

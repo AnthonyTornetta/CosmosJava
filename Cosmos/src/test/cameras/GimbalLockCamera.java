@@ -1,4 +1,4 @@
-package test.physx;
+package test.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -6,19 +6,20 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
+
+import test.physx.Transform;
 
 public class GimbalLockCamera extends Camera
 {
 	private Matrix4f matrix;
-	private Vector3fc parentPosition;
+	private Transform parent;
 	
 	private Vector3f forward, right, up;
 	private Vector3f rot;
 	
-	public GimbalLockCamera(Vector3fc parentPosition)
+	public GimbalLockCamera(Transform parent)
 	{
-		this.parentPosition = parentPosition;
+		this.parent = parent;
 		
 		rot = new Vector3f();
 		matrix = new Matrix4f();
@@ -32,7 +33,9 @@ public class GimbalLockCamera extends Camera
 	
 	private void update()
 	{
-		Maths.createViewMatrix(parentPosition, rot, matrix);
+		rot.x = Maths.clamp(rot.x, -Maths.PI / 2, Maths.PI / 2);
+		
+		Maths.createViewMatrix(parent.position(), rot, matrix);
 		
 		forward.x = Maths.sin(rot.y) * Maths.cos(rot.x);
 	    forward.y = Maths.sin(-rot.x);
@@ -49,7 +52,16 @@ public class GimbalLockCamera extends Camera
 	public void rotate(Vector3fc delta)
 	{
 		rot.add(delta);
-		Utils.println(parentPosition);
+		
+		update();
+	}
+
+	public void rotation(Vector3fc r)
+	{
+		rot.x = r.x();
+		rot.y = r.y();
+		rot.z = r.z();
+		
 		update();
 	}
 	
