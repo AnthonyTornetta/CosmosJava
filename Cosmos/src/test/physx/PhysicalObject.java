@@ -4,6 +4,8 @@ import javax.vecmath.Vector3f;
 
 import com.bulletphysics.dynamics.RigidBody;
 
+import test.Vec3;
+
 public class PhysicalObject
 {
 	private RigidBody body;
@@ -13,9 +15,9 @@ public class PhysicalObject
 		body = b;
 	}
 	
-	public Vector3f position()
+	public Vec3 position()
 	{
-		return body.getCenterOfMassPosition(new Vector3f());
+		return new Vec3(body.getCenterOfMassPosition(new Vector3f()));
 	}
 	
 	public RigidBody body() { return body; }

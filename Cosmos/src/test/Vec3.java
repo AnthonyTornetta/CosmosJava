@@ -35,12 +35,12 @@ public class Vec3
 		set(vec);
 	}
 	
-	public void set(org.joml.Vector3f vec)
+	public void set(org.joml.Vector3fc vec)
 	{
 		if(vec != null)
 		{
-			joml = vec;
-			java = new javax.vecmath.Vector3f(vec.x, vec.y, vec.z);
+			joml = new org.joml.Vector3f(vec.x(), vec.y(), vec.z());
+			java = new javax.vecmath.Vector3f(vec.x(), vec.y(), vec.z());
 		}
 		else
 		{
@@ -54,7 +54,21 @@ public class Vec3
 		if(vec != null)
 		{
 			joml = new org.joml.Vector3f(vec.x, vec.y, vec.z);
-			java = vec;
+			java = new javax.vecmath.Vector3f(vec.x, vec.y, vec.z);
+		}
+		else
+		{
+			joml = null;
+			java = null;
+		}
+	}
+	
+	public void set(Vec3 vec)
+	{
+		if(vec != null)
+		{
+			joml = new org.joml.Vector3f(vec.x(), vec.y(), vec.z());
+			java = new javax.vecmath.Vector3f(vec.x(), vec.y(), vec.z());
 		}
 		else
 		{
@@ -68,7 +82,7 @@ public class Vec3
 		return joml;
 	}
 	
-	public javax.vecmath.Vector3f jx()
+	public javax.vecmath.Vector3f java()
 	{
 		return java;
 	}
@@ -98,12 +112,26 @@ public class Vec3
 		set(joml);
 		return this;
 	}
+
+	public Vec3 add(float s)
+	{
+		joml.x += s;
+		joml.y += s;
+		joml.z += s;
+		set(joml);
+		return this;
+	}
 	
 	public Vec3 sub(Vec3 c)
 	{
 		joml.sub(c.joml);
 		set(joml);
 		return this;
+	}
+	
+	public Vec3 sub(float s)
+	{
+		return add(-s);
 	}
 	
 	public Vec3 mul(Vec3 c)
@@ -113,9 +141,23 @@ public class Vec3
 		return this;
 	}
 	
+	public Vec3 mul(float s)
+	{
+		joml.mul(s);
+		set(joml);
+		return this;
+	}
+	
 	public Vec3 div(Vec3 c)
 	{
 		joml.div(c.joml);
+		set(joml);
+		return this;
+	}
+	
+	public Vec3 div(float s)
+	{
+		joml.mul(1.0f / s);
 		set(joml);
 		return this;
 	}

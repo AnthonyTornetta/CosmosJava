@@ -1,7 +1,5 @@
 package test;
 
-import javax.vecmath.Vector3f;
-
 import org.lwjgl.glfw.GLFW;
 
 import com.bulletphysics.dynamics.RigidBody;
@@ -25,7 +23,7 @@ public class Ployer extends PhysicalObject
 	
 	public void update(float delta)
 	{
-		Vector3f dVel = new Vector3f();
+		Vec3 dVel = new Vec3();
 	    
 		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
 			dVel.add(cam.forward());
@@ -40,35 +38,38 @@ public class Ployer extends PhysicalObject
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 			dVel.sub(cam.up());
 		
-		dVel.x *= delta * 1000;
-		dVel.y *= delta * 1000;
-		dVel.z *= delta * 1000;
+		dVel.x(dVel.x() * (delta * 1000));
+		dVel.z(dVel.z() * (delta * 1000));
+		dVel.y(dVel.y() * (delta * 20.0f));
 		
-		Vector3f dRot = new Vector3f();
+		Vec3 dRot = new Vec3();
 		
-		dRot.y -= Input.getMouseDeltaX() * 0.1f;
+		dRot.y(dRot.y() - Input.getMouseDeltaX() * 0.1f);
 		
-		dRot.x -= Input.getMouseDeltaY() * 0.1f;
+		dRot.x(dRot.x() - Input.getMouseDeltaY() * 0.1f);
 		
-		dRot.x *= delta;
-		dRot.y *= delta;
-		dRot.z *= delta;
+		dRot.mul(delta);
 		
 		cam.rotate(dRot);
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 			cam.rotation(Maths.zero());
 		
-		Vector3 vel = body().getLinearVelocity(new javax.vecmath.Vector3f());
+		Vec3 vel = new Vec3(body().getLinearVelocity(new javax.vecmath.Vector3f()));
 		
 		vel.add(dVel);
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel.mul(0.75f);
-
-		vel = Maths.safeNormalize((Vector3f)vel, 2.0f);
 		
-		body().setLinearVelocity(vel);
+		vel = Maths.safeNormalizeXZ(vel, 5.0f);
+		
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
+			vel.y(vel.y() + 5);
+		
+		vel.y(vel.y() - 9.8f * delta);
+		
+		body().setLinearVelocity(vel.java());
 	}
 
 	public Camera camera()

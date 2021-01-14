@@ -17,21 +17,23 @@ import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
 import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.IDebugDraw;
 import com.bulletphysics.linearmath.MotionState;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
+import com.cornchipss.utils.Utils;
 
-import net.smert.jreactphysics3d.mathematics.Matrix3x3;
-import net.smert.jreactphysics3d.mathematics.Quaternion;
-import net.smert.jreactphysics3d.mathematics.Vector3;
 import test.blocks.Blocks;
 import test.shaders.Shader;
 import test.utils.Logger;
@@ -60,24 +62,65 @@ public class Main
 		ConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
 		DynamicsWorld world = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, cfg);
-		
 		world.setGravity(new Vector3f());
 		
 		final int structW = 16 * 3,
 				structH = 16,
 				structL = 16 * 3;
 		
-		BoxShape bs = new BoxShape(new Vector3f(structW / 2.0f, structH / 2.0f, structL / 2.0f));
+		CollisionShape structShape = new BoxShape(new Vector3f(structW / 2.0f, structH / 2.0f, structL / 2.0f));
+		Transform structTransform = new Transform();
 		
-		RigidBody bdy = new RigidBody(100.0f, new DefaultMotionState(), bs);
+		RigidBody structBody;
 		
-		world.addRigidBody(bdy);
+		{
+			float mass = 10000000f;
+
+			// rigidbody is dynamic if and only if mass is non zero, otherwise static
+			boolean isDynamic = (mass != 0f);
+
+			Vector3f localInertia = new Vector3f(0, 0, 0);
+			if (isDynamic)
+				structShape.calculateLocalInertia(mass, localInertia);
+			
+			// using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
+			DefaultMotionState myMotionState = new DefaultMotionState(structTransform);
+			RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, myMotionState, structShape, localInertia);
+			rbInfo.friction = 15.0f;
+			rbInfo.restitution = 0.0f;
+			structBody = new RigidBody(rbInfo);
+//			structBody.setCollisionFlags(structBody.getCollisionFlags() | CollisionFlags.STATIC_OBJECT);
+			
+			// add the body to the dynamics world
+			world.addRigidBody(structBody);
+		}
+		Utils.println(structBody.getCenterOfMassPosition(new Vector3f()));
 		
-		Structure s = new Structure(bdy, structW, structH, structL);
+		Transform playerTransform = new Transform();
+		playerTransform.origin.set(0, structH / 2.0f + 2, 0);
+		RigidBody playerBody;
 		
-		rb.setIsAllowedToSleep(false);
-		Logger.LOGGER.debug(rb.getAABB().getMin());
-		Logger.LOGGER.debug(rb.getAABB().getMax());
+		CollisionShape playerShape = new CapsuleShape(0.4f, 0.9f);
+		
+		{
+			float mass = 50.0f;
+			
+			Vector3f localIntertia = new Vector3f();
+			playerShape.calculateLocalInertia(mass, localIntertia);
+			
+			MotionState motionState = new DefaultMotionState(playerTransform);
+			RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass, motionState, playerShape);
+			
+			rbInfo.restitution = 0.0f;
+			playerBody = new RigidBody(rbInfo);
+			
+//			playerBody.setCollisionFlags(playerBody.getCollisionFlags());
+			world.addRigidBody(playerBody);
+		}
+		
+		Ployer p = new Ployer(playerBody);
+		
+		Structure s = new Structure(structBody, structW, structH, structL);
 		
 		Random rdm = new Random();
 		
@@ -85,7 +128,7 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - 5;//s.height() -4;//- rdm.nextInt(8) - 4;
+				int h = s.height();// - 5;//s.height() -4;//- rdm.nextInt(8) - 4;
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
@@ -128,17 +171,11 @@ public class Main
 		int ups = 0;
 		float variance = 0;
 		
-		Ployer p = new Ployer(world.createRigidBody(
-				new Transform(new Vector3(0, 7, 0)), 4, new Matrix3x3(), 
-				new BoxShape(new Vector3(0.4f, 0.8f, 0.4f), 0)));
-		
 		Input.hideCursor(true);
 		
 		Input.update();
 		
 		boolean running = true;
-		
-		world.start();
 		
 		while(!window.shouldClose() && running)
 		{
@@ -180,9 +217,14 @@ public class Main
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running = false;
 			
-			world.update(delta);
+//			world.update(delta);
 			
-			p.body().getTransform().setOrientation(new Quaternion().identity());
+			p.body().setActivationState(RigidBody.ACTIVE_TAG);
+			
+			world.stepSimulation(delta);
+			world.debugDrawWorld();
+			
+//			p.body().getTransform().setOrientation(new Quaternion().identity());
 			
 			p.update(delta);
 			
@@ -223,7 +265,7 @@ public class Main
 			window.update();
 		}
 		
-		world.stop();
+//		world.stop();
 		
 		window.destroy();
 		

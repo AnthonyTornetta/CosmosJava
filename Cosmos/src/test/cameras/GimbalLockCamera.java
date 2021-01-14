@@ -2,12 +2,10 @@ package test.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
 
-import net.smert.jreactphysics3d.mathematics.Transform;
+import test.Vec3;
 import test.physx.PhysicalObject;
 
 public class GimbalLockCamera extends Camera
@@ -15,53 +13,51 @@ public class GimbalLockCamera extends Camera
 	private Matrix4f matrix;
 	private PhysicalObject parent;
 	
-	private Vector3f forward, right, up;
-	private Vector3f rot;
+	private Vec3 forward, right, up;
+	private Vec3 rot;
 	
 	public GimbalLockCamera(PhysicalObject parent)
 	{
 		this.parent = parent;
 		
-		rot = new Vector3f();
+		rot = new Vec3();
 		matrix = new Matrix4f();
 		
-		forward = new Vector3f(0, 0, -1); // opengl moment
-		right = new Vector3f(1, 0, 0);
-		up = new Vector3f(0, 1, 0);
+		forward = new Vec3(0, 0, -1); // opengl moment
+		right = new Vec3(1, 0, 0);
+		up = new Vec3(0, 1, 0);
 		
 		update();
 	}
 	
 	private void update()
 	{
-		rot.x = Maths.clamp(rot.x, -Maths.PI / 2, Maths.PI / 2);
+		rot.x(Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2));
 		
-		Maths.createViewMatrix(parent.getPosition(), rot, matrix);
+		Maths.createViewMatrix(new Vec3(parent.position()).add(new Vec3(0, 0.4f, 0)), new Vec3(rot), matrix);
 		
-		forward.x = Maths.sin(rot.y) * Maths.cos(rot.x);
-	    forward.y = Maths.sin(-rot.x);
-	    forward.z = -Maths.cos(rot.x) * Maths.cos(rot.y);
+		forward.x(Maths.sin(rot.y()) * Maths.cos(rot.x()));
+	    forward.y(Maths.sin(-rot.x()));
+	    forward.z(-Maths.cos(rot.x()) * Maths.cos(rot.y()));
 	    
-	    right.x = Maths.cos(rot.y);
-	    right.z = Maths.sin(rot.y);
+	    right.x(Maths.cos(rot.y()));
+	    right.z(Maths.sin(rot.y()));
 	    
-	    up.x = Maths.sin(rot.y) * Maths.sin(rot.x);
-	    up.y = Maths.cos(rot.x);
-	    up.z = -Maths.sin(rot.x) * Maths.cos(rot.y);
+	    up.x(Maths.sin(rot.y()) * Maths.sin(rot.x()));
+	    up.y(Maths.cos(rot.x()));
+	    up.z(-Maths.sin(rot.x()) * Maths.cos(rot.y()));
 	}
 	
-	public void rotate(Vector3fc delta)
+	public void rotate(Vec3 delta)
 	{
 		rot.add(delta);
 		
 		update();
 	}
 
-	public void rotation(Vector3fc r)
+	public void rotation(Vec3 r)
 	{
-		rot.x = r.x();
-		rot.y = r.y();
-		rot.z = r.z();
+		rot.set(r);
 		
 		update();
 	}
@@ -73,29 +69,29 @@ public class GimbalLockCamera extends Camera
 	}
 
 	@Override
-	public Vector3fc forward()
+	public Vec3 forward()
 	{
 		return forward;
 	}
 
 	@Override
-	public Vector3fc right()
+	public Vec3 right()
 	{
 		return right;
 	}
 
 	@Override
-	public Vector3fc up()
+	public Vec3 up()
 	{
 		return up;
 	}
 
-	public void parent(Transform transform)
+	public void parent(PhysicalObject transform)
 	{
 		this.parent = transform;
 	}
 	
-	public Transform parent()
+	public PhysicalObject parent()
 	{
 		return parent;
 	}

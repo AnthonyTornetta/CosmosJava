@@ -104,7 +104,7 @@ public class Structure extends PhysicalObject
 					
 					chunks[i].transformMatrix(
 							Maths.createTransformationMatrix(
-									new Vector3f(
+									new Vec3(
 											x * Chunk.WIDTH, 
 											y * Chunk.HEIGHT, 
 											z * Chunk.LENGTH), 
@@ -225,9 +225,9 @@ public class Structure extends PhysicalObject
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
 	}
 	
-	public Vector3f center()
+	public Vec3 center()
 	{
-		javax.vecmath.Vector3f pos = body().getCenterOfMassPosition(new javax.vecmath.Vector3f());
+		Vec3 pos = new Vec3(body().getCenterOfMassPosition(new javax.vecmath.Vector3f()));
 		return pos;
 	}
 	
@@ -237,7 +237,9 @@ public class Structure extends PhysicalObject
 
 	public Matrix4fc transformMatrix()
 	{
-		return Maths.createTransformationMatrix(body().getTransform().getPosition(), Maths.blankQuaternion());
+		return Maths.createTransformationMatrix(
+				new Vec3(body().getCenterOfMassPosition(new javax.vecmath.Vector3f())).sub(new Vec3(width() / 2.0f, height / 2.0f, length / 2.0f)), 
+				Maths.blankQuaternion()); // TODO: put rotation here
 	}
 	
 	public LightMap lightMap()
