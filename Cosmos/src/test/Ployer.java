@@ -1,37 +1,28 @@
 package test;
 
-import org.joml.Vector3f;
+import javax.vecmath.Vector3f;
+
 import org.lwjgl.glfw.GLFW;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 
 import test.cameras.Camera;
 import test.cameras.GimbalLockCamera;
-import test.physx.Transform;
+import test.physx.PhysicalObject;
 
-public class Ployer
+public class Ployer extends PhysicalObject
 {
-	private Transform transform;
-	
 	private GimbalLockCamera cam;
 	
-	public Ployer()
+	public Ployer(RigidBody body)
 	{
-		this(0, 0, 0);
+		super(body);
+		
+		cam = new GimbalLockCamera(this);
 	}
 	
-	public Ployer(int x, int y, int z)
-	{
-		transform = new Transform(new Vector3f(x, y, z), new Vector3f(0.4f, .95f, 0.4f));
-		cam = new GimbalLockCamera(transform);
-	}
-	
-	public Transform transform()
-	{
-		return transform;
-	}
-
 	public void update(float delta)
 	{
 		Vector3f dVel = new Vector3f();
@@ -49,7 +40,9 @@ public class Ployer
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 			dVel.sub(cam.up());
 		
-		dVel.mul(delta * 1000);
+		dVel.x *= delta * 1000;
+		dVel.y *= delta * 1000;
+		dVel.z *= delta * 1000;
 		
 		Vector3f dRot = new Vector3f();
 		
@@ -57,23 +50,37 @@ public class Ployer
 		
 		dRot.x -= Input.getMouseDeltaY() * 0.1f;
 		
-		dRot.mul(delta);
+		dRot.x *= delta;
+		dRot.y *= delta;
+		dRot.z *= delta;
 		
 		cam.rotate(dRot);
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
 			cam.rotation(Maths.zero());
 		
-		Vector3f vel = transform.getVelocity();
+		Vector3 vel = body().getLinearVelocity(new javax.vecmath.Vector3f());
 		
 		vel.add(dVel);
-		Maths.safeNormalize(vel, 2.0f);
 		
-		transform.setVelocity(vel);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+			vel.mul(0.75f);
+
+		vel = Maths.safeNormalize((Vector3f)vel, 2.0f);
+		
+		body().setLinearVelocity(vel);
 	}
 
 	public Camera camera()
 	{
 		return cam;
+	}
+	
+	@Override
+	public void body(RigidBody b)
+	{
+		super.body(b);
+		
+		cam.parent(this);
 	}
 }

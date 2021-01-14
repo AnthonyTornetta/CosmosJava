@@ -2,6 +2,8 @@ package test.utils;
 
 import javax.annotation.Nonnull;
 
+import com.cornchipss.utils.Utils;
+
 public class Logger
 {
 	public static final Logger LOGGER = new Logger(LogLevel.INFO);
@@ -48,27 +50,27 @@ public class Logger
 		return clazz.substring(clazz.lastIndexOf(".") + 1) + ":" + trace.getLineNumber() + "";
 	}
 	
-	public void debug(String msg)
+	public void debug(Object msg)
 	{
 		if(level.val <= LogLevel.DEBUG.val)
-			System.out.println(raw(msg, "Debug"));
+			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Debug"));
 	}
 	
-	public void info(String msg)
+	public void info(Object msg)
 	{
 		if(level.val <= LogLevel.INFO.val)
-			System.out.println(raw(msg, "Info"));
+			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Info"));
 	}
 	
-	public void warning(String msg)
+	public void warning(Object msg)
 	{
 		if(level.val <= LogLevel.WARNING.val)
-			System.out.println(raw(msg, "Warning"));
+			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Warning"));
 	}
 	
-	public void error(String msg)
+	public void error(Object msg)
 	{
 		if(level.val <= LogLevel.ERROR.val)
-			System.out.println(raw(msg, "Error"));
+			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Error"));
 	}
 }

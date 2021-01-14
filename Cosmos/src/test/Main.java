@@ -2,21 +2,37 @@ package test;
 
 import java.util.Random;
 
+import javax.vecmath.Vector3f;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
+import com.bulletphysics.collision.broadphase.BroadphaseInterface;
+import com.bulletphysics.collision.broadphase.DbvtBroadphase;
+import com.bulletphysics.collision.dispatch.CollisionConfiguration;
+import com.bulletphysics.collision.dispatch.CollisionDispatcher;
+import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
+import com.bulletphysics.dynamics.DynamicsWorld;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
+import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
-import com.cornchipss.utils.Maths;
 
+import net.smert.jreactphysics3d.mathematics.Matrix3x3;
+import net.smert.jreactphysics3d.mathematics.Quaternion;
+import net.smert.jreactphysics3d.mathematics.Vector3;
 import test.blocks.Blocks;
-import test.physx.Transform;
 import test.shaders.Shader;
 import test.utils.Logger;
 
@@ -31,17 +47,37 @@ public class Main
 	
 	private void run()
 	{
-		Logger.LOGGER.setLevel(Logger.LogLevel.INFO);
+		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
-		window = new Window(1024, 720, "wack simulator 2020");
+		window = new Window(1024, 720, "wack simulator 2021");
 		
 		Shader defaultShader = new Shader("assets/shaders/chunk");
 		defaultShader.init();
 		
-		Structure s = new Structure(new Transform(Maths.zero(), Maths.zero()), 16*3,16,16*3);//16 * 2, 16 * 2, 16 * 2);
+		BroadphaseInterface broadphase = new DbvtBroadphase();
+		CollisionConfiguration cfg = new DefaultCollisionConfiguration();
+		CollisionDispatcher dispatcher = new CollisionDispatcher(cfg);
+		ConstraintSolver solver = new SequentialImpulseConstraintSolver();
 		
-		s.transform().translate(new Vector3f(-s.width() / 2.0f, -s.height() / 2.0f, -s.length() / 2.0f));
-		s.transform().dimensions(new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f));
+		DynamicsWorld world = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, cfg);
+		
+		world.setGravity(new Vector3f());
+		
+		final int structW = 16 * 3,
+				structH = 16,
+				structL = 16 * 3;
+		
+		BoxShape bs = new BoxShape(new Vector3f(structW / 2.0f, structH / 2.0f, structL / 2.0f));
+		
+		RigidBody bdy = new RigidBody(100.0f, new DefaultMotionState(), bs);
+		
+		world.addRigidBody(bdy);
+		
+		Structure s = new Structure(bdy, structW, structH, structL);
+		
+		rb.setIsAllowedToSleep(false);
+		Logger.LOGGER.debug(rb.getAABB().getMin());
+		Logger.LOGGER.debug(rb.getAABB().getMax());
 		
 		Random rdm = new Random();
 		
@@ -92,7 +128,9 @@ public class Main
 		int ups = 0;
 		float variance = 0;
 		
-		Ployer p = new Ployer();
+		Ployer p = new Ployer(world.createRigidBody(
+				new Transform(new Vector3(0, 7, 0)), 4, new Matrix3x3(), 
+				new BoxShape(new Vector3(0.4f, 0.8f, 0.4f), 0)));
 		
 		Input.hideCursor(true);
 		
@@ -100,9 +138,7 @@ public class Main
 		
 		boolean running = true;
 		
-		Transform structureTrans = 
-				new Transform(new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f), 
-						new Vector3f(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f));
+		world.start();
 		
 		while(!window.shouldClose() && running)
 		{
@@ -143,12 +179,12 @@ public class Main
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running = false;
-
-			update(delta);
+			
+			world.update(delta);
+			
+			p.body().getTransform().setOrientation(new Quaternion().identity());
 			
 			p.update(delta);
-			
-			p.transform().update(delta, structureTrans);
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
@@ -187,13 +223,11 @@ public class Main
 			window.update();
 		}
 		
+		world.stop();
+		
 		window.destroy();
 		
 		Logger.LOGGER.info("Successfully closed.");
-	}
-	
-	private void update(float delta)
-	{
 	}
 	
 	private void render(float delta)

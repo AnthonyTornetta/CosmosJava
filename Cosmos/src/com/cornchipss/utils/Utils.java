@@ -116,7 +116,7 @@ public class Utils
 		{
 			Quaternionfc q = (Quaternionfc)obj;
 			Vector3fc eulers = q.getEulerAnglesXYZ(new Vector3f());
-			return toString(Maths.toDegs(eulers));
+			return "[" + q.x() + ", " + q.y() + ", " + q.z() + ", " + q.w() + "]";//toString(Maths.toDegs(eulers));
 		}
 		
 		if(obj instanceof Vector3fc)

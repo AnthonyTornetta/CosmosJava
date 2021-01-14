@@ -7,17 +7,18 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
 
-import test.physx.Transform;
+import net.smert.jreactphysics3d.mathematics.Transform;
+import test.physx.PhysicalObject;
 
 public class GimbalLockCamera extends Camera
 {
 	private Matrix4f matrix;
-	private Transform parent;
+	private PhysicalObject parent;
 	
 	private Vector3f forward, right, up;
 	private Vector3f rot;
 	
-	public GimbalLockCamera(Transform parent)
+	public GimbalLockCamera(PhysicalObject parent)
 	{
 		this.parent = parent;
 		
@@ -35,7 +36,7 @@ public class GimbalLockCamera extends Camera
 	{
 		rot.x = Maths.clamp(rot.x, -Maths.PI / 2, Maths.PI / 2);
 		
-		Maths.createViewMatrix(parent.position(), rot, matrix);
+		Maths.createViewMatrix(parent.getPosition(), rot, matrix);
 		
 		forward.x = Maths.sin(rot.y) * Maths.cos(rot.x);
 	    forward.y = Maths.sin(-rot.x);
@@ -87,5 +88,15 @@ public class GimbalLockCamera extends Camera
 	public Vector3fc up()
 	{
 		return up;
+	}
+
+	public void parent(Transform transform)
+	{
+		this.parent = transform;
+	}
+	
+	public Transform parent()
+	{
+		return parent;
 	}
 }

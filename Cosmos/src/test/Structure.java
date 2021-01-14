@@ -4,14 +4,15 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Block;
 import test.lights.LightMap;
-import test.physx.Transform;
+import test.physx.PhysicalObject;
 import test.utils.Logger;
 
-public class Structure
+public class Structure extends PhysicalObject
 {
 	private Chunk[] chunks;
 
@@ -21,16 +22,14 @@ public class Structure
 	
 	private int cWidth, cHeight, cLength;
 	
-	private Transform transform;
-	
 	private LightMap lightMap;
 	
-	public Structure(Transform trans, int width, int height, int length)
+	public Structure(RigidBody body, int width, int height, int length)
 	{
+		super(body);
+		
 		if(width <= 0 || height <= 0 || length <= 0)
 			throw new IllegalArgumentException("A Structure's width/height/length cannot be <= 0");
-		
-		this.transform = trans;
 		
 		this.width = width;
 		this.height = height;
@@ -228,9 +227,8 @@ public class Structure
 	
 	public Vector3f center()
 	{
-		return new Vector3f(transform.position().x() + width / 2.0f, 
-						transform.position().y() + height / 2.0f, 
-						transform.position().z() + length / 2.0f);
+		javax.vecmath.Vector3f pos = body().getCenterOfMassPosition(new javax.vecmath.Vector3f());
+		return pos;
 	}
 	
 	public int length() { return length; }
@@ -239,14 +237,9 @@ public class Structure
 
 	public Matrix4fc transformMatrix()
 	{
-		return transform.matrix();
+		return Maths.createTransformationMatrix(body().getTransform().getPosition(), Maths.blankQuaternion());
 	}
 	
-	public Transform transform()
-	{
-		return transform;
-	}
-
 	public LightMap lightMap()
 	{
 		return lightMap;

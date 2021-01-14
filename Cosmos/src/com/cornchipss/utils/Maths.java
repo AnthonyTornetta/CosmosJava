@@ -12,6 +12,8 @@ import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
 
+import test.Vec3;
+
 public class Maths
 {
 	/**
@@ -55,7 +57,7 @@ public class Maths
 		dest.translate(-x, -y, -z);
 	}
 	
-	public static void createViewMatrix(Vector3fc position, Quaternionfc rotation, Matrix4f dest)
+	public static void createViewMatrix(Vec3 position, Quaternionfc rotation, Matrix4f dest)
 	{
 		dest.identity();
 		
@@ -70,34 +72,39 @@ public class Maths
 	 * @param rot Rotation
 	 * @param dest The destiantion matrix
 	 */
-	public static void createViewMatrix(Vector3fc pos, Vector3fc rot, Matrix4f dest)
+	public static void createViewMatrix(Vec3 pos, Vec3 rot, Matrix4f dest)
 	{
 		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), dest);
 	}
 	
-	public static Matrix4f createTransformationMatrix(Vector3fc position, float rx, float ry, float rz)
+	public static Matrix4f createTransformationMatrix(Vec3 position, float rx, float ry, float rz)
 	{
 		return createTransformationMatrix(position, rx, ry, rz, 1);
 	}
 	
-	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx, float ry, float rz, float scale)
+	public static final Vector3fc 
+		RIGHT = new Vector3f(1,0,0), 
+		UP = new Vector3f(0,1,0), 
+		FORWARD = new Vector3f(0,0,1);
+	
+	public static Matrix4f createTransformationMatrix(Vec3 pos, float rx, float ry, float rz, float scale)
 	{
         Matrix4f matrix = new Matrix4f();
         matrix.identity();
-        matrix.translate(pos);
-        matrix.rotate(rx, new Vector3f(1,0,0));
-        matrix.rotate(ry, new Vector3f(0,1,0));
-        matrix.rotate(rz, new Vector3f(0,0,1));
+        matrix.translate(pos.joml());
+        matrix.rotate(rx, RIGHT);
+        matrix.rotate(ry, UP);
+        matrix.rotate(rz, FORWARD);
         matrix.scale(new Vector3f(scale, scale, scale));
         return matrix;
     }
 	
-	public static Matrix4f createTransformationMatrix(Vector3fc pos, Quaternionfc rot)
+	public static Matrix4f createTransformationMatrix(Vec3 pos, Quaternionfc rot)
 	{
 		Matrix4f matrix = new Matrix4f();
         matrix.identity();
         matrix.rotate(rot);
-        matrix.translate(pos);
+        matrix.translate(pos.joml());
         return matrix;
 	}
 	
@@ -106,6 +113,11 @@ public class Maths
 		FloatBuffer buf = BufferUtils.createFloatBuffer(16);
 		q.getAsMatrix4f(buf);
 		return new Matrix4f(buf);
+	}
+	
+	public static Matrix4f createRotationMatrix(Vec3 axis, float angle)
+	{
+		return createRotationMatrix(axis.joml(), angle);
 	}
 	
 	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
@@ -127,12 +139,19 @@ public class Maths
 	                0.0f,                                0.0f,                                0.0f,                                1.0f);
 	}
 	
-	public static Matrix4f createCombinedRotationMatrix(Vector3fc rotation)
+	public static Matrix4f createCombinedRotationMatrix(Vec3 rotation)
 	{
 		return createRotationMatrix(Utils.x(), rotation.x()).mul(createRotationMatrix(Utils.y(), rotation.y()).mul(createRotationMatrix(Utils.z(), rotation.z())));
 	}
 	
-	public static Vector3f getPositionActual(Vector3f pos, Matrix4fc... rotations)
+	@Deprecated
+	/**
+	 * idk if this works 
+	 * @param pos
+	 * @param rotations
+	 * @return
+	 */
+	public static Vec3 getPositionActual(Vec3 pos, Matrix4fc... rotations)
 	{
 		Matrix4f rotationFinal = new Matrix4f();
 		rotationFinal.identity();
@@ -140,9 +159,9 @@ public class Maths
 		for(Matrix4fc rot : rotations)
 			rotationFinal.mul(rot);
 		
-		Vector4f vec = new Vector4f(pos.x, pos.y, pos.z, 0).mul(rotationFinal);
+		Vector4f vec = new Vector4f(pos.x(), pos.y(), pos.z(), 0).mul(rotationFinal);
 		
-		return new Vector3f(vec.x, vec.y, vec.z);
+		return new Vec3(vec.x, vec.y, vec.z);
 	}
 	
 	public static float cos(float theta)
@@ -182,46 +201,46 @@ public class Maths
 		return new Quaternionf(qx, qy, qz, qw);
 	}
 	
-	public static Quaternionf quaternionFromRotation(Vector3fc rot)
+	public static Quaternionf quaternionFromRotation(Vec3 rot)
 	{
 		return quaternionFromRotation(rot.x(), rot.y(), rot.z());
 	}
 	
-	public static Vector3f rotatePoint(Vector3fc point, Vector3fc rotation)
+	public static Vec3 rotatePoint(Vec3 point, Vec3 rotation)
 	{
 		Quaternionf transQuat = blankQuaternion();
 		
-		Vector3f punto = new Vector3f(point.x(), point.y(), point.z());
+		Vec3 punto = new Vec3(point.x(), point.y(), point.z());
 		rotation = mod(rotation, Maths.TAU);
 		
 		Quaternionf rotationQuat = blankQuaternion();
 		
 		rotationQuat.rotateXYZ(rotation.x(), rotation.y(), rotation.z(), transQuat);
 		
-		transQuat.transform(punto);
+		transQuat.transform(punto.joml());
 		
 		return punto;
 	}
 	
-	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector3fc point)
+	public static Vec3 rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vec3 point)
 	{
 		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX, new Vector4f(point.x(), point.y(), point.z(), 0));
 	}
 	
-	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector4fc point)
+	public static Vec3 rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector4fc point)
 	{
 		return rotatePoint(Maths.mul(rotationMatrixX, rotationMatrixY).mul(rotationMatrixZ), point);
 	}
 	
-	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector3fc point)
+	public static Vec3 rotatePoint(Matrix4fc combinedRotation, Vec3 point)
 	{
 		return rotatePoint(combinedRotation, new Vector4f(point.x(), point.y(), point.z(), 0));
 	}
 	
-	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector4fc point)
+	public static Vec3 rotatePoint(Matrix4fc combinedRotation, Vector4fc point)
 	{
 		Vector4f vec = new Vector4f(point).mul(combinedRotation);
-		return new Vector3f(vec.x, vec.y, vec.z);
+		return new Vec3(vec.x, vec.y, vec.z);
 	}
 	
 	/**
@@ -231,7 +250,7 @@ public class Maths
 	 * @param dist The total distance travelable
 	 * @return The ending point
 	 */
-	public static Vector3f pointAt(Vector3fc start, Vector3fc v, float dist)
+	public static Vec3 pointAt(Vec3 start, Vec3 v, float dist)
 	{
 		return add(toComponents(v.x(), v.y(), dist), start);
 	}
@@ -244,7 +263,7 @@ public class Maths
 	 * @param dist The total distance travelable
 	 * @return The ending point
 	 */
-	public static Vector3f pointAt(Vector3fc start, float rx, float ry, float dist)
+	public static Vec3 pointAt(Vec3 start, float rx, float ry, float dist)
 	{
 		return add(toComponents(rx, ry, dist), start);
 	}
@@ -256,15 +275,15 @@ public class Maths
 	 * @param dist The total distance travelable
 	 * @return The ending point
 	 */
-	public static Vector3fc toComponents(float rx, float ry, float velMagnitude)
+	public static Vec3 toComponents(float rx, float ry, float velMagnitude)
 	{
-		Vector3f components = new Vector3f();
+		Vec3 components = new Vec3();
 		
 		final double j = velMagnitude * Math.cos(rx);
 		
-		components.x = (float) (j * Math.sin(ry));
-		components.y = (float) (-velMagnitude * Math.sin(rx));
-		components.z = (float) (-j * Math.cos(ry));
+		components.x((float) (j * Math.sin(ry)));
+		components.y((float) (-velMagnitude * Math.sin(rx)));
+		components.z((float) (-j * Math.cos(ry)));
 		
 		return components;
 	}
@@ -275,9 +294,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors added
 	 */
-	public static Vector3f add(Vector3fc a, Vector3fc b)
+	public static Vec3 add(Vec3 a, Vec3 b)
 	{
-		return new Vector3f(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
+		return new Vec3(a.x() + b.x(), a.y() + b.y(), a.z() + b.z());
 	}
 	
 	/**
@@ -285,19 +304,19 @@ public class Maths
 	 * @param vecs The vectors
 	 * @return A new vector of two vectors added
 	 */
-	public static Vector3f add(Vector3fc... vecs)
+	public static Vec3 add(Vec3... vecs)
 	{
-		Vector3f v = Maths.zero();
+		Vec3 v = Maths.zero();
 		
-		for(Vector3fc c : vecs)
+		for(Vec3 c : vecs)
 			v.add(c);
 		
 		return v;
 	}
 	
-	public static Vector3f add(Vector3fc v, float x, float y, float z)
+	public static Vec3 add(Vec3 v, float x, float y, float z)
 	{
-		return new Vector3f(v.x() + x, v.y() + y, v.z() + z);
+		return new Vec3(v.x() + x, v.y() + y, v.z() + z);
 	}
 	
 	/**
@@ -306,9 +325,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors subtracted
 	 */
-	public static Vector3f sub(Vector3fc a, Vector3fc b)
+	public static Vec3 sub(Vec3 a, Vec3 b)
 	{
-		return new Vector3f(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
+		return new Vec3(a.x() - b.x(), a.y() - b.y(), a.z() - b.z());
 	}
 	
 	/**
@@ -317,9 +336,9 @@ public class Maths
 	 * @param b The second scalor
 	 * @return A new vector of the vector - scalor
 	 */
-	public static Vector3f sub(Vector3fc a, float s)
+	public static Vec3 sub(Vec3 a, float s)
 	{
-		return new Vector3f(a.x() - s, a.y() - s, a.z() - s);
+		return new Vec3(a.x() - s, a.y() - s, a.z() - s);
 	}
 	
 	/**
@@ -327,11 +346,11 @@ public class Maths
 	 * @param vecs The vectors
 	 * @return A new vector of two vectors subtracted
 	 */
-	public static Vector3f sub(Vector3fc... vecs)
+	public static Vec3 sub(Vec3... vecs)
 	{
-		Vector3f v = Maths.zero();
+		Vec3 v = Maths.zero();
 		
-		for(Vector3fc c : vecs)
+		for(Vec3 c : vecs)
 			v.sub(c);
 		
 		return v;
@@ -343,9 +362,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors multiplied
 	 */
-	public static Vector3f mul(Vector3fc a, Vector3fc b)
+	public static Vec3 mul(Vec3 a, Vec3 b)
 	{
-		return new Vector3f(a.x() * b.x(), a.y() * b.y(), a.z() * b.z());
+		return new Vec3(a.x() * b.x(), a.y() * b.y(), a.z() * b.z());
 	}
 	
 	/**
@@ -353,14 +372,14 @@ public class Maths
 	 * @param vecs The vectors
 	 * @return A new vector of two vectors multiplid
 	 */
-	public static Vector3f mul(Vector3fc... vecs)
+	public static Vec3 mul(Vec3... vecs)
 	{
 		if(vecs.length == 0)
 			return Maths.zero();
 		
-		Vector3f v = Maths.one();
+		Vec3 v = Maths.one();
 		
-		for(Vector3fc c : vecs)
+		for(Vec3 c : vecs)
 			v.mul(c);
 		
 		return v;
@@ -368,13 +387,13 @@ public class Maths
 	
 	/**
 	 * Multiplies two vectors without modifying either one
-	 * @param x The first vector (<code>new Vector3f(x, x, x)</code>)
+	 * @param x The first vector (<code>new Vec3(x, x, x)</code>)
 	 * @param b The second vector
 	 * @return A new vector of the two vectors multiplied
 	 */
-	public static Vector3f mul(float x, Vector3fc a)
+	public static Vec3 mul(float x, Vec3 a)
 	{
-		return mul(a, new Vector3f(x));
+		return mul(a, new Vec3(x));
 	}
 	
 	/**
@@ -383,9 +402,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors divided
 	 */
-	public static Vector3f div(Vector3fc a, Vector3fc b)
+	public static Vec3 div(Vec3 a, Vec3 b)
 	{
-		return new Vector3f(a.x() / b.x(), a.y() / b.y(), a.z() / b.z());
+		return new Vec3(a.x() / b.x(), a.y() / b.y(), a.z() / b.z());
 	}
 	
 	/**
@@ -394,9 +413,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors divided
 	 */
-	public static Vector3f div(Vector3fc a, float d)
+	public static Vec3 div(Vec3 a, float d)
 	{
-		return new Vector3f(a.x() / d, a.y() / d, a.z() / d);
+		return new Vec3(a.x() / d, a.y() / d, a.z() / d);
 	}
 	
 	/**
@@ -404,14 +423,14 @@ public class Maths
 	 * @param vecs The vectors
 	 * @return A new vector of two vectors divided
 	 */
-	public static Vector3f div(Vector3fc... vecs)
+	public static Vec3 div(Vec3... vecs)
 	{
 		if(vecs.length == 0)
 			return Maths.zero();
 		
-		Vector3f v = Maths.one();
+		Vec3 v = Maths.one();
 		
-		for(Vector3fc c : vecs)
+		for(Vec3 c : vecs)
 			v.div(c);
 		
 		return v;
@@ -423,9 +442,9 @@ public class Maths
 	 * @param b The second vector
 	 * @return A new vector of the two vectors modulus'ed
 	 */
-	public static Vector3f mod(Vector3fc a, Vector3fc b)
+	public static Vec3 mod(Vec3 a, Vec3 b)
 	{
-		return new Vector3f(a.x() % b.x(), a.y() % b.y(), a.z() % b.z());
+		return new Vec3(a.x() % b.x(), a.y() % b.y(), a.z() % b.z());
 	}
 	
 	/**
@@ -434,28 +453,28 @@ public class Maths
 	 * @param b The scalar
 	 * @return A new vector of the two vectors modulus'ed
 	 */
-	public static Vector3f mod(Vector3fc a, float b)
+	public static Vec3 mod(Vec3 a, float b)
 	{
-		return new Vector3f(a.x() % b, a.y() % b, a.z() % b);
+		return new Vec3(a.x() % b, a.y() % b, a.z() % b);
 	}
 	
 	/**
-	 * A Vector3f with all values being 0
-	 * @return a Vector3f with all values being 0
+	 * A Vec3 with all values being 0
+	 * @return a Vec3 with all values being 0
 	 */
-	public static Vector3f zero()
+	public static Vec3 zero()
 	{
-		return new Vector3f(0, 0, 0);
+		return new Vec3(0, 0, 0);
 	}
 	
-	public static Vector3f one()
+	public static Vec3 one()
 	{
-		return new Vector3f(1, 1, 1);
+		return new Vec3(1, 1, 1);
 	}
 
-	public static Vector3fc negative()
+	public static Vec3 negative()
 	{
-		return new Vector3f(-1, -1, -1);
+		return new Vec3(-1, -1, -1);
 	}
 
 	public static float toRads(float degs)
@@ -468,9 +487,9 @@ public class Maths
 		return rads * 180f / Maths.PI;
 	}
 	
-	public static Vector3f toDegs(Vector3fc rads)
+	public static Vec3 toDegs(Vec3 rads)
 	{
-		return new Vector3f(toDegs(rads.x()), toDegs(rads.y()), toDegs(rads.z()));
+		return new Vec3(toDegs(rads.x()), toDegs(rads.y()), toDegs(rads.z()));
 	}
 
 	public static Matrix4f identity()
@@ -483,9 +502,9 @@ public class Maths
 		return new Matrix4f().identity().mul(a).mul(b);
 	}
 
-	public static Vector3f invert(Vector3fc v)
+	public static Vec3 invert(Vec3 v)
 	{
-		return new Vector3f(-v.x(), -v.y(), -v.z());
+		return new Vec3(-v.x(), -v.y(), -v.z());
 	}
 
 	/**
@@ -510,9 +529,9 @@ public class Maths
 		return a.div(b, new Quaternionf());
 	}
 
-	public static Vector3f rotatePoint(Quaternionfc rotation, Vector3fc position)
+	public static Vec3 rotatePoint(Quaternionfc rotation, Vec3 position)
 	{
-		return rotation.transform(position, new Vector3f());
+		return new Vec3(rotation.transform(position.joml(), new Vector3f()));
 	}
 
 	public static Quaternionfc invert(Quaternionfc q)
@@ -525,19 +544,19 @@ public class Maths
 		return x > max ? max : x < min ? min : x;
 	}
 
-	public static Vector3f x(float x)
+	public static Vec3 x(float x)
 	{
-		return new Vector3f(x, 0, 0);
+		return new Vec3(x, 0, 0);
 	}
 	
-	public static Vector3f y(float y)
+	public static Vec3 y(float y)
 	{
-		return new Vector3f(0, y, 0);
+		return new Vec3(0, y, 0);
 	}
 	
-	public static Vector3f z(float z)
+	public static Vec3 z(float z)
 	{
-		return new Vector3f(0, 0, z);
+		return new Vec3(0, 0, z);
 	}
 
 	public static Quaternionf clone(Quaternionfc rotation)
@@ -546,38 +565,33 @@ public class Maths
 	}
 	
 	/**
-	 * Normalizes a vector ({@link Vector3f#normalize(float)}), but keeps it 0,0,0 if every value is 0
+	 * Normalizes a vector ({@link Vec3#normalize(float)}), but keeps it 0,0,0 if every value is 0
 	 * @param vec The vector to normalize
 	 * @param max The amount to normalize it to (generally 1)
 	 * @return A normalized version of the vector
 	 */
-	public static Vector3f safeNormalize(Vector3fc vec, float max)
+	public static Vec3 safeNormalize(Vec3 vec, float max)
 	{
 		return safeNormalize(vec.x(), vec.y(), vec.z(), max);
 	}
 	
-	public static Vector3f safeNormalize(float x, float y, float z, float max)
+	public static Vec3 safeNormalize(float x, float y, float z, float max)
 	{
-		float k = (x * x + y * y + z * z) / (max * max);
-		if(k != 0)
-		{
-			x /= k;
-			y /= k;
-			z /= k;
-		}
-		return new Vector3f(x, y, z);
+		if(x * x + y * y + z * z <= max * max)
+			return new Vec3(x, y, z);
+		return new Vec3(new Vec3(x, y, z).normalize(max));
 	}
 	
-	public static Vector3f safeNormalizeXZ(Vector3fc v, float max)
+	public static Vec3 safeNormalizeXZ(Vec3 v, float max)
 	{
-		Vector3fc xzVec = new Vector3f(v.x(), 0, v.z());
+		Vec3 xzVec = new Vec3(v.x(), 0, v.z());
 		xzVec = safeNormalize(xzVec, max);
-		return new Vector3f(xzVec.x(), v.y(), xzVec.z());
+		return new Vec3(xzVec.x(), v.y(), xzVec.z());
 	}
 
-	public static Vector3f mul(Vector3fc v, float s)
+	public static Vec3 mul(Vec3 v, float s)
 	{
-		return new Vector3f(v.x() * s, v.y() * s, v.z() * s);
+		return new Vec3(v.x() * s, v.y() * s, v.z() * s);
 	}
 	
 	public static float sqrt(float x)
@@ -585,30 +599,30 @@ public class Maths
 		return (float)Math.sqrt(x);
 	}
 	
-	public static float magnitude(Vector3fc v)
+	public static float magnitude(Vec3 v)
 	{
 		return Maths.sqrt(v.x() * v.x() + v.y() * v.y() + v.z() * v.z());
 	}
 	
-	public static Vector3f normalClamp(Vector3fc v, float max)
+	public static Vec3 normalClamp(Vec3 v, float max)
 	{
 		if(magnitude(v) > max)
 			return safeNormalize(v, max);
 		else
-			return new Vector3f(v);
+			return v;
 	}
 
-	public static float magnitudeXZ(Vector3fc v)
+	public static float magnitudeXZ(Vec3 v)
 	{
 		return Maths.sqrt(v.x() * v.x() + v.z() * v.z());
 	}
 
-	public static Vector3f normalClampXZ(Vector3fc v, float max)
+	public static Vec3 normalClampXZ(Vec3 v, float max)
 	{
 		if(magnitudeXZ(v) > max)
 			return safeNormalizeXZ(v, max);
 		else
-			return new Vector3f(v);
+			return v;
 	}
 
 	public static Matrix4fc invert(Matrix4fc mat)
@@ -627,7 +641,7 @@ public class Maths
 		return equals(a.x(), b.x()) && equals(a.y(), b.y()) && equals(a.z(), b.z()) && equals(a.w(), b.w());
 	}
 
-	public static float distSqrd(Vector3fc a, Vector3fc b)
+	public static float distSqrd(Vec3 a, Vec3 b)
 	{
 		float x = a.x() - b.x();
 		float y = a.y() - b.y();
