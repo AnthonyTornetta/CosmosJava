@@ -2,23 +2,37 @@ package test;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.bulletphysics.collision.dispatch.CollisionObject;
+import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 
 import test.cameras.Camera;
 import test.cameras.GimbalLockCamera;
 import test.physx.PhysicalObject;
+import test.world.ZaWARUDO;
 
 public class Ployer extends PhysicalObject
 {
 	private GimbalLockCamera cam;
 	
-	public Ployer(RigidBody body)
+	public Ployer(ZaWARUDO world)
 	{
-		super(body);
+		super(world);
 		
 		cam = new GimbalLockCamera(this);
+	}
+	
+	@Override
+	public void addToWorld(Transform transform)
+	{
+		RigidBodyConstructionInfo rbInfo = world().generateInfo(50, transform, new CapsuleShape(0.4f, 0.9f));
+		rbInfo.restitution = 0.0f;
+		body(world().createRigidBody(rbInfo));
+		body().setActivationState(CollisionObject.DISABLE_DEACTIVATION); // never sleeps
 	}
 	
 	public void update(float delta)
@@ -67,6 +81,7 @@ public class Ployer extends PhysicalObject
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 			vel.y(vel.y() + 5);
 		
+		// "things just fall" - Mrs. Light, 2019
 		vel.y(vel.y() - 9.8f * delta);
 		
 		body().setLinearVelocity(vel.java());

@@ -1,16 +1,21 @@
 package test;
 
+import javax.vecmath.Vector3f;
+
 import org.joml.Matrix4fc;
-import org.joml.Vector3f;
 import org.joml.Vector3i;
 
-import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
 
 import test.blocks.Block;
 import test.lights.LightMap;
 import test.physx.PhysicalObject;
 import test.utils.Logger;
+import test.world.ZaWARUDO;
 
 public class Structure extends PhysicalObject
 {
@@ -24,9 +29,9 @@ public class Structure extends PhysicalObject
 	
 	private LightMap lightMap;
 	
-	public Structure(RigidBody body, int width, int height, int length)
+	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
-		super(body);
+		super(world);
 		
 		if(width <= 0 || height <= 0 || length <= 0)
 			throw new IllegalArgumentException("A Structure's width/height/length cannot be <= 0");
@@ -42,6 +47,18 @@ public class Structure extends PhysicalObject
 		lightMap = new LightMap(width + 2, height + 2, length + 2);
 		
 		chunks = new Chunk[cLength * cHeight * cWidth];
+	}
+	
+	@Override
+	public void addToWorld(Transform transform)
+	{
+		CollisionShape structShape = new BoxShape(new Vector3f(width / 2.0f, height / 2.0f, length / 2.0f));
+		
+		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, structShape);
+		rbInfo.friction = 15.0f;
+		rbInfo.restitution = 0.0f;
+
+		body(world().createRigidBody(rbInfo));
 	}
 	
 	public int chunksLength()

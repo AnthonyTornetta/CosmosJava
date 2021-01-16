@@ -175,4 +175,12 @@ public class Vec3
 		set(joml);
 		return this;
 	}
+	
+	@Override
+	public String toString()
+	{
+		if(joml == null)
+			return "null";
+		return "[" + joml.x + ", " + joml.y + ", " + joml.z + "]";
+	}
 }
