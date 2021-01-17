@@ -9,10 +9,14 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
+import com.bulletphysics.collision.dispatch.CollisionWorld.LocalRayResult;
+import com.bulletphysics.collision.dispatch.CollisionWorld.RayResultCallback;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
+import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.blocks.Blocks;
 import test.shaders.Shader;
@@ -37,40 +41,35 @@ public class Main
 		Shader defaultShader = new Shader("assets/shaders/chunk");
 		defaultShader.init();
 		
-//		BroadphaseInterface broadphase = new DbvtBroadphase();
-//		CollisionConfiguration cfg = new DefaultCollisionConfiguration();
-//		CollisionDispatcher dispatcher = new CollisionDispatcher(cfg);
-//		ConstraintSolver solver = new SequentialImpulseConstraintSolver();
-//		
-//		DynamicsWorld world = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, cfg);
-//		world.setGravity(new Vector3f());
+		Shader guiShader = new Shader("assets/shaders/gui");
+		guiShader.init();
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		final int structW = 16 * 3,
-				structH = 16,
-				structL = 16 * 3;
+		final int structW = 8,
+				structH = 4,
+				structL = 8;
 		
 		Ployer p = new Ployer(world);
 		Transform playerTransform = new Transform();
-		playerTransform.origin.set(0, 16 / 2.0f + 2, 0);
+		playerTransform.origin.set(0, 3, 0);
 		p.addToWorld(playerTransform);
 		
 		Structure s = new Structure(world, structW, structH, structL);
 		
 		s.addToWorld(new Transform());
 		
-		Random rdm = new Random();
+		Utils.println(s.position());
 		
 		for(int z = 0; z < s.length(); z++)
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height();// - 5;//s.height() -4;//- rdm.nextInt(8) - 4;
+				int h = s.height();
 				for(int y = 0; y < h; y++)
 				{
 					if(y == h - 1)
-						s.block(x, y, z, rdm.nextFloat() < 0.01f ? Blocks.LIGHT : Blocks.GRASS);
+						s.block(x, y, z, Blocks.GRASS);
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
 					else
@@ -159,6 +158,53 @@ public class Main
 			
 			p.update(delta);
 			
+
+			//Hitposition = from + direction*hitfraction
+			
+			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_2))
+			{
+				Vec3 from = p.position();
+				Vec3 dLook = Maths.mul(p.camera().forward(), 5);
+				Vec3 to = Maths.add(from, dLook);
+				
+				Logger.LOGGER.debug(from.toEasyString());
+				Logger.LOGGER.debug(to.toEasyString());
+				
+				world.world().rayTest(from.java(), to.java(), new RayResultCallback()
+				{
+					@Override
+					public float addSingleResult(LocalRayResult rayResult, boolean normalInWorldSpace)
+					{
+						if(!rayResult.collisionObject.equals(p.body()))
+						{
+							Vec3 pos = Maths.add(from, 
+									Maths.mul(new Vec3(dLook), rayResult.hitFraction));
+							
+							Vec3 normal = new Vec3(rayResult.hitNormalLocal).mul(0.5f);
+							
+							if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
+								pos.sub(normal);
+							else
+								pos.add(normal);
+							
+							int x = Maths.round(s.width() / 2.0f + pos.x() - 0.5f);
+							int y = Maths.round(s.height() / 2.0f + pos.y() - 0.5f);
+							int z = Maths.round(s.length() / 2.0f + pos.z() - 0.5f);
+							
+							if(s.withinBlocks(x, y, z))
+							{
+								if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
+									s.block(x, y, z, Blocks.LIGHT);
+								else
+									s.block(x, y, z, Blocks.LIGHT);
+							}
+						}
+						
+						return 0;
+					}
+				});
+			}
+			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
 			render(delta);
@@ -192,6 +238,12 @@ public class Main
 			Texture.unbind();
 			
 			defaultShader.stop();
+			
+//			guiShader.start();
+//			
+//			// GUI shader code here
+//			
+//			guiShader.stop();
 			
 			window.update();
 		}

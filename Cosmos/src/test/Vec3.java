@@ -1,5 +1,7 @@
 package test;
 
+import com.cornchipss.utils.Utils;
+
 public class Vec3
 {
 	private org.joml.Vector3f joml;
@@ -181,6 +183,13 @@ public class Vec3
 	{
 		if(joml == null)
 			return "null";
-		return "[" + joml.x + ", " + joml.y + ", " + joml.z + "]";
+		return Utils.toString(joml);
+	}
+	
+	public String toEasyString()
+	{
+		if(joml == null)
+			return "null";
+		return Utils.toEasyString(joml);
 	}
 }

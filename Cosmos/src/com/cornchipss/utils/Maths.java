@@ -624,7 +624,7 @@ public class Maths
 		else
 			return v;
 	}
-
+	
 	public static Matrix4fc invert(Matrix4fc mat)
 	{
 		return new Matrix4f(mat).invert();
@@ -663,5 +663,10 @@ public class Maths
 	public static float max(float a, float b)
 	{
 		return a > b ? a : b;
+	}
+
+	public static int round(float x)
+	{
+		return Math.round(x);
 	}
 }
