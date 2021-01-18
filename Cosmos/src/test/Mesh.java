@@ -52,6 +52,26 @@ public class Mesh
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW);
 	}
 	
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs)
+	{
+		Mesh m = new Mesh(indicies.length);
+		
+		GL30.glBindVertexArray(m.vao());
+		
+		m.storeData(VERTEX_INDEX, 3, verticies);
+		
+		m.storeIndicies(indicies);
+		
+		m.storeData(UV_INDEX, 2, uvs);
+		
+		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
+
+		GL30.glBindVertexArray(0);
+
+		
+		return m;
+	}
+	
 	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr)
 	{
 		Mesh m = new Mesh(indicies.length);

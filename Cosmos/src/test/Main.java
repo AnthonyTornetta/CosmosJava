@@ -1,7 +1,5 @@
 package test;
 
-import java.util.Random;
-
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.lwjgl.glfw.GLFW;
@@ -19,6 +17,7 @@ import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Blocks;
+import test.gui.GUIElement;
 import test.shaders.Shader;
 import test.utils.Logger;
 import test.world.ZaWARUDO;
@@ -55,11 +54,9 @@ public class Main
 		playerTransform.origin.set(0, 3, 0);
 		p.addToWorld(playerTransform);
 		
+		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
+		
 		Structure s = new Structure(world, structW, structH, structL);
-		
-		s.addToWorld(new Transform());
-		
-		Utils.println(s.position());
 		
 		for(int z = 0; z < s.length(); z++)
 		{
@@ -83,10 +80,15 @@ public class Main
 		for(Chunk c : s.chunks())
 			c.render();
 		
+		s.addToWorld(new Transform());
+		
 		int timeLoc = defaultShader.uniformLocation("time");
 		int camLoc = defaultShader.uniformLocation("u_camera");
 		int transLoc = defaultShader.uniformLocation("u_transform");
 		int projLoc = defaultShader.uniformLocation("u_proj");
+		
+		int guiTransLoc = guiShader.uniformLocation("u_transform");
+		int guiProjLoc = guiShader.uniformLocation("u_xd");
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
@@ -94,7 +96,9 @@ public class Main
 				0.1f, 1000);
 		
 		Texture tex = Texture.loadTexture("atlas/main.png");
-				
+		
+		Texture guiTex = Texture.loadTexture("atlas/gui.png");
+		
 		Input.setWindow(window);
 		
 		long t = System.currentTimeMillis();
@@ -163,7 +167,7 @@ public class Main
 			
 			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_2))
 			{
-				Vec3 from = p.position();
+				Vec3 from = p.camera().position();
 				Vec3 dLook = Maths.mul(p.camera().forward(), 5);
 				Vec3 to = Maths.add(from, dLook);
 				
@@ -239,16 +243,25 @@ public class Main
 			
 			defaultShader.stop();
 			
-//			guiShader.start();
-//			
+			guiShader.use();
+			GL30.glDisable(GL30.GL_DEPTH_TEST);
+
+			guiTex.bind();
+			
+			guiShader.setUniformMatrix(guiTransLoc, crosshair.transform());
+			guiShader.setUniformMatrix(guiProjLoc, projectionMatrix);
+			
+			crosshair.guiMesh().prepare();
+			crosshair.guiMesh().draw();
+			crosshair.guiMesh().finish();
 //			// GUI shader code here
 //			
-//			guiShader.stop();
+			Texture.unbind();
+			
+			guiShader.stop();
 			
 			window.update();
 		}
-		
-//		world.stop();
 		
 		window.destroy();
 		

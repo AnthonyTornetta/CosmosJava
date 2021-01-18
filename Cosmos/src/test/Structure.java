@@ -1,12 +1,12 @@
 package test;
 
-import javax.vecmath.Vector3f;
-
 import org.joml.Matrix4fc;
 import org.joml.Vector3i;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
@@ -52,13 +52,24 @@ public class Structure extends PhysicalObject
 	@Override
 	public void addToWorld(Transform transform)
 	{
-		CollisionShape structShape = new BoxShape(new Vector3f(width / 2.0f, height / 2.0f, length / 2.0f));
+//		CollisionShape structShape = new BoxShape(new Vector3f(width / 2.0f, height / 2.0f, length / 2.0f));
 		
-		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, structShape);
+		CompoundShape shape = new CompoundShape();
+		
+		for(Chunk c : chunks)
+		{
+			Transform t = new Transform();
+			t.origin.set(c.offset().x(), c.offset().y(), c.offset().z());
+			shape.addChildShape(t, c.physicsShape());
+		}
+		
+		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, shape);
 		rbInfo.friction = 15.0f;
 		rbInfo.restitution = 0.0f;
-
+		
 		body(world().createRigidBody(rbInfo));
+		
+		body().setCollisionShape(shape);
 	}
 	
 	public int chunksLength()
@@ -82,7 +93,7 @@ public class Structure extends PhysicalObject
 	private int flatten(int x, int y, int z)
 	{
 		if(!within(x, y, z))
-			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " is out of bounds.");
+			throw new IndexOutOfBoundsException(x + "," + y + "," + z + " is out of bounds for " + cWidth + "x" + cHeight + "x" + cLength + ".");
 		return x + cWidth * (y + cHeight * z);
 	}
 	
@@ -232,9 +243,9 @@ public class Structure extends PhysicalObject
 		if(!initialized)
 			init();
 		
-		if(x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length)
+		if(withinBlocks(x, y, z))
 		{
-			Chunk c = chunkAt(x, y, z);
+			Chunk c = chunk(x, y, z);
 			
 			return c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
 		}

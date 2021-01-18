@@ -36,7 +36,7 @@ public class GimbalLockCamera extends Camera
 		{
 			rot.x(Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2));
 			
-			Maths.createViewMatrix(new Vec3(parent.position()).add(new Vec3(0, 0.4f, 0)), new Vec3(rot), matrix);
+			Maths.createViewMatrix(position(), new Vec3(rot), matrix);
 			
 			forward.x(Maths.sin(rot.y()) * Maths.cos(rot.x()));
 		    forward.y(Maths.sin(-rot.x()));
@@ -97,5 +97,11 @@ public class GimbalLockCamera extends Camera
 	public PhysicalObject parent()
 	{
 		return parent;
+	}
+
+	@Override
+	public Vec3 position()
+	{
+		return new Vec3(parent.position()).add(new Vec3(0, 0.4f, 0));
 	}
 }

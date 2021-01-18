@@ -4,6 +4,10 @@ import org.joml.Matrix4f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
+import com.bulletphysics.collision.shapes.IndexedMesh;
+import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
@@ -29,6 +33,8 @@ public class Chunk
 	 * block structure it's a part of
 	 */
 	private Structure structure;
+	
+	private BvhTriangleMeshShape triangleShape;
 	
 	public Chunk(int offX, int offY, int offZ, Structure s)
 	{
@@ -238,5 +244,19 @@ public class Chunk
 	public Structure structure()
 	{
 		return structure;
+	}
+	
+	public CollisionShape physicsShape()
+	{
+		TriangleIndexVertexArray v = new TriangleIndexVertexArray();
+		
+		IndexedMesh msh = new IndexedMesh();
+		msh.numVertices = 0;
+		msh.vertexBase = null; // todo
+		
+		v.addIndexedMesh(msh);
+		
+		triangleShape = new BvhTriangleMeshShape(v, true);
+		return triangleShape;
 	}
 }
