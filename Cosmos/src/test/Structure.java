@@ -3,10 +3,8 @@ package test;
 import org.joml.Matrix4fc;
 import org.joml.Vector3i;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
+import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
@@ -14,6 +12,7 @@ import com.cornchipss.utils.Maths;
 import test.blocks.Block;
 import test.lights.LightMap;
 import test.physx.PhysicalObject;
+import test.physx.StructureShape;
 import test.utils.Logger;
 import test.world.ZaWARUDO;
 
@@ -28,6 +27,10 @@ public class Structure extends PhysicalObject
 	private int cWidth, cHeight, cLength;
 	
 	private LightMap lightMap;
+	
+	private StructureShape shape;
+	
+	public StructureShape shape() { return shape; }
 	
 	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
@@ -47,29 +50,53 @@ public class Structure extends PhysicalObject
 		lightMap = new LightMap(width + 2, height + 2, length + 2);
 		
 		chunks = new Chunk[cLength * cHeight * cWidth];
+		
+		shape = new StructureShape(this);
+	}
+	
+	private CollisionShape generateShape()
+	{
+		CompoundShape shape = new CompoundShape();
+		
+		for(Chunk c : chunks())
+		{
+			CollisionShape s = c.physicsShape();
+			
+			Transform chunkT = new Transform();
+			chunkT.setIdentity();
+			chunkT.origin.set(c.offset().x() - width() / 2.0f - 1,
+					c.offset().y() - height() / 2.0f - 1,
+					c.offset().z() - length() / 2.0f - 1);
+			
+			shape.addChildShape(chunkT, s);
+		}
+		
+		return shape;
+	}
+	
+	public void updatePhysics()
+	{
+		if(body() != null)
+		{
+			Transform t = body().getWorldTransform(new Transform());
+			
+			world().world().removeRigidBody(body());
+			body().destroy();
+			
+			addToWorld(t);
+		}
 	}
 	
 	@Override
 	public void addToWorld(Transform transform)
 	{
-//		CollisionShape structShape = new BoxShape(new Vector3f(width / 2.0f, height / 2.0f, length / 2.0f));
-		
-		CompoundShape shape = new CompoundShape();
-		
-		for(Chunk c : chunks)
-		{
-			Transform t = new Transform();
-			t.origin.set(c.offset().x(), c.offset().y(), c.offset().z());
-			shape.addChildShape(t, c.physicsShape());
-		}
+		CollisionShape shape = generateShape();
 		
 		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, shape);
-		rbInfo.friction = 15.0f;
+		rbInfo.friction = 0.0f;
 		rbInfo.restitution = 0.0f;
 		
 		body(world().createRigidBody(rbInfo));
-		
-		body().setCollisionShape(shape);
 	}
 	
 	public int chunksLength()

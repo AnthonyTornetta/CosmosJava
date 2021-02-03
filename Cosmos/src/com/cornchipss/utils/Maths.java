@@ -8,6 +8,7 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.joml.Vector4f;
 import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
@@ -649,7 +650,25 @@ public class Maths
 		
 		return x * x + y * y + z * z;
 	}
+	
+	public static float distSqrd(Vector3i a, Vec3 b)
+	{
+		float x = a.x() - b.x();
+		float y = a.y() - b.y();
+		float z = a.z() - b.z();
+		
+		return x * x + y * y + z * z;
+	}
 
+	public static float distSqrd(Vector3fc a, Vector3fc b)
+	{
+		float x = a.x() - b.x();
+		float y = a.y() - b.y();
+		float z = a.z() - b.z();
+		
+		return x * x + y * y + z * z;
+	}
+	
 	public static int floor(float x)
 	{
 		return (int)Math.floor(x);
@@ -669,4 +688,5 @@ public class Maths
 	{
 		return Math.round(x);
 	}
+
 }

@@ -13,6 +13,11 @@ public abstract class PhysicalObject
 	private RigidBody body;
 	private ZaWARUDO world;
 	
+	private AABB aabb;
+	
+	public AABB aabb() { return aabb; }
+	public void aabb(AABB aabb) { this.aabb = aabb; }
+	
 	public PhysicalObject(ZaWARUDO world)
 	{
 		this.world = world;

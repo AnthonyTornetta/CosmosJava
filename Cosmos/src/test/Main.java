@@ -2,13 +2,12 @@ package test;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import com.bulletphysics.collision.dispatch.CollisionWorld.LocalRayResult;
-import com.bulletphysics.collision.dispatch.CollisionWorld.RayResultCallback;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
@@ -80,7 +79,10 @@ public class Main
 		for(Chunk c : s.chunks())
 			c.render();
 		
-		s.addToWorld(new Transform());
+		Transform sT = new Transform();
+		sT.setIdentity();
+		
+		s.addToWorld(sT );
 		
 		int timeLoc = defaultShader.uniformLocation("time");
 		int camLoc = defaultShader.uniformLocation("u_camera");
@@ -118,6 +120,8 @@ public class Main
 		
 		boolean running = true;
 		
+		final float[] time = new float[1];
+
 		while(!window.shouldClose() && running)
 		{
 			float delta = System.currentTimeMillis() - t;
@@ -162,7 +166,20 @@ public class Main
 			
 			p.update(delta);
 			
-
+			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_MIDDLE))
+			{
+				float y = p.position().y() - 0.9f;
+				Utils.println(y + " - " +  s.height());
+				Utils.println(p.position());
+				Utils.println(s.shape().solidAt(
+						p.position().x() - 0.4f, 
+						y, 
+						p.position().z() - 0.4f, 
+						0.8f, 
+						0.9f * 2, 
+						0.8f));
+			}
+			
 			//Hitposition = from + direction*hitfraction
 			
 			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_2))
@@ -171,42 +188,66 @@ public class Main
 				Vec3 dLook = Maths.mul(p.camera().forward(), 5);
 				Vec3 to = Maths.add(from, dLook);
 				
-				Logger.LOGGER.debug(from.toEasyString());
-				Logger.LOGGER.debug(to.toEasyString());
+				Vector3f hit = s.shape().firstHit(from.joml(), to.joml());
 				
-				world.world().rayTest(from.java(), to.java(), new RayResultCallback()
+				if(hit != null)
 				{
-					@Override
-					public float addSingleResult(LocalRayResult rayResult, boolean normalInWorldSpace)
-					{
-						if(!rayResult.collisionObject.equals(p.body()))
-						{
-							Vec3 pos = Maths.add(from, 
-									Maths.mul(new Vec3(dLook), rayResult.hitFraction));
-							
-							Vec3 normal = new Vec3(rayResult.hitNormalLocal).mul(0.5f);
-							
-							if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
-								pos.sub(normal);
-							else
-								pos.add(normal);
-							
-							int x = Maths.round(s.width() / 2.0f + pos.x() - 0.5f);
-							int y = Maths.round(s.height() / 2.0f + pos.y() - 0.5f);
-							int z = Maths.round(s.length() / 2.0f + pos.z() - 0.5f);
-							
-							if(s.withinBlocks(x, y, z))
-							{
-								if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
-									s.block(x, y, z, Blocks.LIGHT);
-								else
-									s.block(x, y, z, Blocks.LIGHT);
-							}
-						}
-						
-						return 0;
-					}
-				});
+					s.block(Maths.round(hit.x), Maths.round(hit.y), Maths.round(hit.z), Blocks.LIGHT);
+				}
+				
+//				List<Vector3i> hits = new LinkedList<>();
+				
+//				world.world().rayTest(from.java(), to.java(), new RayResultCallback()
+//				{
+//					@Override
+//					public float addSingleResult(LocalRayResult rayResult, boolean normalInWorldSpace)
+//					{
+//						if(!rayResult.collisionObject.equals(p.body()))
+//						{
+//							Vec3 pos = Maths.add(from, 
+//									Maths.mul(new Vec3(dLook), rayResult.hitFraction));
+//							
+//							Vec3 normal = new Vec3(rayResult.hitNormalLocal).mul(0.5f);
+//							
+//							if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
+//								pos.sub(normal);
+//							else
+//								pos.add(normal);
+//							
+//							int x = Maths.round(s.width() / 2.0f + pos.x() - 0.5f);
+//							int y = Maths.round(s.height() / 2.0f + pos.y() - 0.5f);
+//							int z = Maths.round(s.length() / 2.0f + pos.z() - 0.5f);
+//							
+//							hits.add(new Vector3i(x, y, z));
+//						}
+//						
+//						return 0;
+//					}
+//				});
+//				
+//				if(hits.size() > 0)
+//				{
+//					Vector3i closest = hits.get(0);
+//					float closestDist = Maths.distSqrd(closest, from);
+//					
+//					for(int i = 1; i < hits.size(); i++)
+//					{
+//						float d = Maths.distSqrd(hits.get(i), from);
+//						if(closestDist > d)
+//						{
+//							closestDist = d;
+//							closest = hits.get(i);
+//						}
+//					}
+//					
+//					if(s.withinBlocks(closest.x, closest.y, closest.z))
+//					{
+//						if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
+//							s.block(closest.x, closest.y, closest.z, null);
+//						else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
+//							s.block(closest.x, closest.y, closest.z, Blocks.LIGHT);
+//					}
+//				}
 			}
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);

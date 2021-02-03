@@ -1,5 +1,6 @@
 package test;
 
+import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,10 +20,10 @@ public class BulkModel
 	
 	private Mesh combinedModel;
 		
-	List<Integer> indicies = new LinkedList<>();
-	List<Float> verticies = new LinkedList<>();
-	List<Float> uvs = new LinkedList<>();
-	List<Float> lights = new LinkedList<>();
+	private List<Integer> indicies = new LinkedList<>();
+	private List<Float> verticies = new LinkedList<>();
+	private List<Float> uvs = new LinkedList<>();
+	private List<Float> lights = new LinkedList<>();
 	
 	int maxIndex = 0;
 	
@@ -348,5 +349,15 @@ public class BulkModel
 	public int length()
 	{
 		return cubes.length;
+	}
+
+	public List<Float> vertices()
+	{
+		return verticies;
+	}
+
+	public List<Integer> indicies()
+	{
+		return indicies;
 	}
 }

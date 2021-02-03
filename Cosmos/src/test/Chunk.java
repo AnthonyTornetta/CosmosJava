@@ -1,13 +1,16 @@
 package test;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-import com.bulletphysics.collision.shapes.BvhTriangleMeshShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
+import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.collision.shapes.CompoundShapeChild;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
@@ -24,6 +27,8 @@ public class Chunk
 	
 	private Block[][][] blocks;
 	
+	private CompoundShape shape;
+	
 	/**
 	 * Offset relative to block structure's 0,0,0
 	 */
@@ -34,8 +39,6 @@ public class Chunk
 	 */
 	private Structure structure;
 	
-	private BvhTriangleMeshShape triangleShape;
-	
 	public Chunk(int offX, int offY, int offZ, Structure s)
 	{
 		this.offset = new Vector3i(offX, offY, offZ);
@@ -45,6 +48,8 @@ public class Chunk
 		rendered = false;
 		blocks = new Block[LENGTH][HEIGHT][WIDTH];
 		model = new BulkModel(blocks);
+		
+		shape = new CompoundShape();
 	}
 	
 	/**
@@ -186,6 +191,8 @@ public class Chunk
 	{
 		rendered = true;
 		
+		calculatePhysicsShape();
+		
 		model.render(
 				left != null ? left.model : null, 
 				right != null ? right.model : null, 
@@ -246,17 +253,46 @@ public class Chunk
 		return structure;
 	}
 	
+	private void calculatePhysicsShape()
+	{
+		Set<CollisionShape> shapesToRemove = new LinkedHashSet<>();
+		for(CompoundShapeChild s : shape.getChildList())
+		{
+			shapesToRemove.add(s.childShape);
+		}
+		
+		for(CollisionShape s : shapesToRemove)
+		{
+			Utils.println(".-.");
+			shape.removeChildShape(s);
+		}
+		
+		Transform here = new Transform();
+
+		for(int z = 0; z < LENGTH; z++)
+		{
+			for(int y = 0; y < HEIGHT; y++)
+			{
+				for(int x = 0; x < WIDTH; x++)
+				{
+					if(block(x, y, z) != null)
+					{
+						CollisionShape blockShape = block(x, y, z).collisionShape();
+						
+						here.setIdentity();
+						here.origin.set(x + 0.5f, y + 0.5f, z + 0.5f);
+						
+						shape.addChildShape(here, blockShape);
+					}
+				}
+			}
+		}
+		
+		structure.updatePhysics();
+	}
+	
 	public CollisionShape physicsShape()
 	{
-		TriangleIndexVertexArray v = new TriangleIndexVertexArray();
-		
-		IndexedMesh msh = new IndexedMesh();
-		msh.numVertices = 0;
-		msh.vertexBase = null; // todo
-		
-		v.addIndexedMesh(msh);
-		
-		triangleShape = new BvhTriangleMeshShape(v, true);
-		return triangleShape;
+		return shape;
 	}
 }
