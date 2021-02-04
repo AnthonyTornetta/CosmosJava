@@ -2,6 +2,7 @@ package test;
 
 import org.joml.Matrix4fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
@@ -305,5 +306,19 @@ public class Structure extends PhysicalObject
 	public void removeBlock(int x, int y, int z)
 	{
 		block(x, y, z, null);
+	}
+	
+	public Vector3i worldCoordsToStructureCoords(Vector3ic v)
+	{
+		return worldCoordsToStructureCoords(v.x(), v.y(), v.z());
+	}
+	
+	public Vector3i worldCoordsToStructureCoords(float x, float y, float z)
+	{
+		int xx = Maths.round(width() / 2.0f + x - 0.5f);
+		int yy = Maths.round(height() / 2.0f + y - 0.5f);
+		int zz = Maths.round(length() / 2.0f + z - 0.5f);
+		
+		return new Vector3i(xx, yy, zz);
 	}
 }
