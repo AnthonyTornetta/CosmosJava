@@ -54,7 +54,7 @@ public class Ployer extends PhysicalObject
 		
 		dVel.x(dVel.x() * (delta * 1000));
 		dVel.z(dVel.z() * (delta * 1000));
-		dVel.y(dVel.y() * (delta * 20.0f));
+		dVel.y(dVel.y() * (delta * 1000));
 		
 		Vec3 dRot = new Vec3();
 		
@@ -71,18 +71,18 @@ public class Ployer extends PhysicalObject
 		
 		Vec3 vel = new Vec3(body().getLinearVelocity(new javax.vecmath.Vector3f()));
 		
-		vel.add(dVel);
-		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel.mul(0.75f);
-		
-		vel = Maths.safeNormalizeXZ(vel, 5.0f);
+
+		vel.add(dVel);
+
+		vel = Maths.safeNormalize(vel, 10.0f);
 		
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 			vel.y(vel.y() + 5);
 		
 		// "things just fall" - Mrs. Light, 2019
-		vel.y(vel.y() - 9.8f * delta);
+//		vel.y(vel.y() - 9.8f * delta);
 		
 		body().setLinearVelocity(vel.java());
 	}

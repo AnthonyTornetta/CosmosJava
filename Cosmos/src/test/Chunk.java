@@ -15,7 +15,6 @@ import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.blocks.LitBlock;
-import test.lights.LightMap;
 
 public class Chunk
 {
@@ -109,6 +108,11 @@ public class Chunk
 	
 	private Matrix4f transformMatrix;
 
+	public void block(int x, int y, int z, Block block)
+	{
+		block(x, y, z, block, true);
+	}
+	
 	/**
 	 * <p>Sets the block at the given coordinates relative to this chunk.</p>
 	 * <p>If {@link Chunk#render()} has been called previously, this will also call it.</p>
@@ -116,15 +120,16 @@ public class Chunk
 	 * @param y The Y coordinate relative to this chunk
 	 * @param z The Z coordinate relative to this chunk
 	 * @param block The block to set it to
+	 * @param shouldRender If true, the chunk will update the lightmap + re-render the mesh. If the chunk has not been rendered yet - this will be false no matter what is passed
 	 */
-	public void block(int x, int y, int z, Block block)
+	public void block(int x, int y, int z, Block block, boolean shouldRender)
 	{
+		shouldRender = rendered && shouldRender;
+		
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
 			blocks[z][y][x] = block;
 			
-			float mapVal = structure.lightMap().at(x + offset.x(), y + offset.y(), z + offset.z());
-
 			if(block != null)
 				structure.lightMap().addBlocking(x + offset.x(), y + offset.y(), z + offset.z());
 			else
@@ -138,7 +143,7 @@ public class Chunk
 				structure.lightMap().lightSource(x + offset.x(), y + offset.y(), z + offset.z(), 
 							((LitBlock) block).lightSource());
 				
-				if(rendered)
+				if(shouldRender)
 				{
 					structure.calculateLights(true);
 				}
@@ -147,40 +152,33 @@ public class Chunk
 			{
 				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
 				
-				if(rendered)
+				if(shouldRender)
 					structure.calculateLights(true);
 			}
-			else if(mapVal != LightMap.BLOCKED && mapVal != 0.0f && rendered)
+			else if(shouldRender)
 			{
 				structure.calculateLights(true);
 			}
 			
-			if(rendered) // only if the chunk has been rendered at least 1 time before
+			if(shouldRender) // only if the chunk has been rendered at least 1 time before
 				render(); // update the chunk's model for the new block
 			
 			// Make sure if this block is neighboring another chunk, that chunk updates aswell
-			if(x == 0 && left != null)
-				left.potentiallyRender();
-			if(x + 1 == Chunk.WIDTH && right != null)
-				right.potentiallyRender();
+			if(x == 0 && left != null && shouldRender)
+				left.render();
+			if(x + 1 == Chunk.WIDTH && right != null && shouldRender)
+				right.render();
 			
-			if(y == 0 && bottom != null)
-				bottom.potentiallyRender();
-			if(y + 1 == Chunk.HEIGHT && top != null)
-				top.potentiallyRender();
+			if(y == 0 && bottom != null && shouldRender)
+				bottom.render();
+			if(y + 1 == Chunk.HEIGHT && top != null && shouldRender)
+				top.render();
 			
-			if(z == 0 && back != null)
-				back.potentiallyRender();
-			if(z + 1 == Chunk.LENGTH && front != null)
-				front.potentiallyRender();
+			if(z == 0 && back != null && shouldRender)
+				back.render();
+			if(z + 1 == Chunk.LENGTH && front != null && shouldRender)
+				front.render();
 		}
-	}
-	
-	private boolean potentiallyRender()
-	{
-		if(rendered)
-			render();
-		return rendered;
 	}
 	
 	/**
@@ -263,7 +261,6 @@ public class Chunk
 		
 		for(CollisionShape s : shapesToRemove)
 		{
-			Utils.println(".-.");
 			shape.removeChildShape(s);
 		}
 		

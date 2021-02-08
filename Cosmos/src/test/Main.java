@@ -17,6 +17,7 @@ import com.cornchipss.utils.Utils;
 
 import test.blocks.Blocks;
 import test.gui.GUIElement;
+import test.physx.RayResult;
 import test.shaders.Shader;
 import test.utils.Logger;
 import test.world.ZaWARUDO;
@@ -44,14 +45,10 @@ public class Main
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		final int structW = 8,
-				structH = 4,
-				structL = 8;
+		final int structW = 16*4,
+				structH = 16*4,
+				structL = 16*4;
 		
-		Ployer p = new Ployer(world);
-		Transform playerTransform = new Transform();
-		playerTransform.origin.set(0, 3, 0);
-		p.addToWorld(playerTransform);
 		
 		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
 		
@@ -61,10 +58,12 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height();
+				int h = s.height() - (x + z) % 2;
 				for(int y = 0; y < h; y++)
 				{
-					if(y == h - 1)
+					if(Math.random() < 0.01)
+						s.block(x, y, z, Blocks.LIGHT);
+					else if(y == h - 1)
 						s.block(x, y, z, Blocks.GRASS);
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
@@ -81,8 +80,15 @@ public class Main
 		
 		Transform sT = new Transform();
 		sT.setIdentity();
+		sT.origin.set(10, 0, 0);
 		
-		s.addToWorld(sT );
+		s.addToWorld(sT);
+		
+		Ployer p = new Ployer(world);
+		Transform playerTransform = new Transform();
+		playerTransform.origin.set(0, s.height() / 2 + 3, 0);
+		p.addToWorld(playerTransform);
+
 		
 		int timeLoc = defaultShader.uniformLocation("time");
 		int camLoc = defaultShader.uniformLocation("u_camera");
@@ -180,73 +186,24 @@ public class Main
 						0.8f));
 			}
 			
-			//Hitposition = from + direction*hitfraction
-			
-			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_2))
+			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 			{
 				Vec3 from = p.camera().position();
-				Vec3 dLook = Maths.mul(p.camera().forward(), 5);
+				Vec3 dLook = Maths.mul(p.camera().forward(), 50.f);
 				Vec3 to = Maths.add(from, dLook);
 				
-				Vector3f hit = s.shape().firstHit(from.joml(), to.joml());
+				RayResult hits = s.shape().raycast(from.joml(), to.joml());
 				
-				if(hit != null)
+				s.beginBulkUpdate();
+				for(Vector3f v : hits.positionsHit())
 				{
-					s.block(Maths.round(hit.x), Maths.round(hit.y), Maths.round(hit.z), Blocks.LIGHT);
+					s.block(Maths.round(v.x), Maths.round(v.y), Maths.round(v.z), null);
 				}
+				s.endBulkUpdate();
 				
-//				List<Vector3i> hits = new LinkedList<>();
-				
-//				world.world().rayTest(from.java(), to.java(), new RayResultCallback()
+//				if(hit != null)
 //				{
-//					@Override
-//					public float addSingleResult(LocalRayResult rayResult, boolean normalInWorldSpace)
-//					{
-//						if(!rayResult.collisionObject.equals(p.body()))
-//						{
-//							Vec3 pos = Maths.add(from, 
-//									Maths.mul(new Vec3(dLook), rayResult.hitFraction));
-//							
-//							Vec3 normal = new Vec3(rayResult.hitNormalLocal).mul(0.5f);
-//							
-//							if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_1))
-//								pos.sub(normal);
-//							else
-//								pos.add(normal);
-//							
-//							int x = Maths.round(s.width() / 2.0f + pos.x() - 0.5f);
-//							int y = Maths.round(s.height() / 2.0f + pos.y() - 0.5f);
-//							int z = Maths.round(s.length() / 2.0f + pos.z() - 0.5f);
-//							
-//							hits.add(new Vector3i(x, y, z));
-//						}
-//						
-//						return 0;
-//					}
-//				});
-//				
-//				if(hits.size() > 0)
-//				{
-//					Vector3i closest = hits.get(0);
-//					float closestDist = Maths.distSqrd(closest, from);
-//					
-//					for(int i = 1; i < hits.size(); i++)
-//					{
-//						float d = Maths.distSqrd(hits.get(i), from);
-//						if(closestDist > d)
-//						{
-//							closestDist = d;
-//							closest = hits.get(i);
-//						}
-//					}
-//					
-//					if(s.withinBlocks(closest.x, closest.y, closest.z))
-//					{
-//						if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
-//							s.block(closest.x, closest.y, closest.z, null);
-//						else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
-//							s.block(closest.x, closest.y, closest.z, Blocks.LIGHT);
-//					}
+//					s.block(Maths.round(hit.x), Maths.round(hit.y), Maths.round(hit.z), Blocks.LIGHT);
 //				}
 			}
 			

@@ -1,5 +1,9 @@
 package test.physx;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -7,6 +11,7 @@ import org.joml.Vector3i;
 
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
+import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;
 import test.blocks.Block;
@@ -45,49 +50,62 @@ public class StructureShape
 		
 		return null;
 	}
-	
-	public Vector3f firstHit(Vector3fc from, Vector3fc to)
+		
+	public RayResult raycast(Vector3fc from, Vector3fc to)
 	{
 		Vector3f delta = new Vector3f(to.x() - from.x(), to.y() - from.y(), to.z() - from.z());
 		
-		float dist = Maths.sqrt(delta.x() * delta.x() + delta.y() * delta.y() + delta.z() * delta.z());
-		
-		Vector3f slope = new Vector3f(delta).div(dist);
-		
 		Vector3f intersectionPoint = new Vector3f();
-		
 		Vector3f temp1 = new Vector3f(), temp2 = new Vector3f(), temp3 = new Vector3f();
 		
-		for(float z = from.z(); Math.abs(z - from.z()) <= Math.abs(to.z() - from.z()); z += Math.signum(to.z()))
+		List<Vector3f> hitPositions = new LinkedList<>();
+		List<Vector3f> hits = new LinkedList<>();
+		List<BlockFace> faces = new LinkedList<>();
+		
+		for(float dz = 0; Math.abs(dz) <= Math.abs(delta.z()); dz += Maths.signum0(delta.z()))
 		{
-			for(float y = from.y(); Math.abs(y - from.y()) <= Math.abs(to.y() - from.y()); y += Math.signum(to.y()))
+			for(float dy = 0; Math.abs(dy) <= Math.abs(delta.y()); dy += Maths.signum0(delta.y()))
 			{
-				for(float x = from.x(); Math.abs(x - from.x()) <= Math.abs(to.x() - from.x()); x += Math.signum(to.x()))
+				for(float dx = 0; Math.abs(dx) <= Math.abs(delta.x()); dx += Maths.signum0(delta.x()))
 				{
+					float x = from.x() + dx;
+					float y = from.y() + dy;
+					float z = from.z() + dz;
+					
 					Vector3i coords = s.worldCoordsToStructureCoords(x, y, z);
 					
 					if(s.withinBlocks(coords.x, coords.y, coords.z))
 					{
 						Block b = s.block(coords.x, coords.y, coords.z);
 						
-						PhysicsShape sh = new CubeShape();
-						
-						for(int i = 0; i < sh.sides().length; i+=3)
+						if(b != null)
 						{
-							int xx = Maths.floor(x), yy = Maths.floor(y), zz = Maths.floor(z);
+							PhysicsShape sh = new CubeShape();
 							
-							temp1.set(xx + sh.sides()[i].x(), yy + sh.sides()[i].y(), zz + sh.sides()[i].z());
-							temp2.set(xx + sh.sides()[i+1].x(), yy + sh.sides()[i].y(), zz + sh.sides()[i+1].z());
-							temp3.set(xx + sh.sides()[i+2].x(), yy + sh.sides()[i].y(), zz + sh.sides()[i+2].z());
+							float xOff = (s.width() % 2) * 0.5f;
+							float yOff = (s.height() % 2) * 0.5f;
+							float zOff = (s.length() % 2) * 0.5f;
 							
-							if(Intersectionf.intersectLineSegmentTriangle(from, to, 
-									temp1, temp2, temp3, 
-									(float) 1E-9, intersectionPoint))
+							float xx = Maths.floor(x + xOff) - xOff,
+									yy = Maths.floor(y + yOff) - yOff,
+									zz = Maths.floor(z + zOff) - zOff;
+							
+							for(int i = 0; i < sh.sides().length; i+=3)
 							{
-								Utils.println(intersectionPoint);
+								BlockFace face = sh.faces()[i/3];
 								
-								return new Vector3f(coords.x, coords.y, coords.z);
-//								return intersectionPoint.add(s.width() / 2.0f, s.height() / 2.0f, s.length() / 2.0f);
+								temp1.set(xx + sh.sides()[i].x(), yy + sh.sides()[i].y(), zz + sh.sides()[i].z());
+								temp2.set(xx + sh.sides()[i+1].x(), yy + sh.sides()[i+1].y(), zz + sh.sides()[i+1].z());
+								temp3.set(xx + sh.sides()[i+2].x(), yy + sh.sides()[i+2].y(), zz + sh.sides()[i+2].z());
+								
+								if(Intersectionf.intersectLineSegmentTriangle(from, to, 
+										temp1, temp2, temp3, 
+										(float) 1E-9, intersectionPoint))
+								{
+									faces.add(face);
+									hits.add(new Vector3f(coords.x, coords.y, coords.z));
+									hitPositions.add(new Vector3f(intersectionPoint));
+								}
 							}
 						}
 					}
@@ -95,29 +113,8 @@ public class StructureShape
 			}
 		}
 		
-//		Vector3f delta = new Vector3f(to.x() - from.x(), to.y() - from.y(), to.z() - from.z());
-//		delta.normalize(1);
-//
-//		float dist = Maths.sqrt(Maths.distSqrd(from, to));
-//		
-////		Vector3f slope = new Vector3f(delta).div(dist);
-//		
-//		Vector3f pos = new Vector3f(from);
-//		
-//		for(int totalDist = 0; totalDist <= dist; totalDist++)
-//		{
-//			int x = Maths.round(s.width() / 2.0f + pos.x() - 0.5f);
-//			int y = Maths.round(s.height() / 2.0f + pos.y() - 0.5f);
-//			int z = Maths.round(s.length() / 2.0f + pos.z() - 0.5f);
-//
-//			if(solidAt(pos.x, pos.y, pos.z))
-//			{
-//				return new Vector3f(x, y, z);
-//			}
-//			
-//			pos.add(delta);
-//		}
+		RayResult res = new RayResult(from, to, s, hits, faces);
 		
-		return null;
+		return res;
 	}
 }

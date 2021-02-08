@@ -1,9 +1,16 @@
 package test;
 
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.Set;
+
+import javax.vecmath.Vector3f;
+
 import org.joml.Matrix4fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
@@ -33,6 +40,8 @@ public class Structure extends PhysicalObject
 	
 	public StructureShape shape() { return shape; }
 	
+	private Set<Chunk> bulkUpdate;
+	
 	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
 		super(world);
@@ -53,6 +62,52 @@ public class Structure extends PhysicalObject
 		chunks = new Chunk[cLength * cHeight * cWidth];
 		
 		shape = new StructureShape(this);
+	}
+	
+	public boolean bulkUpdating()
+	{
+		return bulkUpdate != null;
+	}
+
+	public void beginBulkUpdate()
+	{
+		if(!bulkUpdating())
+			bulkUpdate = new LinkedHashSet<>();
+	}
+
+	public void endBulkUpdate()
+	{
+		if(bulkUpdating())
+		{
+			calculateLights(true);
+			
+			// Quick + dirty solution
+			for(Chunk c : chunks())
+				c.render();
+			
+//			Set<Chunk> all = new LinkedHashSet<>();
+//		
+//			for(Chunk c : bulkUpdate)
+//			{
+//				all.add(c);
+//				if(c.leftNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//				if(c.rightNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//				if(c.topNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//				if(c.bottomNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//				if(c.frontNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//				if(c.backNeighbor() != null)
+//					all.add(c.leftNeighbor());
+//			}
+		}
+		else
+			throw new IllegalStateException("Cannot end a bulk update when there is no bulk update currently happening");
+		
+		bulkUpdate = null;
 	}
 	
 	private CollisionShape generateShape()
@@ -91,7 +146,9 @@ public class Structure extends PhysicalObject
 	@Override
 	public void addToWorld(Transform transform)
 	{
-		CollisionShape shape = generateShape();
+//		CollisionShape shape = generateShape();
+		
+		CollisionShape shape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
 		
 		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, shape);
 		rbInfo.friction = 0.0f;
@@ -260,7 +317,10 @@ public class Structure extends PhysicalObject
 		{
 			Chunk c = chunk(x, y, z);
 			
-			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
+			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b, !bulkUpdating());
+			
+			if(bulkUpdating())
+				bulkUpdate.add(c);
 		}
 		else
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
@@ -315,10 +375,11 @@ public class Structure extends PhysicalObject
 	
 	public Vector3i worldCoordsToStructureCoords(float x, float y, float z)
 	{
-		int xx = Maths.round(width() / 2.0f + x - 0.5f);
-		int yy = Maths.round(height() / 2.0f + y - 0.5f);
-		int zz = Maths.round(length() / 2.0f + z - 0.5f);
+		int xx = Maths.round(width() / 2.0f + x - 0.5f - position().x());
+		int yy = Maths.round(height() / 2.0f + y - 0.5f - position().y());
+		int zz = Maths.round(length() / 2.0f + z - 0.5f - position().z());
 		
 		return new Vector3i(xx, yy, zz);
 	}
+
 }

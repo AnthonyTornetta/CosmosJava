@@ -689,4 +689,9 @@ public class Maths
 		return Math.round(x);
 	}
 
+	public static float signum0(float z)
+	{
+		return z == 0 ? 1 : Math.signum(z);
+	}
+
 }
