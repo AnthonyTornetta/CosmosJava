@@ -68,6 +68,8 @@ public class Shader
 		GL30.glAttachShader(programID, vert);
 		GL30.glAttachShader(programID, frag);
 		GL30.glLinkProgram(programID);
+		
+		Logger.LOGGER.info("Validating Shader...");
 		GL20.glValidateProgram(programID);
 		
 		Logger.LOGGER.info("Shader Loader > " + GL30.glGetProgramInfoLog(programID));

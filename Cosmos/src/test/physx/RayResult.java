@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;
@@ -72,18 +73,18 @@ public class RayResult
 		
 		closestHit = hitsItr.next();
 		closestFace = facesItr.next();
-		Vector3f t = closestFace.getRelativePosition().add(closestHit);
+		Vector3f t = closestFace.getRelativePosition().add(s.localCoordsToWorldCoords(closestHit));
 		
 		float closest = Maths.distSqrd(from, t);
-		
-		s.beginBulkUpdate();
 		
 		while(hitsItr.hasNext())
 		{
 			Vector3f hit = hitsItr.next();
+			
 			BlockFace face = facesItr.next();
 			
-			t = face.getRelativePosition().add(hit);
+			t = face.getRelativePosition().add(s.localCoordsToWorldCoords(hit));
+			
 			float d = Maths.distSqrd(from, t);
 			
 			if(d < closest)

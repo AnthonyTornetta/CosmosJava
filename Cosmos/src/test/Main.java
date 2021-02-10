@@ -2,7 +2,7 @@ package test;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -13,7 +13,7 @@ import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
+import com.cornchipss.world.blocks.BlockFace;
 
 import test.blocks.Blocks;
 import test.gui.GUIElement;
@@ -45,10 +45,9 @@ public class Main
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		final int structW = 16*4,
-				structH = 16*4,
-				structL = 16*4;
-		
+		final int structW = 16*20,
+				structH = 256,
+				structL = 16*20;
 		
 		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
 		
@@ -58,12 +57,12 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - (x + z) % 2;
+				int h = s.height() - 16;
 				for(int y = 0; y < h; y++)
 				{
-					if(Math.random() < 0.01)
-						s.block(x, y, z, Blocks.LIGHT);
-					else if(y == h - 1)
+//					if(Math.random() < 0.01)
+//						s.block(x, y, z, Blocks.LIGHT);
+					if(y == h - 1)
 						s.block(x, y, z, Blocks.GRASS);
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
@@ -80,7 +79,7 @@ public class Main
 		
 		Transform sT = new Transform();
 		sT.setIdentity();
-		sT.origin.set(10, 0, 0);
+		sT.origin.set(0, 0, 0);
 		
 		s.addToWorld(sT);
 		
@@ -126,8 +125,6 @@ public class Main
 		
 		boolean running = true;
 		
-		final float[] time = new float[1];
-
 		while(!window.shouldClose() && running)
 		{
 			float delta = System.currentTimeMillis() - t;
@@ -155,7 +152,7 @@ public class Main
 			
 			if(lastSecond / 1000 != t / 1000)
 			{
-				Logger.LOGGER.info("UPS: " + ups + "; Max Variance: " + variance + "ms");
+				Logger.LOGGER.info("UPS: " + ups + "; Max Variance: " + variance*1000 + "ms");
 				lastSecond = t;
 				ups = 0;
 				variance = 0;
@@ -172,21 +169,7 @@ public class Main
 			
 			p.update(delta);
 			
-			if(Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_MIDDLE))
-			{
-				float y = p.position().y() - 0.9f;
-				Utils.println(y + " - " +  s.height());
-				Utils.println(p.position());
-				Utils.println(s.shape().solidAt(
-						p.position().x() - 0.4f, 
-						y, 
-						p.position().z() - 0.4f, 
-						0.8f, 
-						0.9f * 2, 
-						0.8f));
-			}
-			
-			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
+			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 			{
 				Vec3 from = p.camera().position();
 				Vec3 dLook = Maths.mul(p.camera().forward(), 50.f);
@@ -194,17 +177,67 @@ public class Main
 				
 				RayResult hits = s.shape().raycast(from.joml(), to.joml());
 				
-				s.beginBulkUpdate();
-				for(Vector3f v : hits.positionsHit())
+				if(hits.closestHit() != null)
 				{
-					s.block(Maths.round(v.x), Maths.round(v.y), Maths.round(v.z), null);
+					Vector3i pos = new Vector3i(Maths.round(hits.closestHit().x()), 
+							Maths.round(hits.closestHit().y()), 
+							Maths.round(hits.closestHit().z()));
+					
+					if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
+					{
+						s.block(pos.x, pos.y, pos.z, null);
+					}
+					else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
+					{
+						BlockFace face = hits.closestFace();
+						
+						int xx = Maths.floor(pos.x + 0.5f + (face.getRelativePosition().x * 2)), 
+							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
+							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
+						
+						if(s.withinBlocks(xx, yy, zz))
+						{
+							s.block(xx, yy, zz, Blocks.LIGHT);
+						}
+					}
+					else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
+					{
+						s.beginBulkUpdate();
+						
+						final int radius = 20;
+						
+						Vec3 temp = new Vec3();
+						Vec3 tempPos = new Vec3(pos.x, pos.y, pos.z);
+						
+						for(int dz = -radius; dz <= radius; dz++)
+						{
+							for(int dy = -radius; dy <= radius; dy++)
+							{
+								for(int dx = -radius; dx <= radius; dx++)
+								{									
+									int xx = pos.x + dx,
+										yy = pos.y + dy, 
+										zz = pos.z + dz;
+									
+									temp.x(xx);
+									temp.y(yy);
+									temp.z(zz);
+
+									if(Maths.distSqrd(temp, tempPos) < radius * radius)
+									{
+										
+										if(s.withinBlocks(xx, yy, zz))
+										{
+											s.block(xx, yy, zz, null);
+										}
+									}
+								}
+							}
+						}
+						
+						s.endBulkUpdate();
+					}
 				}
-				s.endBulkUpdate();
-				
-//				if(hit != null)
-//				{
-//					s.block(Maths.round(hit.x), Maths.round(hit.y), Maths.round(hit.z), Blocks.LIGHT);
-//				}
 			}
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);

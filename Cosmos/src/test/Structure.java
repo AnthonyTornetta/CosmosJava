@@ -1,12 +1,12 @@
 package test;
 
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.Set;
 
 import javax.vecmath.Vector3f;
 
 import org.joml.Matrix4fc;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
@@ -16,6 +16,7 @@ import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.lights.LightMap;
@@ -62,6 +63,8 @@ public class Structure extends PhysicalObject
 		chunks = new Chunk[cLength * cHeight * cWidth];
 		
 		shape = new StructureShape(this);
+		
+		bulkUpdate = null;
 	}
 	
 	public boolean bulkUpdating()
@@ -81,28 +84,28 @@ public class Structure extends PhysicalObject
 		{
 			calculateLights(true);
 			
-			// Quick + dirty solution
-			for(Chunk c : chunks())
-				c.render();
+			Set<Chunk> all = new LinkedHashSet<>();
+		
+			for(Chunk c : bulkUpdate)
+			{
+				// not the best way for account for all changes, given that large light sources would invalidate this, but it works for now
+				all.add(c);
+				if(c.leftNeighbor() != null)
+					all.add(c.leftNeighbor());
+				if(c.rightNeighbor() != null)
+					all.add(c.rightNeighbor());
+				if(c.topNeighbor() != null)
+					all.add(c.topNeighbor());
+				if(c.bottomNeighbor() != null)
+					all.add(c.bottomNeighbor());
+				if(c.frontNeighbor() != null)
+					all.add(c.frontNeighbor());
+				if(c.backNeighbor() != null)
+					all.add(c.backNeighbor());
+			}
 			
-//			Set<Chunk> all = new LinkedHashSet<>();
-//		
-//			for(Chunk c : bulkUpdate)
-//			{
-//				all.add(c);
-//				if(c.leftNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//				if(c.rightNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//				if(c.topNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//				if(c.bottomNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//				if(c.frontNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//				if(c.backNeighbor() != null)
-//					all.add(c.leftNeighbor());
-//			}
+			for(Chunk c : all)
+				c.render();
 		}
 		else
 			throw new IllegalStateException("Cannot end a bulk update when there is no bulk update currently happening");
@@ -380,6 +383,14 @@ public class Structure extends PhysicalObject
 		int zz = Maths.round(length() / 2.0f + z - 0.5f - position().z());
 		
 		return new Vector3i(xx, yy, zz);
+	}
+
+	public Vector3fc localCoordsToWorldCoords(Vector3fc v)
+	{
+		return new org.joml.Vector3f(
+				v.x() - width() / 2.0f + 0.5f + position().x(),
+				v.y() - height() / 2.0f + 0.5f + position().y(),
+				v.z() - length() / 2.0f + 0.5f + position().z());
 	}
 
 }
