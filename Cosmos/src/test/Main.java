@@ -17,9 +17,10 @@ import com.cornchipss.world.blocks.BlockFace;
 
 import test.blocks.Block;
 import test.blocks.Blocks;
-import test.gui.GUIElement;
-import test.gui.GUIElementMultiple;
+import test.gui.GUI;
 import test.gui.GUIModel;
+import test.gui.GUITexture;
+import test.gui.GUITextureMultiple;
 import test.physx.RayResult;
 import test.shaders.Shader;
 import test.utils.Logger;
@@ -45,18 +46,24 @@ public class Main
 		Shader defaultShader = new Shader("assets/shaders/chunk");
 		defaultShader.init();
 		
-		Shader guiShader = new Shader("assets/shaders/gui");
-		guiShader.init();
+		Texture tex = Texture.loadTexture("atlas/main.png");
+		
+		Texture guiTex = Texture.loadTexture("atlas/gui.png");
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
 		final int structW = Chunk.WIDTH*4,
-				structH = Chunk.HEIGHT,
+				structH = Chunk.HEIGHT * 2,
 				structL = Chunk.LENGTH*4;
 		
-		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
+		GUI gui = new GUI(guiTex);
+		gui.init(window.getWidth(), window.getHeight());
 		
-		GUIElementMultiple[] inventorySlots = new GUIElementMultiple[10];
+		GUITexture crosshair = new GUITexture(new Vec3(), 0.1f, 0.1f, 0, 0);
+		gui.addElement(crosshair);
+		
+		GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
+		
 		GUIModel[] models = new GUIModel[10];
 		
 		int selectedSlot = 0;
@@ -64,14 +71,21 @@ public class Main
 		for(int i = 0; i < models.length; i++)
 		{
 			// TODO: fix this magic numbers
-			if(i < Blocks.all().size())
-				models[i] = new GUIModel(new Vec3(-.84f + 0.17f * i, -.84f, -1), 
-						0.15f, Blocks.all().get(i).model());
-			
-			inventorySlots[i] =  new GUIElementMultiple(
+
+			inventorySlots[i] =  new GUITextureMultiple(
 					new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 
 					0.5f, 0,
 					0, 0.5f);
+			
+			gui.addElement(inventorySlots[i]);
+			
+			if(i < Blocks.all().size())
+			{
+				models[i] = new GUIModel(new Vec3(-.84f + 0.17f * i, -.84f, -1f), 
+						0.15f, Blocks.all().get(i).model(), tex);
+				
+				gui.addElement(models[i]);
+			}
 		}
 		
 		inventorySlots[selectedSlot].state(1);
@@ -83,11 +97,11 @@ public class Main
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - 5;
+				int h = s.height() - 16;
 				for(int y = 0; y < h; y++)
 				{
-//					if(Math.random() < 0.01)
-//						s.block(x, y, z, Blocks.LIGHT);
+					if(Math.random() < 0.03)
+						s.block(x, y, z, Blocks.LIGHT);
 					if(y == h - 1)
 						s.block(x, y, z, Blocks.GRASS);
 					else if(h - y < 5)
@@ -119,9 +133,6 @@ public class Main
 		int transLoc = defaultShader.uniformLocation("u_transform");
 		int projLoc = defaultShader.uniformLocation("u_proj");
 		
-		int guiTransLoc = guiShader.uniformLocation("u_transform");
-		int guiProjLoc = guiShader.uniformLocation("u_projection");
-		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
@@ -131,10 +142,6 @@ public class Main
 		guiProjMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
-		
-		Texture tex = Texture.loadTexture("atlas/main.png");
-		
-		Texture guiTex = Texture.loadTexture("atlas/gui.png");
 		
 		Input.setWindow(window);
 		
@@ -164,10 +171,7 @@ public class Main
 						window.getWidth()/(float)window.getHeight(),
 						0.1f, 1000);
 				
-				guiProjMatrix.identity();
-				guiProjMatrix.perspective((float)Math.toRadians(90), 
-						window.getWidth()/(float)window.getHeight(),
-						0.1f, 1000);
+				gui.updateProjection(window.getWidth(), window.getHeight());
 			}
 			
 			float delta = System.currentTimeMillis() - t;
@@ -342,50 +346,7 @@ public class Main
 			
 			defaultShader.stop();
 			
-			guiShader.use();
-			
-			GL30.glDisable(GL30.GL_DEPTH_TEST);
-			
-			guiShader.setUniformMatrix(guiProjLoc, guiProjMatrix);
-			
-			guiTex.bind();
-			
-			guiShader.setUniformMatrix(guiTransLoc, crosshair.transform());
-			
-			crosshair.prepare();
-			crosshair.draw();
-			crosshair.finish();
-			
-			for(int i = 0; i < inventorySlots.length; i++)
-			{
-				guiShader.setUniformMatrix(guiTransLoc, inventorySlots[i].transform());
-				
-				inventorySlots[i].prepare();
-				inventorySlots[i].draw();
-				inventorySlots[i].finish();
-			}
-			
-			Texture.unbind();
-			
-			tex.bind();
-			
-			for(int i = 0; i < models.length; i++)
-			{
-				if(models[i] == null)
-					continue;
-				
-				guiShader.setUniformMatrix(guiTransLoc, models[i].transform());
-
-				models[i].prepare();
-				models[i].draw();
-				models[i].finish();
-			}
-			
-//			// GUI shader code here
-//			
-			Texture.unbind();
-			
-			guiShader.stop();
+			gui.draw();
 			
 			window.update();
 		}

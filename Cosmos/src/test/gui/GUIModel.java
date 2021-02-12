@@ -1,8 +1,8 @@
 package test.gui;
 
 import org.joml.Matrix4f;
-import org.joml.Matrix4fc;
 
+import com.cornchipss.rendering.Texture;
 import com.cornchipss.utils.Maths;
 
 import test.Mesh;
@@ -10,49 +10,50 @@ import test.Vec3;
 import test.models.BlockSide;
 import test.models.CubeModel;
 
-public class GUIModel
+public class GUIModel extends GUIElement
 {
 	private Mesh mesh;
-	private Matrix4f transform;
+	private Texture map;
 	
-	public GUIModel(Vec3 position, float scale, CubeModel model)
+	public GUIModel(Vec3 position, float scale, CubeModel model, Texture map)
 	{
-		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), model);
+		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), model, map);
 	}
 	
-	public GUIModel(Matrix4f transform, CubeModel m)
+	public GUIModel(Matrix4f transform, CubeModel m, Texture map)
 	{
-		this(transform, m.createMesh(0, 0, 0, 1.0f, BlockSide.FRONT));
+		this(transform, m.createMesh(0, 0, 0, 1.0f, BlockSide.FRONT), map);
 	}
 	
-	public GUIModel(Vec3 position, float scale, Mesh m)
+	public GUIModel(Vec3 position, float scale, Mesh m, Texture map)
 	{
-		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), m);
+		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), m, map);
 	}
 	
-	public GUIModel(Matrix4f transform, Mesh m)
+	public GUIModel(Matrix4f transform, Mesh m, Texture map)
 	{
-		this.transform = transform;
+		super(transform);
 		this.mesh = m;
+		this.map = map;
 	}
 	
-	public void prepare()
+	@Override
+	public Mesh guiMesh()
 	{
-		mesh.prepare();
+		return mesh;
 	}
 	
-	public void draw()
+	@Override
+	public void prepare(GUI gui)
 	{
-		mesh.draw();
+		map.bind();
+		super.prepare(gui);
 	}
 	
-	public void finish()
+	@Override
+	public void finish(GUI gui)
 	{
-		mesh.finish();
-	}
-
-	public Matrix4fc transform()
-	{
-		return transform;
+		super.finish(gui);
+		gui.texture().bind();
 	}
 }

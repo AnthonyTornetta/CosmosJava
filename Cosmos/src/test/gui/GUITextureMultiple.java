@@ -3,12 +3,12 @@ package test.gui;
 import test.Mesh;
 import test.Vec3;
 
-public class GUIElementMultiple extends GUIElement
+public class GUITextureMultiple extends GUITexture
 {
 	private Mesh[] meshes;
 	private int state;
 	
-	public GUIElementMultiple(Vec3 position, float w, float h, float... uvs)
+	public GUITextureMultiple(Vec3 position, float w, float h, float... uvs)
 	{
 		super(position, w, h, uvs[0], uvs[1]);
 		
