@@ -16,7 +16,6 @@ import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.lights.LightMap;

@@ -1,6 +1,5 @@
 package test.physx;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,7 +9,6 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;

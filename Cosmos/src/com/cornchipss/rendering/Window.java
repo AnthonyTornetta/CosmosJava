@@ -32,6 +32,15 @@ public class Window
 	
 	private final float ogAspectRatio;
 	
+	private boolean wasWindowResized = false;
+	
+	public boolean wasWindowResized()
+	{
+		boolean ret = wasWindowResized;
+		wasWindowResized = false;
+		return ret;
+	}
+	
 	public Window(int w, int h, String title)
 	{
 		this.width = w;
@@ -65,6 +74,8 @@ public class Window
 			@Override
 			public void invoke(long window, int width, int height)
 			{
+				wasWindowResized = true;
+				
 				int dX = 0, dY = 0;
 				
 				if(width / (float)height > ogAspectRatio)

@@ -57,25 +57,8 @@ public class BulkModel
 							(top == null || top.cubes[z][0][x] == null)) 
 								|| withinB && cubes[z][y + 1][x] == null)
 						{
-							float xx = (float)x;
-							float yy = (float)y + 1;
-							float zz = (float)z;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.TOP, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.TOP, cubes[z][y][x].model());
 							
@@ -85,25 +68,8 @@ public class BulkModel
 								(bottom == null || bottom.cubes[z][bottom.height() - 1][x] == null)) 
 									|| withinB && cubes[z][y - 1][x] == null)
 						{
-							float xx = (float)x;
-							float yy = (float)y;
-							float zz = (float)z;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.BOTTOM, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.BOTTOM, cubes[z][y][x].model());
 							
@@ -114,25 +80,8 @@ public class BulkModel
 								(front == null || front.cubes[0][y][x] == null)) 
 									|| withinB && cubes[z + 1][y][x] == null)
 						{
-							float xx = (float)x;
-							float yy = (float)y;
-							float zz = (float)z + 1;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.FRONT, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.FRONT, cubes[z][y][x].model());
 							
@@ -142,25 +91,8 @@ public class BulkModel
 								(back == null || back.cubes[back.length() - 1][y][x] == null)) 
 									|| withinB && cubes[z - 1][y][x] == null)
 						{
-							float xx = (float)x;
-							float yy = (float)y;
-							float zz = (float)z;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx + 1);
-							verticies.add(yy);
-							verticies.add(zz);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.BACK, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.BACK, cubes[z][y][x].model());
 							
@@ -172,25 +104,8 @@ public class BulkModel
 								(right == null || right.cubes[z][y][0] == null)) 
 									|| withinB && cubes[z][y][x + 1] == null)
 						{
-							float xx = (float)x + 1;
-							float yy = (float)y;
-							float zz = (float)z;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz + 1);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.RIGHT, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.RIGHT, cubes[z][y][x].model());
 							
@@ -200,25 +115,8 @@ public class BulkModel
 								(left == null || left.cubes[z][y][left.width() - 1] == null)) 
 									|| withinB && cubes[z][y][x - 1] == null)
 						{
-							float xx = (float)x;
-							float yy = (float)y;
-							float zz = (float)z;
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz);
-							
-							verticies.add(xx);
-							verticies.add(yy + 1);
-							verticies.add(zz + 1);
-							
-							verticies.add(xx);
-							verticies.add(yy);
-							verticies.add(zz + 1);
+							for(float f : cubes[z][y][x].model().verticies(BlockSide.LEFT, x, y, z))
+								verticies.add(f);
 							
 							maxIndex = indiciesAndUvs(BlockSide.LEFT, cubes[z][y][x].model());
 							

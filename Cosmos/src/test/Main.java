@@ -15,8 +15,10 @@ import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
 import com.cornchipss.world.blocks.BlockFace;
 
+import test.blocks.Block;
 import test.blocks.Blocks;
 import test.gui.GUIElement;
+import test.gui.GUIModel;
 import test.physx.RayResult;
 import test.shaders.Shader;
 import test.utils.Logger;
@@ -35,6 +37,8 @@ public class Main
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
+		Blocks.init();
+		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
 		Shader defaultShader = new Shader("assets/shaders/chunk");
@@ -45,19 +49,35 @@ public class Main
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		final int structW = 16*20,
-				structH = 256,
-				structL = 16*20;
+		final int structW = Chunk.WIDTH*4,
+				structH = Chunk.HEIGHT,
+				structL = Chunk.LENGTH*4;
 		
 		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
 		
+		GUIElement[] inventorySlots = new GUIElement[10];
+		GUIModel[] models = new GUIModel[10];
+		
+		int selectedSlot = 0;
+		
+		for(int i = 0; i < models.length; i++)
+		{
+			// TODO: fix this magic numbers
+			if(i < Blocks.all().size())
+				models[i] = new GUIModel(new Vec3(-.84f + 0.17f * i, -.84f, -1), 
+						0.15f, Blocks.all().get(i).model());
+			
+			inventorySlots[i] =  new GUIElement(new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 0.5f, 0);
+		}
+		
 		Structure s = new Structure(world, structW, structH, structL);
+		s.init();
 		
 		for(int z = 0; z < s.length(); z++)
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				int h = s.height() - 16;
+				int h = s.height() - 5;
 				for(int y = 0; y < h; y++)
 				{
 //					if(Math.random() < 0.01)
@@ -87,7 +107,6 @@ public class Main
 		Transform playerTransform = new Transform();
 		playerTransform.origin.set(0, s.height() / 2 + 3, 0);
 		p.addToWorld(playerTransform);
-
 		
 		int timeLoc = defaultShader.uniformLocation("time");
 		int camLoc = defaultShader.uniformLocation("u_camera");
@@ -95,10 +114,15 @@ public class Main
 		int projLoc = defaultShader.uniformLocation("u_proj");
 		
 		int guiTransLoc = guiShader.uniformLocation("u_transform");
-		int guiProjLoc = guiShader.uniformLocation("u_xd");
+		int guiProjLoc = guiShader.uniformLocation("u_projection");
 		
 		Matrix4f projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
+				1024/720.0f,
+				0.1f, 1000);
+		
+		Matrix4f guiProjMatrix = new Matrix4f();
+		guiProjMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
 		
@@ -127,6 +151,19 @@ public class Main
 		
 		while(!window.shouldClose() && running)
 		{
+			if(window.wasWindowResized())
+			{
+				projectionMatrix.identity();
+				projectionMatrix.perspective((float)Math.toRadians(90), 
+						window.getWidth()/(float)window.getHeight(),
+						0.1f, 1000);
+				
+				guiProjMatrix.identity();
+				guiProjMatrix.perspective((float)Math.toRadians(90), 
+						window.getWidth()/(float)window.getHeight(),
+						0.1f, 1000);
+			}
+			
 			float delta = System.currentTimeMillis() - t;
 			
 			if(delta < MILLIS_WAIT)
@@ -169,6 +206,20 @@ public class Main
 			
 			p.update(delta);
 			
+			for(int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
+			{
+				if(key > GLFW.GLFW_KEY_9)
+				{
+					if(Input.isKeyDown(GLFW.GLFW_KEY_0))
+						selectedSlot = 9;
+				}
+				else if(Input.isKeyDown(key))
+				{
+					selectedSlot = key - GLFW.GLFW_KEY_1;
+					break;
+				}
+			}
+			
 			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 			{
 				Vec3 from = p.camera().position();
@@ -179,6 +230,11 @@ public class Main
 				
 				if(hits.closestHit() != null)
 				{
+					Block selectedBlock = null;
+					
+					if(selectedSlot < Blocks.all().size())
+						selectedBlock = Blocks.all().get(selectedSlot);
+					
 					Vector3i pos = new Vector3i(Maths.round(hits.closestHit().x()), 
 							Maths.round(hits.closestHit().y()), 
 							Maths.round(hits.closestHit().z()));
@@ -197,7 +253,7 @@ public class Main
 						
 						if(s.withinBlocks(xx, yy, zz))
 						{
-							s.block(xx, yy, zz, Blocks.LIGHT);
+							s.block(xx, yy, zz, selectedBlock);
 						}
 					}
 					else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
@@ -275,16 +331,44 @@ public class Main
 			defaultShader.stop();
 			
 			guiShader.use();
+			
 			GL30.glDisable(GL30.GL_DEPTH_TEST);
-
+			
+			guiShader.setUniformMatrix(guiProjLoc, guiProjMatrix);
+			
 			guiTex.bind();
 			
 			guiShader.setUniformMatrix(guiTransLoc, crosshair.transform());
-			guiShader.setUniformMatrix(guiProjLoc, projectionMatrix);
 			
-			crosshair.guiMesh().prepare();
-			crosshair.guiMesh().draw();
-			crosshair.guiMesh().finish();
+			crosshair.prepare();
+			crosshair.draw();
+			crosshair.finish();
+			
+			for(int i = 0; i < inventorySlots.length; i++)
+			{
+				guiShader.setUniformMatrix(guiTransLoc, inventorySlots[i].transform());
+				
+				inventorySlots[i].prepare();
+				inventorySlots[i].draw();
+				inventorySlots[i].finish();
+			}
+			
+			Texture.unbind();
+			
+			tex.bind();
+			
+			for(int i = 0; i < models.length; i++)
+			{
+				if(models[i] == null)
+					continue;
+				
+				guiShader.setUniformMatrix(guiTransLoc, models[i].transform());
+
+				models[i].prepare();
+				models[i].draw();
+				models[i].finish();
+			}
+			
 //			// GUI shader code here
 //			
 			Texture.unbind();
