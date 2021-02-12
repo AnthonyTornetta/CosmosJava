@@ -18,6 +18,7 @@ import com.cornchipss.world.blocks.BlockFace;
 import test.blocks.Block;
 import test.blocks.Blocks;
 import test.gui.GUIElement;
+import test.gui.GUIElementMultiple;
 import test.gui.GUIModel;
 import test.physx.RayResult;
 import test.shaders.Shader;
@@ -55,7 +56,7 @@ public class Main
 		
 		GUIElement crosshair = new GUIElement(new Vec3(), 0.1f, 0.1f, 0, 0);
 		
-		GUIElement[] inventorySlots = new GUIElement[10];
+		GUIElementMultiple[] inventorySlots = new GUIElementMultiple[10];
 		GUIModel[] models = new GUIModel[10];
 		
 		int selectedSlot = 0;
@@ -67,8 +68,13 @@ public class Main
 				models[i] = new GUIModel(new Vec3(-.84f + 0.17f * i, -.84f, -1), 
 						0.15f, Blocks.all().get(i).model());
 			
-			inventorySlots[i] =  new GUIElement(new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 0.5f, 0);
+			inventorySlots[i] =  new GUIElementMultiple(
+					new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 
+					0.5f, 0,
+					0, 0.5f);
 		}
+		
+		inventorySlots[selectedSlot].state(1);
 		
 		Structure s = new Structure(world, structW, structH, structL);
 		s.init();
@@ -210,12 +216,18 @@ public class Main
 			{
 				if(key > GLFW.GLFW_KEY_9)
 				{
-					if(Input.isKeyDown(GLFW.GLFW_KEY_0))
+					if(Input.isKeyJustDown(GLFW.GLFW_KEY_0))
+					{
+						inventorySlots[selectedSlot].state(0);
 						selectedSlot = 9;
+						inventorySlots[selectedSlot].state(1);
+					}
 				}
-				else if(Input.isKeyDown(key))
+				else if(Input.isKeyJustDown(key))
 				{
+					inventorySlots[selectedSlot].state(0);
 					selectedSlot = key - GLFW.GLFW_KEY_1;
+					inventorySlots[selectedSlot].state(1);
 					break;
 				}
 			}

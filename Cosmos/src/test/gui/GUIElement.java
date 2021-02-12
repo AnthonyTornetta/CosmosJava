@@ -54,17 +54,17 @@ public class GUIElement
 	
 	public void prepare()
 	{
-		guiMesh.prepare();
+		guiMesh().prepare();
 	}
 	
 	public void draw()
 	{
-		guiMesh.draw();
+		guiMesh().draw();
 	}
 	
 	public void finish()
 	{
-		guiMesh.finish();
+		guiMesh().finish();
 	}
 	
 	public Vec3 position()
