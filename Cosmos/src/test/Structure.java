@@ -5,14 +5,15 @@ import java.util.Set;
 
 import javax.vecmath.Vector3f;
 
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+import org.joml.Vector4f;
 
 import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
@@ -42,6 +43,8 @@ public class Structure extends PhysicalObject
 	
 	private Set<Chunk> bulkUpdate;
 	
+	private Matrix4f transformMatrix;
+	
 	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
 		super(world);
@@ -64,6 +67,9 @@ public class Structure extends PhysicalObject
 		shape = new StructureShape(this);
 		
 		bulkUpdate = null;
+		
+		transformMatrix = new Matrix4f();
+		transformMatrix.identity();
 	}
 	
 	public boolean bulkUpdating()
@@ -111,27 +117,7 @@ public class Structure extends PhysicalObject
 		
 		bulkUpdate = null;
 	}
-	
-	private CollisionShape generateShape()
-	{
-		CompoundShape shape = new CompoundShape();
 		
-		for(Chunk c : chunks())
-		{
-			CollisionShape s = c.physicsShape();
-			
-			Transform chunkT = new Transform();
-			chunkT.setIdentity();
-			chunkT.origin.set(c.offset().x() - width() / 2.0f - 1,
-					c.offset().y() - height() / 2.0f - 1,
-					c.offset().z() - length() / 2.0f - 1);
-			
-			shape.addChildShape(chunkT, s);
-		}
-		
-		return shape;
-	}
-	
 	public void updatePhysics()
 	{
 		if(body() != null)
@@ -274,6 +260,15 @@ public class Structure extends PhysicalObject
 			
 			if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
 			{
+				// TODO: fix this, for some reason the extremeNeg + Pos calcs don't work. Idk why
+				extremeNeg.x = Maths.min(extremeNeg.x - Chunk.WIDTH, 0);
+				extremeNeg.y = Maths.min(extremeNeg.y - Chunk.HEIGHT, 0);
+				extremeNeg.z = Maths.min(extremeNeg.z - Chunk.LENGTH, 0);
+				
+				extremePos.x = Maths.min(extremePos.x + Chunk.WIDTH, width());
+				extremePos.y = Maths.min(extremePos.y + Chunk.HEIGHT, height());
+				extremePos.z = Maths.min(extremePos.z + Chunk.LENGTH, length());
+				
 				// Account for the +2 size of the light map
 				extremeNeg.x += 1;
 				extremeNeg.y += 1;
@@ -353,11 +348,14 @@ public class Structure extends PhysicalObject
 	public int height() { return height; }
 	public int width() { return width; }
 
+	public void rotation(float r, float x, float y, float z)
+	{
+		transformMatrix.rotation(r, x, y, z);
+	}
+	
 	public Matrix4fc transformMatrix()
 	{
-		return Maths.createTransformationMatrix(
-				new Vec3(body().getCenterOfMassPosition(new javax.vecmath.Vector3f())).sub(new Vec3(width() / 2.0f, height / 2.0f, length / 2.0f)), 
-				Maths.blankQuaternion()); // TODO: put rotation here
+		return transformMatrix;
 	}
 	
 	public LightMap lightMap()
@@ -377,19 +375,24 @@ public class Structure extends PhysicalObject
 	
 	public Vector3i worldCoordsToStructureCoords(float x, float y, float z)
 	{
-		int xx = Maths.round(width() / 2.0f + x - 0.5f - position().x());
-		int yy = Maths.round(height() / 2.0f + y - 0.5f - position().y());
-		int zz = Maths.round(length() / 2.0f + z - 0.5f - position().z());
+		Vector4f c = new Vector4f(x, y, z, 1);
 		
-		return new Vector3i(xx, yy, zz);
+		transformMatrix.invert(new Matrix4f()).transform(c);
+		
+//		int xx = Maths.round(width() / 2.0f + x - 0.5f - position().x());
+//		int yy = Maths.round(height() / 2.0f + y - 0.5f - position().y());
+//		int zz = Maths.round(length() / 2.0f + z - 0.5f - position().z());
+		
+		return new Vector3i((int)c.x, (int)c.y, (int)c.z);
 	}
 
 	public Vector3fc localCoordsToWorldCoords(Vector3fc v)
 	{
-		return new org.joml.Vector3f(
-				v.x() - width() / 2.0f + 0.5f + position().x(),
-				v.y() - height() / 2.0f + 0.5f + position().y(),
-				v.z() - length() / 2.0f + 0.5f + position().z());
+		Vector4f c = new Vector4f(v.x(), v.y(), v.z(), 1);
+		
+		transformMatrix.transform(c);
+		
+		return new org.joml.Vector3f(c.x(), c.y(), c.z());
 	}
-
+	
 }

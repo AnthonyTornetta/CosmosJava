@@ -56,6 +56,9 @@ public class Ployer extends PhysicalObject
 		dVel.z(dVel.z() * (delta * 1000));
 		dVel.y(dVel.y() * (delta * 1000));
 		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
+			dVel.mul(0.001f);
+		
 		Vec3 dRot = new Vec3();
 		
 		dRot.y(dRot.y() - Input.getMouseDeltaX() * 0.1f);

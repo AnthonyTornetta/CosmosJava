@@ -30,6 +30,15 @@ public class Utils
 	}
 	
 	/**
+	 * Prints objects w/ the class & line number next to it and a newline
+	 * @param obj The objects to print
+	 */
+	public static void println(Object... obj)
+	{
+		printraw(toString(obj) + "\n");
+	}
+	
+	/**
 	 * Prints an object w/ the class & line number next to it
 	 * @param obj The object to print
 	 */

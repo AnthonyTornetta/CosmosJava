@@ -3,8 +3,6 @@ package test.models;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cornchipss.utils.Utils;
-
 import test.Mesh;
 
 public abstract class CubeModel
@@ -208,9 +206,7 @@ public abstract class CubeModel
 		int i = 0;
 		for(float f : verts)
 		{
-//			Utils.println(f);
 			asArrVerts[i++] = f;
-			Utils.println(f);
 		}
 		
 		int[] asArrIndicies = new int[indicies.size()];
@@ -218,13 +214,12 @@ public abstract class CubeModel
 		for(int index : indicies)
 		{
 			asArrIndicies[i++] = index;
-			Utils.println(index);
 		}
+		
 		float[] asArrUvs = new float[uvs.size()];
 		i = 0;
 		for(float uv : uvs)
 		{
-//			Utils.println(uv);
 			asArrUvs[i++] = uv;
 		}
 		

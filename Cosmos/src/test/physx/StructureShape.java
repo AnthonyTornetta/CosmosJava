@@ -9,6 +9,7 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;
@@ -84,9 +85,9 @@ public class StructureShape
 							float yOff = (s.height() % 2) * 0.5f;
 							float zOff = (s.length() % 2) * 0.5f;
 							
-							float xx = Maths.floor(x + xOff) - xOff,
-									yy = Maths.floor(y + yOff) - yOff,
-									zz = Maths.floor(z + zOff) - zOff;
+							float xx = Maths.floor(x - xOff) + xOff,
+									yy = Maths.floor(y - yOff) + yOff,
+									zz = Maths.floor(z - zOff) + zOff;
 							
 							for(int i = 0; i < sh.sides().length; i+=3)
 							{

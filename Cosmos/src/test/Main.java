@@ -37,7 +37,7 @@ public class Main
 	
 	private void run()
 	{
-		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
+		Logger.LOGGER.setLevel(Logger.LogLevel.NONE);
 		
 		Blocks.init();
 		

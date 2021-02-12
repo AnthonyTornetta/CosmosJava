@@ -673,6 +673,11 @@ public class Maths
 	{
 		return (int)Math.floor(x);
 	}
+	
+	public static int min(int a, int b)
+	{
+		return a < b ? a : b;
+	}
 
 	public static float min(float a, float b)
 	{
@@ -692,6 +697,11 @@ public class Maths
 	public static float signum0(float z)
 	{
 		return z == 0 ? 1 : Math.signum(z);
+	}
+
+	public static Vector3f vec3(Vector4fc temp1)
+	{
+		return new Vector3f(temp1.x(), temp1.y(), temp1.z());
 	}
 
 }

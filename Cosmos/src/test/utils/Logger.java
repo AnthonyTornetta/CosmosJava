@@ -14,7 +14,7 @@ public class Logger
 		INFO(1),
 		WARNING(2),
 		ERROR(3),
-		NOTHING(4);
+		NONE(4);
 		
 		int val;
 		
