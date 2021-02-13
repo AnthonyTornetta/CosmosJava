@@ -52,9 +52,9 @@ public class Main
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		final int structW = Chunk.WIDTH*4,
-				structH = Chunk.HEIGHT * 2,
-				structL = Chunk.LENGTH*4;
+		final int structW = 4,//Chunk.WIDTH*4,
+				structH = Chunk.HEIGHT + 4,//Chunk.HEIGHT * 2,
+				structL = 4;//Chunk.LENGTH*4;
 		
 		GUI gui = new GUI(guiTex);
 		gui.init(window.getWidth(), window.getHeight());
@@ -93,6 +93,8 @@ public class Main
 		Structure s = new Structure(world, structW, structH, structL);
 		s.init();
 		
+		s.transformMatrix(Maths.createTransformationMatrix(new Vec3(10, 10, 10), Maths.blankQuaternion()));
+		
 		for(int z = 0; z < s.length(); z++)
 		{
 			for(int x = 0; x < s.width(); x++)
@@ -100,9 +102,9 @@ public class Main
 				int h = s.height() - 16;
 				for(int y = 0; y < h; y++)
 				{
-					if(Math.random() < 0.03)
+					if(Math.random() < 0.1)
 						s.block(x, y, z, Blocks.LIGHT);
-					if(y == h - 1)
+					else if(y == h - 1)
 						s.block(x, y, z, Blocks.GRASS);
 					else if(h - y < 5)
 						s.block(x, y, z, Blocks.DIRT);
@@ -239,7 +241,7 @@ public class Main
 			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 			{
 				Vec3 from = p.camera().position();
-				Vec3 dLook = Maths.mul(p.camera().forward(), 50.f);
+				Vec3 dLook = Maths.mul(p.camera().forward(), 10.0f);
 				Vec3 to = Maths.add(from, dLook);
 				
 				RayResult hits = s.shape().raycast(from.joml(), to.joml());

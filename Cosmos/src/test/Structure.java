@@ -17,6 +17,7 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.lights.LightMap;
@@ -377,7 +378,9 @@ public class Structure extends PhysicalObject
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 		
-		transformMatrix.invert(new Matrix4f()).transform(c);
+		Matrix4f inverted = new Matrix4f();
+		transformMatrix.invert(inverted);
+		inverted.transform(c);
 		
 //		int xx = Maths.round(width() / 2.0f + x - 0.5f - position().x());
 //		int yy = Maths.round(height() / 2.0f + y - 0.5f - position().y());
@@ -394,5 +397,9 @@ public class Structure extends PhysicalObject
 		
 		return new org.joml.Vector3f(c.x(), c.y(), c.z());
 	}
-	
+
+	public void transformMatrix(Matrix4fc t)
+	{
+		transformMatrix.set(t);
+	}
 }

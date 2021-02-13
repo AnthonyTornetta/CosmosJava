@@ -7,6 +7,7 @@ import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector4f;
 
 import com.cornchipss.utils.Maths;
 import com.cornchipss.utils.Utils;
@@ -56,10 +57,13 @@ public class StructureShape
 		
 		Vector3f intersectionPoint = new Vector3f();
 		Vector3f temp1 = new Vector3f(), temp2 = new Vector3f(), temp3 = new Vector3f();
+		Vector4f temp4 = new Vector4f();
 		
 		List<Vector3f> hitPositions = new LinkedList<>();
 		List<Vector3f> hits = new LinkedList<>();
 		List<BlockFace> faces = new LinkedList<>();
+		
+		Utils.println("====");
 		
 		for(float dz = 0; Math.abs(dz) <= Math.abs(delta.z()); dz += Maths.signum0(delta.z()))
 		{
@@ -81,21 +85,25 @@ public class StructureShape
 						{
 							PhysicsShape sh = new CubeShape();
 							
-							float xOff = (s.width() % 2) * 0.5f;
-							float yOff = (s.height() % 2) * 0.5f;
-							float zOff = (s.length() % 2) * 0.5f;
-							
-							float xx = Maths.floor(x - xOff) + xOff,
-									yy = Maths.floor(y - yOff) + yOff,
-									zz = Maths.floor(z - zOff) + zOff;
-							
 							for(int i = 0; i < sh.sides().length; i+=3)
 							{
 								BlockFace face = sh.faces()[i/3];
 								
-								temp1.set(xx + sh.sides()[i].x(), yy + sh.sides()[i].y(), zz + sh.sides()[i].z());
-								temp2.set(xx + sh.sides()[i+1].x(), yy + sh.sides()[i+1].y(), zz + sh.sides()[i+1].z());
-								temp3.set(xx + sh.sides()[i+2].x(), yy + sh.sides()[i+2].y(), zz + sh.sides()[i+2].z());
+								temp1.set(coords.x + sh.sides()[i].x(), coords.y + sh.sides()[i].y(), coords.z + sh.sides()[i].z());
+								temp2.set(coords.x + sh.sides()[i+1].x(), coords.y + sh.sides()[i+1].y(), coords.z + sh.sides()[i+1].z());
+								temp3.set(coords.x + sh.sides()[i+2].x(), coords.y + sh.sides()[i+2].y(), coords.z + sh.sides()[i+2].z());
+								
+								temp4.set(temp1.x, temp1.y, temp1.z, 1);
+								s.transformMatrix().transform(temp4);
+								temp1.set(temp4.x, temp4.y, temp4.z);
+								
+								temp4.set(temp2.x, temp2.y, temp2.z, 1);
+								s.transformMatrix().transform(temp4);
+								temp2.set(temp4.x, temp4.y, temp4.z);
+								
+								temp4.set(temp3.x, temp3.y, temp3.z, 1);
+								s.transformMatrix().transform(temp4);
+								temp3.set(temp4.x, temp4.y, temp4.z);
 								
 								if(Intersectionf.intersectLineSegmentTriangle(from, to, 
 										temp1, temp2, temp3, 
@@ -111,6 +119,9 @@ public class StructureShape
 				}
 			}
 		}
+		
+		Utils.println(from);
+		Utils.println(to);
 		
 		RayResult res = new RayResult(from, to, s, hits, faces);
 		

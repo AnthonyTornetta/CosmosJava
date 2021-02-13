@@ -9,6 +9,7 @@ import org.joml.Vector3dc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3ic;
+import org.joml.Vector4fc;
 import org.lwjgl.BufferUtils;
 
 public class Utils
@@ -141,6 +142,11 @@ public class Utils
 		{
 			Vector3dc t = (Vector3dc)obj;
 			return "[" + t.x() + ", " + t.y() + ", " + t.z() + "]";
+		}
+		else if(obj instanceof Vector4fc)
+		{
+			Vector4fc t = (Vector4fc)obj;
+			return "[" + t.x() + ", " + t.y() + ", " + t.z() + ", " + t.w() + "]";
 		}
 		
 		return obj.toString();
