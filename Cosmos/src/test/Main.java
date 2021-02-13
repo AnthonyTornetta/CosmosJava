@@ -93,7 +93,7 @@ public class Main
 		Structure s = new Structure(world, structW, structH, structL);
 		s.init();
 		
-		s.transformMatrix(Maths.createTransformationMatrix(new Vec3(10, 10, 10), Maths.blankQuaternion()));
+		s.transformMatrix(Maths.createTransformationMatrix(new Vec3(10, 10, 10), Maths.quaternionFromRotation(Maths.PI / 3, 0, 0)));
 		
 		for(int z = 0; z < s.length(); z++)
 		{
