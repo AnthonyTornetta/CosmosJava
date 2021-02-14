@@ -62,13 +62,6 @@ public class StructureShape
 		List<Vector3f> hits = new LinkedList<>();
 		List<BlockFace> faces = new LinkedList<>();
 		
-//		final int OFF = 10;
-//		
-//		for(float dz = 0; Math.abs(dz) - OFF <= Math.abs(delta.z()) + OFF; dz += Maths.signum0(delta.z()))
-//		{
-//			for(float dy = 0; Math.abs(dy) - OFF <= Math.abs(delta.y()) + OFF; dy += Maths.signum0(delta.y()))
-//			{
-//				for(float dx = 0; Math.abs(dx) - OFF <= Math.abs(delta.x()) + OFF; dx += Maths.signum0(delta.x()))
 		for(int z = 0; z < s.length(); z++)
 		{
 			for(int y = 0; y < s.height(); y++)
