@@ -18,7 +18,7 @@ public class TestBiosphere extends Biosphere
 		{
 			for(int x = 0; x < s.width(); x++)
 			{
-				float n = 6 * SimplexNoise.noise(x * 0.01f, z * 0.01f);
+				float n = 6 * SimplexNoise.noise(x * 0.03f, z * 0.03f);
 				
 				int h = Maths.round(s.height() - 16 + n);
 				

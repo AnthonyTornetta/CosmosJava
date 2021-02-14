@@ -13,7 +13,6 @@ import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.biospheres.Biosphere;
@@ -46,8 +45,6 @@ public class Main
 		
 		Biospheres.registerBiospheres("test.biospheres");
 		
-		Utils.println(Biospheres.getBiosphereIds().size());
-		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
 		Shader defaultShader = new Shader("assets/shaders/chunk");
@@ -73,7 +70,7 @@ public class Main
 		
 		for(int i = 0; i < models.length; i++)
 		{
-			// TODO: fix this magic numbers
+			// TODO: fix these magic numbers
 			
 			inventorySlots[i] =  new GUITextureMultiple(
 					new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 
