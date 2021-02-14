@@ -7,10 +7,8 @@ import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
-import org.joml.Vector4f;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;
@@ -25,41 +23,18 @@ public class StructureShape
 		this.s = s;
 	}
 	
-	public boolean solidAt(float x, float y, float z)
-	{
-		x = Maths.floor(x + s.width() / 2.0f);
-		y = Maths.floor(y + s.height() / 2.0f);
-		z = Maths.floor(z + s.length() / 2.0f);
-		
-		return s.withinBlocks((int)x, (int)y, (int)z) && s.block((int)x, (int)y, (int)z) != null;
-	}
-	
-	public Vector3f solidAt(float x, float y, float z, float w, float h, float l)
-	{
-		for(float xx = 0; xx <= Math.ceil(w); xx++)
-		{
-			for(float yy = 0; yy <= Math.ceil(h); yy++)
-			{
-				for(float zz = 0; zz <= Math.ceil(l); zz++)
-				{
-					if(solidAt(xx + x + 0.5f, yy + y + 0.5f, zz + z + 0.5f))
-						return new Vector3f(xx + x + 0.5f, yy + y + 0.5f, zz + z + 0.5f);
-				}
-			}
-		}
-		
-		return null;
-	}
-	
+	/**
+	 * Sends a raycast from a given point A to point B relative to world coordinates.
+	 * @param from Point A
+	 * @param to Point B
+	 * @return A RayResult where the first point is marked as the closest.
+	 */
 	public RayResult raycast(Vector3fc from, Vector3fc to)
 	{
 		Vector3f intersectionPoint = new Vector3f();
 		
 		// Used  for checking the triangles of each cube face
 		Vector3f temp1 = new Vector3f(), temp2 = new Vector3f(), temp3 = new Vector3f();
-		
-		
-		Vector4f temp4 = new Vector4f();
 		
 		List<Vector3f> hitPositions = new LinkedList<>();
 		List<Vector3f> hits = new LinkedList<>();

@@ -7,7 +7,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;

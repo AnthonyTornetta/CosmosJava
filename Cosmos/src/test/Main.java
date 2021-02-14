@@ -13,8 +13,10 @@ import com.cornchipss.rendering.Texture;
 import com.cornchipss.rendering.Window;
 import com.cornchipss.utils.Input;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
+import test.biospheres.Biosphere;
 import test.blocks.Block;
 import test.blocks.Blocks;
 import test.gui.GUI;
@@ -22,6 +24,7 @@ import test.gui.GUIModel;
 import test.gui.GUITexture;
 import test.gui.GUITextureMultiple;
 import test.physx.RayResult;
+import test.registry.Biospheres;
 import test.shaders.Shader;
 import test.utils.Logger;
 import test.world.ZaWARUDO;
@@ -41,6 +44,10 @@ public class Main
 		
 		Blocks.init();
 		
+		Biospheres.registerBiospheres("test.biospheres");
+		
+		Utils.println(Biospheres.getBiosphereIds().size());
+		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
 		Shader defaultShader = new Shader("assets/shaders/chunk");
@@ -51,10 +58,6 @@ public class Main
 		Texture guiTex = Texture.loadTexture("atlas/gui.png");
 		
 		ZaWARUDO world = new ZaWARUDO();
-		
-		final int structW = 4,//Chunk.WIDTH*4,
-				structH = Chunk.HEIGHT + 4,//Chunk.HEIGHT * 2,
-				structL = 4;//Chunk.LENGTH*4;
 		
 		GUI gui = new GUI(guiTex);
 		gui.init(window.getWidth(), window.getHeight());
@@ -71,7 +74,7 @@ public class Main
 		for(int i = 0; i < models.length; i++)
 		{
 			// TODO: fix this magic numbers
-
+			
 			inventorySlots[i] =  new GUITextureMultiple(
 					new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 
 					0.5f, 0,
@@ -90,27 +93,12 @@ public class Main
 		
 		inventorySlots[selectedSlot].state(1);
 		
-		Structure s = new Structure(world, structW, structH, structL);
+		Structure s = new Structure(world, 100, 32, 100);
 		s.init();
 		
-		for(int z = 0; z < s.length(); z++)
-		{
-			for(int x = 0; x < s.width(); x++)
-			{
-				int h = s.height() - 16;
-				for(int y = 0; y < h; y++)
-				{
-					if(Math.random() < 0.1)
-						s.block(x, y, z, Blocks.LIGHT);
-					else if(y == h - 1)
-						s.block(x, y, z, Blocks.GRASS);
-					else if(h - y < 5)
-						s.block(x, y, z, Blocks.DIRT);
-					else
-						s.block(x, y, z, Blocks.STONE);
-				}
-			}
-		}
+		Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
+		
+		def.generatePlanet(s);
 		
 		s.calculateLights(false);
 		

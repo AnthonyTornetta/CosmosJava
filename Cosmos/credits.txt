@@ -4,4 +4,6 @@ Bullet - erwincoumans (https://github.com/bulletphysics/bullet3)
 JBullet - jezek2 (http://jbullet.advel.cz/)
 SimplexNoise - Stefan Gustavson (stegu@itn.liu.se) + Peter Eastman (peastman@drizzle.stanford.edu)
 
+wood texture: https://opengameart.org/content/wood-log-pixel-art
+
 Cosmos - Anthony Tornetta (https://github.com/Cornchipss)

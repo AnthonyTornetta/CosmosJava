@@ -7,7 +7,9 @@ import java.util.List;
 import test.lights.LightSource;
 import test.models.DirtModel;
 import test.models.GrassModel;
+import test.models.LeafModel;
 import test.models.LightModel;
+import test.models.LogModel;
 import test.models.StoneModel;
 
 public class Blocks
@@ -18,12 +20,15 @@ public class Blocks
 		GRASS = new Block(new GrassModel()),
 		DIRT  = new Block(new DirtModel()),
 		STONE = new Block(new StoneModel()),
-		LIGHT = new LitBlock(new LightModel(), new LightSource(16));
+		LIGHT = new LitBlock(new LightModel(), new LightSource(16)),
+		LOG   = new Block(new LogModel()),
+		LEAF  = new Block(new LeafModel());
 
 	public static void init()
 	{
 		allBlocks = Collections.unmodifiableList(
-				Arrays.asList(STONE, GRASS, DIRT, LIGHT));
+				Arrays.asList(STONE, GRASS, DIRT, 
+						LIGHT, LOG, LEAF));
 	}
 	
 	/**

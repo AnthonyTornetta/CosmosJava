@@ -419,4 +419,15 @@ public class Structure extends PhysicalObject
 	{
 		transformMatrix.set(t);
 	}
+
+	public int higehstYAt(int x, int z)
+	{
+		for(int y = height() - 1; y >= 0; y--)
+		{
+			if(block(x, y, z) != null)
+				return y;
+		}
+		
+		return -1;
+	}
 }
