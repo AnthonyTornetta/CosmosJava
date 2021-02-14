@@ -10,6 +10,7 @@ import org.joml.Vector3i;
 import org.joml.Vector4f;
 
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 import com.cornchipss.world.blocks.BlockFace;
 
 import test.Structure;
@@ -52,58 +53,73 @@ public class StructureShape
 	
 	public RayResult raycast(Vector3fc from, Vector3fc to)
 	{
-		Vector3f delta = new Vector3f(to.x() - from.x(), to.y() - from.y(), to.z() - from.z());
-		
 		Vector3f intersectionPoint = new Vector3f();
+		
+		// Used  for checking the triangles of each cube face
 		Vector3f temp1 = new Vector3f(), temp2 = new Vector3f(), temp3 = new Vector3f();
+		
+		
 		Vector4f temp4 = new Vector4f();
 		
 		List<Vector3f> hitPositions = new LinkedList<>();
 		List<Vector3f> hits = new LinkedList<>();
 		List<BlockFace> faces = new LinkedList<>();
 		
-		for(int z = 0; z < s.length(); z++)
+		Vector3i coordsNeg = s.worldCoordsToStructureCoords(from);
+		Vector3i coordsPos = s.worldCoordsToStructureCoords(to);
+		
+		if(coordsNeg.x > coordsPos.x)
 		{
-			for(int y = 0; y < s.height(); y++)
+			int temp = coordsNeg.x;
+			coordsNeg.x = coordsPos.x;
+			coordsPos.x = temp;
+		}
+		
+		if(coordsNeg.y > coordsPos.y)
+		{
+			int temp = coordsNeg.y;
+			coordsNeg.y = coordsPos.y;
+			coordsPos.y = temp;
+		}
+		
+		if(coordsNeg.z > coordsPos.z)
+		{
+			int temp = coordsNeg.z;
+			coordsNeg.z = coordsPos.z;
+			coordsPos.z = temp;
+		}
+		
+		for(int z = Maths.max(coordsNeg.z, 0); z <= Maths.min(s.length() - 1, coordsPos.z); z++)
+		{
+			for(int y = Maths.max(coordsNeg.y, 0); y <= Maths.min(s.height() - 1, coordsPos.y); y++)
 			{
-				for(int x = 0; x < s.width(); x++)
+				for(int x = Maths.max(coordsNeg.x, 0); x <= Maths.min(s.width() - 1, coordsPos.x); x++)
 				{
-					if(s.withinBlocks(x, y, z))
+					Block b = s.block(x, y, z);
+					
+					if(b != null)
 					{
-						Block b = s.block(x, y, z);
+						PhysicsShape sh = new CubeShape();
 						
-						if(b != null)
+						for(int i = 0; i < sh.sides().length; i+=3)
 						{
-							PhysicsShape sh = new CubeShape();
+							BlockFace face = sh.faces()[i/3];
 							
-							for(int i = 0; i < sh.sides().length; i+=3)
+							temp1.set(x + sh.sides()[i].x(), y + sh.sides()[i].y(), z + sh.sides()[i].z());
+							temp2.set(x + sh.sides()[i+1].x(), y + sh.sides()[i+1].y(), z + sh.sides()[i+1].z());
+							temp3.set(x + sh.sides()[i+2].x(), y + sh.sides()[i+2].y(), z + sh.sides()[i+2].z());
+							
+							s.localCoordsToWorldCoords(temp1, temp1);
+							s.localCoordsToWorldCoords(temp2, temp2);
+							s.localCoordsToWorldCoords(temp3, temp3);
+							
+							if(Intersectionf.intersectLineSegmentTriangle(from, to, 
+									temp1, temp2, temp3, 
+									(float) 1E-9, intersectionPoint))
 							{
-								BlockFace face = sh.faces()[i/3];
-								
-								temp1.set(x + sh.sides()[i].x(), y + sh.sides()[i].y(), z + sh.sides()[i].z());
-								temp2.set(x + sh.sides()[i+1].x(), y + sh.sides()[i+1].y(), z + sh.sides()[i+1].z());
-								temp3.set(x + sh.sides()[i+2].x(), y + sh.sides()[i+2].y(), z + sh.sides()[i+2].z());
-								
-								temp4.set(temp1.x, temp1.y, temp1.z, 1);
-								s.transformMatrix().transform(temp4);
-								temp1.set(temp4.x, temp4.y, temp4.z);
-								
-								temp4.set(temp2.x, temp2.y, temp2.z, 1);
-								s.transformMatrix().transform(temp4);
-								temp2.set(temp4.x, temp4.y, temp4.z);
-								
-								temp4.set(temp3.x, temp3.y, temp3.z, 1);
-								s.transformMatrix().transform(temp4);
-								temp3.set(temp4.x, temp4.y, temp4.z);
-								
-								if(Intersectionf.intersectLineSegmentTriangle(from, to, 
-										temp1, temp2, temp3, 
-										(float) 1E-9, intersectionPoint))
-								{
-									faces.add(face);
-									hits.add(new Vector3f(x, y, z));
-									hitPositions.add(new Vector3f(intersectionPoint));
-								}
+								faces.add(face);
+								hits.add(new Vector3f(x, y, z));
+								hitPositions.add(new Vector3f(intersectionPoint));
 							}
 						}
 					}

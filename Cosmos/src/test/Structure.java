@@ -17,7 +17,6 @@ import com.bulletphysics.collision.shapes.CollisionShape;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.utils.Maths;
-import com.cornchipss.utils.Utils;
 
 import test.blocks.Block;
 import test.lights.LightMap;
@@ -369,6 +368,11 @@ public class Structure extends PhysicalObject
 		block(x, y, z, null);
 	}
 	
+	public Vector3i worldCoordsToStructureCoords(Vector3fc v)
+	{
+		return worldCoordsToStructureCoords(v.x(), v.y(), v.z());
+	}
+	
 	public Vector3i worldCoordsToStructureCoords(Vector3ic v)
 	{
 		return worldCoordsToStructureCoords(v.x(), v.y(), v.z());
@@ -382,20 +386,33 @@ public class Structure extends PhysicalObject
 		transformMatrix.invert(inverted);
 		inverted.transform(c);
 		
-//		int xx = Maths.round(width() / 2.0f + x - 0.5f - position().x());
-//		int yy = Maths.round(height() / 2.0f + y - 0.5f - position().y());
-//		int zz = Maths.round(length() / 2.0f + z - 0.5f - position().z());
-		
 		return new Vector3i((int)c.x, (int)c.y, (int)c.z);
 	}
-
-	public Vector3fc localCoordsToWorldCoords(Vector3fc v)
+	
+	public org.joml.Vector3f localCoordsToWorldCoords(float x, float y, float z, org.joml.Vector3f storage)
 	{
-		Vector4f c = new Vector4f(v.x(), v.y(), v.z(), 1);
+		Vector4f c = new Vector4f(x, y, z, 1);
 		
 		transformMatrix.transform(c);
 		
-		return new org.joml.Vector3f(c.x(), c.y(), c.z());
+		storage.set(c.x, c.y, c.z);
+		
+		return storage;
+	}
+	
+	public org.joml.Vector3f localCoordsToWorldCoords(float x, float y, float z)
+	{
+		return localCoordsToWorldCoords(x, y, z, new org.joml.Vector3f());
+	}
+	
+	public org.joml.Vector3f localCoordsToWorldCoords(Vector3fc v, org.joml.Vector3f storage)
+	{
+		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
+	}
+	
+	public org.joml.Vector3f localCoordsToWorldCoords(Vector3fc v)
+	{
+		return localCoordsToWorldCoords(v.x(), v.y(), v.z());
 	}
 
 	public void transformMatrix(Matrix4fc t)

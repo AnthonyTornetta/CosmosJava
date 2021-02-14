@@ -684,6 +684,11 @@ public class Maths
 		return a < b ? a : b;
 	}
 	
+	public static int max(int a, int b)
+	{
+		return a > b ? a : b;
+	}
+	
 	public static float max(float a, float b)
 	{
 		return a > b ? a : b;
