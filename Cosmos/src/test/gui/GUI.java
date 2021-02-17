@@ -1,6 +1,5 @@
 package test.gui;
 
-import java.awt.Font;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,7 +8,6 @@ import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.rendering.Texture;
 
-import test.gui.text.TextRenderer;
 import test.shaders.Shader;
 
 public class GUI
@@ -24,8 +22,6 @@ public class GUI
 	
 	private int guiTransLoc;
 	private int guiProjLoc;
-	
-	private TextRenderer textRenderer;
 	
 	public GUI(Texture texture)
 	{
@@ -42,8 +38,6 @@ public class GUI
 		
 		guiTransLoc = shader.uniformLocation("u_transform");
 		guiProjLoc = shader.uniformLocation("u_projection");
-		
-		textRenderer = new TextRenderer(new Font("Arial", Font.PLAIN, 72));
 	}
 	
 	public void draw()
@@ -64,12 +58,6 @@ public class GUI
 			e.draw(this);
 			e.finish(this);
 		}
-		
-		shader.setUniformMatrix(guiTransLoc, new Matrix4f().identity());
-		
-		shader.setUniformMatrix(guiProjLoc, new Matrix4f().ortho2D(0, 1024, 0, 720));
-		
-		textRenderer.renderText("Hello, World!", 1024 / 2 - 200, 200);
 		
 		shader.stop();
 	}
@@ -104,8 +92,10 @@ public class GUI
 		if(projectionMatrix == null)
 			projectionMatrix = new Matrix4f();
 		projectionMatrix.identity();
-		projectionMatrix.perspective((float)Math.toRadians(90), 
-				width/(float)height,
-				0.1f, 1000);
+//		projectionMatrix.perspective((float)Math.toRadians(90), 
+//				width/(float)height,
+//				0.1f, 1000);
+		
+		projectionMatrix.ortho2D(0, 1024, 0, 720);
 	}
 }

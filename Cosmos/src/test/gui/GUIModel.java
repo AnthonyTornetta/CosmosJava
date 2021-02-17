@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 
 import com.cornchipss.rendering.Texture;
 import com.cornchipss.utils.Maths;
+import com.cornchipss.utils.Utils;
 
 import test.Mesh;
 import test.Vec3;
@@ -22,7 +23,7 @@ public class GUIModel extends GUIElement
 	
 	public GUIModel(Matrix4f transform, CubeModel m, Texture map)
 	{
-		this(transform, m.createMesh(0, 0, 0, 1.0f, BlockSide.FRONT), map);
+		this(transform, m.createMesh(0, 0, -1, 1, BlockSide.FRONT), map);
 	}
 	
 	public GUIModel(Vec3 position, float scale, Mesh m, Texture map)

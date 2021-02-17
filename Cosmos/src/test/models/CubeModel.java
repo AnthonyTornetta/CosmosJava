@@ -3,6 +3,8 @@ package test.models;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.cornchipss.utils.Utils;
+
 import test.Mesh;
 
 public abstract class CubeModel
@@ -170,7 +172,11 @@ public abstract class CubeModel
 		for(BlockSide s : sides)
 		{
 			for(float f : verticies(s, offX, offY, offZ))
+			{
 				verts.add(f * scale);
+				
+				Utils.println(f * scale);
+			}
 			
 			int tempMax = maxI;
 			

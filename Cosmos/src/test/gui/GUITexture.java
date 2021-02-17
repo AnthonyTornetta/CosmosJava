@@ -18,10 +18,10 @@ public class GUITexture extends GUIElement
 	{
 		return new float[]
 			{
-				 w/2,  h/2, -1.0f,  // top right
-				 w/2, -h/2, -1.0f,  // bottom right
-			    -w/2, -h/2, -1.0f,  // bottom left
-			    -w/2,  h/2, -1.0f   // top left 
+				 w,  h, 0,  // top right
+				 w,  0, 0,  // bottom right
+			     0,  0, 0,  // bottom left
+			     0,  h, 0   // top left 
 			};
 	}
 	

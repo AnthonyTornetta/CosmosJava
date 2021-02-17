@@ -2,6 +2,8 @@ package test;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
@@ -19,15 +21,19 @@ public class Mesh
 	final private int vao;
 	final private int verticies;
 	
+	private List<Integer> vbos; // for deleting them when done with this mesh.
+	
 	private Mesh(int verticies)
 	{
 		vao = GL30.glGenVertexArrays(); 
 		this.verticies = verticies;
+		vbos = new LinkedList<>();
 	}
 	
 	public void storeData(int index, int dimensions, float[] data)
 	{
 		int vbo = GL15.glGenBuffers();
+		vbos.add(vbo);
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 		
 		FloatBuffer dataBuffer = BufferUtils.createFloatBuffer(data.length);
@@ -43,6 +49,7 @@ public class Mesh
 	public void storeIndicies(int[] data)
 	{
 		int vbo = GL15.glGenBuffers();
+		vbos.add(vbo);
 		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vbo);
 		
 		IntBuffer buf = BufferUtils.createIntBuffer(data.length);
@@ -128,5 +135,17 @@ public class Mesh
 	public void draw()
 	{
 		GL11.glDrawElements(GL20.GL_TRIANGLES, verticies(), GL11.GL_UNSIGNED_INT, 0);
+	}
+	
+	public void delete()
+	{
+		GL30.glBindVertexArray(vao());
+		
+		for(int vbo : vbos)
+			GL30.glDeleteBuffers(vbo);
+		
+		GL30.glDeleteVertexArrays(vao());
+		
+		GL30.glBindVertexArray(0);
 	}
 }

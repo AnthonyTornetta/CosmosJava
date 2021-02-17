@@ -53,4 +53,9 @@ public abstract class GUIElement
 	{
 		return transform;
 	}
+	
+	public void delete()
+	{
+		guiMesh().delete();
+	}
 }

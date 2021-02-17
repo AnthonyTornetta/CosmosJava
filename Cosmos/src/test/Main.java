@@ -24,6 +24,8 @@ import test.gui.GUI;
 import test.gui.GUIModel;
 import test.gui.GUITexture;
 import test.gui.GUITextureMultiple;
+import test.gui.text.GUIText;
+import test.gui.text.OpenGLFont;
 import test.gui.text.TextRenderer;
 import test.physx.RayResult;
 import test.registry.Biospheres;
@@ -53,17 +55,20 @@ public class Main
 		Shader defaultShader = new Shader("assets/shaders/chunk");
 		defaultShader.init();
 		
-		Texture tex = Texture.loadTexture("atlas/main.png");
+		Texture mainTexture = Texture.loadTexture("atlas/main.png");
 		
-		Texture guiTex = Texture.loadTexture("atlas/gui.png");
+		Texture guiTexture = Texture.loadTexture("atlas/gui.png");
 		
 		ZaWARUDO world = new ZaWARUDO();
 		
-		GUI gui = new GUI(guiTex);
+		GUI gui = new GUI(guiTexture);
 		gui.init(window.getWidth(), window.getHeight());
 		
 		GUITexture crosshair = new GUITexture(new Vec3(), 0.1f, 0.1f, 0, 0);
 		gui.addElement(crosshair);
+		
+		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
+		font.init();
 		
 		GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
 		
@@ -71,12 +76,14 @@ public class Main
 		
 		int selectedSlot = 0;
 		
+		int slotDimensions = 64;
+		
+		int startX = (int)(1024 / 2.0f - (inventorySlots.length / 2.0f) * slotDimensions);
+		
 		for(int i = 0; i < models.length; i++)
 		{
-			// TODO: fix these magic numbers
-			
 			inventorySlots[i] =  new GUITextureMultiple(
-					new Vec3(-1.8f + 0.4f * i, -1.8f, -1), 0.4f, 0.4f, 
+					new Vec3(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
 					0.5f, 0,
 					0, 0.5f);
 			
@@ -84,14 +91,19 @@ public class Main
 			
 			if(i < Blocks.all().size())
 			{
-				models[i] = new GUIModel(new Vec3(-.84f + 0.17f * i, -.84f, -1f), 
-						0.15f, Blocks.all().get(i).model(), tex);
+				int margin = 4;
+				
+				models[i] = new GUIModel(new Vec3(startX + i * slotDimensions + margin, margin, 0), 
+						slotDimensions - margin * 2, Blocks.all().get(i).model(), mainTexture);
 				
 				gui.addElement(models[i]);
 			}
 		}
 		
 		inventorySlots[selectedSlot].state(1);
+		
+		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
+		gui.addElement(fpsText);
 		
 		Structure s = new Structure(world, 100, 32, 100);
 		s.init();
@@ -188,6 +200,8 @@ public class Main
 			if(lastSecond / 1000 != t / 1000)
 			{
 				Logger.LOGGER.info("UPS: " + ups + "; Max Variance: " + variance*1000 + "ms");
+				fpsText.text(ups + " " + (int)(variance*1000) + "ms");
+				
 				lastSecond = t;
 				ups = 0;
 				variance = 0;
@@ -308,7 +322,7 @@ public class Main
 
 			defaultShader.use();
 			defaultShader.setUniformF(timeLoc, (float)GLFW.glfwGetTime());
-			tex.bind();
+			mainTexture.bind();
 			
 			defaultShader.setUniformMatrix(projLoc, projectionMatrix);
 			
