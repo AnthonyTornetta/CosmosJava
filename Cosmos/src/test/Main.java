@@ -1,5 +1,7 @@
 package test;
 
+import java.awt.Font;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3i;
@@ -22,6 +24,7 @@ import test.gui.GUI;
 import test.gui.GUIModel;
 import test.gui.GUITexture;
 import test.gui.GUITextureMultiple;
+import test.gui.text.TextRenderer;
 import test.physx.RayResult;
 import test.registry.Biospheres;
 import test.shaders.Shader;
@@ -313,6 +316,8 @@ public class Main
 			
 			GL30.glEnable(GL30.GL_DEPTH_TEST);
 			GL30.glDepthFunc(GL30.GL_LESS);
+			
+			//GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 			
 			for(Chunk chunk : s.chunks())
 			{
