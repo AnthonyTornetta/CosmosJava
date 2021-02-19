@@ -26,7 +26,6 @@ import test.gui.GUITexture;
 import test.gui.GUITextureMultiple;
 import test.gui.text.GUIText;
 import test.gui.text.OpenGLFont;
-import test.gui.text.TextRenderer;
 import test.physx.RayResult;
 import test.registry.Biospheres;
 import test.shaders.Shader;
@@ -174,7 +173,7 @@ public class Main
 				gui.updateProjection(window.getWidth(), window.getHeight());
 			}
 			
-			float delta = System.currentTimeMillis() - t;
+			float delta = System.currentTimeMillis() - t; 
 			
 			if(delta < MILLIS_WAIT)
 			{
