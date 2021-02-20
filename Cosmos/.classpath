@@ -205,6 +205,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/vecmath.jar"/>
-	<classpathentry kind="lib" path="libs/reflections-0.9.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
