@@ -2,9 +2,9 @@ package com.cornchipss.cosmos.gui;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.Mesh;
-import com.cornchipss.cosmos.Vec3;
 import com.cornchipss.cosmos.utils.Maths;
 
 public abstract class GUIElement
@@ -16,17 +16,17 @@ public abstract class GUIElement
 		this.transform = new Matrix4f().set(transform);
 	}
 	
-	public GUIElement(Vec3 position, float rx, float ry, float rz, float scale)
+	public GUIElement(Vector3fc position, float rx, float ry, float rz, float scale)
 	{
 		transform = Maths.createTransformationMatrix(position, rx, ry, rz, scale);
 	}
 	
-	public GUIElement(Vec3 position, float scale)
+	public GUIElement(Vector3fc position, float scale)
 	{
 		this(position, 0, 0, 0, 1);
 	}
 	
-	public GUIElement(Vec3 position)
+	public GUIElement(Vector3fc position)
 	{
 		this(position, 1);
 	}

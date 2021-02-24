@@ -2,8 +2,9 @@ package com.cornchipss.cosmos.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.Vec3;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.utils.Maths;
 
@@ -12,19 +13,19 @@ public class GimbalLockCamera extends Camera
 	private Matrix4f matrix;
 	private PhysicalObject parent;
 	
-	private Vec3 forward, right, up;
-	private Vec3 rot;
+	private Vector3f forward, right, up;
+	private Vector3f rot;
 	
 	public GimbalLockCamera(PhysicalObject parent)
 	{
 		this.parent = parent;
 		
-		rot = new Vec3();
+		rot = new Vector3f();
 		matrix = new Matrix4f();
 		
-		forward = new Vec3(0, 0, -1); // opengl moment
-		right = new Vec3(1, 0, 0);
-		up = new Vec3(0, 1, 0);
+		forward = new Vector3f(0, 0, -1); // opengl moment
+		right = new Vector3f(1, 0, 0);
+		up = new Vector3f(0, 1, 0);
 		
 		update();
 	}
@@ -33,31 +34,31 @@ public class GimbalLockCamera extends Camera
 	{
 		if(parent.initialized())
 		{
-			rot.x(Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2));
+			rot.x = Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2);
 			
-			Maths.createViewMatrix(position(), new Vec3(rot), matrix);
+			Maths.createViewMatrix(position(), new Vector3f(rot), matrix);
 			
-			forward.x(Maths.sin(rot.y()) * Maths.cos(rot.x()));
-		    forward.y(Maths.sin(-rot.x()));
-		    forward.z(-Maths.cos(rot.x()) * Maths.cos(rot.y()));
+			forward.x = Maths.sin(rot.y()) * Maths.cos(rot.x());
+		    forward.y = Maths.sin(-rot.x());
+		    forward.z = -Maths.cos(rot.x()) * Maths.cos(rot.y());
 		    
-		    right.x(Maths.cos(rot.y()));
-		    right.z(Maths.sin(rot.y()));
+		    right.x = Maths.cos(rot.y());
+		    right.z = Maths.sin(rot.y());
 		    
-		    up.x(Maths.sin(rot.y()) * Maths.sin(rot.x()));
-		    up.y(Maths.cos(rot.x()));
-		    up.z(-Maths.sin(rot.x()) * Maths.cos(rot.y()));
+		    up.x = Maths.sin(rot.y()) * Maths.sin(rot.x());
+		    up.y = Maths.cos(rot.x());
+		    up.z = -Maths.sin(rot.x()) * Maths.cos(rot.y());
 		}
 	}
 	
-	public void rotate(Vec3 delta)
+	public void rotate(Vector3fc delta)
 	{
 		rot.add(delta);
 		
 		update();
 	}
 
-	public void rotation(Vec3 r)
+	public void rotation(Vector3fc r)
 	{
 		rot.set(r);
 		
@@ -71,19 +72,19 @@ public class GimbalLockCamera extends Camera
 	}
 
 	@Override
-	public Vec3 forward()
+	public Vector3fc forward()
 	{
 		return forward;
 	}
 
 	@Override
-	public Vec3 right()
+	public Vector3fc right()
 	{
 		return right;
 	}
 
 	@Override
-	public Vec3 up()
+	public Vector3fc up()
 	{
 		return up;
 	}
@@ -99,8 +100,8 @@ public class GimbalLockCamera extends Camera
 	}
 
 	@Override
-	public Vec3 position()
+	public Vector3fc position()
 	{
-		return new Vec3(parent.position()).add(new Vec3(0, 0.4f, 0));
+		return new Vector3f(parent.position()).add(new Vector3f(0, 0.4f, 0));
 	}
 }

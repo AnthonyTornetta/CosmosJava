@@ -4,13 +4,14 @@ import java.awt.Font;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.biospheres.TestBiosphere;
 import com.cornchipss.cosmos.blocks.Block;
@@ -23,6 +24,7 @@ import com.cornchipss.cosmos.gui.GUITextureMultiple;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.physx.RayResult;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.rendering.Window;
@@ -63,7 +65,7 @@ public class Main
 		GUI gui = new GUI(guiTexture);
 		gui.init(window.getWidth(), window.getHeight());
 		
-		GUITexture crosshair = new GUITexture(new Vec3(), 0.1f, 0.1f, 0, 0);
+		GUITexture crosshair = new GUITexture(new Vector3f(), 0.1f, 0.1f, 0, 0);
 		gui.addElement(crosshair);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
@@ -82,7 +84,7 @@ public class Main
 		for(int i = 0; i < models.length; i++)
 		{
 			inventorySlots[i] =  new GUITextureMultiple(
-					new Vec3(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
+					new Vector3f(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
 					0.5f, 0,
 					0, 0.5f);
 			
@@ -92,7 +94,7 @@ public class Main
 			{
 				int margin = 4;
 				
-				models[i] = new GUIModel(new Vec3(startX + i * slotDimensions + margin, margin, 0), 
+				models[i] = new GUIModel(new Vector3f(startX + i * slotDimensions + margin, margin, 0), 
 						slotDimensions - margin * 2, Blocks.all().get(i).model(), mainTexture);
 				
 				gui.addElement(models[i]);
@@ -117,14 +119,11 @@ public class Main
 			c.render();
 		
 		Transform sT = new Transform();
-		sT.setIdentity();
-		sT.origin.set(0, 0, 0);
 		
 		s.addToWorld(sT);
 		
-		Ployer p = new Ployer(world);
-		Transform playerTransform = new Transform();
-		playerTransform.origin.set(0, s.height() / 2 + 3, 0);
+		Player p = new Player(world);
+		Transform playerTransform = new Transform(0, s.height() / 2 + 3, 0);
 		p.addToWorld(playerTransform);
 		
 		int timeLoc = defaultShader.uniformLocation("time");
@@ -239,11 +238,11 @@ public class Main
 			
 			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 			{
-				Vec3 from = p.camera().position();
-				Vec3 dLook = Maths.mul(p.camera().forward(), 10.0f);
-				Vec3 to = Maths.add(from, dLook);
+				Vector3fc from = p.camera().position();
+				Vector3f dLook = Maths.mul(p.camera().forward(), 10.0f);
+				Vector3f to = Maths.add(from, dLook);
 				
-				RayResult hits = s.shape().raycast(from.joml(), to.joml());
+				RayResult hits = s.shape().raycast(from, to);
 				
 				if(hits.closestHit() != null)
 				{
@@ -279,8 +278,8 @@ public class Main
 						
 						final int radius = 20;
 						
-						Vec3 temp = new Vec3();
-						Vec3 tempPos = new Vec3(pos.x, pos.y, pos.z);
+						Vector3f temp = new Vector3f();
+						Vector3f tempPos = new Vector3f(pos.x, pos.y, pos.z);
 						
 						for(int dz = -radius; dz <= radius; dz++)
 						{
@@ -292,9 +291,9 @@ public class Main
 										yy = pos.y + dy, 
 										zz = pos.z + dz;
 									
-									temp.x(xx);
-									temp.y(yy);
-									temp.z(zz);
+									temp.x = xx;
+									temp.y = yy;
+									temp.z = zz;
 
 									if(Maths.distSqrd(temp, tempPos) < radius * radius)
 									{

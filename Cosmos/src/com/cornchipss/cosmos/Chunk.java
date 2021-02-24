@@ -1,16 +1,9 @@
 package com.cornchipss.cosmos;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.CompoundShape;
-import com.bulletphysics.collision.shapes.CompoundShapeChild;
-import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.LitBlock;
 import com.cornchipss.cosmos.utils.Utils;
@@ -24,8 +17,6 @@ public class Chunk
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
 	
 	private Block[][][] blocks;
-	
-	private CompoundShape shape;
 	
 	/**
 	 * Offset relative to block structure's 0,0,0
@@ -46,8 +37,6 @@ public class Chunk
 		rendered = false;
 		blocks = new Block[LENGTH][HEIGHT][WIDTH];
 		model = new BulkModel(blocks);
-		
-		shape = new CompoundShape();
 	}
 	
 	/**
@@ -188,8 +177,6 @@ public class Chunk
 	{
 		rendered = true;
 		
-		calculatePhysicsShape();
-		
 		model.render(
 				left != null ? left.model : null, 
 				right != null ? right.model : null, 
@@ -248,47 +235,5 @@ public class Chunk
 	public Structure structure()
 	{
 		return structure;
-	}
-	
-	private void calculatePhysicsShape()
-	{
-		Set<CollisionShape> shapesToRemove = new LinkedHashSet<>();
-		for(CompoundShapeChild s : shape.getChildList())
-		{
-			shapesToRemove.add(s.childShape);
-		}
-		
-		for(CollisionShape s : shapesToRemove)
-		{
-			shape.removeChildShape(s);
-		}
-		
-		Transform here = new Transform();
-
-		for(int z = 0; z < LENGTH; z++)
-		{
-			for(int y = 0; y < HEIGHT; y++)
-			{
-				for(int x = 0; x < WIDTH; x++)
-				{
-					if(block(x, y, z) != null)
-					{
-						CollisionShape blockShape = block(x, y, z).collisionShape();
-						
-						here.setIdentity();
-						here.origin.set(x + 0.5f, y + 0.5f, z + 0.5f);
-						
-						shape.addChildShape(here, blockShape);
-					}
-				}
-			}
-		}
-		
-		structure.updatePhysics();
-	}
-	
-	public CollisionShape physicsShape()
-	{
-		return shape;
 	}
 }

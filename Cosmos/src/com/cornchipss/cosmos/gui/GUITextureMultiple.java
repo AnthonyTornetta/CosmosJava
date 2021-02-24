@@ -1,14 +1,15 @@
 package com.cornchipss.cosmos.gui;
 
+import org.joml.Vector3fc;
+
 import com.cornchipss.cosmos.Mesh;
-import com.cornchipss.cosmos.Vec3;
 
 public class GUITextureMultiple extends GUITexture
 {
 	private Mesh[] meshes;
 	private int state;
 	
-	public GUITextureMultiple(Vec3 position, float w, float h, float... uvs)
+	public GUITextureMultiple(Vector3fc position, float w, float h, float... uvs)
 	{
 		super(position, w, h, uvs[0], uvs[1]);
 		

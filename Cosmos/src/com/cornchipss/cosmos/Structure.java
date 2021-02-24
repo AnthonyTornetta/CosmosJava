@@ -3,23 +3,20 @@ package com.cornchipss.cosmos;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import javax.vecmath.Vector3f;
-
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 
-import com.bulletphysics.collision.shapes.BoxShape;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
-import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.StructureShape;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.world.ZaWARUDO;
@@ -116,32 +113,12 @@ public class Structure extends PhysicalObject
 		
 		bulkUpdate = null;
 	}
-		
-	public void updatePhysics()
-	{
-		if(body() != null)
-		{
-			Transform t = body().getWorldTransform(new Transform());
-			
-			world().world().removeRigidBody(body());
-			body().destroy();
-			
-			addToWorld(t);
-		}
-	}
 	
 	@Override
 	public void addToWorld(Transform transform)
 	{
-//		CollisionShape shape = generateShape();
-		
-		CollisionShape shape = new BoxShape(new Vector3f(0.5f, 0.5f, 0.5f));
-		
-		RigidBodyConstructionInfo rbInfo = world().generateInfo(10000000.0f, transform, shape);
-		rbInfo.friction = 0.0f;
-		rbInfo.restitution = 0.0f;
-		
-		body(world().createRigidBody(rbInfo));
+		body(new RigidBody(transform));
+		world().addRigidBody(body());
 	}
 	
 	public int chunksLength()
@@ -204,7 +181,7 @@ public class Structure extends PhysicalObject
 					
 					chunks[i].transformMatrix(
 							Maths.createTransformationMatrix(
-									new Vec3(
+									new Vector3f(
 											x * Chunk.WIDTH, 
 											y * Chunk.HEIGHT, 
 											z * Chunk.LENGTH), 
@@ -337,10 +314,9 @@ public class Structure extends PhysicalObject
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
 	}
 	
-	public Vec3 center()
+	public Vector3fc center()
 	{
-		Vec3 pos = new Vec3(body().getCenterOfMassPosition(new javax.vecmath.Vector3f()));
-		return pos;
+		return body().transform().position();
 	}
 	
 	public int length() { return length; }
@@ -388,7 +364,7 @@ public class Structure extends PhysicalObject
 		return new Vector3i((int)c.x, (int)c.y, (int)c.z);
 	}
 	
-	public org.joml.Vector3f localCoordsToWorldCoords(float x, float y, float z, org.joml.Vector3f storage)
+	public Vector3f localCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 		
@@ -399,17 +375,17 @@ public class Structure extends PhysicalObject
 		return storage;
 	}
 	
-	public org.joml.Vector3f localCoordsToWorldCoords(float x, float y, float z)
+	public Vector3f localCoordsToWorldCoords(float x, float y, float z)
 	{
-		return localCoordsToWorldCoords(x, y, z, new org.joml.Vector3f());
+		return localCoordsToWorldCoords(x, y, z, new Vector3f());
 	}
 	
-	public org.joml.Vector3f localCoordsToWorldCoords(Vector3fc v, org.joml.Vector3f storage)
+	public Vector3f localCoordsToWorldCoords(Vector3fc v, Vector3f storage)
 	{
 		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
 	}
 	
-	public org.joml.Vector3f localCoordsToWorldCoords(Vector3fc v)
+	public Vector3f localCoordsToWorldCoords(Vector3fc v)
 	{
 		return localCoordsToWorldCoords(v.x(), v.y(), v.z());
 	}

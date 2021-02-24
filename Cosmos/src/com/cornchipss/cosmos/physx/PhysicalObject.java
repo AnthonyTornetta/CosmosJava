@@ -1,10 +1,7 @@
 package com.cornchipss.cosmos.physx;
 
-import javax.vecmath.Vector3f;
+import org.joml.Vector3fc;
 
-import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.linearmath.Transform;
-import com.cornchipss.cosmos.Vec3;
 import com.cornchipss.cosmos.world.ZaWARUDO;
 
 public abstract class PhysicalObject
@@ -35,9 +32,9 @@ public abstract class PhysicalObject
 		return body != null;
 	}
 	
-	public Vec3 position()
+	public Vector3fc position()
 	{
-		return new Vec3(body.getCenterOfMassPosition(new Vector3f()));
+		return body.transform().position();
 	}
 	
 	public ZaWARUDO world() { return world; }

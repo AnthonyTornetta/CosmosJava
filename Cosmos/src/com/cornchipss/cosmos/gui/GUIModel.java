@@ -1,9 +1,9 @@
 package com.cornchipss.cosmos.gui;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.Mesh;
-import com.cornchipss.cosmos.Vec3;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.rendering.Texture;
@@ -14,7 +14,7 @@ public class GUIModel extends GUIElement
 	private Mesh mesh;
 	private Texture map;
 	
-	public GUIModel(Vec3 position, float scale, CubeModel model, Texture map)
+	public GUIModel(Vector3fc position, float scale, CubeModel model, Texture map)
 	{
 		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), model, map);
 	}
@@ -24,7 +24,7 @@ public class GUIModel extends GUIElement
 		this(transform, m.createMesh(0, 0, -1, 1, BlockFace.FRONT), map);
 	}
 	
-	public GUIModel(Vec3 position, float scale, Mesh m, Texture map)
+	public GUIModel(Vector3fc position, float scale, Mesh m, Texture map)
 	{
 		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), m, map);
 	}

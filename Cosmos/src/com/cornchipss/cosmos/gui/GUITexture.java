@@ -1,7 +1,8 @@
 package com.cornchipss.cosmos.gui;
 
+import org.joml.Vector3fc;
+
 import com.cornchipss.cosmos.Mesh;
-import com.cornchipss.cosmos.Vec3;
 
 public class GUITexture extends GUIElement
 {
@@ -38,7 +39,7 @@ public class GUITexture extends GUIElement
 	
 	private Mesh guiMesh;
 
-	public GUITexture(Vec3 position, float w, float h, float u, float v)
+	public GUITexture(Vector3fc position, float w, float h, float u, float v)
 	{
 		super(position);
 		guiMesh = Mesh.createMesh(makeVerts(w, h), indices, makeUVs(u, v));

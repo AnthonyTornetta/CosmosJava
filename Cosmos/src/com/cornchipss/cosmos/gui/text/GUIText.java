@@ -1,7 +1,8 @@
 package com.cornchipss.cosmos.gui.text;
 
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.Mesh;
-import com.cornchipss.cosmos.Vec3;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIElement;
 
@@ -13,7 +14,7 @@ public class GUIText extends GUIElement
 	
 	public GUIText(String text, OpenGLFont font, float x, float y)
 	{
-		super(new Vec3(x, y, 0));
+		super(new Vector3f(x, y, 0));
 		
 		this.font = font;
 		

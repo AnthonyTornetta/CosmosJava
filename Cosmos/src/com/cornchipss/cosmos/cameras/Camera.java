@@ -1,16 +1,15 @@
 package com.cornchipss.cosmos.cameras;
 
 import org.joml.Matrix4fc;
-
-import com.cornchipss.cosmos.Vec3;
+import org.joml.Vector3fc;
 
 public abstract class Camera
 {
 	public abstract Matrix4fc viewMatrix();
 	
-	public abstract Vec3 forward();
-	public abstract Vec3 right();
-	public abstract Vec3 up();
+	public abstract Vector3fc forward();
+	public abstract Vector3fc right();
+	public abstract Vector3fc up();
 
-	public abstract Vec3 position();
+	public abstract Vector3fc position();
 }
