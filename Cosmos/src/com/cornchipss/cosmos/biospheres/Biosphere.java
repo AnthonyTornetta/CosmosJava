@@ -1,6 +1,6 @@
 package com.cornchipss.cosmos.biospheres;
 
-import com.cornchipss.cosmos.Structure;
+import com.cornchipss.cosmos.structures.Structure;
 
 public abstract class Biosphere
 {

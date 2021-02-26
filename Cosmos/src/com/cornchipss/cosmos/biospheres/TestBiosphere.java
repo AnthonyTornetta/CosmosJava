@@ -2,8 +2,8 @@ package com.cornchipss.cosmos.biospheres;
 
 import org.joml.SimplexNoise;
 
-import com.cornchipss.cosmos.Structure;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class TestBiosphere extends Biosphere

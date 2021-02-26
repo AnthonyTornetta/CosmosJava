@@ -6,6 +6,7 @@ import org.joml.Vector3ic;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class Chunk

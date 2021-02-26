@@ -2,6 +2,8 @@ package com.cornchipss.cosmos;
 
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.structures.Structure;
+
 public class Location
 {
 	private Vector3fc position;

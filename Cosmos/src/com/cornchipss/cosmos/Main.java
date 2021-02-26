@@ -29,6 +29,9 @@ import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.shaders.Shader;
+import com.cornchipss.cosmos.structures.Planet;
+import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -65,7 +68,7 @@ public class Main
 		GUI gui = new GUI(guiTexture);
 		gui.init(window.getWidth(), window.getHeight());
 		
-		GUITexture crosshair = new GUITexture(new Vector3f(), 0.1f, 0.1f, 0, 0);
+		GUITexture crosshair = new GUITexture(new Vector3f(window.getWidth() / 2.f - 16, window.getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
@@ -106,25 +109,31 @@ public class Main
 		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-		Structure s = new Structure(world, 100, 32, 100);
-		s.init();
+		Planet mainPlanet = new Planet(world, 100, 32, 100);
+		mainPlanet.init();
+		
+		Ship ship = new Ship(world);
+		ship.init();
+		ship.addToWorld(new Transform(-ship.width() / 2, -ship.height() / 2, -ship.length() / 2));
+		ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2, Blocks.SHIP_CORE);
+		ship.calculateLights(false);
+		
+		for(Chunk c : ship.chunks())
+			c.render();
 		
 		Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
 		
-		def.generatePlanet(s);
+		def.generatePlanet(mainPlanet);
 		
-		s.calculateLights(false);
+		mainPlanet.calculateLights(false);
 		
-		for(Chunk c : s.chunks())
+		for(Chunk c : mainPlanet.chunks())
 			c.render();
 		
-		Transform sT = new Transform();
-		
-		s.addToWorld(sT);
+		mainPlanet.addToWorld(new Transform(0, 50, 0));
 		
 		Player p = new Player(world);
-		Transform playerTransform = new Transform(0, s.height() / 2 + 3, 0);
-		p.addToWorld(playerTransform);
+		p.addToWorld(new Transform(0, mainPlanet.height() / 2 + 3, 0));
 		
 		int timeLoc = defaultShader.uniformLocation("time");
 		int camLoc = defaultShader.uniformLocation("u_camera");
@@ -236,13 +245,15 @@ public class Main
 				}
 			}
 			
+			Structure interactWith = ship;
+			
 			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 			{
 				Vector3fc from = p.camera().position();
 				Vector3f dLook = Maths.mul(p.camera().forward(), 10.0f);
 				Vector3f to = Maths.add(from, dLook);
 				
-				RayResult hits = s.shape().raycast(from, to);
+				RayResult hits = interactWith.shape().raycast(from, to);
 				
 				if(hits.closestHit() != null)
 				{
@@ -257,7 +268,7 @@ public class Main
 					
 					if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 					{
-						s.block(pos.x, pos.y, pos.z, null);
+						interactWith.block(pos.x, pos.y, pos.z, null);
 					}
 					else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 					{
@@ -267,14 +278,14 @@ public class Main
 							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
 							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
 						
-						if(s.withinBlocks(xx, yy, zz))
+						if(interactWith.withinBlocks(xx, yy, zz))
 						{
-							s.block(xx, yy, zz, selectedBlock);
+							interactWith.block(xx, yy, zz, selectedBlock);
 						}
 					}
 					else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 					{
-						s.beginBulkUpdate();
+						interactWith.beginBulkUpdate();
 						
 						final int radius = 20;
 						
@@ -298,16 +309,16 @@ public class Main
 									if(Maths.distSqrd(temp, tempPos) < radius * radius)
 									{
 										
-										if(s.withinBlocks(xx, yy, zz))
+										if(interactWith.withinBlocks(xx, yy, zz))
 										{
-											s.block(xx, yy, zz, null);
+											interactWith.block(xx, yy, zz, null);
 										}
 									}
 								}
 							}
 						}
 						
-						s.endBulkUpdate();
+						interactWith.endBulkUpdate();
 					}
 				}
 			}
@@ -331,10 +342,23 @@ public class Main
 			
 			//GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 			
-			for(Chunk chunk : s.chunks())
+			for(Chunk chunk : mainPlanet.chunks())
 			{
 				Matrix4f transform = new Matrix4f();
-				Matrix4fc trans = s.transformMatrix();
+				Matrix4fc trans = mainPlanet.transformMatrix();
+				trans.mul(chunk.transformMatrix(), transform);
+				
+				defaultShader.setUniformMatrix(transLoc, transform);
+				
+				chunk.mesh().prepare();
+				chunk.mesh().draw();
+				chunk.mesh().finish();
+			}
+			
+			for(Chunk chunk : ship.chunks())
+			{
+				Matrix4f transform = new Matrix4f();
+				Matrix4fc trans = ship.transformMatrix();
 				trans.mul(chunk.transformMatrix(), transform);
 				
 				defaultShader.setUniformMatrix(transLoc, transform);

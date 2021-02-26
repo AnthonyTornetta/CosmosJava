@@ -22,7 +22,9 @@ public class Blocks
 		STONE = new Block(new StoneModel()),
 		LIGHT = new LitBlock(new LightModel(), new LightSource(16)),
 		LOG   = new Block(new LogModel()),
-		LEAF  = new Block(new LeafModel());
+		LEAF  = new Block(new LeafModel()),
+		SHIP_CORE = new ShipCoreBlock();
+
 
 	public static void init()
 	{

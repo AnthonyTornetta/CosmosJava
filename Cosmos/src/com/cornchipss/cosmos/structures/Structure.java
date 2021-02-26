@@ -1,9 +1,8 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.structures;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -11,6 +10,7 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 
+import com.cornchipss.cosmos.Chunk;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -21,7 +21,7 @@ import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.world.ZaWARUDO;
 
-public class Structure extends PhysicalObject
+public abstract class Structure extends PhysicalObject
 {
 	private Chunk[] chunks;
 
@@ -38,8 +38,6 @@ public class Structure extends PhysicalObject
 	public StructureShape shape() { return shape; }
 	
 	private Set<Chunk> bulkUpdate;
-	
-	private Matrix4f transformMatrix;
 	
 	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
@@ -63,9 +61,6 @@ public class Structure extends PhysicalObject
 		shape = new StructureShape(this);
 		
 		bulkUpdate = null;
-		
-		transformMatrix = new Matrix4f();
-		transformMatrix.identity();
 	}
 	
 	public boolean bulkUpdating()
@@ -323,14 +318,22 @@ public class Structure extends PhysicalObject
 	public int height() { return height; }
 	public int width() { return width; }
 
+	/**
+	 * Not implemented
+	 * TODO implement this
+	 * @param r
+	 * @param x
+	 * @param y
+	 * @param z
+	 */
 	public void rotation(float r, float x, float y, float z)
 	{
-		transformMatrix.rotation(r, x, y, z);
+		throw new RuntimeException("Not yet implemented D;");
 	}
 	
 	public Matrix4fc transformMatrix()
 	{
-		return transformMatrix;
+		return body().transform().matrix();
 	}
 	
 	public LightMap lightMap()
@@ -357,9 +360,7 @@ public class Structure extends PhysicalObject
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 		
-		Matrix4f inverted = new Matrix4f();
-		transformMatrix.invert(inverted);
-		inverted.transform(c);
+		body().transform().invertedMatrix().transform(c);
 		
 		return new Vector3i((int)c.x, (int)c.y, (int)c.z);
 	}
@@ -368,7 +369,7 @@ public class Structure extends PhysicalObject
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 		
-		transformMatrix.transform(c);
+		body().transform().matrix().transform(c);
 		
 		storage.set(c.x, c.y, c.z);
 		
@@ -389,15 +390,21 @@ public class Structure extends PhysicalObject
 	{
 		return localCoordsToWorldCoords(v.x(), v.y(), v.z());
 	}
-
-	public void transformMatrix(Matrix4fc t)
-	{
-		transformMatrix.set(t);
-	}
-
+	
 	public int higehstYAt(int x, int z)
 	{
 		for(int y = height() - 1; y >= 0; y--)
+		{
+			if(block(x, y, z) != null)
+				return y;
+		}
+		
+		return -1;
+	}
+	
+	public int lowestYAt(int x, int z)
+	{
+		for(int y = 0; y < height(); y++)
 		{
 			if(block(x, y, z) != null)
 				return y;
