@@ -53,6 +53,6 @@ public class GUIModel extends GUIElement
 	public void finish(GUI gui)
 	{
 		super.finish(gui);
-		gui.texture().bind();
+		gui.material().texture().bind();
 	}
 }

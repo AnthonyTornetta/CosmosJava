@@ -5,6 +5,8 @@ in vec3 frag_color;
 in vec2 frag_uv;
 in vec3 frag_light;
 
+uniform int u_animation_state; // actually an int
+
 uniform sampler2D sampler;
 
 out vec4 FragColor;

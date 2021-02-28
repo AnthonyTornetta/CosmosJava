@@ -6,69 +6,56 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL30;
 
-import com.cornchipss.cosmos.rendering.Texture;
-import com.cornchipss.cosmos.shaders.Shader;
+import com.cornchipss.cosmos.material.Material;
 
 public class GUI
 {
 	private List<GUIElement> elements;
 	
-	private Texture texture;
-	
-	private Shader shader;
+	private Material material;
 	
 	private Matrix4f projectionMatrix;
 	
 	private int guiTransLoc;
 	private int guiProjLoc;
 	
-	public GUI(Texture texture)
+	public GUI(Material material)
 	{
-		this.texture = texture;
+		this.material = material;
 		elements = new LinkedList<>();
 	}
 	
 	public void init(int width, int height)
 	{
-		shader = new Shader("assets/shaders/gui");
-		shader.init();
-		
 		updateProjection(width, height);
 		
-		guiTransLoc = shader.uniformLocation("u_transform");
-		guiProjLoc = shader.uniformLocation("u_projection");
+		guiTransLoc = material.shader().uniformLocation("u_transform");
+		guiProjLoc = material.shader().uniformLocation("u_projection");
 	}
 	
 	public void draw()
 	{
-		shader.use();
-		
 		GL30.glDisable(GL30.GL_DEPTH_TEST);
 		
-		shader.setUniformMatrix(guiProjLoc, projectionMatrix);
+		material.use();
 		
-		texture.bind();
+		material.shader().setUniformMatrix(guiProjLoc, projectionMatrix);
 		
 		for(GUIElement e : elements)
 		{
-			shader.setUniformMatrix(guiTransLoc, e.transform());
+			material.shader().setUniformMatrix(guiTransLoc, e.transform());
 			
 			e.prepare(this);
 			e.draw(this);
 			e.finish(this);
 		}
 		
-		shader.stop();
+		material.stop();
 	}
 	
-	public Shader shader()
+	public Material material()
 	{
-		return shader;
-	}
-	
-	public Texture texture()
-	{
-		return texture;
+		return material;
 	}
 	
 	public void addElement(GUIElement... e)

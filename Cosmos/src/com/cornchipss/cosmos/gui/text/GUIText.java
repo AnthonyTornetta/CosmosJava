@@ -44,7 +44,7 @@ public class GUIText extends GUIElement
 		
 		OpenGLFont.unbind();
 		
-		gui.texture().bind();
+		gui.material().texture().bind();
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import com.cornchipss.cosmos.models.GrassModel;
 import com.cornchipss.cosmos.models.LeafModel;
 import com.cornchipss.cosmos.models.LightModel;
 import com.cornchipss.cosmos.models.LogModel;
+import com.cornchipss.cosmos.models.ShipHullModel;
 import com.cornchipss.cosmos.models.StoneModel;
 
 public class Blocks
@@ -23,14 +24,14 @@ public class Blocks
 		LIGHT = new LitBlock(new LightModel(), new LightSource(16)),
 		LOG   = new Block(new LogModel()),
 		LEAF  = new Block(new LeafModel()),
-		SHIP_CORE = new ShipCoreBlock();
-
+		SHIP_CORE = new ShipCoreBlock(),
+		SHIP_HULL = new Block(new ShipHullModel());
 
 	public static void init()
 	{
 		allBlocks = Collections.unmodifiableList(
 				Arrays.asList(STONE, GRASS, DIRT, 
-						LIGHT, LOG, LEAF));
+						LIGHT, LOG, LEAF, SHIP_CORE, SHIP_HULL));
 	}
 	
 	/**

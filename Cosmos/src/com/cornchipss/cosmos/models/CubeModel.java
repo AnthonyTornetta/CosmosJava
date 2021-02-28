@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.Materials;
 
 public abstract class CubeModel
 {
@@ -18,6 +20,16 @@ public abstract class CubeModel
 	
 	public abstract float u(BlockFace side);
 	public abstract float v(BlockFace side);
+	
+	public float maxU(BlockFace side)
+	{
+		return u(side) + TEXTURE_DIMENSIONS;
+	}
+	
+	public float maxV(BlockFace side)
+	{
+		return v(side) + TEXTURE_DIMENSIONS;
+	}
 	
 	public int[] indicies(BlockFace side)
 	{
@@ -230,5 +242,10 @@ public abstract class CubeModel
 	public boolean opaque()
 	{
 		return true;
+	}
+	
+	public Material material()
+	{
+		return Materials.DEFAULT_MATERIAL;
 	}
 }

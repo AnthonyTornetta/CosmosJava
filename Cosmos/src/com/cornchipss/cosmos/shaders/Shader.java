@@ -47,6 +47,11 @@ public class Shader
 		GL30.glUniform1f(location, value);
 	}
 	
+	public void setUniformI(int location, int value)
+	{
+		GL30.glUniform1i(location, value);
+	}
+	
 	public void setUniformVector(int location, float x, float y, float z)
 	{
 		GL30.glUniform3f(location, x, y, z);

@@ -1,15 +1,15 @@
 package com.cornchipss.cosmos.blocks;
 
 import com.cornchipss.cosmos.blocks.data.BlockData;
-import com.cornchipss.cosmos.lights.LightSource;
 import com.cornchipss.cosmos.models.ShipCoreModel;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 
-public class ShipCoreBlock extends LitBlock implements IHasData
+public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 {
-	public ShipCoreBlock() 
+	public ShipCoreBlock()
 	{
-		super(new ShipCoreModel(), new LightSource(8));
+		super(new ShipCoreModel());
 	}
 
 	@Override
@@ -18,5 +18,11 @@ public class ShipCoreBlock extends LitBlock implements IHasData
 		BlockData data = new BlockData();
 		data.data("ship", s);
 		return data;
+	}
+
+	@Override
+	public void onInteract()
+	{
+		Utils.println("Ship Core Used!");
 	}
 }

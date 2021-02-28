@@ -74,7 +74,6 @@ public class Mesh
 		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
 
 		GL30.glBindVertexArray(0);
-
 		
 		return m;
 	}

@@ -1,11 +1,14 @@
 package com.cornchipss.cosmos;
 
+import java.util.List;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Utils;
 
@@ -204,9 +207,9 @@ public class Chunk
 	 * The mesh of all the blocks - null if {@link Chunk#render()} has not been called.
 	 * @return The mesh of all the blocks - null if {@link Chunk#render()} has not been called.
 	 */
-	public Mesh mesh()
+	public List<MaterialMesh> meshes()
 	{
-		return model.mesh();
+		return model.materialMeshes();
 	}
 	
 	public int width() { return WIDTH; }

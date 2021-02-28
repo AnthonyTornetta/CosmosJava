@@ -44,7 +44,7 @@ public class Texture
 	{
 		try
 		{
-			PNGDecoder decoder = new PNGDecoder(new FileInputStream("assets/images/" + texture));
+			PNGDecoder decoder = new PNGDecoder(new FileInputStream(texture + ".png"));
 			ByteBuffer buffer = BufferUtils.createByteBuffer(decoder.getWidth() * decoder.getHeight() * 4); //4 -> rgba
 			decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
 			buffer.rewind();
