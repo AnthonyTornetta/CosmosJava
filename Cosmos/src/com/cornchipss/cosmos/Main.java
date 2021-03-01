@@ -34,6 +34,7 @@ import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.ZaWARUDO;
 
@@ -57,7 +58,7 @@ public class Main
 	
 	private void run()
 	{
-		Logger.LOGGER.setLevel(Logger.LogLevel.NONE);
+		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
 		Blocks.init();
 		
@@ -65,7 +66,11 @@ public class Main
 		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
+		Utils.println("2");
+		
 		Materials.initMaterials();
+		
+		Utils.println("E");
 		
 		world = new ZaWARUDO();
 		

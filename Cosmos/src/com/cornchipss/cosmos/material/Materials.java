@@ -10,7 +10,9 @@ public class Materials
 	public static void initMaterials()
 	{
 		DEFAULT_MATERIAL.init();
-		GUI_MATERIAL.init();
+		
 		ANIMATED_DEFAULT_MATERIAL.init();
+
+		GUI_MATERIAL.init();
 	}
 }

@@ -4,28 +4,30 @@ import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 
-public class ShipCoreModel extends CubeModel
+public class ShipCoreModel extends AnimatedCubeModel
 {
 	@Override
 	public float u(BlockFace side)
 	{
-		return 0; // - max width = 16
+		return 0;
 	}
-
+	
 	@Override
 	public float v(BlockFace side)
 	{
 		return 0;
 	}
 	
-	public float maxU(BlockFace side)
+	@Override
+	public int maxAnimationStage(BlockFace side)
 	{
-		return u(side) + TEXTURE_DIMENSIONS;
+		return 14;
 	}
-	
-	public float maxV(BlockFace side)
+
+	@Override
+	public float animationDelay(BlockFace side)
 	{
-		return v(side) + TEXTURE_DIMENSIONS;
+		return 1/10.0f;
 	}
 	
 	@Override
@@ -33,4 +35,5 @@ public class ShipCoreModel extends CubeModel
 	{
 		return Materials.ANIMATED_DEFAULT_MATERIAL;
 	}
+
 }

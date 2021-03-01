@@ -4,6 +4,7 @@ layout (location = 0) in vec3 inPos;
 layout (location = 1) in vec3 inColor;
 layout (location = 2) in vec2 inUv;
 layout (location = 3) in vec3 inLight;
+layout (location = 4) in vec2 inAnimation;
 
 uniform mat4 u_camera;
 uniform mat4 u_proj;
@@ -14,6 +15,7 @@ out vec3 frag_pos;
 out vec3 frag_color;
 out vec2 frag_uv;
 out vec3 frag_light;
+out vec2 frag_animation;
 
 void main()
 {
@@ -21,6 +23,7 @@ void main()
 	frag_color = inColor;
 	frag_uv = inUv;
 	frag_light = inLight;
+	frag_animation = inAnimation;
 	
 	gl_Position = u_proj * u_camera * u_transform * vec4(inPos, 1.0);
 }

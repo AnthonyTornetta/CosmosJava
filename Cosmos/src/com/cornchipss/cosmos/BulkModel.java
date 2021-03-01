@@ -8,9 +8,12 @@ import java.util.Map;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.models.AnimatedCubeModel;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.models.IHasModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class BulkModel
 {
@@ -27,6 +30,13 @@ public class BulkModel
 		List<Float> verticies = new LinkedList<>();
 		List<Float> uvs = new LinkedList<>();
 		List<Float> lights = new LinkedList<>();
+		
+		/**
+		 * Only used for an animated material
+		 * TODO: put this class in the Material and make it modifyable by the material class so I don't have to hardcode this stuff here
+		 */
+		List<Float> animationInfo; // only initialized if it is an animated material
+		
 		int maxIndex = 0;
 	}
 	
@@ -50,6 +60,33 @@ public class BulkModel
 				&& x >= 0 && x < cubes[z][y].length;
 	}
 	
+	private void doStuff(LightMap lightMap, 
+			int x, int y, int z, 
+			int dx, int dy, int dz, 
+			int offX, int offY, int offZ, 
+			BlockFace face, MaterialMeshGenerator matMesh)
+	{
+		CubeModel model = cubes[z][y][x].model();
+		boolean animated = model instanceof AnimatedCubeModel;
+		
+		for(float f : model.verticies(face, x, y, z))
+			matMesh.verticies.add(f);
+		
+		matMesh.maxIndex = indiciesAndUvs(face, model, matMesh);
+		
+		if(animated)
+		{
+			AnimatedCubeModel modelAnimated = (AnimatedCubeModel)model;
+			for(int i = 0; i < 4; i++)
+			{
+				matMesh.animationInfo.add((float)modelAnimated.maxAnimationStage(face));
+				matMesh.animationInfo.add(modelAnimated.animationDelay(face) * 1000);
+			}
+		}
+		
+		lighting(offX, offY, offZ, x + dx, y + dy, z + dz, lightMap, matMesh);
+	}
+	
 	private void computeEverything(BulkModel left, BulkModel right, BulkModel top, 
 			BulkModel bottom, BulkModel front, BulkModel back,
 			int offX, int offY, int offZ, LightMap lightMap)
@@ -66,9 +103,16 @@ public class BulkModel
 						
 						Material mat = cubes[z][y][x].model().material();
 						
+						boolean animated = Materials.ANIMATED_DEFAULT_MATERIAL.equals(mat);
+						
 						if(!indevMeshes.containsKey(mat))
 						{
-							indevMeshes.put(mat, new MaterialMeshGenerator());
+							MaterialMeshGenerator gen = new MaterialMeshGenerator();
+							indevMeshes.put(mat, gen);
+							if(animated)
+							{
+								gen.animationInfo = new LinkedList<>();
+							}
 						}
 						
 						MaterialMeshGenerator matMesh = indevMeshes.get(mat);
@@ -77,46 +121,26 @@ public class BulkModel
 							(top == null || top.cubes[z][0][x] == null)) 
 								|| withinB && cubes[z][y + 1][x] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.TOP, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.TOP, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x, y + 1, z, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, 0, 1, 0, offX, offY, offZ, BlockFace.TOP, matMesh);
 						}
 						if((!(withinB = within(x, y - 1, z)) &&
 								(bottom == null || bottom.cubes[z][bottom.height() - 1][x] == null)) 
 									|| withinB && cubes[z][y - 1][x] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.BOTTOM, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.BOTTOM, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x, y - 1, z, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, 0, -1, 0, offX, offY, offZ, BlockFace.BOTTOM, matMesh);
 						}
 						
 						if((!(withinB = within(x, y, z + 1)) &&
 								(front == null || front.cubes[0][y][x] == null)) 
 									|| withinB && cubes[z + 1][y][x] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.FRONT, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.FRONT, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x, y, z + 1, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, 0, 0, 1, offX, offY, offZ, BlockFace.FRONT, matMesh);
 						}
 						if((!(withinB = within(x, y, z - 1)) &&
 								(back == null || back.cubes[back.length() - 1][y][x] == null)) 
 									|| withinB && cubes[z - 1][y][x] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.BACK, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.BACK, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x, y, z - 1, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, 0, 0, -1, offX, offY, offZ, BlockFace.BACK, matMesh);
 						}
 						
 
@@ -124,23 +148,13 @@ public class BulkModel
 								(right == null || right.cubes[z][y][0] == null)) 
 									|| withinB && cubes[z][y][x + 1] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.RIGHT, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.RIGHT, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x + 1, y, z, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, 1, 0, 0, offX, offY, offZ, BlockFace.RIGHT, matMesh);
 						}
 						if((!(withinB = within(x - 1, y, z)) &&
 								(left == null || left.cubes[z][y][left.width() - 1] == null)) 
 									|| withinB && cubes[z][y][x - 1] == null)
 						{
-							for(float f : cubes[z][y][x].model().verticies(BlockFace.LEFT, x, y, z))
-								matMesh.verticies.add(f);
-							
-							matMesh.maxIndex = indiciesAndUvs(BlockFace.LEFT, cubes[z][y][x].model(), matMesh);
-							
-							lighting(offX, offY, offZ, x - 1, y, z, lightMap, matMesh);
+							doStuff(lightMap, x, y, z, -1, 0, 0, offX, offY, offZ, BlockFace.LEFT, matMesh);
 						}
 					}
 				}
@@ -246,8 +260,25 @@ public class BulkModel
 			for(float l : matMesh.lights)
 				lightsArr[i++] = l;
 			
-			meshes.add(new MaterialMesh(m,
-					Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr)));
+			boolean isAnimated = matMesh.animationInfo != null;
+			
+			Mesh mesh = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr, !isAnimated);
+			
+			if(isAnimated)
+			{
+				Utils.println(matMesh.animationInfo.size());
+				
+				float[] animationInfoArr = new float[matMesh.animationInfo.size()];
+				i = 0;
+				for(float f : matMesh.animationInfo)
+					animationInfoArr[i++] = f;
+				
+				mesh.storeData(4, 2, animationInfoArr);
+				
+				mesh.unbind();
+			}
+			
+			meshes.add(new MaterialMesh(m, mesh));
 		}
 	}
 	

@@ -62,7 +62,6 @@ public class Mesh
 	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs)
 	{
 		Mesh m = new Mesh(indicies.length);
-		
 		GL30.glBindVertexArray(m.vao());
 		
 		m.storeData(VERTEX_INDEX, 3, verticies);
@@ -74,14 +73,12 @@ public class Mesh
 		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
 
 		GL30.glBindVertexArray(0);
-		
 		return m;
 	}
 	
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr)
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr, boolean unbind)
 	{
 		Mesh m = new Mesh(indicies.length);
-		
 		GL30.glBindVertexArray(m.vao());
 		
 		m.storeData(VERTEX_INDEX, 3, verticies);
@@ -93,11 +90,16 @@ public class Mesh
 		m.storeData(LIGHT_INDEX, 3, lightsArr);
 		
 		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
-
-		GL30.glBindVertexArray(0);
-
+		
+		if(unbind)
+			GL30.glBindVertexArray(0);
 		
 		return m;
+	}
+	
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr)
+	{
+		return createMesh(verticies, indicies, uvs, lightsArr, true);
 	}
 
 	public int vao()
@@ -117,12 +119,13 @@ public class Mesh
 		GL20.glEnableVertexAttribArray(0);
 		GL20.glEnableVertexAttribArray(1);
 		GL20.glEnableVertexAttribArray(2);
-		GL20.glEnableVertexAttribArray(2);
 		GL20.glEnableVertexAttribArray(3);
+		GL20.glEnableVertexAttribArray(4);
 	}
 
 	public void finish()
 	{
+		GL20.glDisableVertexAttribArray(4);
 		GL20.glDisableVertexAttribArray(3);
 		GL20.glDisableVertexAttribArray(2);
 		GL20.glDisableVertexAttribArray(1);
@@ -145,6 +148,11 @@ public class Mesh
 		
 		GL30.glDeleteVertexArrays(vao());
 		
+		GL30.glBindVertexArray(0);
+	}
+
+	public void unbind()
+	{
 		GL30.glBindVertexArray(0);
 	}
 }

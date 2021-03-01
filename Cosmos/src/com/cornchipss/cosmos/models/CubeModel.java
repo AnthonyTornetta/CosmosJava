@@ -199,8 +199,8 @@ public abstract class CubeModel
 			float u = u(s);
 			float v = v(s);
 			
-			float uEnd = u + CubeModel.TEXTURE_DIMENSIONS;
-			float vEnd = v + CubeModel.TEXTURE_DIMENSIONS;
+			float uEnd = maxU(s);
+			float vEnd = maxV(s);
 			
 			uvs.add(uEnd);
 			uvs.add(vEnd);
