@@ -26,6 +26,7 @@ public class Block implements IHasModel
 	 * <p>Use {@link BlockData} to differentiate between different blocks</p>
 	 * 
 	 * @param m The model the block has
+	 * @param name The name used to refer to the block in the registry
 	 */
 	public Block(CubeModel m, String name)
 	{

@@ -8,6 +8,10 @@ import org.joml.Vector3fc;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.utils.Maths;
 
+/**
+ * <p>A camera that treats every rotation as an absolute rotation.  This also suffers from the gimbal lock most first person cameras suffer from.</p>
+ * <p>See <a href="https://en.wikipedia.org/wiki/Gimbal_lock">https://en.wikipedia.org/wiki/Gimbal_lock</a></p>
+ */
 public class GimbalLockCamera extends Camera
 {
 	private Matrix4f matrix;
@@ -16,6 +20,11 @@ public class GimbalLockCamera extends Camera
 	private Vector3f forward, right, up;
 	private Vector3f rot;
 	
+	/**
+	 * <p>A camera that treats every rotation as an absolute rotation.  This also suffers from the gimbal lock most first person cameras suffer from.</p>
+	 * <p>See <a href="https://en.wikipedia.org/wiki/Gimbal_lock">https://en.wikipedia.org/wiki/Gimbal_lock</a></p>
+	 * @param parent The parent this camera sits on
+	 */
 	public GimbalLockCamera(PhysicalObject parent)
 	{
 		this.parent = parent;
@@ -30,6 +39,9 @@ public class GimbalLockCamera extends Camera
 		update();
 	}
 	
+	/**
+	 * Call this after every update to a variable - updates all the other variables
+	 */
 	private void update()
 	{
 		if(parent.initialized())
@@ -51,13 +63,21 @@ public class GimbalLockCamera extends Camera
 		}
 	}
 	
+	/**
+	 * Rotates the camera (assumes they are absolute rotations)
+	 * @param delta The amount to rotate it by
+	 */
 	public void rotate(Vector3fc delta)
 	{
 		rot.add(delta);
 		
 		update();
 	}
-
+	
+	/**
+	 * Sets the camera's absolute rotation
+	 * @param r The absolute rotation
+	 */
 	public void rotation(Vector3fc r)
 	{
 		rot.set(r);
@@ -89,11 +109,19 @@ public class GimbalLockCamera extends Camera
 		return up;
 	}
 
+	/**
+	 * Sets the camera's parent
+	 * @param transform The camera's new parent
+	 */
 	public void parent(PhysicalObject transform)
 	{
 		this.parent = transform;
 	}
 	
+	/**
+	 * The camera's parent
+	 * @return The camera's parent
+	 */
 	public PhysicalObject parent()
 	{
 		return parent;

@@ -45,6 +45,14 @@ public class RayResult
 		return hits.size();
 	}
 	
+	public Vector3f closestHitWorldCoords()
+	{
+		if(closestHit == null)
+			calculateClosest();
+		
+		return s.localCoordsToWorldCoords(Maths.add(closestFace.getRelativePosition(), closestHit));
+	}
+	
 	public Vector3f closestHit()
 	{
 		if(closestHit == null)

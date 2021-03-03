@@ -12,6 +12,10 @@ import com.cornchipss.cosmos.utils.Utils;
  */
 public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 {
+	/**
+	 * <p>The core block of any ship</p>
+	 * <p>If this is removed, then there is no ship</p>
+	 */
 	public ShipCoreBlock()
 	{
 		super(new ShipCoreModel(), "ship_core");

@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -61,8 +63,10 @@ public class Main
 	private int selectedSlot;
 	private GUITextureMultiple[] inventorySlots;
 	
+	private List<Structure> structures;
+	
 	private void run()
-	{
+	{		
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
 		Blocks.init();
@@ -74,6 +78,7 @@ public class Main
 		Materials.initMaterials();
 		
 		world = new ZaWARUDO();
+		structures = new LinkedList<>();
 		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(window.getWidth(), window.getHeight());
@@ -119,14 +124,16 @@ public class Main
 		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-		mainPlanet = new Planet(world, 16*8, 16*8, 16*8);
+		mainPlanet = new Planet(world, 16*4, 16*2, 16*4);
 		mainPlanet.init();
 		Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
 		def.generatePlanet(mainPlanet);
+		structures.add(mainPlanet);
 		//mainPlanet.init();
 		
 		ship = new Ship(world);
 		ship.init();
+		structures.add(ship);
 		
 		try(DataInputStream shipStr = new DataInputStream(new FileInputStream(new File("assets/structures/ships/test.struct"))))
 		{
@@ -149,7 +156,7 @@ public class Main
 		for(Chunk c : mainPlanet.chunks())
 			c.render();
 		
-		mainPlanet.addToWorld(new Transform(0, 0, 0));
+		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
 		
 		p = new Player(world);
 		p.addToWorld(new Transform(0, 0, 0));
@@ -269,11 +276,47 @@ public class Main
 		}
 	}
 	
-	private void update(float delta)
+	private Structure lookingAt = null;
+	
+	private Structure calculateLookingAt()
 	{
+		Vector3fc from = p.camera().position();
+		Vector3f dLook = Maths.mul(p.camera().forward(), 50.0f);
+		Vector3f to = Maths.add(from, dLook);
+		
+		Structure closestHit = null;
+		float closestDistSqrd = -1;
+		
+		for(Structure s : structures)
+		{
+			RayResult hits = s.shape().raycast(from, to);
+			if(hits.closestHit() != null)
+			{
+				float distSqrd = Maths.distSqrd(from, hits.closestHitWorldCoords());
+				
+				if(closestHit == null)
+				{
+					closestHit = s;
+					closestDistSqrd = distSqrd;
+				}
+				else if(closestDistSqrd > distSqrd)
+				{
+					closestHit = s;
+					closestDistSqrd = distSqrd;
+				}
+			}
+		}
+		
+		return closestHit;
+	}
+	
+	private void update(float delta)
+	{		
 		world.update(delta);
 		
 		p.update(delta);
+		
+		lookingAt = calculateLookingAt();
 		
 		for(int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
 		{
@@ -295,8 +338,6 @@ public class Main
 			}
 		}
 		
-		Structure interactWith = ship;
-		
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_ENTER))
 		{
 			try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/ships/test.struct"))))
@@ -309,13 +350,13 @@ public class Main
 			}
 		}
 		
-		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
+		if(lookingAt != null && (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
 			Vector3fc from = p.camera().position();
 			Vector3f dLook = Maths.mul(p.camera().forward(), 10.0f);
 			Vector3f to = Maths.add(from, dLook);
 			
-			RayResult hits = interactWith.shape().raycast(from, to);
+			RayResult hits = lookingAt.shape().raycast(from, to);
 			
 			if(hits.closestHit() != null)
 			{
@@ -330,7 +371,7 @@ public class Main
 				
 				if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
-					interactWith.block(pos.x, pos.y, pos.z, null);
+					lookingAt.block(pos.x, pos.y, pos.z, null);
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
@@ -340,14 +381,14 @@ public class Main
 						yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
 						zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
 					
-					if(interactWith.withinBlocks(xx, yy, zz))
+					if(lookingAt.withinBlocks(xx, yy, zz))
 					{
-						interactWith.block(xx, yy, zz, selectedBlock);
+						lookingAt.block(xx, yy, zz, selectedBlock);
 					}
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
 				{
-					interactWith.beginBulkUpdate();
+					lookingAt.beginBulkUpdate();
 					
 					final int radius = 20;
 					
@@ -371,16 +412,16 @@ public class Main
 								if(Maths.distSqrd(temp, tempPos) < radius * radius)
 								{
 									
-									if(interactWith.withinBlocks(xx, yy, zz))
+									if(lookingAt.withinBlocks(xx, yy, zz))
 									{
-										interactWith.block(xx, yy, zz, null);
+										lookingAt.block(xx, yy, zz, null);
 									}
 								}
 							}
 						}
 					}
 					
-					interactWith.endBulkUpdate();
+					lookingAt.endBulkUpdate();
 				}
 			}
 		}
@@ -399,7 +440,10 @@ public class Main
 		
 //		drawStructure(mainPlanet, projectionMatrix, p);
 		
-		drawStructure(ship, projectionMatrix, p);
+		for(Structure s : structures)
+		{
+			drawStructure(s, projectionMatrix, p);
+		}
 		
 		gui.draw();
 		
