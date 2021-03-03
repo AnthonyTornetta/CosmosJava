@@ -1,5 +1,8 @@
 package com.cornchipss.cosmos.structures;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -19,12 +22,13 @@ import com.cornchipss.cosmos.physx.StructureShape;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.ZaWARUDO;
 
-public abstract class Structure extends PhysicalObject
+public abstract class Structure extends PhysicalObject implements IWritable
 {
 	private Chunk[] chunks;
-
+	
 	private boolean initialized = false;
 	
 	private int width, height, length;
@@ -38,6 +42,11 @@ public abstract class Structure extends PhysicalObject
 	public StructureShape shape() { return shape; }
 	
 	private Set<Chunk> bulkUpdate;
+	
+	public Structure(ZaWARUDO world)
+	{
+		super(world);
+	}
 	
 	public Structure(ZaWARUDO world, int width, int height, int length)
 	{
@@ -227,8 +236,6 @@ public abstract class Structure extends PhysicalObject
 			Vector3i extremeNeg = changedArea[0];
 			Vector3i extremePos = changedArea[1];
 			
-			int updates = 0;
-			
 			if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
 			{
 				// TODO: fix this, for some reason the extremeNeg + Pos calcs don't work. Idk why
@@ -256,14 +263,71 @@ public abstract class Structure extends PhysicalObject
 						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
 						{
 							chunks[flatten(cx, cy, cz)].render();
-							updates++;
 						}
 					}
 				}
 			}
-			
-			Logger.LOGGER.debug("Chunk Re-Renders: " + updates);
 		}
+	}
+	
+	@Override
+	public void write(DataOutputStream writer) throws IOException
+	{
+		long sec = System.currentTimeMillis();
+		
+		writer.writeInt(width);
+		writer.writeInt(height);
+		writer.writeInt(length);
+		
+		for(int z = 0; z < chunksLength(); z++)
+		{
+			for(int y = 0; y < chunksHeight(); y++)
+			{
+				for(int x = 0; x < chunksWidth(); x++)
+				{
+					chunkAt(x, y, z).write(writer);
+				}
+			}
+		}
+		
+		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to save " + width() + "x" + height + "x" + length() + " structure.");
+	}
+	
+	@Override
+	public void read(DataInputStream reader) throws IOException
+	{
+		long sec = System.currentTimeMillis();
+		
+		this.width = reader.readInt();
+		this.height = reader.readInt();
+		this.length = reader.readInt();
+		
+		cLength = (int)Math.ceil((float)length / Chunk.LENGTH);
+		cHeight = (int)Math.ceil((float)height / Chunk.HEIGHT);
+		cWidth = (int)Math.ceil((float)width / Chunk.WIDTH);
+		
+		lightMap = new LightMap(width + 2, height + 2, length + 2);
+		
+		chunks = new Chunk[cLength * cHeight * cWidth];
+		
+		shape = new StructureShape(this);
+		
+		bulkUpdate = null;
+		
+		init();
+		
+		for(int z = 0; z < chunksLength(); z++)
+		{
+			for(int y = 0; y < chunksHeight(); y++)
+			{
+				for(int x = 0; x < chunksWidth(); x++)
+				{
+					chunkAt(x, y, z).read(reader);
+				}
+			}
+		}
+		
+		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to read " + width() + "x" + height + "x" + length() + " structure.");
 	}
 	
 	public boolean within(int x, int y, int z)

@@ -4,11 +4,14 @@ import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 
+/**
+ * A block that is unique to ships
+ */
 public class ShipBlock extends Block
 {
-	public ShipBlock(CubeModel m)
+	public ShipBlock(CubeModel m, String name)
 	{
-		super(m);
+		super(m, name);
 	}
 	
 	@Override

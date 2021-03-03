@@ -2,6 +2,9 @@ package com.cornchipss.cosmos.blocks;
 
 import org.joml.Vector3f;
 
+/**
+ * The faces of each block
+ */
 public enum BlockFace
 {
 	FRONT(0), 
@@ -20,11 +23,36 @@ public enum BlockFace
 		this.f = f;
 	}
 	
+	/**
+	 * <ul>
+	 * 	<li>0: FRONT</li>
+	 * 	<li>1: FRONT</li>
+	 * 	<li>2: FRONT</li>
+	 * 	<li>3: FRONT</li>
+	 * 	<li>4: FRONT</li>
+	 * 	<li>5: FRONT</li>
+	 * 	<li>-1: UNKNOWN</li>
+	 * </ul>
+	 */
 	public int getValue()
 	{
 		return f;
 	}
 
+	/**
+	 * <p>The block face that corresponds to that index</p>
+	 * <ul>
+	 * 	<li>0: FRONT</li>
+	 * 	<li>1: FRONT</li>
+	 * 	<li>2: FRONT</li>
+	 * 	<li>3: FRONT</li>
+	 * 	<li>4: FRONT</li>
+	 * 	<li>5: FRONT</li>
+	 * 	<li>?: UNKNOWN</li>
+	 * </ul>
+	 * @param i The index
+	 * @return The block face that corresponds to that index
+	 */
 	public static BlockFace fromFaceIndex(int i)
 	{
 		switch(i)
@@ -45,7 +73,11 @@ public enum BlockFace
 			return UNKNOWN;
 		}
 	}
-
+	
+	/**
+	 * The position relative to the block's center assuming no rotation
+	 * @return The position relative to the block's center assuming no rotation
+	 */
 	public Vector3f getRelativePosition()
 	{
 		switch(this)

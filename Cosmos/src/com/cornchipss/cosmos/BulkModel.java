@@ -13,7 +13,6 @@ import com.cornchipss.cosmos.models.AnimatedCubeModel;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.models.IHasModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class BulkModel
 {
@@ -266,8 +265,6 @@ public class BulkModel
 			
 			if(isAnimated)
 			{
-				Utils.println(matMesh.animationInfo.size());
-				
 				float[] animationInfoArr = new float[matMesh.animationInfo.size()];
 				i = 0;
 				for(float f : matMesh.animationInfo)

@@ -8,4 +8,9 @@ public class Planet extends Structure
 	{
 		super(world, width, height, length);
 	}
+	
+	public Planet(ZaWARUDO world)
+	{
+		super(world);
+	}
 }

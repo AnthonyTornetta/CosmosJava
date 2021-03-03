@@ -3,6 +3,9 @@ package com.cornchipss.cosmos.blocks;
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.structures.Structure;
 
+/**
+ * A way of storing data of a block in the world without multiple instances of a block
+ */
 public interface IHasData
 {
 	/**

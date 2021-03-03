@@ -1,6 +1,11 @@
 package com.cornchipss.cosmos;
 
 import java.awt.Font;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -34,7 +39,6 @@ import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.ZaWARUDO;
 
@@ -47,7 +51,7 @@ public class Main
 		new Main().run();
 	}
 	
-	private Planet mainPlanet;
+	private Planet mainPlanet, testPlanet;
 	private Ship ship;
 	private Matrix4f projectionMatrix;
 	private Player p;
@@ -66,11 +70,7 @@ public class Main
 		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
-		Utils.println("2");
-		
 		Materials.initMaterials();
-		
-		Utils.println("E");
 		
 		world = new ZaWARUDO();
 		
@@ -119,8 +119,28 @@ public class Main
 		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-		mainPlanet = new Planet(world, 100, 32, 100);
-		mainPlanet.init();
+		mainPlanet = new Planet(world, 16*8, 16*8, 16*8);
+		testPlanet = new Planet(world);
+		
+		try
+		{
+			Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
+			def.generatePlanet(mainPlanet);
+			
+			DataOutputStream writer = new DataOutputStream(new FileOutputStream("temp.bin"));
+			mainPlanet.write(writer);
+			writer.close();
+			
+			DataInputStream reader = new DataInputStream(new FileInputStream("temp.bin"));
+			testPlanet.read(reader);
+			reader.close();
+		}
+		catch(IOException ex)
+		{
+			ex.printStackTrace();
+		}
+		
+		//mainPlanet.init();
 		
 		ship = new Ship(world);
 		ship.init();
@@ -131,16 +151,17 @@ public class Main
 		for(Chunk c : ship.chunks())
 			c.render();
 		
-		Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
-		
-		def.generatePlanet(mainPlanet);
-		
 		mainPlanet.calculateLights(false);
+		testPlanet.calculateLights(false);
 		
 		for(Chunk c : mainPlanet.chunks())
 			c.render();
 		
-		mainPlanet.addToWorld(new Transform(0, 50, 0));
+		for(Chunk c : testPlanet.chunks())
+			c.render();
+		
+		mainPlanet.addToWorld(new Transform(0, 0, 0));
+		testPlanet.addToWorld(new Transform(-mainPlanet.width() - 1, 0, 0));
 		
 		p = new Player(world);
 		p.addToWorld(new Transform(0, mainPlanet.height() / 2 + 3, 0));
@@ -211,7 +232,6 @@ public class Main
 			
 			if(lastSecond / 1000 != t / 1000)
 			{
-				Logger.LOGGER.info("UPS: " + ups + "; Max Variance: " + variance*1000 + "ms");
 				fpsText.text(ups + " " + (int)(variance*1000) + "ms");
 				
 				lastSecond = t;
@@ -380,6 +400,8 @@ public class Main
 		drawStructure(mainPlanet, projectionMatrix, p);
 		
 		drawStructure(ship, projectionMatrix, p);
+		
+		drawStructure(testPlanet, projectionMatrix, p);
 		
 		gui.draw();
 		

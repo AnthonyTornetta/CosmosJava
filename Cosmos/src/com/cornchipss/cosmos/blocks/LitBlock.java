@@ -5,13 +5,21 @@ import javax.annotation.Nonnull;
 import com.cornchipss.cosmos.lights.LightSource;
 import com.cornchipss.cosmos.models.CubeModel;
 
+/**
+ * A block that emits light
+ */
 public class LitBlock extends Block
 {
 	private LightSource source;
 	
-	public LitBlock(CubeModel m, @Nonnull LightSource src)
+	/**
+	 * A block that emits light
+	 * @param m The model to use
+	 * @param src The {@link LightSource} the block emits
+	 */
+	public LitBlock(CubeModel m, @Nonnull LightSource src, String name)
 	{
-		super(m);
+		super(m, name);
 		
 		source = src;
 	}

@@ -35,5 +35,4 @@ public class ShipCoreModel extends AnimatedCubeModel
 	{
 		return Materials.ANIMATED_DEFAULT_MATERIAL;
 	}
-
 }

@@ -6,6 +6,9 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 
+/**
+ * A test biosphere that just generates some basic terrain
+ */
 public class TestBiosphere extends Biosphere
 {
 	@Override
@@ -17,7 +20,8 @@ public class TestBiosphere extends Biosphere
 			{
 				float n = 6 * SimplexNoise.noise(x * 0.03f, z * 0.03f);
 				
-				int h = Maths.round(s.height() - 16 + n);
+				int REMOVE_ME_LATER = s.height() == 16 ? 8 : 16;
+				int h = Maths.round(s.height() - REMOVE_ME_LATER + n);
 				
 				for(int y = 0; y < h; y++)
 				{
@@ -59,6 +63,13 @@ public class TestBiosphere extends Biosphere
 		}
 	}
 	
+	/**
+	 * Makes a happy tree
+	 * @param x x
+	 * @param y y
+	 * @param z z
+	 * @param s the planet to do it on
+	 */
 	private void generateTree(int x, int y, int z, Structure s)
 	{
 		s.block(x, y, z, Blocks.LOG);
