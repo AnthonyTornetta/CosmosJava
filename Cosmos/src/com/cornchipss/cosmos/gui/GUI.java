@@ -15,39 +15,36 @@ public class GUI
 	private Material material;
 	
 	private Matrix4f projectionMatrix;
-	
-	private int guiTransLoc;
-	private int guiProjLoc;
+	private Matrix4f cameraMatrix;
 	
 	public GUI(Material material)
 	{
 		this.material = material;
 		elements = new LinkedList<>();
+		
+		cameraMatrix = new Matrix4f().identity();
 	}
 	
 	public void init(int width, int height)
 	{
 		updateProjection(width, height);
 		
-		guiTransLoc = material.shader().uniformLocation("u_transform");
-		guiProjLoc = material.shader().uniformLocation("u_projection");
 	}
 	
 	public void draw()
 	{
 		GL30.glDisable(GL30.GL_DEPTH_TEST);
 		
-		material.use();
-		
-		material.shader().setUniformMatrix(guiProjLoc, projectionMatrix);
-		
 		for(GUIElement e : elements)
 		{
-			material.shader().setUniformMatrix(guiTransLoc, e.transform());
+			e.material().use();
+			e.material().initUniforms(projectionMatrix, cameraMatrix, e.transform(), true);
 			
 			e.prepare(this);
 			e.draw(this);
 			e.finish(this);
+			
+			e.material().stop();
 		}
 		
 		material.stop();

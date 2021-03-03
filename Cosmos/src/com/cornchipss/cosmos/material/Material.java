@@ -30,7 +30,8 @@ public abstract class Material
 	}
 	
 	public abstract void initUniforms(
-			Matrix4fc projectionMatrix, Matrix4fc camera, Matrix4fc transform);
+			Matrix4fc projectionMatrix, Matrix4fc camera, 
+			Matrix4fc transform, boolean inGUI);
 
 	/**
 	 * Used to get the uniform locations

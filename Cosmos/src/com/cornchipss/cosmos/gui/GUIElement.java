@@ -5,6 +5,8 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.Mesh;
+import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.utils.Maths;
 
 public abstract class GUIElement
@@ -56,5 +58,10 @@ public abstract class GUIElement
 	public void delete()
 	{
 		guiMesh().delete();
+	}
+
+	public Material material()
+	{
+		return Materials.GUI_MATERIAL;
 	}
 }

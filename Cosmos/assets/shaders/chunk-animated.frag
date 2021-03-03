@@ -12,7 +12,7 @@ uniform sampler2D sampler;
 
 out vec4 FragColor;
 
-float ambient = 0.2;
+uniform float u_ambientLight;
 
 void main()
 {
@@ -21,7 +21,7 @@ void main()
 	float textureWidth = 16.0f; // TODO: pass this in via uniform
 
 	vec4 textColor = 
-		vec4(max(frag_light.x, ambient), max(frag_light.y, ambient), max(frag_light.z, ambient), 1)
+		vec4(max(frag_light.x, u_ambientLight), max(frag_light.y, u_ambientLight), max(frag_light.z, u_ambientLight), 1)
 		* texture(sampler, vec2(frag_uv.x + ((u_animation_state / delay % numFrames) / textureWidth), frag_uv.y));
 	
 	FragColor = textColor;
