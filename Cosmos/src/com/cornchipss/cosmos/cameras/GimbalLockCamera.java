@@ -42,7 +42,7 @@ public class GimbalLockCamera extends Camera
 	/**
 	 * Call this after every update to a variable - updates all the other variables
 	 */
-	private void update()
+	public void update()
 	{
 		if(parent.initialized())
 		{
@@ -70,8 +70,6 @@ public class GimbalLockCamera extends Camera
 	public void rotate(Vector3fc delta)
 	{
 		rot.add(delta);
-		
-		update();
 	}
 	
 	/**
@@ -81,8 +79,6 @@ public class GimbalLockCamera extends Camera
 	public void rotation(Vector3fc r)
 	{
 		rot.set(r);
-		
-		update();
 	}
 	
 	@Override

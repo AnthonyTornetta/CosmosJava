@@ -72,6 +72,14 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		bulkUpdate = null;
 	}
 	
+	/**
+	 * For sub classes to override if needed
+	 */
+	public void update(float delta)
+	{
+		
+	}
+	
 	public boolean bulkUpdating()
 	{
 		return bulkUpdate != null;

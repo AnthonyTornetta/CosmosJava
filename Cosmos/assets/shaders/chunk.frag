@@ -11,6 +11,8 @@ out vec4 FragColor;
 
 uniform float u_ambientLight;
 
+uniform float u_time;
+
 void main()
 {
 	vec4 textColor = 

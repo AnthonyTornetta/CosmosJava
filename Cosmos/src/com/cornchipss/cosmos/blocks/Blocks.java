@@ -5,11 +5,14 @@ import java.util.Collections;
 import java.util.List;
 
 import com.cornchipss.cosmos.lights.LightSource;
+import com.cornchipss.cosmos.models.CactusModel;
 import com.cornchipss.cosmos.models.DirtModel;
 import com.cornchipss.cosmos.models.GrassModel;
 import com.cornchipss.cosmos.models.LeafModel;
 import com.cornchipss.cosmos.models.LightModel;
 import com.cornchipss.cosmos.models.LogModel;
+import com.cornchipss.cosmos.models.SandModel;
+import com.cornchipss.cosmos.models.SandStoneModel;
 import com.cornchipss.cosmos.models.ShipHullModel;
 import com.cornchipss.cosmos.models.StoneModel;
 
@@ -28,7 +31,10 @@ public class Blocks
 		LOG   = new Block(new LogModel(), "log"),
 		LEAF  = new Block(new LeafModel(), "leaf"),
 		SHIP_CORE = new ShipCoreBlock(),
-		SHIP_HULL = new Block(new ShipHullModel(), "ship_hull");
+		SHIP_HULL = new Block(new ShipHullModel(), "ship_hull"),
+		SAND = new Block(new SandModel(), "sand"),
+		SAND_STONE = new Block(new SandStoneModel(), "sand_stone"),
+		CACTUS = new Block(new CactusModel(), "cactus");
 	
 	/**
 	 * Adds all the blocks to a list
@@ -37,7 +43,8 @@ public class Blocks
 	{
 		allBlocks = Collections.unmodifiableList(
 				Arrays.asList(STONE, GRASS, DIRT, 
-						LIGHT, LOG, LEAF, SHIP_CORE, SHIP_HULL));
+						LIGHT, LOG, LEAF, SHIP_CORE, SHIP_HULL,
+						SAND, SAND_STONE, CACTUS));
 		
 		for(short i = 0; i < allBlocks.size(); i++)
 			allBlocks.get(i).blockId((short)(i + 1));

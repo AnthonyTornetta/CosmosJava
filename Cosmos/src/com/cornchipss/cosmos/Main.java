@@ -21,10 +21,12 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
-import com.cornchipss.cosmos.biospheres.TestBiosphere;
+import com.cornchipss.cosmos.biospheres.DesertBiosphere;
+import com.cornchipss.cosmos.biospheres.GrassBiosphere;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.blocks.IInteractable;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -71,7 +73,8 @@ public class Main
 		
 		Blocks.init();
 		
-		Biospheres.registerBiosphere(TestBiosphere.class, "cosmos:test");
+		Biospheres.registerBiosphere(GrassBiosphere.class, "cosmos:grass");
+		Biospheres.registerBiosphere(DesertBiosphere.class, "cosmos:desert");
 		
 		window = new Window(1024, 720, "wack simulator 2021");
 		
@@ -124,9 +127,9 @@ public class Main
 		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-		mainPlanet = new Planet(world, 16*4, 16*2, 16*4);
+		mainPlanet = new Planet(world, 16*10, 16*6, 16*10);
 		mainPlanet.init();
-		Biosphere def = Biospheres.newInstance(Biospheres.getBiosphereIds().get(0));
+		Biosphere def = Biospheres.newInstance("cosmos:desert");
 		def.generatePlanet(mainPlanet);
 		structures.add(mainPlanet);
 		//mainPlanet.init();
@@ -314,7 +317,12 @@ public class Main
 	{		
 		world.update(delta);
 		
+		for(Structure s : structures)
+			s.update(delta);
+		
+		boolean toggledPiloting = p.pilotingShip() != null;
 		p.update(delta);
+		toggledPiloting = toggledPiloting != (p.pilotingShip() != null);
 		
 		lookingAt = calculateLookingAt();
 		
@@ -350,7 +358,7 @@ public class Main
 			}
 		}
 		
-		if(lookingAt != null && (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
+		if(lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R) && !toggledPiloting || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
 			Vector3fc from = p.camera().position();
 			Vector3f dLook = Maths.mul(p.camera().forward(), 10.0f);
@@ -375,15 +383,25 @@ public class Main
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
-					BlockFace face = hits.closestFace();
-					
-					int xx = Maths.floor(pos.x + 0.5f + (face.getRelativePosition().x * 2)), 
-						yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
-						zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
-					
-					if(lookingAt.withinBlocks(xx, yy, zz))
+					if(selectedBlock != null && selectedBlock.canAddTo(lookingAt))
 					{
-						lookingAt.block(xx, yy, zz, selectedBlock);
+						BlockFace face = hits.closestFace();
+						
+						int xx = Maths.floor(pos.x + 0.5f + (face.getRelativePosition().x * 2)), 
+							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
+							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
+						
+						if(lookingAt.withinBlocks(xx, yy, zz))
+						{
+							lookingAt.block(xx, yy, zz, selectedBlock);
+						}
+					}
+				}
+				else if(Input.isKeyJustDown(GLFW.GLFW_KEY_R) && !toggledPiloting)
+				{
+					if(lookingAt.block(pos.x, pos.y, pos.z) instanceof IInteractable)
+					{
+						((IInteractable)lookingAt.block(pos.x, pos.y, pos.z)).onInteract(lookingAt, p);
 					}
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))

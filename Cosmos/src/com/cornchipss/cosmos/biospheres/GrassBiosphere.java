@@ -9,7 +9,7 @@ import com.cornchipss.cosmos.utils.Maths;
 /**
  * A test biosphere that just generates some basic terrain
  */
-public class TestBiosphere extends Biosphere
+public class GrassBiosphere extends Biosphere
 {
 	@Override
 	protected void generateTerrain(Structure s)
