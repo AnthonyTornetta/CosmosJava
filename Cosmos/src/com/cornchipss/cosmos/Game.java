@@ -17,8 +17,6 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
-import com.cornchipss.cosmos.biospheres.DesertBiosphere;
-import com.cornchipss.cosmos.biospheres.GrassBiosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
@@ -34,19 +32,11 @@ import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
 
-public class Main
+public class Game
 {
-	private Window window;
-	
-	public static void main(String[] args)
-	{
-		new Main().run();
-	}
-	
 	private Planet mainPlanet;
 	private Ship ship;
 	private Matrix4f projectionMatrix;
@@ -55,20 +45,20 @@ public class Main
 	private World world;
 	private int selectedSlot;
 	private GUITextureMultiple[] inventorySlots;
+	private GUIText fpsText;
 	
-	private void run()
+	public void onResize(int w, int h)
 	{
-		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
+		projectionMatrix.identity();
+		projectionMatrix.perspective((float)Math.toRadians(90), 
+				w/(float)h,
+				0.1f, 1000);
 		
-		Blocks.init();
-		
-		Biospheres.registerBiosphere(GrassBiosphere.class, "cosmos:grass");
-		Biospheres.registerBiosphere(DesertBiosphere.class, "cosmos:desert");
-		
-		window = new Window(1024, 720, "Cosmos");
-		
-		Materials.initMaterials();
-		
+		gui.updateProjection(w, h);
+	}
+	
+	public Game(Window window)
+	{
 		world = new World();
 		
 		gui = new GUI(Materials.GUI_MATERIAL);
@@ -84,7 +74,8 @@ public class Main
 		
 		GUIModel[] models = new GUIModel[10];
 		
-		selectedSlot = 0;
+		p = new ClientPlayer(world);
+		p.addToWorld(new Transform(0, 0, 0));
 		
 		int slotDimensions = 64;
 		
@@ -99,12 +90,12 @@ public class Main
 			
 			gui.addElement(inventorySlots[i]);
 			
-			if(i < Blocks.all().size())
+			if(i < p.inventory().columns() && p.inventory().block(0, i) != null)
 			{
 				int margin = 4;
 				
 				models[i] = new GUIModel(new Vector3f(startX + i * slotDimensions + margin, margin, 0), 
-						slotDimensions - margin * 2, Blocks.all().get(i).model());
+						slotDimensions - margin * 2, p.inventory().block(0, i).model());
 				
 				gui.addElement(models[i]);
 			}
@@ -112,7 +103,7 @@ public class Main
 		
 		inventorySlots[selectedSlot].state(1);
 		
-		GUIText fpsText = new GUIText("-- --ms", font, 0, 0);
+		fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
 		mainPlanet = new Planet(world, 16*10, 16*6, 16*10);
@@ -149,9 +140,6 @@ public class Main
 		
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
 		
-		p = new ClientPlayer(world);
-		p.addToWorld(new Transform(0, 0, 0));
-		
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
@@ -161,87 +149,56 @@ public class Main
 		guiProjMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
+	}
+	
+	void update(float delta)
+	{
+		fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
 		
-		Input.setWindow(window);
+		world.update(delta);
 		
-		long t = System.currentTimeMillis();
+		int prevRow = p.selectedInventoryColumn();
 		
-		final int UPS_TARGET = 70;
+		p.update(delta);
 		
-		final int MILLIS_WAIT = 1000 / UPS_TARGET;
+		int row = p.selectedInventoryColumn();
 		
-		long lastSecond = t;
-		
-		int ups = 0;
-		float variance = 0;
-		
-		Input.hideCursor(true);
-		
-		Input.update();
-		
-		boolean running = true;
-		
-		while(!window.shouldClose() && running)
+		if(prevRow != row)
 		{
-			if(window.wasWindowResized())
-			{
-				projectionMatrix.identity();
-				projectionMatrix.perspective((float)Math.toRadians(90), 
-						window.getWidth()/(float)window.getHeight(),
-						0.1f, 1000);
-				
-				gui.updateProjection(window.getWidth(), window.getHeight());
-			}
-			
-			float delta = System.currentTimeMillis() - t; 
-			
-			if(delta < MILLIS_WAIT)
-			{
-				try
-				{
-					Thread.sleep(MILLIS_WAIT - (int)delta);
-					
-					delta = (System.currentTimeMillis() - t);
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			delta /= 1000.0f;
-			
-			if(delta > variance)
-				variance = delta;
-			
-			t = System.currentTimeMillis();
-			
-			if(lastSecond / 1000 != t / 1000)
-			{
-				fpsText.text(ups + " " + (int)(variance*1000) + "ms");
-				
-				lastSecond = t;
-				ups = 0;
-				variance = 0;
-			}
-			ups++;
-			
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
-				Input.toggleCursor();
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
-				running = false;
-			
-			update(delta);
-			
-			Input.update();
-			
-			render(delta);
+			inventorySlots[prevRow].state(0);
+			inventorySlots[row].state(1);
 		}
 		
-		window.destroy();
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_ENTER))
+		{
+			try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/ships/test.struct"))))
+			{
+				ship.write(str);
+			}
+			catch(IOException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	void render(float delta)
+	{
+		GL11.glEnable(GL13.GL_TEXTURE0);
 		
-		Logger.LOGGER.info("Successfully closed.");
+		GL30.glEnable(GL30.GL_DEPTH_TEST);
+		GL30.glDepthFunc(GL30.GL_LESS);
+		
+		//GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
+		
+//		drawStructure(mainPlanet, projectionMatrix, p);
+		
+		for(Structure s : world.structures())
+		{
+			drawStructure(s, projectionMatrix, p);
+		}
+		
+		gui.draw();
 	}
 	
 	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, ClientPlayer p)
@@ -269,89 +226,5 @@ public class Main
 				m.material().stop();
 			}
 		}
-	}
-	
-	private void update(float delta)
-	{
-		world.update(delta);
-		
-		int prevRow = p.selectedInventoryRow();
-		
-		p.update(delta);
-		
-		int row = p.selectedInventoryRow();
-		
-		if(prevRow != row)
-		{
-			inventorySlots[prevRow].state(0);
-			inventorySlots[row].state(1);
-		}
-		
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_ENTER))
-		{
-			try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/ships/test.struct"))))
-			{
-				ship.write(str);
-			}
-			catch(IOException ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-		
-		for(int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
-		{
-			if(key > GLFW.GLFW_KEY_9)
-			{
-				if(Input.isKeyJustDown(GLFW.GLFW_KEY_0))
-				{
-					inventorySlots[selectedSlot].state(0);
-					selectedSlot = 9;
-					inventorySlots[selectedSlot].state(1);
-				}
-			}
-			else if(Input.isKeyJustDown(key))
-			{
-				inventorySlots[selectedSlot].state(0);
-				selectedSlot = key - GLFW.GLFW_KEY_1;
-				inventorySlots[selectedSlot].state(1);
-				break;
-			}
-		}
-		
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_ENTER))
-		{
-			try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/ships/test.struct"))))
-			{
-				ship.write(str);
-			}
-			catch(IOException ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-	}
-	
-	private void render(float delta)
-	{
-		window.clear(33 / 255.0f, 33 / 255.0f, 33 / 255.0f, 1.0f);
-		
-		GL11.glEnable(GL13.GL_TEXTURE0);
-		
-		GL30.glEnable(GL30.GL_DEPTH_TEST);
-		GL30.glDepthFunc(GL30.GL_LESS);
-		
-		//GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
-		
-//		drawStructure(mainPlanet, projectionMatrix, p);
-		
-		for(Structure s : world.structures())
-		{
-			drawStructure(s, projectionMatrix, p);
-		}
-		
-		gui.draw();
-		
-		window.update();
 	}
 }

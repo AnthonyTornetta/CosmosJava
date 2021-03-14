@@ -66,7 +66,7 @@ public class ClientPlayer extends Player
 			{
 				Block selectedBlock = null;
 				
-				selectedBlock = inventory().block(selectedInventoryRow(), 0);
+				selectedBlock = inventory().block(0, selectedInventoryColumn());
 				
 				Vector3i pos = new Vector3i(Maths.round(hits.closestHit().x()), 
 						Maths.round(hits.closestHit().y()), 
@@ -161,7 +161,7 @@ public class ClientPlayer extends Player
 	{
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_0))
 		{
-			selectedInventoryRow(9);
+			selectedInventoryColumn(9);
 		}
 		else
 		{
@@ -169,7 +169,7 @@ public class ClientPlayer extends Player
 			{
 				if(Input.isKeyJustDown(key))
 				{
-					selectedInventoryRow(key - GLFW.GLFW_KEY_1);
+					selectedInventoryColumn(key - GLFW.GLFW_KEY_1);
 					break;
 				}
 			}

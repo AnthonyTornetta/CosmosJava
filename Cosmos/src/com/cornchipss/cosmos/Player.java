@@ -3,6 +3,7 @@ package com.cornchipss.cosmos;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RayResult;
@@ -19,13 +20,20 @@ public abstract class Player extends PhysicalObject
 	private Ship pilotingShip;
 	
 	private Inventory inventory;
-	private int selectedInventoryRow;
+	private int selectedInventoryCol;
 	
 	public Player(World world)
 	{
 		super(world);
 		
-		inventory = new Inventory(10, 4);
+		inventory = new Inventory(4, 10);
+		
+		for(int i = 0; i < Blocks.all().size() && i < inventory.rows() * inventory.columns(); i++)
+		{
+			Utils.println(i % inventory.columns());
+			
+			inventory.block(i / inventory.columns(), i % inventory.columns(), Blocks.all().get(i));
+		}
 	}
 	
 	public abstract void update(float delta);
@@ -99,14 +107,14 @@ public abstract class Player extends PhysicalObject
 	
 	public abstract Camera camera();
 	
-	public void selectedInventoryRow(int r)
+	public void selectedInventoryColumn(int c)
 	{
-		selectedInventoryRow = r;
+		selectedInventoryCol = c;
 	}
 	
-	public int selectedInventoryRow()
+	public int selectedInventoryColumn()
 	{
-		return selectedInventoryRow;
+		return selectedInventoryCol;
 	}
 	
 	public Inventory inventory() { return inventory; }
