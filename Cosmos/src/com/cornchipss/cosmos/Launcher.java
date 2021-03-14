@@ -24,7 +24,7 @@ public class Launcher
 		Initializer loader = new Initializer();
 		loader.init();
 		
-		Game game = new Game(window);
+		ClientGame game = new ClientGame(window);
 		
 		Input.setWindow(window);
 		

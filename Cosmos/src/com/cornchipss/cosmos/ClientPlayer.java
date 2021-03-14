@@ -14,7 +14,6 @@ import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
 
@@ -49,8 +48,7 @@ public class ClientPlayer extends Player
 	private void handleInteractions()
 	{
 		Structure lookingAt = calculateLookingAt();
-
-		Utils.println(lookingAt);
+		
 		if(lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R) || 
 						Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || 
 						Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || 

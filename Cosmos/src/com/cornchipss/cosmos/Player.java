@@ -30,8 +30,6 @@ public abstract class Player extends PhysicalObject
 		
 		for(int i = 0; i < Blocks.all().size() && i < inventory.rows() * inventory.columns(); i++)
 		{
-			Utils.println(i % inventory.columns());
-			
 			inventory.block(i / inventory.columns(), i % inventory.columns(), Blocks.all().get(i));
 		}
 	}
