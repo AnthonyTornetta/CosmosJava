@@ -45,8 +45,9 @@ public class Transform
 	private void updateMatrix()
 	{
 		transMatrix.identity();
-		transMatrix.rotate(rotation);
 		
+		transMatrix.rotate(rotation);
+
 		transMatrix.transform(0, 0, -1, 1, temp); // opengl moment
 		forward.set(temp.x, temp.y, temp.z);
 		
@@ -56,7 +57,11 @@ public class Transform
 		transMatrix.transform(0, 1, 0, 1, temp);
 		up.set(temp.x, temp.y, temp.z);
 		
+		transMatrix.identity();
+		
 		transMatrix.translate(position);
+		
+		transMatrix.rotate(rotation);
 		
 		transMatrix.invert(invertedMatirx);
 	}
@@ -80,6 +85,12 @@ public class Transform
 	public Quaternionfc rotation()
 	{
 		return rotation;
+	}
+	
+	public void rotation(Quaternionfc q)
+	{
+		rotation.set(q);
+		updateMatrix();
 	}
 
 	public Matrix4fc matrix()

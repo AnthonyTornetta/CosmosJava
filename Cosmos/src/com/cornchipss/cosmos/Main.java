@@ -68,7 +68,7 @@ public class Main
 	private List<Structure> structures;
 	
 	private void run()
-	{		
+	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
 		Blocks.init();
@@ -76,7 +76,7 @@ public class Main
 		Biospheres.registerBiosphere(GrassBiosphere.class, "cosmos:grass");
 		Biospheres.registerBiosphere(DesertBiosphere.class, "cosmos:desert");
 		
-		window = new Window(1024, 720, "wack simulator 2021");
+		window = new Window(1024, 720, "Cosmos");
 		
 		Materials.initMaterials();
 		
@@ -132,7 +132,6 @@ public class Main
 		Biosphere def = Biospheres.newInstance("cosmos:desert");
 		def.generatePlanet(mainPlanet);
 		structures.add(mainPlanet);
-		//mainPlanet.init();
 		
 		ship = new Ship(world);
 		ship.init();
@@ -148,7 +147,8 @@ public class Main
 			ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2, Blocks.SHIP_CORE);
 		}
 		
-		ship.addToWorld(new Transform(-ship.width() / 2, -ship.height() / 2, -ship.length() / 2));
+		ship.addToWorld(new Transform());
+		
 		ship.calculateLights(false);
 		
 		for(Chunk c : ship.chunks())
@@ -261,14 +261,18 @@ public class Main
 		for(Chunk chunk : s.chunks())
 		{
 			Matrix4f transform = new Matrix4f();
-			Matrix4fc trans = s.transformMatrix();
+			Matrix4fc trans = s.openGLMatrix();
 			trans.mul(chunk.transformMatrix(), transform);
 			
 			for(MaterialMesh m : chunk.model().materialMeshes())
 			{
 				m.material().use();
 				
-				m.material().initUniforms(projectionMatrix, p.camera().viewMatrix(), transform, false);
+				Matrix4fc camera = p.pilotingShip() == null ? 
+						p.camera().viewMatrix() : 
+							p.pilotingShip().body().transform().invertedMatrix();
+				
+				m.material().initUniforms(projectionMatrix, camera, transform, false);
 				
 				m.mesh().prepare();
 				m.mesh().draw();
@@ -322,6 +326,7 @@ public class Main
 		
 		boolean toggledPiloting = p.pilotingShip() != null;
 		p.update(delta);
+
 		toggledPiloting = toggledPiloting != (p.pilotingShip() != null);
 		
 		lookingAt = calculateLookingAt();

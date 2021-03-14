@@ -128,4 +128,10 @@ public class GimbalLockCamera extends Camera
 	{
 		return new Vector3f(parent.position()).add(new Vector3f(0, 0.4f, 0));
 	}
+
+	@Override
+	public void zeroRotation()
+	{
+		rot.set(0, 0, 0);
+	}
 }

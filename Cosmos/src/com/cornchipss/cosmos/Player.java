@@ -89,7 +89,7 @@ public class Player extends PhysicalObject
 	
 			vel.add(dVel);
 	
-			vel = Maths.safeNormalize(vel, 10.0f);
+			vel = Maths.safeNormalize(vel, 50.0f);
 			
 			if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 				vel.y = (vel.y() + 5);

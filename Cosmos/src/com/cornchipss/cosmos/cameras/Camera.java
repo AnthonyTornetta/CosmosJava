@@ -36,4 +36,14 @@ public abstract class Camera
 	 * @return The camera's position
 	 */
 	public abstract Vector3fc position();
+
+	/**
+	 * Sets the camera's rotation to zero
+	 */
+	public abstract void zeroRotation();
+	
+	/**
+	 * Updates all the values
+	 */
+	public abstract void update();
 }

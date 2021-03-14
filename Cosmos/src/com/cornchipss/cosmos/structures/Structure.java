@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -403,6 +404,14 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		throw new RuntimeException("Not yet implemented D;");
 	}
 	
+	public Matrix4fc openGLMatrix()
+	{
+		Matrix4f mat = new Matrix4f();
+		mat.set(body().transform().matrix());
+		mat.translate(-width() / 2.f, -height() / 2.f, -length() / 2.f);
+		return mat;
+	}
+	
 	public Matrix4fc transformMatrix()
 	{
 		return body().transform().matrix();
@@ -434,12 +443,12 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		
 		body().transform().invertedMatrix().transform(c);
 		
-		return new Vector3i((int)c.x, (int)c.y, (int)c.z);
+		return new Vector3i((int)c.x + width() / 2, (int)c.y + width() / 2, (int)c.z + width() / 2);
 	}
 	
 	public Vector3f localCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
 	{
-		Vector4f c = new Vector4f(x, y, z, 1);
+		Vector4f c = new Vector4f(x - width() / 2, y - width() / 2, z - width() / 2, 1);
 		
 		body().transform().matrix().transform(c);
 		
