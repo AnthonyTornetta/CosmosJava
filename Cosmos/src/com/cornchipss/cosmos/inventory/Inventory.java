@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.inventory;
 
 import com.cornchipss.cosmos.blocks.Block;
 

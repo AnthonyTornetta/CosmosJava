@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.game;
 
 import java.awt.Font;
 import java.io.DataInputStream;
@@ -32,7 +32,10 @@ import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.io.Input;
+import com.cornchipss.cosmos.world.Chunk;
+import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class ClientGame extends Game
 {
@@ -147,7 +150,7 @@ public class ClientGame extends Game
 		gui.updateProjection(w, h);
 	}
 	
-	void render(float delta)
+	public void render(float delta)
 	{
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		

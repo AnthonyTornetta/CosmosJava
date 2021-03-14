@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.utils;
 
 import java.util.HashMap;
 import java.util.Map;

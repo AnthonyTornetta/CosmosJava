@@ -1,10 +1,11 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.world.entities.player;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
+import com.cornchipss.cosmos.inventory.Inventory;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;

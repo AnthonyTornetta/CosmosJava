@@ -2,7 +2,10 @@ package com.cornchipss.cosmos;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
+import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 

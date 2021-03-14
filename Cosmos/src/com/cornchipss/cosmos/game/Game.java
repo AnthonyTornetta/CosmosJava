@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.game;
 
 import com.cornchipss.cosmos.world.World;
 
@@ -11,7 +11,7 @@ public abstract class Game
 		world = new World();
 	}
 	
-	void update(float delta)
+	public void update(float delta)
 	{
 		world.update(delta);
 	}

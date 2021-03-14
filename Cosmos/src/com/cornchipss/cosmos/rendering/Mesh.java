@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.rendering;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

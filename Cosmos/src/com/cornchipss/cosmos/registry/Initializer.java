@@ -1,10 +1,9 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.registry;
 
 import com.cornchipss.cosmos.biospheres.DesertBiosphere;
 import com.cornchipss.cosmos.biospheres.GrassBiosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.material.Materials;
-import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.utils.Logger;
 
 public class Initializer

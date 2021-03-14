@@ -3,10 +3,10 @@ package com.cornchipss.cosmos.models;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.rendering.Mesh;
 
 public abstract class CubeModel
 {

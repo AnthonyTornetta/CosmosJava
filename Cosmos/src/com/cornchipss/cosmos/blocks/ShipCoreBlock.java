@@ -1,10 +1,10 @@
 package com.cornchipss.cosmos.blocks;
 
-import com.cornchipss.cosmos.Player;
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.models.ShipCoreModel;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 /**
  * <p>The core block of any ship</p>

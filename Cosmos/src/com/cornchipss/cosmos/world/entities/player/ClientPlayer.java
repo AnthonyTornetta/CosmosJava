@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.world.entities.player;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;

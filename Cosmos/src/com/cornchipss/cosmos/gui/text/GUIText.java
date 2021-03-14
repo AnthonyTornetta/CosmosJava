@@ -2,9 +2,9 @@ package com.cornchipss.cosmos.gui.text;
 
 import org.joml.Vector3f;
 
-import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIElement;
+import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUIText extends GUIElement
 {

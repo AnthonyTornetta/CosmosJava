@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.gui.text;
 
 import javax.annotation.Nonnull;
 
-import com.cornchipss.cosmos.Mesh;
+import com.cornchipss.cosmos.rendering.Mesh;
 
 public class TextRenderer
 {

@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.gui;
 
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.Mesh;
+import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUITextureMultiple extends GUITexture
 {

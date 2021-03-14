@@ -5,11 +5,11 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
-import com.cornchipss.cosmos.Player;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 /**
  * A structure representing a ship

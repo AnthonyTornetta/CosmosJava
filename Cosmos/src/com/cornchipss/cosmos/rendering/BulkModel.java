@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.rendering;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,7 +12,6 @@ import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.models.AnimatedCubeModel;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.models.IHasModel;
-import com.cornchipss.cosmos.rendering.MaterialMesh;
 
 public class BulkModel
 {
@@ -220,7 +219,7 @@ public class BulkModel
 	/**
 	 * algorithm kinda
 	 */
-	void render(BulkModel left, BulkModel right, BulkModel top, 
+	public void render(BulkModel left, BulkModel right, BulkModel top, 
 			BulkModel bottom, BulkModel front, BulkModel back,
 			int offX, int offY, int offZ, LightMap lightMap)
 	{

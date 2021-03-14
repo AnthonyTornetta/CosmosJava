@@ -14,7 +14,6 @@ import org.joml.Vector3i;
 import org.joml.Vector3ic;
 import org.joml.Vector4f;
 
-import com.cornchipss.cosmos.Chunk;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -24,6 +23,7 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.IWritable;
+import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
 
 public abstract class Structure extends PhysicalObject implements IWritable

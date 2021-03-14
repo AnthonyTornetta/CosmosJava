@@ -4,9 +4,9 @@ import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.Maths;
 
 public abstract class GUIElement

@@ -1,6 +1,5 @@
 package com.cornchipss.cosmos.rendering;
 
-import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.material.Material;
 
 /**

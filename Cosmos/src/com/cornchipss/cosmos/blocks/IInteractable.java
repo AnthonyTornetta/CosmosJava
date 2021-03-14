@@ -1,7 +1,7 @@
 package com.cornchipss.cosmos.blocks;
 
-import com.cornchipss.cosmos.Player;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 /**
  * If a block is interactable by the player

@@ -3,10 +3,10 @@ package com.cornchipss.cosmos.gui;
 import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.Mesh;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.models.CubeModel;
+import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class GUIModel extends GUIElement
