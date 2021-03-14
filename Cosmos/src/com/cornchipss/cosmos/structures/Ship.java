@@ -9,7 +9,7 @@ import com.cornchipss.cosmos.Player;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
-import com.cornchipss.cosmos.world.ZaWARUDO;
+import com.cornchipss.cosmos.world.World;
 
 /**
  * A structure representing a ship
@@ -22,7 +22,7 @@ public class Ship extends Structure
 	
 	private Vector3f corePos = new Vector3f();
 	
-	public Ship(ZaWARUDO world)
+	public Ship(World world)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS);
 	}
@@ -42,7 +42,6 @@ public class Ship extends Structure
 		{			
 			pilot.body().velocity(Maths.zero());
 			pilot.body().transform().position(localCoordsToWorldCoords(width()/2, height()/2, length()/2));
-			pilot.camera().zeroRotation();
 			
 			Vector3f dVel = new Vector3f();
 		    
@@ -111,11 +110,11 @@ public class Ship extends Structure
 		if(!Utils.equals(pilot, p))
 		{
 			if(pilot != null)
-				pilot.pilotingShip(null);
+				pilot.shipPiloting(null);
 			
 			pilot = p;
 			if(p != null)
-				p.pilotingShip(this);
+				p.shipPiloting(this);
 		}
 	}
 	

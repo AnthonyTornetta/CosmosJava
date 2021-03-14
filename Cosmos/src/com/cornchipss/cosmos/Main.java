@@ -7,14 +7,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
-import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -23,10 +19,7 @@ import org.lwjgl.opengl.GL30;
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.biospheres.DesertBiosphere;
 import com.cornchipss.cosmos.biospheres.GrassBiosphere;
-import com.cornchipss.cosmos.blocks.Block;
-import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.Blocks;
-import com.cornchipss.cosmos.blocks.IInteractable;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -34,7 +27,6 @@ import com.cornchipss.cosmos.gui.GUITextureMultiple;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
-import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
@@ -43,9 +35,8 @@ import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Logger;
-import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
-import com.cornchipss.cosmos.world.ZaWARUDO;
+import com.cornchipss.cosmos.world.World;
 
 public class Main
 {
@@ -59,13 +50,11 @@ public class Main
 	private Planet mainPlanet;
 	private Ship ship;
 	private Matrix4f projectionMatrix;
-	private Player p;
+	private ClientPlayer p;
 	private GUI gui;
-	private ZaWARUDO world;
+	private World world;
 	private int selectedSlot;
 	private GUITextureMultiple[] inventorySlots;
-	
-	private List<Structure> structures;
 	
 	private void run()
 	{
@@ -80,8 +69,7 @@ public class Main
 		
 		Materials.initMaterials();
 		
-		world = new ZaWARUDO();
-		structures = new LinkedList<>();
+		world = new World();
 		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(window.getWidth(), window.getHeight());
@@ -131,11 +119,11 @@ public class Main
 		mainPlanet.init();
 		Biosphere def = Biospheres.newInstance("cosmos:desert");
 		def.generatePlanet(mainPlanet);
-		structures.add(mainPlanet);
+		world.addStructure(mainPlanet);
 		
 		ship = new Ship(world);
 		ship.init();
-		structures.add(ship);
+		world.addStructure(ship);
 		
 		try(DataInputStream shipStr = new DataInputStream(new FileInputStream(new File("assets/structures/ships/test.struct"))))
 		{
@@ -161,7 +149,7 @@ public class Main
 		
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
 		
-		p = new Player(world);
+		p = new ClientPlayer(world);
 		p.addToWorld(new Transform(0, 0, 0));
 		
 		projectionMatrix = new Matrix4f();
@@ -256,7 +244,7 @@ public class Main
 		Logger.LOGGER.info("Successfully closed.");
 	}
 	
-	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, Player p)
+	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, ClientPlayer p)
 	{
 		for(Chunk chunk : s.chunks())
 		{
@@ -268,9 +256,9 @@ public class Main
 			{
 				m.material().use();
 				
-				Matrix4fc camera = p.pilotingShip() == null ? 
+				Matrix4fc camera = p.shipPiloting() == null ? 
 						p.camera().viewMatrix() : 
-							p.pilotingShip().body().transform().invertedMatrix();
+							p.shipPiloting().body().transform().invertedMatrix();
 				
 				m.material().initUniforms(projectionMatrix, camera, transform, false);
 				
@@ -283,53 +271,33 @@ public class Main
 		}
 	}
 	
-	private Structure lookingAt = null;
-	
-	private Structure calculateLookingAt()
-	{
-		Vector3fc from = p.camera().position();
-		Vector3f dLook = Maths.mul(p.camera().forward(), 50.0f);
-		Vector3f to = Maths.add(from, dLook);
-		
-		Structure closestHit = null;
-		float closestDistSqrd = -1;
-		
-		for(Structure s : structures)
-		{
-			RayResult hits = s.shape().raycast(from, to);
-			if(hits.closestHit() != null)
-			{
-				float distSqrd = Maths.distSqrd(from, hits.closestHitWorldCoords());
-				
-				if(closestHit == null)
-				{
-					closestHit = s;
-					closestDistSqrd = distSqrd;
-				}
-				else if(closestDistSqrd > distSqrd)
-				{
-					closestHit = s;
-					closestDistSqrd = distSqrd;
-				}
-			}
-		}
-		
-		return closestHit;
-	}
-	
 	private void update(float delta)
-	{		
+	{
 		world.update(delta);
 		
-		for(Structure s : structures)
-			s.update(delta);
+		int prevRow = p.selectedInventoryRow();
 		
-		boolean toggledPiloting = p.pilotingShip() != null;
 		p.update(delta);
-
-		toggledPiloting = toggledPiloting != (p.pilotingShip() != null);
 		
-		lookingAt = calculateLookingAt();
+		int row = p.selectedInventoryRow();
+		
+		if(prevRow != row)
+		{
+			inventorySlots[prevRow].state(0);
+			inventorySlots[row].state(1);
+		}
+		
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_ENTER))
+		{
+			try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/ships/test.struct"))))
+			{
+				ship.write(str);
+			}
+			catch(IOException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
 		
 		for(int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
 		{
@@ -362,91 +330,6 @@ public class Main
 				ex.printStackTrace();
 			}
 		}
-		
-		if(lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R) && !toggledPiloting || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
-		{
-			Vector3fc from = p.camera().position();
-			Vector3f dLook = Maths.mul(p.camera().forward(), 10.0f);
-			Vector3f to = Maths.add(from, dLook);
-			
-			RayResult hits = lookingAt.shape().raycast(from, to);
-			
-			if(hits.closestHit() != null)
-			{
-				Block selectedBlock = null;
-				
-				if(selectedSlot < Blocks.all().size())
-					selectedBlock = Blocks.all().get(selectedSlot);
-				
-				Vector3i pos = new Vector3i(Maths.round(hits.closestHit().x()), 
-						Maths.round(hits.closestHit().y()), 
-						Maths.round(hits.closestHit().z()));
-				
-				if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
-				{
-					lookingAt.block(pos.x, pos.y, pos.z, null);
-				}
-				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
-				{
-					if(selectedBlock != null && selectedBlock.canAddTo(lookingAt))
-					{
-						BlockFace face = hits.closestFace();
-						
-						int xx = Maths.floor(pos.x + 0.5f + (face.getRelativePosition().x * 2)), 
-							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
-							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
-						
-						if(lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
-						{
-							lookingAt.block(xx, yy, zz, selectedBlock);
-						}
-					}
-				}
-				else if(Input.isKeyJustDown(GLFW.GLFW_KEY_R) && !toggledPiloting)
-				{
-					if(lookingAt.block(pos.x, pos.y, pos.z) instanceof IInteractable)
-					{
-						((IInteractable)lookingAt.block(pos.x, pos.y, pos.z)).onInteract(lookingAt, p);
-					}
-				}
-				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
-				{
-					lookingAt.beginBulkUpdate();
-					
-					final int radius = 20;
-					
-					Vector3f temp = new Vector3f();
-					Vector3f tempPos = new Vector3f(pos.x, pos.y, pos.z);
-					
-					for(int dz = -radius; dz <= radius; dz++)
-					{
-						for(int dy = -radius; dy <= radius; dy++)
-						{
-							for(int dx = -radius; dx <= radius; dx++)
-							{									
-								int xx = pos.x + dx,
-									yy = pos.y + dy, 
-									zz = pos.z + dz;
-								
-								temp.x = xx;
-								temp.y = yy;
-								temp.z = zz;
-
-								if(Maths.distSqrd(temp, tempPos) < radius * radius)
-								{
-									if(lookingAt.withinBlocks(xx, yy, zz))
-									{
-										lookingAt.block(xx, yy, zz, null);
-									}
-								}
-							}
-						}
-					}
-					
-					lookingAt.endBulkUpdate();
-				}
-			}
-		}
 	}
 	
 	private void render(float delta)
@@ -462,7 +345,7 @@ public class Main
 		
 //		drawStructure(mainPlanet, projectionMatrix, p);
 		
-		for(Structure s : structures)
+		for(Structure s : world.structures())
 		{
 			drawStructure(s, projectionMatrix, p);
 		}

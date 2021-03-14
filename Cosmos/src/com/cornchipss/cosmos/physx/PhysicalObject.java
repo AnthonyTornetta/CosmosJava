@@ -2,24 +2,24 @@ package com.cornchipss.cosmos.physx;
 
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.world.ZaWARUDO;
+import com.cornchipss.cosmos.world.World;
 
 public abstract class PhysicalObject
 {
 	private RigidBody body;
-	private ZaWARUDO world;
+	private World world;
 	
 	private AABB aabb;
 	
 	public AABB aabb() { return aabb; }
 	public void aabb(AABB aabb) { this.aabb = aabb; }
 	
-	public PhysicalObject(ZaWARUDO world)
+	public PhysicalObject(World world)
 	{
 		this.world = world;
 	}
 	
-	public PhysicalObject(ZaWARUDO world, RigidBody b)
+	public PhysicalObject(World world, RigidBody b)
 	{
 		this.world = world;
 		body = b;
@@ -37,8 +37,8 @@ public abstract class PhysicalObject
 		return body.transform().position();
 	}
 	
-	public ZaWARUDO world() { return world; }
-	public void world(ZaWARUDO world) { this.world = world; }
+	public World world() { return world; }
+	public void world(World world) { this.world = world; }
 	
 	public RigidBody body() { return body; }
 	public void body(RigidBody body) { this.body = body; }

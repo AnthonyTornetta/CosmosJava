@@ -1,31 +1,35 @@
 package com.cornchipss.cosmos;
 
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
+import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.cameras.Camera;
-import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.io.Input;
-import com.cornchipss.cosmos.world.ZaWARUDO;
+import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.world.World;
 
-public class Player extends PhysicalObject
+public abstract class Player extends PhysicalObject
 {
-	private GimbalLockCamera cam;
-	
 	private Ship pilotingShip;
 	
-	public Player(ZaWARUDO world)
+	private Inventory inventory;
+	private int selectedInventoryRow;
+	
+	public Player(World world)
 	{
 		super(world);
 		
-		cam = new GimbalLockCamera(this);
+		inventory = new Inventory(10, 4);
 	}
 	
+	public abstract void update(float delta);
+
 	@Override
 	public void addToWorld(Transform transform)
 	{
@@ -33,93 +37,78 @@ public class Player extends PhysicalObject
 		world().addRigidBody(body());
 	}
 	
-	public void pilotingShip(Ship s)
+	public Structure calculateLookingAt()
 	{
-		pilotingShip = s;
+		Vector3fc from = camera().position();
+		Vector3f dLook = Maths.mul(camera().forward(), 50.0f);
+		Vector3f to = Maths.add(from, dLook);
+		
+		Structure closestHit = null;
+		float closestDistSqrd = -1;
+		
+		for(Structure s : world().structuresNear(body().transform().position()))
+		{
+			RayResult hits = s.shape().raycast(from, to);
+			if(hits.closestHit() != null)
+			{
+				float distSqrd = Maths.distSqrd(from, hits.closestHitWorldCoords());
+				
+				if(closestHit == null)
+				{
+					closestHit = s;
+					closestDistSqrd = distSqrd;
+				}
+				else if(closestDistSqrd > distSqrd)
+				{
+					closestHit = s;
+					closestDistSqrd = distSqrd;
+				}
+			}
+		}
+		
+		return closestHit;
+	}
+
+	public boolean isPilotingShip()
+	{
+		return pilotingShip != null;
 	}
 	
-	public Ship pilotingShip()
+	public void shipPiloting(Ship s)
+	{
+		if(Utils.equals(pilotingShip, s))
+			return;
+		
+		Ship temp = pilotingShip;
+		pilotingShip = null;
+		
+		if(temp != null)
+			temp.setPilot(null);
+		
+		if(s != null)
+		{
+			pilotingShip = s;
+			pilotingShip.setPilot(this);
+		}
+	}
+	
+	public Ship shipPiloting()
 	{
 		return pilotingShip;
 	}
 	
-	public void update(float delta)
-	{
-		if(pilotingShip == null)
-		{
-			Vector3f dVel = new Vector3f();
-		    
-			if(Input.isKeyDown(GLFW.GLFW_KEY_W))
-				dVel.add(cam.forward());
-			if(Input.isKeyDown(GLFW.GLFW_KEY_S))
-				dVel.sub(cam.forward());
-			if(Input.isKeyDown(GLFW.GLFW_KEY_D))
-				dVel.add(cam.right());
-			if(Input.isKeyDown(GLFW.GLFW_KEY_A))
-				dVel.sub(cam.right());
-			if(Input.isKeyDown(GLFW.GLFW_KEY_E))
-				dVel.add(cam.up());
-			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
-				dVel.sub(cam.up());
-			
-			dVel.x = (dVel.x() * (delta * 1000));
-			dVel.z = (dVel.z() * (delta * 1000));
-			dVel.y = (dVel.y() * (delta * 1000));
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
-				dVel.mul(0.001f);
-			
-			Vector3f dRot = new Vector3f();
-			
-			dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.1f);
-			
-			dRot.x = (dRot.x() - Input.getMouseDeltaY() * 0.1f);
-			
-			dRot.mul(delta);
-			
-			cam.rotate(dRot);
-			
-	//		if(Input.isKeyDown(GLFW.GLFW_KEY_R))
-	//			cam.rotation(Maths.zero());
-			
-			Vector3f vel = body().velocity();
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
-				vel.mul(0.75f);
+	public abstract Camera camera();
 	
-			vel.add(dVel);
-	
-			vel = Maths.safeNormalize(vel, 50.0f);
-			
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
-				vel.y = (vel.y() + 5);
-			
-			// "things just fall" - Mrs. Light, 2019
-	//		vel.y(vel.y() - 9.8f * delta);
-			
-			body().velocity(vel);
-		}
-		else
-		{
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_R))
-			{
-				pilotingShip.setPilot(null);
-			}
-		}
-		
-		cam.update();
-	}
-
-	public Camera camera()
+	public void selectedInventoryRow(int r)
 	{
-		return cam;
+		selectedInventoryRow = r;
 	}
 	
-	@Override
-	public void body(RigidBody b)
+	public int selectedInventoryRow()
 	{
-		super.body(b);
-		
-		cam.parent(this);
+		return selectedInventoryRow;
 	}
+	
+	public Inventory inventory() { return inventory; }
+	public void inventory(Inventory i) { inventory = i; }
 }

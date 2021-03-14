@@ -24,7 +24,7 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.IWritable;
-import com.cornchipss.cosmos.world.ZaWARUDO;
+import com.cornchipss.cosmos.world.World;
 
 public abstract class Structure extends PhysicalObject implements IWritable
 {
@@ -44,12 +44,12 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	
 	private Set<Chunk> bulkUpdate;
 	
-	public Structure(ZaWARUDO world)
+	public Structure(World world)
 	{
 		super(world);
 	}
 	
-	public Structure(ZaWARUDO world, int width, int height, int length)
+	public Structure(World world, int width, int height, int length)
 	{
 		super(world);
 		
@@ -79,6 +79,41 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	public void update(float delta)
 	{
 		
+	}
+	
+	public void explode(int radius, Vector3i pos)
+	{
+		beginBulkUpdate();
+		
+		Vector3f temp = new Vector3f();
+		Vector3f tempPos = new Vector3f(pos.x, pos.y, pos.z);
+		
+		for(int dz = -radius; dz <= radius; dz++)
+		{
+			for(int dy = -radius; dy <= radius; dy++)
+			{
+				for(int dx = -radius; dx <= radius; dx++)
+				{									
+					int xx = pos.x + dx,
+						yy = pos.y + dy, 
+						zz = pos.z + dz;
+					
+					temp.x = xx;
+					temp.y = yy;
+					temp.z = zz;
+					
+					if(Maths.distSqrd(temp, tempPos) < radius * radius)
+					{
+						if(withinBlocks(xx, yy, zz))
+						{
+							block(xx, yy, zz, null);
+						}
+					}
+				}
+			}
+		}
+		
+		endBulkUpdate();
 	}
 	
 	public boolean bulkUpdating()
