@@ -396,7 +396,7 @@ public class Main
 							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
 							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
 						
-						if(lookingAt.withinBlocks(xx, yy, zz))
+						if(lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
 							lookingAt.block(xx, yy, zz, selectedBlock);
 						}
@@ -434,7 +434,6 @@ public class Main
 
 								if(Maths.distSqrd(temp, tempPos) < radius * radius)
 								{
-									
 									if(lookingAt.withinBlocks(xx, yy, zz))
 									{
 										lookingAt.block(xx, yy, zz, null);

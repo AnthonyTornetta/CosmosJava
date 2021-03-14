@@ -16,7 +16,7 @@ import com.cornchipss.cosmos.world.ZaWARUDO;
  */
 public class Ship extends Structure
 {
-	private final static int MAX_DIMENSIONS = 16 * 9;
+	private final static int MAX_DIMENSIONS = 16 * 10;
 	
 	private Player pilot;
 	

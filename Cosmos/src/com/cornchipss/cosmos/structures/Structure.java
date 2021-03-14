@@ -443,12 +443,12 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		
 		body().transform().invertedMatrix().transform(c);
 		
-		return new Vector3i((int)c.x + width() / 2, (int)c.y + width() / 2, (int)c.z + width() / 2);
+		return new Vector3i((int)c.x + width() / 2, (int)c.y + height() / 2, (int)c.z + length() / 2);
 	}
 	
 	public Vector3f localCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
 	{
-		Vector4f c = new Vector4f(x - width() / 2, y - width() / 2, z - width() / 2, 1);
+		Vector4f c = new Vector4f(x - width() / 2, y - height() / 2, z - length() / 2, 1);
 		
 		body().transform().matrix().transform(c);
 		
@@ -492,5 +492,10 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		}
 		
 		return -1;
+	}
+
+	public boolean hasBlock(int x, int y, int z)
+	{
+		return withinBlocks(x, y, z) && block(x, y, z) != null;
 	}
 }
