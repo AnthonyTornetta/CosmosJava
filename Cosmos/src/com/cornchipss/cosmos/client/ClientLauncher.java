@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos;
+package com.cornchipss.cosmos.client;
 
 import org.lwjgl.glfw.GLFW;
 
@@ -9,13 +9,13 @@ import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class Launcher
+public class ClientLauncher
 {
 	private Window window;
 	
 	public static void main(String[] args)
 	{
-		new Launcher().run();
+		new ClientLauncher().run();
 	}
 	
 	private void run()
