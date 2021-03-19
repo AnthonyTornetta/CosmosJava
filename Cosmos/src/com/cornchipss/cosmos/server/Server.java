@@ -9,14 +9,9 @@ import com.cornchipss.cosmos.server.command.commands.StopCommand;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 
-public class ServerLauncher
+public class Server
 {
-	public static void main(String[] args)
-	{
-		new ServerLauncher().run();
-	}
-	
-	private void run()
+	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
 		
@@ -31,7 +26,10 @@ public class ServerLauncher
 		defaultCmd.addCommand(new PingCommand());
 		defaultCmd.addCommand(new SayCommand());
 		
-		final CosmosServer server = new CosmosServer(game, defaultCmd);
+		final CosmosNettyServer server = new CosmosNettyServer(game, defaultCmd);
+		
+		Thread serverThread = new Thread(server);
+		serverThread.start();
 		
 		ServerConsole cmd = new ServerConsole();
 		
@@ -52,6 +50,7 @@ public class ServerLauncher
 		
 		try
 		{
+			serverThread.join();
 			gameThread.join();
 		}
 		catch (InterruptedException e)

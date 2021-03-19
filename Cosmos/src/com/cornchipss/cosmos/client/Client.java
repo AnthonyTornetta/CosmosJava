@@ -9,18 +9,16 @@ import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class ClientLauncher
+public class Client
 {
 	private Window window;
 	
-	public static void main(String[] args)
-	{
-		new ClientLauncher().run();
-	}
-	
-	private void run()
+	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
+		
+		Thread thread = new Thread(new CosmosNettyClient());
+		thread.start();
 		
 		window = new Window(1024, 720, "Cosmos");
 		

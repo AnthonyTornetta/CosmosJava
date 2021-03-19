@@ -11,7 +11,7 @@ public class ServerConsole
 		scan = new Scanner(System.in);
 	}
 	
-	public boolean readCommand(CosmosServer server)
+	public boolean readCommand(CosmosNettyServer server)
 	{
 		System.out.print("> ");
 		return server.commandHandler().processInput(server, scan.nextLine());

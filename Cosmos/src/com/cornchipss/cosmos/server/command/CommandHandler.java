@@ -1,8 +1,8 @@
 package com.cornchipss.cosmos.server.command;
 
-import com.cornchipss.cosmos.server.CosmosServer;
+import com.cornchipss.cosmos.server.CosmosNettyServer;
 
 public interface CommandHandler
 {
-	public boolean processInput(CosmosServer server, String command);
+	public boolean processInput(CosmosNettyServer server, String command);
 }

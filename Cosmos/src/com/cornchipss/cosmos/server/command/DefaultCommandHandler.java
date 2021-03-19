@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.cornchipss.cosmos.server.CosmosServer;
+import com.cornchipss.cosmos.server.CosmosNettyServer;
 
 public class DefaultCommandHandler implements CommandHandler
 {
@@ -17,7 +17,7 @@ public class DefaultCommandHandler implements CommandHandler
 	}
 	
 	@Override
-	public boolean processInput(CosmosServer server, String command)
+	public boolean processInput(CosmosNettyServer server, String command)
 	{
 		String[] split = command.trim().split(" ");
 		String cmdName = split[0].toLowerCase();
