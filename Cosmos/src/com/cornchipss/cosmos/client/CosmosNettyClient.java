@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.Scanner;
 
+import com.cornchipss.cosmos.netty.JoinPacket;
+import com.cornchipss.cosmos.netty.PlayerPacket;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class CosmosNettyClient implements Runnable
@@ -16,26 +18,36 @@ public class CosmosNettyClient implements Runnable
 	@Override
 	public void run()
 	{
-		try
+		try(Scanner scan = new Scanner(System.in))
 		{
 			socket = new DatagramSocket();
 	        address = InetAddress.getByName("localhost");
 	        
-	        Scanner scan = new Scanner(System.in);
+	        final int port = 1337;
+
+        	byte[] buffer = new byte[1024];
+	        
+	        Utils.println("name: ");
+	        String name = scan.nextLine();
+	        
+	        JoinPacket joinP = new JoinPacket(buffer, 0, name);
+	        
+	        joinP.send(socket, address, port);
 	        
 	        while(true)
-	        {
-	        	byte[] buf = new byte[1024];
-	        	
-	        	buf[0] = (byte)scan.nextLine().charAt(0);
-	        	
-	        	DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 1337);
-	        	socket.send(packet);
-	        	
-	        	DatagramPacket recieved = new DatagramPacket(buf, buf.length);
+	        {	        	
+	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
 	        	socket.receive(recieved);
 	        	
-	        	Utils.println(new String(packet.getData(), packet.getOffset(), packet.getLength()));
+	        	Utils.println((int)buffer[0]);
+
+	        	name = scan.nextLine();
+	        	
+	        	PlayerPacket pp = new PlayerPacket(buffer, 0);
+	        	
+	        	pp.write(name);
+	        	
+	        	pp.send(socket, address, port);
 	        }
 		}
 		catch(IOException ex)
