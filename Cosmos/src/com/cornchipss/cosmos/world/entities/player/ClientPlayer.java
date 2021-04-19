@@ -21,9 +21,9 @@ public class ClientPlayer extends Player
 {
 	private GimbalLockCamera cam;
 	
-	public ClientPlayer(World world)
+	public ClientPlayer(World world, String name)
 	{
-		super(world);
+		super(world, name);
 		
 		cam = new GimbalLockCamera(this);
 	}

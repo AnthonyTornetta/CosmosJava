@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.client;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.DebugMonitor;
@@ -13,19 +14,33 @@ public class Client
 {
 	private Window window;
 	
+	private static Client instance;
+	
+	public Client()
+	{
+		if(instance != null)
+			throw new IllegalStateException("Cannot have more than 1 running clients!");
+		instance = this;
+	}
+	
+	private volatile boolean running = true;
+	private ClientGame game;
+	
 	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
-		
-		Thread thread = new Thread(new CosmosNettyClient());
-		thread.start();
 		
 		window = new Window(1024, 720, "Cosmos");
 		
 		Initializer loader = new Initializer();
 		loader.init();
 		
-		ClientGame game = new ClientGame(window);
+		game = new ClientGame(window);
+		
+		PacketTypes.registerAll();
+		
+		Thread thread = new Thread(new CosmosNettyClient(game));
+		thread.start();
 		
 		Input.setWindow(window);
 		
@@ -43,8 +58,6 @@ public class Client
 		Input.hideCursor(true);
 		
 		Input.update();
-		
-		boolean running = true;
 		
 		DebugMonitor.set("ups", 0);
 		DebugMonitor.set("ups-variance", 0.0f);
@@ -92,7 +105,7 @@ public class Client
 				Input.toggleCursor();
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
-				running = false;
+				running(false);
 			
 			game.update(delta);
 			
@@ -107,6 +120,31 @@ public class Client
 		
 		window.destroy();
 		
+		try
+		{
+			thread.join();
+		}
+		catch (InterruptedException e)
+		{
+			e.printStackTrace();
+		}
+		
 		Logger.LOGGER.info("Successfully closed.");
+	}
+
+	public static Client instance()
+	{
+		return instance;
+	}
+
+	public void running(boolean b)
+	{
+		game.running(b);
+		running = b;
+	}
+	
+	public boolean running()
+	{
+		return running;
 	}
 }

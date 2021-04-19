@@ -5,10 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 import com.cornchipss.cosmos.game.ServerGame;
-import com.cornchipss.cosmos.netty.JoinPacket;
-import com.cornchipss.cosmos.netty.Packet;
 import com.cornchipss.cosmos.netty.PacketTypes;
-import com.cornchipss.cosmos.netty.PlayerPacket;
+import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.server.command.CommandHandler;
 import com.cornchipss.cosmos.utils.Utils;
 
@@ -30,9 +28,6 @@ public class CosmosNettyServer implements Runnable
 		this.game = game;
 		
 		this.cmdHandler = cmdHandler;
-		
-		PacketTypes.addPacketType(new JoinPacket());
-		PacketTypes.addPacketType(new PlayerPacket());
 	}
 	
 	private synchronized void process(DatagramPacket packet, DatagramSocket serverSocket) throws IOException
@@ -55,7 +50,7 @@ public class CosmosNettyServer implements Runnable
 		
 		int off = Packet.additionalOffset(buffer, packet.getOffset(), packet.getLength());
 		
-		p.onReceive(buffer, packet.getLength() - off, packet.getOffset() + off, client, this);
+		p.onReceiveServer(buffer, packet.getLength() - off, packet.getOffset() + off, client, this);
 	}
 	
 	@Override
@@ -72,11 +67,6 @@ public class CosmosNettyServer implements Runnable
 				DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 				socket.receive(packet);
 				
-				if(buffer[0] == '0')
-				{
-					running(false);
-				}
-				
 				process(packet, socket);
 			}
 			
@@ -86,7 +76,6 @@ public class CosmosNettyServer implements Runnable
 		{
 			throw new RuntimeException(e);
 		}
-
 	}
 	
 	public boolean running() { return running; }

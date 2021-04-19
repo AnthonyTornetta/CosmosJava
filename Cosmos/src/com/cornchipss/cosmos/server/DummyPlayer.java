@@ -5,15 +5,15 @@ import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
-public class ServerPlayer extends Player
+public class DummyPlayer extends Player
 {
-	private ServerClient serverClient;
+	private GimbalLockCamera cam;
 	
-	public ServerPlayer(World world, ServerClient serverClient, String name)
+	public DummyPlayer(World world, String name)
 	{
 		super(world, name);
 		
-		this.serverClient = serverClient;
+		cam = new GimbalLockCamera(this);
 	}
 
 	@Override
@@ -25,8 +25,6 @@ public class ServerPlayer extends Player
 	@Override
 	public Camera camera()
 	{
-		return new GimbalLockCamera(this);
+		return cam;
 	}
-	
-	public ServerClient client() { return serverClient; }
 }

@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.server.command.DefaultCommandHandler;
 import com.cornchipss.cosmos.server.command.commands.PingCommand;
@@ -26,6 +27,7 @@ public class Server
 		defaultCmd.addCommand(new PingCommand());
 		defaultCmd.addCommand(new SayCommand());
 		
+		PacketTypes.registerAll();
 		final CosmosNettyServer server = new CosmosNettyServer(game, defaultCmd);
 		
 		Thread serverThread = new Thread(server);

@@ -25,7 +25,7 @@ public class Mesh
 	
 	private Mesh(int verticies)
 	{
-		vao = GL30.glGenVertexArrays(); 
+		vao = GL30.glGenVertexArrays();
 		this.verticies = verticies;
 		vbos = new LinkedList<>();
 	}

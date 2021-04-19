@@ -5,6 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.world.World;
+
 public class ServerPlayerList
 {
 	private Map<ServerClient, ServerPlayer> playerClients;
@@ -28,20 +32,24 @@ public class ServerPlayerList
 		return playerNames.containsKey(name.toLowerCase());
 	}
 	
-	public boolean createPlayer(ServerClient c, String name)
+	public ServerPlayer createPlayer(World world, ServerClient c, String name)
 	{
 		if(!playerExists(c) && !nameTaken(name))
 		{
-			ServerPlayer p = new ServerPlayer(null, c, name);
+			ServerPlayer p = new ServerPlayer(world, c, name);
 			
 			playerClients.put(c, p);
-			playerNames.put(name, p);
+			playerNames.put(name.toLowerCase(), p);
 			players.add(p);
 			
-			return true;
+			p.addToWorld(new Transform());
+			
+			return p;
 		}
 		
-		return false;
+		Utils.println("L:");
+		
+		return null;
 	}
 	
 	public boolean removePlayer(ServerClient c)
@@ -51,7 +59,7 @@ public class ServerPlayerList
 		if(p == null)
 			return false;
 		
-		playerNames.remove(p.name());
+		playerNames.remove(p.name().toLowerCase());
 		players.remove(p);
 		
 		return true;
@@ -59,7 +67,7 @@ public class ServerPlayerList
 	
 	public boolean removePlayer(String name)
 	{
-		ServerPlayer p = playerNames.remove(name);
+		ServerPlayer p = playerNames.remove(name.toLowerCase());
 		
 		if(p == null)
 			return false;
@@ -75,9 +83,9 @@ public class ServerPlayerList
 		return playerClients.get(client);
 	}
 	
-	public ServerPlayer playerFromName(String name)
+	public ServerPlayer player(String name)
 	{
-		return playerNames.get(name);
+		return playerNames.get(name.toLowerCase());
 	}
 	
 	public List<ServerPlayer> players() { return players; }

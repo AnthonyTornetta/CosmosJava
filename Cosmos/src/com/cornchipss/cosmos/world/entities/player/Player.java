@@ -23,9 +23,14 @@ public abstract class Player extends PhysicalObject
 	private Inventory inventory;
 	private int selectedInventoryCol;
 	
-	public Player(World world)
+	private String name;
+	public String name() { return name; }
+	
+	public Player(World world, String name)
 	{
 		super(world);
+		
+		this.name = name;
 		
 		inventory = new Inventory(4, 10);
 		
@@ -114,6 +119,24 @@ public abstract class Player extends PhysicalObject
 	public int selectedInventoryColumn()
 	{
 		return selectedInventoryCol;
+	}
+	
+	@Override
+	public boolean equals(Object other)
+	{
+		if(other instanceof Player)
+		{
+			Player o = (Player)other;
+			return name().equals(o.name());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return name.hashCode();
 	}
 	
 	public Inventory inventory() { return inventory; }

@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.client.ClientServer;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -42,11 +43,19 @@ public class ClientGame extends Game
 	private Planet mainPlanet;
 	private Ship ship;
 	private Matrix4f projectionMatrix;
-	private ClientPlayer p;
+	private ClientPlayer player;
 	private GUI gui;
 	private int selectedSlot;
-	private GUITextureMultiple[] inventorySlots;
+	private GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
 	private GUIText fpsText;
+	
+	private	GUIModel[] models;
+	
+	private final int slotDimensions = 64;
+	
+	private final int startX = (int)(1024 / 2.0f - (inventorySlots.length / 2.0f) * slotDimensions);
+	
+	private volatile boolean running = true;
 	
 	public ClientGame(Window window)
 	{
@@ -61,16 +70,7 @@ public class ClientGame extends Game
 		
 		inventorySlots = new GUITextureMultiple[10];
 		
-		GUIModel[] models = new GUIModel[10];
-		
-		p = new ClientPlayer(world());
-		p.addToWorld(new Transform(0, 0, 0));
-		
-		int slotDimensions = 64;
-		
-		int startX = (int)(1024 / 2.0f - (inventorySlots.length / 2.0f) * slotDimensions);
-		
-		for(int i = 0; i < models.length; i++)
+		for(int i = 0; i < inventorySlots.length; i++)
 		{
 			inventorySlots[i] =  new GUITextureMultiple(
 					new Vector3f(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
@@ -78,16 +78,6 @@ public class ClientGame extends Game
 					0, 0.5f);
 			
 			gui.addElement(inventorySlots[i]);
-			
-			if(i < p.inventory().columns() && p.inventory().block(0, i) != null)
-			{
-				int margin = 4;
-				
-				models[i] = new GUIModel(new Vector3f(startX + i * slotDimensions + margin, margin, 0), 
-						slotDimensions - margin * 2, p.inventory().block(0, i).model());
-				
-				gui.addElement(models[i]);
-			}
 		}
 		
 		inventorySlots[selectedSlot].state(1);
@@ -150,8 +140,31 @@ public class ClientGame extends Game
 		gui.updateProjection(w, h);
 	}
 	
+	private void initInventoryBarModels()
+	{
+		models = new GUIModel[10];
+		
+		for(int i = 0; i < player.inventory().columns(); i++)
+		{
+			if(player.inventory().block(0, i) != null)
+			{
+				int margin = 4;
+				
+				models[i] = new GUIModel(new Vector3f(startX + i * slotDimensions + margin, margin, 0), 
+						slotDimensions - margin * 2, player.inventory().block(0, i).model());
+				
+				gui.addElement(models[i]);
+			}
+		}
+	}
+	
 	public void render(float delta)
 	{
+		if(player() == null)
+			return;
+		else if(models == null)
+			initInventoryBarModels();
+		
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
 		GL30.glEnable(GL30.GL_DEPTH_TEST);
@@ -161,7 +174,7 @@ public class ClientGame extends Game
 		
 		for(Structure s : world().structures())
 		{
-			drawStructure(s, projectionMatrix, p);
+			drawStructure(s, projectionMatrix, player);
 		}
 		
 		gui.draw();
@@ -172,13 +185,18 @@ public class ClientGame extends Game
 	{
 		super.update(delta);
 		
+		if(player() == null)
+			return;
+		else if(models == null)
+			initInventoryBarModels();
+		
 		fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
 		
-		int prevRow = p.selectedInventoryColumn();
+		int prevRow = player.selectedInventoryColumn();
 		
-		p.update(delta);
+		player.update(delta);
 		
-		int row = p.selectedInventoryColumn();
+		int row = player.selectedInventoryColumn();
 		
 		if(prevRow != row)
 		{
@@ -224,5 +242,26 @@ public class ClientGame extends Game
 				m.material().stop();
 			}
 		}
+	}
+
+	public ClientPlayer player()
+	{
+		return player;
+	}
+	
+	public void player(ClientPlayer p)
+	{
+		this.player = p;
+		p.addToWorld(new Transform());
+	}
+
+	public void running(boolean r)
+	{
+		running = r;
+	}
+	
+	public boolean running()
+	{
+		return running;
 	}
 }
