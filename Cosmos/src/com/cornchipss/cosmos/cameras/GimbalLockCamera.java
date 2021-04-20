@@ -67,6 +67,7 @@ public class GimbalLockCamera extends Camera
 	 * Rotates the camera (assumes they are absolute rotations)
 	 * @param delta The amount to rotate it by
 	 */
+	@Override
 	public void rotate(Vector3fc delta)
 	{
 		rot.add(delta);
@@ -105,19 +106,13 @@ public class GimbalLockCamera extends Camera
 		return up;
 	}
 
-	/**
-	 * Sets the camera's parent
-	 * @param transform The camera's new parent
-	 */
+	@Override
 	public void parent(PhysicalObject transform)
 	{
 		this.parent = transform;
 	}
 	
-	/**
-	 * The camera's parent
-	 * @return The camera's parent
-	 */
+	@Override
 	public PhysicalObject parent()
 	{
 		return parent;

@@ -3,6 +3,8 @@ package com.cornchipss.cosmos.cameras;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.physx.PhysicalObject;
+
 /**
  * Contains methods to set the view OpenGL view matrix
  */
@@ -46,4 +48,22 @@ public abstract class Camera
 	 * Updates all the values
 	 */
 	public abstract void update();
+
+	/**
+	 * Rotates the camera
+	 * @param dRot The amount to rotate each axis by in radians
+	 */
+	public abstract void rotate(Vector3fc dRot);
+
+	/**
+	 * Sets the camera's parent
+	 * @param parent The parent
+	 */
+	public abstract void parent(PhysicalObject parent);
+	
+	/**
+	 * The camera's parent
+	 * @return The camera's parent
+	 */
+	public abstract PhysicalObject parent();
 }
