@@ -65,6 +65,24 @@ public class Transform
 		
 		transMatrix.invert(invertedMatirx);
 	}
+
+	public void rotateRelative(Vector3fc dRot)
+	{
+		rotateRelative(dRot, right(), up(), forward());
+	}
+	
+	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
+	{
+		Quaternionf temp = Maths.blankQuaternion();
+		
+		temp.rotateAxis(dRot.z(), forward);
+		temp.rotateAxis(dRot.y(), up);
+		temp.rotateAxis(dRot.x(), right);
+		
+		temp.mul(rotation(), temp);
+		
+		rotation(temp);
+	}
 	
 	public Transform(Vector3fc pos)
 	{

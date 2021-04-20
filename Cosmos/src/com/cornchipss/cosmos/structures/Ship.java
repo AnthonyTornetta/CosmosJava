@@ -75,34 +75,18 @@ public class Ship extends Structure
 			
 			body().velocity(vel);
 			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_9))
-				dRot.z += 1;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_7))
-				dRot.z -= 1;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_4))
-				dRot.y += 1;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_6))
-				dRot.y -= 1;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_8))
-				dRot.x += 1;
-			if(Input.isKeyDown(GLFW.GLFW_KEY_KP_2))
-				dRot.x -= 1;
+			if(Input.isKeyDown(GLFW.GLFW_KEY_C))
+				dRot.z += 2;
+			if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
+				dRot.z -= 2;
+			
+			dRot.y = Input.getMouseDeltaX() * 0.1f;
+			
+			dRot.x = Input.getMouseDeltaY() * 0.1f;
 			
 			dRot.mul(0.01f);
 			
-			// gets the rotation
-			Quaternionf temp = Maths.blankQuaternion();
-//			temp.set(body().transform().rotation());
-			
-			// rotates it based on inputs
-			temp.rotateAxis(dRot.z, body().transform().forward());
-			temp.rotateAxis(dRot.y, body().transform().up());
-			temp.rotateAxis(dRot.x, body().transform().right());
-			
-			temp.mul(body().transform().rotation(), temp);
-			
-			// sets rotation
-			body().transform().rotation(temp);
+			body().transform().rotateRelative(dRot);
 			
 			pilot.body().transform().rotation(body().transform().rotation());
 		}
