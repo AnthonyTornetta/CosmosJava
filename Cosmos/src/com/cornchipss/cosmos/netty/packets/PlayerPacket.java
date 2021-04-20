@@ -97,7 +97,21 @@ public class PlayerPacket extends Packet
 		
 		if(p.body() != null)
 		{
-			p.body().transform().position(packet.readVector3f(new Vector3f()));
+			Vector3f newPos = packet.readVector3f(new Vector3f());
+
+			Vector3f dPos = newPos.sub(p.body().transform().position(), new Vector3f());
+			
+			// if it's a small enough distance, move there smoothly
+			if(dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z > 5)
+			{
+				p.body().transform().position(newPos);
+			}
+			else
+			{
+				float time = 1 / 20.0f; // approximate
+				p.body().velocity().add(new Vector3f(dPos.x * time, dPos.y * time, dPos.z * time));
+			}
+			
 			p.body().transform().rotation(packet.readQuaternionf(new Quaternionf()));
 		}
 	}

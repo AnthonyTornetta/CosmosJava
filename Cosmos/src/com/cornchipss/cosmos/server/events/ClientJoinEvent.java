@@ -10,7 +10,12 @@ public class ClientJoinEvent extends ClientEvent implements ICancellable
 	
 	public ClientJoinEvent(ServerClient origin )
 	{
-		
+		this.origin = origin;
+	}
+	
+	public ServerClient origin()
+	{
+		return origin;
 	}
 
 	@Override

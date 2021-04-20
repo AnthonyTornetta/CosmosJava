@@ -18,7 +18,6 @@ import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
-import com.cornchipss.cosmos.client.ClientServer;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -34,6 +33,7 @@ import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
+import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
@@ -229,9 +229,16 @@ public class ClientGame extends Game
 			{
 				m.material().use();
 				
+				Transform ttt = new Transform();
+				if(p.shipPiloting() != null)
+				{
+					ttt.position(p.shipPiloting().body().transform().position().add(new Vector3f(0, 10, 20), new Vector3f()));
+					ttt.rotation(Maths.quaternionFromRotation(-Maths.PI / 5,0,0));
+				}
+				
 				Matrix4fc camera = p.shipPiloting() == null ? 
 						p.camera().viewMatrix() : 
-							p.shipPiloting().body().transform().invertedMatrix();
+							ttt.invertedMatrix();
 				
 				m.material().initUniforms(projectionMatrix, camera, transform, false);
 				

@@ -89,14 +89,19 @@ public class Ship extends Structure
 				dRot.x -= 1;
 			
 			dRot.mul(0.01f);
-
-			Quaternionf temp = new Quaternionf();
-			temp.set(body().transform().rotation());
+			
+			// gets the rotation
+			Quaternionf temp = Maths.blankQuaternion();
+//			temp.set(body().transform().rotation());
+			
+			// rotates it based on inputs
 			temp.rotateAxis(dRot.z, body().transform().forward());
-			
 			temp.rotateAxis(dRot.y, body().transform().up());
-			temp.rotateAxis(-dRot.x, body().transform().right());
+			temp.rotateAxis(dRot.x, body().transform().right());
 			
+			temp.mul(body().transform().rotation(), temp);
+			
+			// sets rotation
 			body().transform().rotation(temp);
 			
 			pilot.body().transform().rotation(body().transform().rotation());
