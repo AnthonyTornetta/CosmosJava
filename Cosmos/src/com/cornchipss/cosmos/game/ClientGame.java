@@ -21,7 +21,6 @@ import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 

@@ -97,7 +97,6 @@ public class FullStructurePacket extends Packet
 	@Override
 	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
 	{
-		Utils.println(len + " vs " + data.length);
 		FullStructurePacket p = new FullStructurePacket(data, offset);
 		
 		Structure s;
@@ -117,18 +116,20 @@ public class FullStructurePacket extends Packet
 		else
 			s = new Ship(client.game().world(), id);
 		
+		s.init();
+		
 		for(int z = 0; z < s.length(); z++)
 		{
 			for(int y = 0; y < s.height(); y++)
 			{
 				for(int x = 0; x < s.width(); x++)
 				{
-					s.block(x, y, z, Blocks.fromNumericId(p.readShort()));
+					short blockID = p.readShort();
+					s.block(x, y, z, Blocks.fromNumericId(blockID));
 				}	
 			}	
 		}
 		
-		s.init();
 		Transform trans = new Transform();
 		trans.position(pos);
 		trans.orientation(new Orientation(rot));
