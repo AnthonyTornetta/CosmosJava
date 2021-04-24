@@ -8,6 +8,7 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class World
 {
@@ -15,15 +16,29 @@ public class World
 	
 	private List<Structure> structures;
 	
+	private boolean locked = false;
+	private List<RigidBody> bodiesToAdd;
+	private List<Structure> structuresToAdd;
+//	private List<RigidBody> bodiesToRemove;
+//	private List<Structure> structuresToRemove;
+	
 	public World()
 	{
 		bodies = new LinkedList<>();
 		structures = new LinkedList<>();
+		
+		bodiesToAdd = new LinkedList<>();
+		structuresToAdd = new LinkedList<>();
+//		bodiesToRemove = new LinkedList<>();
+//		structuresToRemove = new LinkedList<>();
 	}
 	
 	public void addRigidBody(RigidBody bdy)
 	{
-		bodies.add(bdy);
+		if(!locked)
+			bodies.add(bdy);
+		else
+			bodiesToAdd.add(bdy);
 	}
 	
 	public void update(float delta)
@@ -58,6 +73,40 @@ public class World
 
 	public void addStructure(Structure s)
 	{
-		structures.add(s);
+		if(!locked)
+		{
+			if(!structures.contains(s))
+				structures.add(s);
+			else
+				Utils.println(":O");
+		}
+		else
+			structuresToAdd.add(s);
+	}
+
+	public Structure structureFromID(int id)
+	{
+		for(Structure s : structures)
+			if(s.id() == id)
+				return s;
+		return null;
+	}
+
+	public void lock()
+	{
+		locked = true;
+	}
+	
+	public void unlock()
+	{
+		locked = false;
+		
+		for(RigidBody b : bodiesToAdd)
+			addRigidBody(b);
+		bodiesToAdd.clear();
+		
+		for(Structure s : structuresToAdd)
+			addStructure(s);
+		structuresToAdd.clear();
 	}
 }

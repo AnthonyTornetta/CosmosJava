@@ -5,15 +5,15 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class FreeCamera extends Camera
 {
 	private PhysicalObject parent;
 	
-	private Transform trans;
+	private Orientation orientation;
 	
 	/**
 	 * <p>A camera that treats every rotation as an absolute rotation.  This also suffers from the gimbal lock most first person cameras suffer from.</p>
@@ -24,33 +24,33 @@ public class FreeCamera extends Camera
 	{
 		this.parent = parent;
 		
-		trans = new Transform();
+		orientation = new Orientation();
 	}
 	
 	@Override
 	public Matrix4fc viewMatrix()
 	{
 		Matrix4f mat = new Matrix4f();
-		Maths.createViewMatrix(position(), trans.rotation(), mat);
+		Maths.createViewMatrix(position(), orientation.quaternion(), mat);
 		return mat;
 	}
 
 	@Override
 	public Vector3fc forward()
 	{
-		return trans.forward();
+		return orientation.forward();
 	}
 
 	@Override
 	public Vector3fc right()
 	{
-		return trans.right();
+		return orientation.right();
 	}
 
 	@Override
 	public Vector3fc up()
 	{
-		return trans.up();
+		return orientation.up();
 	}
 
 	/**
@@ -82,7 +82,7 @@ public class FreeCamera extends Camera
 	@Override
 	public void zeroRotation()
 	{
-		trans.rotation(Maths.blankQuaternion());
+		orientation.zero();
 	}
 
 	@Override
@@ -94,6 +94,6 @@ public class FreeCamera extends Camera
 	@Override
 	public void rotate(Vector3fc dRot)
 	{
-		trans.rotateRelative(dRot);
+		orientation.rotateRelative(dRot);
 	}
 }

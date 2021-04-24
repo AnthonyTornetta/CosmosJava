@@ -15,7 +15,7 @@ import com.cornchipss.cosmos.utils.Utils;
 
 public class CosmosNettyClient implements Runnable
 {
-	private ClientServer server;
+	private ServerConnection udpServer, tcpServer;
 	private ClientPlayerList players;
 	
 	private ClientGame game;
@@ -31,9 +31,18 @@ public class CosmosNettyClient implements Runnable
 	{
 		try(Scanner scan = new Scanner(System.in))
 		{
-			server = new ClientServer(InetAddress.getByName("localhost"), 1337);
-			server.createConnection();
+			udpServer = new ServerConnection(InetAddress.getByName("localhost"), 1337);
+			udpServer.createConnection();
+			Utils.println("UDP 'CONNECTION'");
 			
+			Utils.println("CREATEING TCP CONNECTION");
+			TCPServerConnection tcpConnection = new TCPServerConnection(this, "localhost", 1337);
+			Utils.println("CREATING SERVER CONNECTION");
+			tcpServer = new ServerConnection(tcpConnection);
+			Thread tcpThread = new Thread(tcpConnection);
+			Utils.println("RUNNING TCP THREAD");
+			tcpThread.start();
+			Utils.println("TCP THREAD RAN");
         	byte[] buffer = new byte[1024];
 	        
 	        Utils.println("name: ");
@@ -42,12 +51,13 @@ public class CosmosNettyClient implements Runnable
 	        JoinPacket joinP = new JoinPacket(buffer, 0, name);
 	        joinP.init();
 	        
-	        joinP.send(server.socket(), server.address(), server.port());
+	        tcpServer.send(joinP.buffer(), joinP.bufferLength(), this);//joinP.send(server.socket(), server.address(), server.port());
 	        
+	        // udp stuff
 	        while(game.running())
 	        {
 	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
-	        	server.socket().receive(recieved);
+	        	udpServer.socket().receive(recieved);
 	        	
 	        	byte marker = Packet.findMarker(buffer, recieved.getOffset(), recieved.getLength());
 	    		
@@ -56,7 +66,7 @@ public class CosmosNettyClient implements Runnable
 	    			Logger.LOGGER.error("WARNING: Invalid packet type (" + marker + ") received from server");
 	    		else
 	    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
-	    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
+	    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), udpServer, this);
 	        	
 	    		try
 	    		{
@@ -70,10 +80,12 @@ public class CosmosNettyClient implements Runnable
 	        	PlayerPacket pp = new PlayerPacket(buffer, 0, game().player());
 	        	pp.init();
 	        	
-	        	pp.send(server.socket(), server.address(), server.port());
+	        	udpServer.send(pp.buffer(), pp.bufferLength(), this);
 	        }
+	        
+	        tcpThread.join();
 		}
-		catch(IOException ex)
+		catch(IOException | InterruptedException ex)
 		{
 			ex.printStackTrace();
 		}

@@ -2,25 +2,18 @@ package com.cornchipss.cosmos.physx;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Quaternionf;
-import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector4f;
-
-import com.cornchipss.cosmos.utils.Maths;
 
 public class Transform
 {
 	private Vector3f position;
-	private Quaternionf rotation;
 	
 	private Matrix4f transMatrix;
 	private Matrix4f invertedMatirx;
 	
-	private Vector3f forward, up, right;
-	private Vector4f temp;
-
+	private Orientation orientation;
+	
 	public Transform()
 	{
 		this(0, 0, 0);
@@ -29,15 +22,10 @@ public class Transform
 	public Transform(float x, float y, float z)
 	{
 		position = new Vector3f(x, y, z);
-		rotation = Maths.blankQuaternion();
+		orientation = new Orientation();
 		
 		transMatrix = new Matrix4f();
 		invertedMatirx = new Matrix4f();
-		
-		forward = new Vector3f(0, 0, 1);
-		up = new Vector3f(0, 1, 0);
-		right = new Vector3f(1, 0, 0);
-		temp = new Vector4f();
 		
 		updateMatrix();
 	}
@@ -46,22 +34,9 @@ public class Transform
 	{
 		transMatrix.identity();
 		
-		transMatrix.rotate(rotation);
-
-		transMatrix.transform(0, 0, -1, 1, temp); // opengl moment
-		forward.set(temp.x, temp.y, temp.z);
-		
-		transMatrix.transform(1, 0, 0, 1, temp);
-		right.set(temp.x, temp.y, temp.z);
-		
-		transMatrix.transform(0, 1, 0, 1, temp);
-		up.set(temp.x, temp.y, temp.z);
-		
-		transMatrix.identity();
-		
 		transMatrix.translate(position);
 		
-		transMatrix.rotate(rotation);
+		orientation.applyRotation(transMatrix);
 		
 		transMatrix.invert(invertedMatirx);
 	}
@@ -73,15 +48,7 @@ public class Transform
 	
 	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
 	{
-		Quaternionf temp = Maths.blankQuaternion();
-		
-		temp.rotateAxis(dRot.z(), forward);
-		temp.rotateAxis(dRot.y(), up);
-		temp.rotateAxis(dRot.x(), right);
-		
-		temp.mul(rotation(), temp);
-		
-		rotation(temp);
+		orientation.rotateRelative(dRot, right, up, forward);
 	}
 	
 	public Transform(Vector3fc pos)
@@ -100,14 +67,14 @@ public class Transform
 		return position;
 	}
 	
-	public Quaternionfc rotation()
+	public Orientation orientation()
 	{
-		return rotation;
+		return orientation;
 	}
 	
-	public void rotation(Quaternionfc q)
+	public void orientation(Orientation o)
 	{
-		rotation.set(q);
+		this.orientation = o;
 		updateMatrix();
 	}
 
@@ -123,16 +90,16 @@ public class Transform
 
 	public Vector3fc forward()
 	{
-		return forward;
+		return orientation.forward();
 	}
 
 	public Vector3fc right()
 	{
-		return right;
+		return orientation.right();
 	}
 
 	public Vector3fc up()
 	{
-		return up;
+		return orientation.up();
 	}
 }

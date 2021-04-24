@@ -10,7 +10,7 @@ import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class Client
+public class Client implements Runnable
 {
 	private Window window;
 	
@@ -26,6 +26,7 @@ public class Client
 	private volatile boolean running = true;
 	private ClientGame game;
 	
+	@Override
 	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);

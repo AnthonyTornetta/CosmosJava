@@ -21,9 +21,9 @@ public class Ship extends Structure
 	
 	private Vector3f corePos = new Vector3f();
 	
-	public Ship(World world)
+	public Ship(World world, int id)
 	{
-		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS);
+		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
 	}
 	
 	public Vector3fc corePosition()
@@ -87,7 +87,7 @@ public class Ship extends Structure
 			
 			body().transform().rotateRelative(dRot);
 			
-			pilot.body().transform().rotation(body().transform().rotation());
+			pilot.body().transform().orientation(body().transform().orientation());
 		}
 		else
 			body().velocity(body().velocity().mul(0.99f)); // no more drifting into space once the pilot leaves

@@ -2,12 +2,14 @@ package com.cornchipss.cosmos.netty.packets;
 
 import java.io.IOException;
 
-import com.cornchipss.cosmos.client.ClientServer;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.ServerClient;
 import com.cornchipss.cosmos.server.ServerPlayer;
+import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class JoinPacket extends Packet
@@ -36,17 +38,17 @@ public class JoinPacket extends Packet
 	{
 		super.init();
 		
-		write(name);
+		writeString(name);
 	}
 	
 	@Override
 	public void onReceiveServer(byte[] data, int len, int offset,
-			ServerClient client, CosmosNettyServer server)
+			ClientConnection client, CosmosNettyServer server)
 	{
 		JoinPacket packet = new JoinPacket(data, offset);
 		
 		String name = packet.readString();
-		
+		Utils.println("NAME: " + name);
 		if(!server.players().playerExists(client) && !server.players().nameTaken(name))
 		{
 			ServerPlayer p = server.players().createPlayer(server.game().world(), client, name);
@@ -62,6 +64,21 @@ public class JoinPacket extends Packet
 			catch (IOException e)
 			{
 				e.printStackTrace();
+			}
+			
+			for(Structure s : server.game().world().structures())
+			{
+				byte[] buf = new byte[s.width() * s.height() * s.length() * 2 + 64];
+				FullStructurePacket sp = new FullStructurePacket(buf, 0, s);
+				sp.init();
+				try
+				{
+					client.send(sp.buffer(), sp.bufferLength(), server);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 		else
@@ -87,7 +104,7 @@ public class JoinPacket extends Packet
 	}
 
 	@Override
-	public void onReceiveClient(byte[] data, int len, int offset, ClientServer server, CosmosNettyClient client)
+	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
 	{
 		JoinPacket packet = new JoinPacket(data, offset);
 		

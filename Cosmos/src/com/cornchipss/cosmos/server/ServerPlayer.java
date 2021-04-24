@@ -7,9 +7,9 @@ import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ServerPlayer extends Player
 {
-	private ServerClient serverClient;
+	private ClientConnection serverClient;
 	
-	public ServerPlayer(World world, ServerClient serverClient, String name)
+	public ServerPlayer(World world, ClientConnection serverClient, String name)
 	{
 		super(world, name);
 		
@@ -28,5 +28,5 @@ public class ServerPlayer extends Player
 		return new GimbalLockCamera(this);
 	}
 	
-	public ServerClient client() { return serverClient; }
+	public ClientConnection client() { return serverClient; }
 }

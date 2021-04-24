@@ -35,6 +35,7 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	private int width, height, length;
 	
 	private int cWidth, cHeight, cLength;
+	private boolean rendered = false;
 	
 	private LightMap lightMap;
 	
@@ -43,15 +44,20 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	public StructureShape shape() { return shape; }
 	
 	private Set<Chunk> bulkUpdate;
+	private int id;
 	
-	public Structure(World world)
+	public Structure(World world, int id)
 	{
 		super(world);
+		
+		this.id = id;
 	}
 	
-	public Structure(World world, int width, int height, int length)
+	public Structure(World world, int width, int height, int length, int id)
 	{
 		super(world);
+		
+		this.id = id;
 		
 		if(width <= 0 || height <= 0 || length <= 0)
 			throw new IllegalArgumentException("A Structure's width/height/length cannot be <= 0");
@@ -167,6 +173,7 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	{
 		body(new RigidBody(transform));
 		world().addRigidBody(body());
+		world().addStructure(this);
 	}
 	
 	public int chunksLength()
@@ -532,5 +539,39 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	public boolean hasBlock(int x, int y, int z)
 	{
 		return withinBlocks(x, y, z) && block(x, y, z) != null;
+	}
+
+	public int id()
+	{
+		return id;
+	}
+
+	public boolean hasBeenRendered()
+	{
+		return rendered;
+	}
+
+	public void render()
+	{
+		for(Chunk c : chunks)
+			c.render();
+		
+		rendered = true;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return id;
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof Structure)
+		{
+			return ((Structure)o).id == id;
+		}
+		return false;
 	}
 }

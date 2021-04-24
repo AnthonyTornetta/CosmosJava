@@ -1,10 +1,10 @@
 package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.client.Client;
-import com.cornchipss.cosmos.client.ClientServer;
+import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.ServerClient;
+import com.cornchipss.cosmos.server.ClientConnection;
 
 public class DisconnectedPacket extends Packet
 {
@@ -19,7 +19,7 @@ public class DisconnectedPacket extends Packet
 	}
 	
 	@Override
-	public void onReceiveServer(byte[] data, int len, int offset, ServerClient client, CosmosNettyServer server)
+	public void onReceiveServer(byte[] data, int len, int offset, ClientConnection client, CosmosNettyServer server)
 	{
 		server.players().removePlayer(client);
 	}
@@ -31,7 +31,7 @@ public class DisconnectedPacket extends Packet
 	}
 
 	@Override
-	public void onReceiveClient(byte[] data, int len, int offset, ClientServer server, CosmosNettyClient client)
+	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
 	{
 		server.socket().close();
 		

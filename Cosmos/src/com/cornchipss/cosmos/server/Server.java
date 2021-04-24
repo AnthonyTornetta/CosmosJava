@@ -10,8 +10,9 @@ import com.cornchipss.cosmos.server.command.commands.StopCommand;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 
-public class Server
+public class Server implements Runnable
 {
+	@Override
 	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);

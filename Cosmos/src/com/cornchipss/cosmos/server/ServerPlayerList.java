@@ -11,7 +11,7 @@ import com.cornchipss.cosmos.world.World;
 
 public class ServerPlayerList
 {
-	private Map<ServerClient, ServerPlayer> playerClients;
+	private Map<ClientConnection, ServerPlayer> playerClients;
 	private Map<String, ServerPlayer> playerNames;
 	private List<ServerPlayer> players;
 	
@@ -22,7 +22,7 @@ public class ServerPlayerList
 		players = new LinkedList<>();
 	}
 	
-	public boolean playerExists(ServerClient c)
+	public boolean playerExists(ClientConnection c)
 	{
 		return playerClients.containsKey(c);
 	}
@@ -32,7 +32,7 @@ public class ServerPlayerList
 		return playerNames.containsKey(name.toLowerCase());
 	}
 	
-	public ServerPlayer createPlayer(World world, ServerClient c, String name)
+	public ServerPlayer createPlayer(World world, ClientConnection c, String name)
 	{
 		if(!playerExists(c) && !nameTaken(name))
 		{
@@ -52,7 +52,7 @@ public class ServerPlayerList
 		return null;
 	}
 	
-	public boolean removePlayer(ServerClient c)
+	public boolean removePlayer(ClientConnection c)
 	{
 		ServerPlayer p = playerClients.remove(c);
 		
@@ -78,7 +78,7 @@ public class ServerPlayerList
 		return true;
 	}
 
-	public ServerPlayer player(ServerClient client)
+	public ServerPlayer player(ClientConnection client)
 	{
 		return playerClients.get(client);
 	}

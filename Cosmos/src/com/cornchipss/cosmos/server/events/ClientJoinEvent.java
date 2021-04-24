@@ -1,19 +1,19 @@
 package com.cornchipss.cosmos.server.events;
 
-import com.cornchipss.cosmos.server.ServerClient;
+import com.cornchipss.cosmos.server.ClientConnection;
 
 public class ClientJoinEvent extends ClientEvent implements ICancellable
 {
-	private ServerClient origin;
+	private ClientConnection origin;
 	
 	private boolean cancelled;
 	
-	public ClientJoinEvent(ServerClient origin )
+	public ClientJoinEvent(ClientConnection origin )
 	{
 		this.origin = origin;
 	}
 	
-	public ServerClient origin()
+	public ClientConnection origin()
 	{
 		return origin;
 	}

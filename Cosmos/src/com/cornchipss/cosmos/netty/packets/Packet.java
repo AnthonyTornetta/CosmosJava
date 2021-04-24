@@ -1,9 +1,5 @@
 package com.cornchipss.cosmos.netty.packets;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -11,18 +7,19 @@ import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3ic;
 
-import com.cornchipss.cosmos.client.ClientServer;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.ServerClient;
 
 public abstract class Packet
 {
 	private byte[] buffer;
 	private int bufferOffset;
 	private int bufferLength;
-	
+		
 	private int writingAt;
 	
 	public Packet()
@@ -43,23 +40,23 @@ public abstract class Packet
 	 */
 	public void init()
 	{
-		write(marker());
+		writeByte(marker());
 	}
 	
-	public void write(byte b)
+	public void writeByte(byte b)
 	{
 		buffer[writingAt++] = b;
 		bufferLength++;
 	}
 	
-	public void write(String s)
+	public void writeString(String s)
 	{
-		write(s.length());
+		writeInt(s.length());
 		for(byte b : s.getBytes())
-			write(b);
+			writeByte(b);
 	}
 	
-	public void write(float f)
+	public void writeFloat(float f)
 	{
 		ByteBuffer.wrap(buffer, writingAt, 4).order(ByteOrder.BIG_ENDIAN)
 			.putFloat(f);
@@ -67,7 +64,7 @@ public abstract class Packet
 		bufferLength += 4;
 	}
 	
-	public void write(int value)
+	public void writeInt(int value)
 	{
 		// Big endian
 		ByteBuffer.wrap(buffer, writingAt, 4).order(ByteOrder.BIG_ENDIAN)
@@ -76,19 +73,35 @@ public abstract class Packet
 		bufferLength += 4;
 	}
 	
-	public void write(Vector3fc vec)
+	public void writeShort(short value)
 	{
-		write(vec.x());
-		write(vec.y());
-		write(vec.z());
+		// Big endian
+		ByteBuffer.wrap(buffer, writingAt, 2).order(ByteOrder.BIG_ENDIAN)
+			.putShort(value);
+		writingAt += 2;
+		bufferLength += 2;
 	}
 	
-	public void write(Quaternionfc q)
+	public void writeVector3fc(Vector3fc vec)
 	{
-		write(q.x());
-		write(q.y());
-		write(q.z());
-		write(q.w());
+		writeFloat(vec.x());
+		writeFloat(vec.y());
+		writeFloat(vec.z());
+	}
+	
+	public void writeVector3ic(Vector3ic vec)
+	{
+		writeInt(vec.x());
+		writeInt(vec.y());
+		writeInt(vec.z());
+	}
+	
+	public void writeQuaternionfc(Quaternionfc q)
+	{
+		writeFloat(q.x());
+		writeFloat(q.y());
+		writeFloat(q.z());
+		writeFloat(q.w());
 	}
 	
 	public byte readByte()
@@ -100,6 +113,13 @@ public abstract class Packet
 	{
 		int val = ByteBuffer.wrap(buffer, writingAt, 4).getInt();
 		writingAt += 4;
+		return val;
+	}
+	
+	public short readShort()
+	{
+		short val = ByteBuffer.wrap(buffer, writingAt, 2).getShort();
+		writingAt += 2;
 		return val;
 	}
 	
@@ -128,23 +148,16 @@ public abstract class Packet
 		return into.set(readFloat(), readFloat(), readFloat());
 	}
 	
-	public void send(DatagramSocket socket, InetAddress address, int port) throws IOException
-	{
-		DatagramPacket packet = new DatagramPacket(
-				buffer(), bufferOffset(), bufferLength(),
-				address, port);
-		socket.send(packet);
-	}
-	
 	public abstract void onReceiveServer(byte[] data, int len, int offset, 
-			ServerClient client, CosmosNettyServer server);
+			ClientConnection client, CosmosNettyServer server);
 	
 	public abstract void onReceiveClient(byte[] data, int len, int offset, 
-			ClientServer server, CosmosNettyClient client);
+			ServerConnection server, CosmosNettyClient client);
 	
 	public abstract byte marker();
 	
 	public byte[] buffer() { return buffer; }
+	public void buffer(byte[] buf) { buffer = buf; }
 	public int bufferOffset() { return bufferOffset; }
 	public int bufferLength() { return bufferLength; }
 
