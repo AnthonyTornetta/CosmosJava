@@ -15,15 +15,22 @@ import com.cornchipss.cosmos.utils.Utils;
 
 public class CosmosNettyClient implements Runnable
 {
-	private ServerConnection udpServer, tcpServer;
+	private ServerConnection server;
 	private ClientPlayerList players;
 	
-	private ClientGame game;
-	
-	public CosmosNettyClient(ClientGame game)
+	public CosmosNettyClient()
 	{
 		players = new ClientPlayerList();
-		this.game = game;
+	}
+	
+	public void sendUDP(Packet p)
+	{
+		server.sendUDP(p.buffer(), p.bufferLength(), this);
+	}
+	
+	public void sendTCP(Packet p)
+	{
+		server.sendTCP(p.buffer(), p.bufferLength(), this);
 	}
 	
 	@Override
@@ -31,18 +38,17 @@ public class CosmosNettyClient implements Runnable
 	{
 		try(Scanner scan = new Scanner(System.in))
 		{
-			udpServer = new ServerConnection(InetAddress.getByName("localhost"), 1337);
-			udpServer.createConnection();
-			Utils.println("UDP 'CONNECTION'");
-			
-			Utils.println("CREATEING TCP CONNECTION");
 			TCPServerConnection tcpConnection = new TCPServerConnection(this, "localhost", 1337);
-			Utils.println("CREATING SERVER CONNECTION");
-			tcpServer = new ServerConnection(tcpConnection);
+			
+			server = new ServerConnection(
+					InetAddress.getByName("localhost"), 1337,
+					tcpConnection);
+			
+			server.initUDPSocket();
+			
 			Thread tcpThread = new Thread(tcpConnection);
-			Utils.println("RUNNING TCP THREAD");
 			tcpThread.start();
-			Utils.println("TCP THREAD RAN");
+			
         	byte[] buffer = new byte[1024];
 	        
 	        Utils.println("name: ");
@@ -51,13 +57,14 @@ public class CosmosNettyClient implements Runnable
 	        JoinPacket joinP = new JoinPacket(buffer, 0, name);
 	        joinP.init();
 	        
-	        tcpServer.send(joinP.buffer(), joinP.bufferLength(), this);//joinP.send(server.socket(), server.address(), server.port());
+	        sendTCP(joinP);
+	        sendUDP(joinP);
 	        
 	        // udp stuff
-	        while(game.running())
+	        while(ClientGame.instance().running())
 	        {
 	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
-	        	udpServer.socket().receive(recieved);
+	        	server.socket().receive(recieved);
 	        	
 	        	byte marker = Packet.findMarker(buffer, recieved.getOffset(), recieved.getLength());
 	    		
@@ -66,7 +73,7 @@ public class CosmosNettyClient implements Runnable
 	    			Logger.LOGGER.error("WARNING: Invalid packet type (" + marker + ") received from server");
 	    		else
 	    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
-	    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), udpServer, this);
+	    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
 	        	
 	    		try
 	    		{
@@ -77,10 +84,11 @@ public class CosmosNettyClient implements Runnable
 					e.printStackTrace();
 				}
 	    		
+	    		// send player info - TODO: move this
 	        	PlayerPacket pp = new PlayerPacket(buffer, 0, game().player());
 	        	pp.init();
 	        	
-	        	udpServer.send(pp.buffer(), pp.bufferLength(), this);
+	        	server.sendUDP(pp.buffer(), pp.bufferLength(), this);
 	        }
 	        
 	        tcpThread.join();
@@ -98,6 +106,6 @@ public class CosmosNettyClient implements Runnable
 
 	public ClientGame game()
 	{
-		return game;
+		return ClientGame.instance();
 	}
 }

@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.utils.Utils;
 
 /**
@@ -19,10 +18,22 @@ public class ServerConnection
 	private DatagramSocket socket;
 	private TCPServerConnection tcpServerConnection;
 	
+	public ServerConnection(InetAddress addr, int port, TCPServerConnection tcp)
+	{
+		this.addr = addr;
+		this.port = port;
+		this.tcpServerConnection = tcp;
+	}
+	
 	public ServerConnection(InetAddress addr, int port)
 	{
 		this.addr = addr;
 		this.port = port;
+	}
+	
+	public void initTCP(TCPServerConnection tcpServer)
+	{
+		this.tcpServerConnection = tcpServer;
 	}
 	
 	public ServerConnection(TCPServerConnection tcpServer)
@@ -30,7 +41,13 @@ public class ServerConnection
 		this.tcpServerConnection = tcpServer;
 	}
 	
-	public void createConnection() throws SocketException
+	public void initUDP(InetAddress addr, int port)
+	{
+		this.addr = addr;
+		this.port = port;
+	}
+	
+	public void initUDPSocket() throws SocketException
 	{
 		socket = new DatagramSocket();
 	}
@@ -41,7 +58,7 @@ public class ServerConnection
 	@Override
 	public int hashCode()
 	{
-		if(tcp())
+		if(hasTCP())
 			return tcpServerConnection.hashCode();
 		else
 			return addr.hashCode() + port;
@@ -52,7 +69,7 @@ public class ServerConnection
 	{
 		if(o instanceof ServerConnection)
 		{
-			if(tcp())
+			if(hasTCP())
 				return Utils.equals(tcpServerConnection, ((ServerConnection)o).tcpServerConnection);
 			else
 				return Utils.equals(addr, ((ServerConnection)o).addr) && port == ((ServerConnection)o).port;
@@ -77,20 +94,11 @@ public class ServerConnection
 		return socket;
 	}
 
-	public void send(byte[] buffer, int length, CosmosNettyClient client)
+	public void sendTCP(byte[] buffer, int length, CosmosNettyClient client)
 	{
 		try
 		{
-			if(tcp())
-			{
-				tcpServerConnection.sendData(buffer, 0, length);
-			}
-			else
-			{
-				DatagramPacket response = new DatagramPacket(buffer, 0, length, 
-						address(), port());
-				socket.send(response);
-			}
+			tcpServerConnection.sendData(buffer, 0, length);
 		}
 		catch(IOException ex)
 		{
@@ -98,6 +106,20 @@ public class ServerConnection
 		}
 	}
 	
-	public boolean tcp() { return tcpServerConnection != null; }
-	public boolean udp() { return !tcp(); }
+	public void sendUDP(byte[] buffer, int length, CosmosNettyClient client)
+	{
+		DatagramPacket response = new DatagramPacket(buffer, 0, length, 
+				address(), port());
+		try
+		{
+			socket.send(response);
+		}
+		catch (IOException ex)
+		{
+			throw new RuntimeException(ex);
+		}
+	}
+	
+	public boolean hasTCP() { return tcpServerConnection != null; }
+	public boolean hasUDP() { return addr != null; }
 }

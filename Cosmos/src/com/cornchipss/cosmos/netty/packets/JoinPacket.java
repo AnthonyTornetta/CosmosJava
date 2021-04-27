@@ -4,10 +4,12 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.ServerPlayer;
+import com.cornchipss.cosmos.server.ServerPlayerList;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
@@ -49,17 +51,47 @@ public class JoinPacket extends Packet
 		
 		String name = packet.readString();
 		Utils.println("NAME: " + name);
-		if(!server.players().playerExists(client) && !server.players().nameTaken(name))
+		
+		ServerPlayerList list = server.players();
+		
+		if(!server.players().nameTaken(name))
 		{
-			ServerPlayer p = server.players().createPlayer(server.game().world(), client, name);
-			p.addToWorld(new Transform());
+			ClientConnection c = list.getPendingConnection(name);
+			
+			if(c == null)
+			{
+				if(client.hasUDP() && client.hasTCP())
+				{
+					// they have already joined since both connections were setup but there was no in progress join phase
+					return;
+				}
+				
+				list.beginJoin(client, name);
+			}
+			else
+			{
+				if(client.hasUDP())
+				{
+					c.initUDP(client.address(), client.port());
+				}
+				
+				if(client.hasTCP())
+				{
+					c.initTCP(client.tcpConnection());
+				}
+				
+				if(c.hasUDP() && c.hasTCP())
+				{
+					list.finishJoin(c, ServerGame.instance().world(), name);
+				}
+			}
 			
 			JoinPacket jp = new JoinPacket(data, 0, name);
 			jp.init();
 			
 			try
 			{
-				client.send(jp.buffer(), jp.bufferLength(), server);
+				client.sendTCP(jp.buffer(), jp.bufferLength());
 			}
 			catch (IOException e)
 			{
@@ -73,12 +105,28 @@ public class JoinPacket extends Packet
 				sp.init();
 				try
 				{
-					client.send(sp.buffer(), sp.bufferLength(), server);
+					client.sendTCP(sp.buffer(), sp.bufferLength());
 				}
 				catch (IOException e)
 				{
 					e.printStackTrace();
 				}
+			}
+			
+			try
+			{
+				byte[] buf = new byte[1000];
+				DebugPacket dbgP = new DebugPacket(buf, 0, "TCP RECEIVED");
+				dbgP.init();
+				client.sendTCP(dbgP.buffer(), dbgP.bufferLength());
+				
+				dbgP = new DebugPacket(buf, 0, "UDP RECEIVED");
+				dbgP.init();
+				client.sendUDP(dbgP.buffer(), dbgP.bufferLength(), server);
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
 			}
 		}
 		else
@@ -88,7 +136,7 @@ public class JoinPacket extends Packet
 			
 			try
 			{
-				client.send(dc.buffer(), dc.bufferLength(), server);
+				client.sendTCP(dc.buffer(), dc.bufferLength());
 			}
 			catch (IOException e)
 			{

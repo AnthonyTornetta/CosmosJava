@@ -67,7 +67,7 @@ public class PlayerPacket extends Packet
 		
 		try
 		{
-			client.send(response.buffer(), response.bufferLength(), server);
+			client.sendTCP(response.buffer(), response.bufferLength());
 		}
 		catch (IOException e)
 		{

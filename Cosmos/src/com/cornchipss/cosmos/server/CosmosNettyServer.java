@@ -8,6 +8,7 @@ import java.net.Socket;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.server.command.CommandHandler;
 import com.cornchipss.cosmos.utils.Utils;
@@ -35,9 +36,24 @@ public class CosmosNettyServer implements Runnable
 		this.cmdHandler = cmdHandler;
 	}
 	
+	public void sendToAllUDP(Packet packet)
+	{
+		for(ServerPlayer p : players.players())
+		{
+			try
+			{
+				p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
+			}
+			catch(IOException ex)
+			{
+				
+			}
+		}
+	}
+	
 	private synchronized void processUDP(DatagramPacket packet, DatagramSocket serverSocket) throws IOException
 	{
-		ClientConnection client = new ClientConnection(packet.getAddress(), packet.getPort());
+		ServerPlayer player = players.player(packet.getAddress(), packet.getPort());
 		
 		byte[] buffer = packet.getData();
 		
@@ -49,13 +65,24 @@ public class CosmosNettyServer implements Runnable
 		{
 			Utils.println("INVALID PACKET TYPE");
 			buffer[0] = -1; // we can reuse the same buffer
-			client.send(buffer, 1, this);
+			player.client().sendUDP(buffer, 1, this);
 			return;
 		}
 		
+		ClientConnection connection = null;
+		
+		if(player == null && p instanceof JoinPacket)
+		{
+			connection = new ClientConnection(packet.getAddress(), packet.getPort(), null);
+		}
+		else if(player != null)
+			connection = player.client();
+		else
+			return;
+		
 		int off = Packet.additionalOffset(buffer, packet.getOffset(), packet.getLength());
 		
-		p.onReceiveServer(buffer, packet.getLength() - off, packet.getOffset() + off, client, this);
+		p.onReceiveServer(buffer, packet.getLength() - off, packet.getOffset() + off, connection, this);
 	}
 	
 	@Override

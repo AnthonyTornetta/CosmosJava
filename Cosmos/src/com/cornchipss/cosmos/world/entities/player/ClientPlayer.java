@@ -10,6 +10,8 @@ import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
+import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.structures.Structure;
@@ -72,7 +74,10 @@ public class ClientPlayer extends Player
 				
 				if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
-					lookingAt.block(pos.x, pos.y, pos.z, null);
+					byte[] buffer = new byte[64];
+					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, pos.x, pos.y, pos.z, null);
+					packet.init();
+					ClientGame.instance().nettyClient().sendUDP(packet);
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
@@ -86,7 +91,11 @@ public class ClientPlayer extends Player
 						
 						if(lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
-							lookingAt.block(xx, yy, zz, selectedBlock);
+							//lookingAt.block(xx, yy, zz, selectedBlock);
+							byte[] buffer = new byte[64];
+							ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, xx, yy, zz, selectedBlock);
+							packet.init();
+							ClientGame.instance().nettyClient().sendUDP(packet);
 						}
 					}
 				}

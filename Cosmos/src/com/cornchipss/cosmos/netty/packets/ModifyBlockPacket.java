@@ -5,6 +5,7 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
+import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
 
@@ -44,7 +45,7 @@ public class ModifyBlockPacket extends Packet
 		writeInt(x);
 		writeInt(y);
 		writeInt(z);
-		writeShort(to.numericId());
+		writeShort(to == null ? 0 : to.numericId());
 	}
 	
 	@Override
@@ -61,6 +62,10 @@ public class ModifyBlockPacket extends Packet
 		Block block = Blocks.fromNumericId(packet.readShort());
 		
 		s.block(x, y, z, block);
+		
+		packet.reset();
+		
+		Server.nettyServer().sendToAllUDP(packet);
 	}
 
 	@Override

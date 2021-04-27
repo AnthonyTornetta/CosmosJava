@@ -8,7 +8,6 @@ import java.net.UnknownHostException;
 
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.Packet;
-import com.cornchipss.cosmos.server.TCPClientConnection;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class TCPServerConnection implements Runnable
@@ -60,7 +59,7 @@ public class TCPServerConnection implements Runnable
 				{
 					Utils.println("INVALID PACKET TYPE");
 					buffer[0] = -1; // we can reuse the same buffer
-					server.send(buffer, 1, client);
+					server.sendTCP(buffer, 1, client);
 					return;
 				}
 				
@@ -100,5 +99,5 @@ public class TCPServerConnection implements Runnable
 		return serverSocket.hashCode();
 	}
 	
-	public boolean active() { return connected && client.game().running(); }
+	public boolean active() { return connected && (client.game() == null || client.game().running()); }
 }

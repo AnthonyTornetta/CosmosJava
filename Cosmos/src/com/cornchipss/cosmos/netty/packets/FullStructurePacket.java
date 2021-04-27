@@ -14,7 +14,6 @@ import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class FullStructurePacket extends Packet
 {
@@ -124,9 +123,8 @@ public class FullStructurePacket extends Packet
 			{
 				for(int x = 0; x < s.width(); x++)
 				{
-					short blockID = p.readShort();
-					s.block(x, y, z, Blocks.fromNumericId(blockID));
-				}	
+					s.block(x, y, z, Blocks.fromNumericId(p.readShort()));
+				}
 			}	
 		}
 		

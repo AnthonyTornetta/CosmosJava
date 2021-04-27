@@ -36,12 +36,15 @@ public class Client implements Runnable
 		Initializer loader = new Initializer();
 		loader.init();
 		
-		game = new ClientGame(window);
+		CosmosNettyClient nettyClient = new CosmosNettyClient();
+		
+		Thread thread = new Thread(nettyClient);
+		thread.start();
+		
+		game = new ClientGame(window, nettyClient);
 		
 		PacketTypes.registerAll();
 		
-		Thread thread = new Thread(new CosmosNettyClient(game));
-		thread.start();
 		
 		Input.setWindow(window);
 		

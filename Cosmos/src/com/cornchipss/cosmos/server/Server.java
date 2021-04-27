@@ -12,6 +12,10 @@ import com.cornchipss.cosmos.utils.Logger;
 
 public class Server implements Runnable
 {
+	private static CosmosNettyServer server;
+	
+	public static CosmosNettyServer nettyServer() { return server; }
+	
 	@Override
 	public void run()
 	{
@@ -29,7 +33,7 @@ public class Server implements Runnable
 		defaultCmd.addCommand(new SayCommand());
 		
 		PacketTypes.registerAll();
-		final CosmosNettyServer server = new CosmosNettyServer(game, defaultCmd);
+		server = new CosmosNettyServer(game, defaultCmd);
 		
 		Thread serverThread = new Thread(server);
 		serverThread.start();

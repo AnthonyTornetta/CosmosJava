@@ -35,6 +35,11 @@ public abstract class Packet
 		this.bufferOffset = bufferOffset;
 	}
 	
+	public void reset()
+	{
+		writingAt = bufferOffset;
+	}
+	
 	/**
 	 * Initializes this packet to begin writing to
 	 */

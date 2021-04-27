@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
+import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -32,6 +33,8 @@ public class ClientGame extends Game
 	private int selectedSlot;
 	private GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
 	private GUIText fpsText;
+	private CosmosNettyClient nettyClient;
+	public CosmosNettyClient nettyClient() { return nettyClient; }
 	
 	private	GUIModel[] models;
 	
@@ -41,8 +44,18 @@ public class ClientGame extends Game
 	
 	private volatile boolean running = true;
 	
-	public ClientGame(Window window)
+	private static ClientGame instance;
+	public static ClientGame instance() { return instance; }
+	
+	public ClientGame(Window window, CosmosNettyClient nettyClient)
 	{
+		if(instance != null)
+			throw new IllegalStateException("A game is already running.");
+		
+		instance = this;
+		
+		this.nettyClient = nettyClient;
+		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(window.getWidth(), window.getHeight());
 		

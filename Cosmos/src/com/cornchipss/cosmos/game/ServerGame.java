@@ -17,8 +17,12 @@ public class ServerGame extends Game
 	private Ship ship;
 	private Planet mainPlanet;
 	
+	private static ServerGame instance;
+	
 	public ServerGame()
 	{
+		instance = this;
+		
 		mainPlanet = new Planet(world(), 16*10, 16*6, 16*10, 1);
 		mainPlanet.init();
 		Biosphere def = Biospheres.newInstance("cosmos:desert");
@@ -39,5 +43,10 @@ public class ServerGame extends Game
 		
 		ship.addToWorld(new Transform());
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
+	}
+
+	public static ServerGame instance()
+	{
+		return instance;
 	}
 }

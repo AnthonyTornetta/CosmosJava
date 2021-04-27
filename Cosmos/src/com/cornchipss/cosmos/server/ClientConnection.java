@@ -13,21 +13,18 @@ public class ClientConnection
 {
 	private InetAddress addr;
 	private int port;
+	
 	private TCPClientConnection tcpClientConnection;
 	
 	private long lastCommunicationTime;
 	
-	public ClientConnection(InetAddress addr, int port)
+	public ClientConnection(InetAddress addr, int port, TCPClientConnection clientConnection)
 	{
 		this.addr = addr;
 		this.port = port;
-	}
-	
-	public ClientConnection(TCPClientConnection clientConnection)
-	{
 		this.tcpClientConnection = clientConnection;
 	}
-
+	
 	public void updateCommunicationTime()
 	{
 		lastCommunicationTime = System.currentTimeMillis();
@@ -44,10 +41,7 @@ public class ClientConnection
 	@Override
 	public int hashCode()
 	{
-		if(tcp())
-			return tcpClientConnection.hashCode();
-		else
-			return addr.hashCode() + port;
+		return tcpClientConnection.hashCode() + addr.hashCode() + port;
 	}
 	
 	@Override
@@ -55,28 +49,46 @@ public class ClientConnection
 	{
 		if(o instanceof ClientConnection)
 		{
-			if(tcp())
-				return Utils.equals(tcpClientConnection, ((ClientConnection)o).tcpClientConnection);
-			else
-				return Utils.equals(addr, ((ClientConnection)o).addr) && port == ((ClientConnection)o).port;
+			return Utils.equals(tcpClientConnection, ((ClientConnection)o).tcpClientConnection) && Utils.equals(addr, ((ClientConnection)o).addr) && port == ((ClientConnection)o).port;
 		}
 		return false;
 	}
 
-	public void send(byte[] buffer, int length, CosmosNettyServer server) throws IOException
+	public void sendUDP(byte[] buffer, int length, CosmosNettyServer server) throws IOException
 	{
-		if(tcp())
-		{
-			tcpClientConnection.sendData(buffer, 0, length);
-		}
-		else
-		{
-			DatagramPacket response = new DatagramPacket(buffer, 0, length, 
-					address(), port());
-			server.socket().send(response);
-		}
+		DatagramPacket response = new DatagramPacket(buffer, 0, length, 
+				address(), port());
+		server.socket().send(response);
 	}
 	
-	public boolean tcp() { return tcpClientConnection != null; }
-	public boolean udp() { return !tcp(); }
+	public void sendTCP(byte[] buffer, int length) throws IOException
+	{
+		tcpClientConnection.sendData(buffer, 0, length);
+	}
+
+	public boolean hasUDP()
+	{
+		return addr != null;
+	}
+	
+	public boolean hasTCP()
+	{
+		return tcpClientConnection != null;
+	}
+
+	public void initUDP(InetAddress address, int port)
+	{
+		this.addr = address;
+		this.port = port;
+	}
+
+	public TCPClientConnection tcpConnection()
+	{
+		return tcpClientConnection;
+	}
+
+	public void initTCP(TCPClientConnection tcpConnection)
+	{
+		this.tcpClientConnection = tcpConnection;
+	}
 }

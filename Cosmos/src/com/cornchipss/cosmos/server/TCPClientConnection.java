@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.utils.Utils;
 
@@ -41,7 +42,7 @@ public class TCPClientConnection implements Runnable
 	
 	@Override
 	public void run()
-	{
+	{		
 		DataInputStream in;
 		try
 		{
@@ -61,24 +62,35 @@ public class TCPClientConnection implements Runnable
 				Utils.println("GOT DATA");	
 				byte[] buffer = in.readNBytes(nextBufferSize);
 				
-				ClientConnection client = new ClientConnection(this);
+				ServerPlayer player = server.players().player(this);
 				
 				byte marker = Packet.findMarker(buffer, 0, buffer.length);
 				
 				Packet p = PacketTypes.packet(marker);
 				
+				ClientConnection connection = null;
+				
+				if(player == null && p instanceof JoinPacket)
+				{
+					connection = new ClientConnection(null, 0, this);
+				}
+				else if(player != null)
+					connection = player.client();
+				else
+					continue;
+				
 				if(p == null)
 				{
 					Utils.println("INVALID PACKET TYPE");
 					buffer[0] = -1; // we can reuse the same buffer
-					client.send(buffer, 1, server);
+					connection.sendTCP(buffer, 1);
 					return;
 				}
 				
 				int off = Packet.additionalOffset(buffer, 0, buffer.length);
 				
 				Utils.println(buffer.length - off);
-				p.onReceiveServer(buffer, buffer.length - off, off, client, server);
+				p.onReceiveServer(buffer, buffer.length - off, off, connection, server);
 			}
 			catch(IOException ex)
 			{

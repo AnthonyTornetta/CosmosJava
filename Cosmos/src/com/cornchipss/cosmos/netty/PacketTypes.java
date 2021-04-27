@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.netty;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.FullStructurePacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
@@ -31,6 +32,6 @@ public class PacketTypes
 		PacketTypes.addPacketType(new DisconnectedPacket());
 		PacketTypes.addPacketType(new ModifyBlockPacket());
 		PacketTypes.addPacketType(new FullStructurePacket());
-		
+		PacketTypes.addPacketType(new DebugPacket());
 	}
 }
