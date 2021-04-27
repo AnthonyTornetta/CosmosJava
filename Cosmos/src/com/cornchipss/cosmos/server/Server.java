@@ -62,20 +62,24 @@ public class Server implements Runnable
 		
 		gameThread.start();
 		
-		while(cmd.readCommand(server));
+		while(server.running())
+		{
+			cmd.readCommand(server);
+		}
 		
-		server.running(false);
+		Logger.LOGGER.info("Terminating server...");
 		
 		try
 		{
-			serverThread.join();
 			gameThread.join();
+			// I cannot join() the udp thread because it forever waits for a UDP connection that will never happen
 		}
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
 		
-		Logger.LOGGER.info("Successfully closed.");
+		Logger.LOGGER.info("Server terminated.");
+		System.exit(0);
 	}
 }
