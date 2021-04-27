@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.server.command.DefaultCommandHandler;
 import com.cornchipss.cosmos.server.command.commands.PingCommand;
@@ -40,9 +41,19 @@ public class Server implements Runnable
 		
 		ServerConsole cmd = new ServerConsole();
 		
+		byte[] playerBuffer = new byte[128];
+		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
 			server.game().update(delta);
+			
+			for(ServerPlayer p : server.players().players())
+			{
+				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
+				packet.init();
+				
+				server.sendToAllUDP(packet);
+			}
 			
 			return server.running();
 		}, 10);

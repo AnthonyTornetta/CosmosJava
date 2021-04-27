@@ -97,6 +97,20 @@ public class TCPClientConnection implements Runnable
 				throw new RuntimeException(ex);
 			}
 		}
+		
+		try
+		{
+			writer.close();
+			
+			if(!clientSocket.isClosed())
+				clientSocket.close();
+		}
+		catch(IOException ex)
+		{
+			
+		}
+		
+		Utils.println("TCP connection closed.");
 	}
 	
 	@Override

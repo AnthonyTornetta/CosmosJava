@@ -168,6 +168,10 @@ public abstract class Packet
 
 	public static byte findMarker(byte[] buffer, int offset, int length)
 	{
+		if(length == 0)
+		{
+			throw new IllegalArgumentException("Buffer length for packet 0 - did you forget to initialize it?");
+		}
 		return buffer[offset];
 	}
 

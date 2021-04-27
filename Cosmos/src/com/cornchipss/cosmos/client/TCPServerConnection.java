@@ -2,12 +2,14 @@ package com.cornchipss.cosmos.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.Packet;
+import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class TCPServerConnection implements Runnable
@@ -67,11 +69,26 @@ public class TCPServerConnection implements Runnable
 				
 				p.onReceiveClient(buffer, buffer.length - off, off, server, client);
 			}
+			catch(EOFException ex)
+			{
+				connected = false;
+			}
 			catch(IOException ex)
 			{
 				throw new RuntimeException(ex);
 			}
 		}
+		
+		try
+		{
+			stopConnection();
+		}
+		catch(IOException ex)
+		{
+			// already closed
+		}
+		
+		Logger.LOGGER.info("TCP connection to server closed.");
 	}
 	
 	public void stopConnection() throws IOException
@@ -81,7 +98,7 @@ public class TCPServerConnection implements Runnable
 		in.close();
 		serverSocket.close();
     }
-
+	
 	@Override
 	public boolean equals(Object o)
 	{

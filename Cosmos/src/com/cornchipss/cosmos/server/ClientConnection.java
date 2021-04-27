@@ -91,4 +91,11 @@ public class ClientConnection
 	{
 		this.tcpClientConnection = tcpConnection;
 	}
+
+	public void terminateConnection()
+	{
+		tcpClientConnection.active(false);
+		addr = null;
+		port = 0;
+	}
 }

@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
@@ -38,7 +39,8 @@ public class CosmosNettyClient implements Runnable
 	{
 		try(Scanner scan = new Scanner(System.in))
 		{
-			TCPServerConnection tcpConnection = new TCPServerConnection(this, "localhost", 1337);
+			TCPServerConnection tcpConnection = 
+					new TCPServerConnection(this, "localhost", 1337);
 			
 			server = new ServerConnection(
 					InetAddress.getByName("localhost"), 1337,
@@ -90,6 +92,11 @@ public class CosmosNettyClient implements Runnable
 	        	
 	        	server.sendUDP(pp.buffer(), pp.bufferLength(), this);
 	        }
+	        
+	        
+	        DisconnectedPacket dcp = new DisconnectedPacket(buffer, 0, "Disconnected");
+	        dcp.init();
+	        server.sendTCP(dcp.buffer(), dcp.bufferLength(), this);
 	        
 	        tcpThread.join();
 		}

@@ -5,13 +5,11 @@ import java.io.IOException;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.game.ServerGame;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.ServerPlayer;
 import com.cornchipss.cosmos.server.ServerPlayerList;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class JoinPacket extends Packet
@@ -50,7 +48,6 @@ public class JoinPacket extends Packet
 		JoinPacket packet = new JoinPacket(data, offset);
 		
 		String name = packet.readString();
-		Utils.println("NAME: " + name);
 		
 		ServerPlayerList list = server.players();
 		
@@ -83,50 +80,9 @@ public class JoinPacket extends Packet
 				if(c.hasUDP() && c.hasTCP())
 				{
 					list.finishJoin(c, ServerGame.instance().world(), name);
+					
+					successJoin(server, data, name, c);
 				}
-			}
-			
-			JoinPacket jp = new JoinPacket(data, 0, name);
-			jp.init();
-			
-			try
-			{
-				client.sendTCP(jp.buffer(), jp.bufferLength());
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			for(Structure s : server.game().world().structures())
-			{
-				byte[] buf = new byte[s.width() * s.height() * s.length() * 2 + 64];
-				FullStructurePacket sp = new FullStructurePacket(buf, 0, s);
-				sp.init();
-				try
-				{
-					client.sendTCP(sp.buffer(), sp.bufferLength());
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			try
-			{
-				byte[] buf = new byte[1000];
-				DebugPacket dbgP = new DebugPacket(buf, 0, "TCP RECEIVED");
-				dbgP.init();
-				client.sendTCP(dbgP.buffer(), dbgP.bufferLength());
-				
-				dbgP = new DebugPacket(buf, 0, "UDP RECEIVED");
-				dbgP.init();
-				client.sendUDP(dbgP.buffer(), dbgP.bufferLength(), server);
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
 			}
 		}
 		else
@@ -142,6 +98,54 @@ public class JoinPacket extends Packet
 			{
 				e.printStackTrace();
 			}
+		}
+	}
+	
+	private void successJoin(CosmosNettyServer server, byte[] data, String name, ClientConnection c)
+	{
+		JoinPacket jp = new JoinPacket(data, 0, name);
+		jp.init();
+		
+		Logger.LOGGER.info("PLAYER CONNECTED - " + name);
+		
+		try
+		{
+			c.sendTCP(jp.buffer(), jp.bufferLength());
+		}
+		catch (IOException ex)
+		{
+			ex.printStackTrace();
+		}
+		
+		for(Structure s : server.game().world().structures())
+		{
+			byte[] buf = new byte[s.width() * s.height() * s.length() * 2 + 64];
+			FullStructurePacket sp = new FullStructurePacket(buf, 0, s);
+			sp.init();
+			try
+			{
+				c.sendTCP(sp.buffer(), sp.bufferLength());
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
+		try
+		{
+			byte[] buf = new byte[1000];
+			DebugPacket dbgP = new DebugPacket(buf, 0, "TCP RECEIVED");
+			dbgP.init();
+			c.sendTCP(dbgP.buffer(), dbgP.bufferLength());
+			
+			dbgP = new DebugPacket(buf, 0, "UDP RECEIVED");
+			dbgP.init();
+			c.sendUDP(dbgP.buffer(), dbgP.bufferLength(), server);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 	
