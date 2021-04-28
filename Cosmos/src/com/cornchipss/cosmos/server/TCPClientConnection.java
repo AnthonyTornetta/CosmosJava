@@ -57,9 +57,7 @@ public class TCPClientConnection implements Runnable
 		{
 			try
 			{
-				Utils.println("WAITING FOR DATA");
 				int nextBufferSize = in.readInt();
-				Utils.println("GOT DATA");	
 				byte[] buffer = in.readNBytes(nextBufferSize);
 				
 				ServerPlayer player = server.players().player(this);
@@ -89,7 +87,6 @@ public class TCPClientConnection implements Runnable
 				
 				int off = Packet.additionalOffset(buffer, 0, buffer.length);
 				
-				Utils.println(buffer.length - off);
 				p.onReceiveServer(buffer, buffer.length - off, off, connection, server);
 			}
 			catch(IOException ex)

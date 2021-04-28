@@ -111,7 +111,9 @@ public class Client implements Runnable
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running(false);
 			
+			game.world().lock();
 			game.update(delta);
+			game.world().unlock();
 			
 			Input.update();
 			

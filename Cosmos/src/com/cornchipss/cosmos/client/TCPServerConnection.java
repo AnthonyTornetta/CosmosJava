@@ -47,10 +47,6 @@ public class TCPServerConnection implements Runnable
 				int nextBufferSize = in.readInt();
 				byte[] buffer = in.readNBytes(nextBufferSize);
 				
-				Utils.println(nextBufferSize);
-				Utils.println(buffer.length);
-				Utils.println(buffer[0]);
-				
 				ServerConnection server = new ServerConnection(this);
 				
 				byte marker = Packet.findMarker(buffer, 0, buffer.length);
@@ -59,7 +55,7 @@ public class TCPServerConnection implements Runnable
 				
 				if(p == null)
 				{
-					Utils.println("INVALID PACKET TYPE");
+					Utils.println("INVALID PACKET TYPE - " + marker);
 					buffer[0] = -1; // we can reuse the same buffer
 					server.sendTCP(buffer, 1, client);
 					return;

@@ -13,9 +13,7 @@ public abstract class Game
 	
 	public void update(float delta)
 	{
-		world.lock();
 		world.update(delta);
-		world.unlock();
 	}
 	
 	public World world()

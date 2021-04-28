@@ -24,6 +24,12 @@ public class ServerPlayerList
 		}
 		
 		@Override
+		public String toString()
+		{
+			return addr + ":" + port;
+		}
+		
+		@Override
 		public boolean equals(Object o)
 		{
 			return o instanceof AddressPort && ((AddressPort)o).port == port && ((AddressPort)o).addr.equals(addr);
@@ -41,7 +47,7 @@ public class ServerPlayerList
 	private Map<ClientConnection, ServerPlayer> playerClients;
 	private Map<String, ServerPlayer> playerNames;
 	private Map<AddressPort, ServerPlayer> playerAddrs;
-	private Map<TCPClientConnection, ServerPlayer> playersTCP;
+	private Map<TCPClientConnection, ServerPlayer> playerTCPs;
 	private List<ServerPlayer> players;
 	
 	public ServerPlayerList()
@@ -49,7 +55,7 @@ public class ServerPlayerList
 		playerClients = new HashMap<>();
 		playerNames = new HashMap<>();
 		playerAddrs = new HashMap<>();
-		playersTCP = new HashMap<>();
+		playerTCPs = new HashMap<>();
 		players = new LinkedList<>();
 	}
 	
@@ -84,7 +90,8 @@ public class ServerPlayerList
 	{
 		playerClients.put(c, p);
 		playerNames.put(p.name().toLowerCase(), p);
-		playersTCP.put(c.tcpConnection(), p);
+		playerAddrs.put(new AddressPort(c.address(), c.port()), p);
+		playerTCPs.put(c.tcpConnection(), p);
 		players.add(p);
 	}
 	
@@ -150,7 +157,7 @@ public class ServerPlayerList
 
 	public ServerPlayer player(TCPClientConnection tcpClientConnection)
 	{
-		return playersTCP.get(tcpClientConnection);
+		return playerTCPs.get(tcpClientConnection);
 	}
 	
 	public List<ServerPlayer> players() { return players; }

@@ -63,7 +63,7 @@ public class CosmosNettyServer implements Runnable
 		
 		if(p == null)
 		{
-			Utils.println("INVALID PACKET TYPE");
+			Utils.println("INVALID PACKET TYPE - " + marker);
 			buffer[0] = -1; // we can reuse the same buffer
 			player.client().sendUDP(buffer, 1, this);
 			return;

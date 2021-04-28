@@ -102,7 +102,7 @@ public class ServerConnection
 		}
 		catch(IOException ex)
 		{
-			throw new RuntimeException(ex);
+			ex.printStackTrace();
 		}
 	}
 	

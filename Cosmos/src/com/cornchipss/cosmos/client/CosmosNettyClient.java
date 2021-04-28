@@ -7,6 +7,7 @@ import java.util.Scanner;
 
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
