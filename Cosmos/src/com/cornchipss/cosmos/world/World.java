@@ -101,12 +101,10 @@ public class World
 	{
 		locked = false;
 		
-		for(RigidBody b : bodiesToAdd)
-			addRigidBody(b);
-		bodiesToAdd.clear();
+		while(bodiesToAdd.size() != 0)
+			addRigidBody(bodiesToAdd.remove(0));
 		
-		for(Structure s : structuresToAdd)
-			addStructure(s);
-		structuresToAdd.clear();
+		while(structuresToAdd.size() != 0)
+			addStructure(structuresToAdd.remove(0));
 	}
 }

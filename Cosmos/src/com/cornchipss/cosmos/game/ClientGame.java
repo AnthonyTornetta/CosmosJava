@@ -174,28 +174,48 @@ public class ClientGame extends Game
 	}
 	
 	@Override
+	public void preUpdate()
+	{
+		if(nettyClient.ready())
+		{
+			for(Structure s : world().structures())
+				updateStructureGraphics(s);
+		}
+	}
+	
+	@Override
 	public void update(float delta)
 	{
-		super.update(delta);
-		
-		if(player() == null)
-			return;
-		else if(models == null)
-			initInventoryBarModels();
-		
-		fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
-		
-		int prevRow = player.selectedInventoryColumn();
-		
-		player.update(delta);
-		
-		int row = player.selectedInventoryColumn();
-		
-		if(prevRow != row)
+		if(nettyClient.ready())
 		{
-			inventorySlots[prevRow].state(0);
-			inventorySlots[row].state(1);
+			super.update(delta);
+			
+			if(player() == null)
+				return;
+			else if(models == null)
+				initInventoryBarModels();
+			
+			fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
+			
+			int prevRow = player.selectedInventoryColumn();
+			
+			player.update(delta);
+			
+			int row = player.selectedInventoryColumn();
+			
+			if(prevRow != row)
+			{
+				inventorySlots[prevRow].state(0);
+				inventorySlots[row].state(1);
+			}
 		}
+	}
+	
+	private static void updateStructureGraphics(Structure s)
+	{
+		for(Chunk c : s.chunks())
+			if(c.needsRendered())
+				c.render();
 	}
 
 	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, ClientPlayer p)
@@ -245,4 +265,5 @@ public class ClientGame extends Game
 	{
 		return running;
 	}
+
 }

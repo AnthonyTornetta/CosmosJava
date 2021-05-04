@@ -313,7 +313,7 @@ public abstract class Structure extends PhysicalObject implements IWritable
 					{
 						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
 						{
-							chunks[flatten(cx, cy, cz)].render();
+							chunks[flatten(cx, cy, cz)].needsRendered(true);
 						}
 					}
 				}

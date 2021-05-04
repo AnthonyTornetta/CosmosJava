@@ -12,6 +12,7 @@ import org.joml.Vector3ic;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.Structure;
@@ -23,6 +24,18 @@ public class Chunk implements IWritable
 	private BulkModel model;
 	
 	private boolean rendered;
+	
+	private boolean needsRendered;
+	
+	public boolean needsRendered()
+	{
+		return needsRendered;
+	}
+	
+	public void needsRendered(boolean b)
+	{
+		needsRendered = b;
+	}
 	
 	/**
 	 * Dimensions of a Chunk - must be even
@@ -48,6 +61,8 @@ public class Chunk implements IWritable
 		this.structure = s;
 		
 		rendered = false;
+		needsRendered = true;
+		
 		blocks = new Block[LENGTH][HEIGHT][WIDTH];
 		model = new BulkModel(blocks);
 	}
@@ -203,7 +218,7 @@ public class Chunk implements IWritable
 		if(!within(x, y, z))
 			throw new IllegalArgumentException("Bad x,y,z: " + x + ", " + y + ", " + z);
 		
-		shouldRender = rendered && shouldRender;
+		shouldRender = rendered && shouldRender && NettySide.side() == NettySide.CLIENT;
 		
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
@@ -240,23 +255,30 @@ public class Chunk implements IWritable
 			}
 			
 			if(shouldRender) // only if the chunk has been rendered at least 1 time before
-				render(); // update the chunk's model for the new block
+//				render(); // update the chunk's model for the new block
+				needsRendered(true);
 			
 			// Make sure if this block is neighboring another chunk, that chunk updates aswell
 			if(x == 0 && left != null && shouldRender)
-				left.render();
+//				left.render();
+				needsRendered(true);
 			if(x + 1 == Chunk.WIDTH && right != null && shouldRender)
-				right.render();
+//				right.render();
+				needsRendered(true);
 			
 			if(y == 0 && bottom != null && shouldRender)
-				bottom.render();
+//				bottom.render();
+				needsRendered(true);
 			if(y + 1 == Chunk.HEIGHT && top != null && shouldRender)
-				top.render();
+//				top.render();
+				needsRendered(true);
 			
 			if(z == 0 && back != null && shouldRender)
-				back.render();
+//				back.render();
+				needsRendered(true);
 			if(z + 1 == Chunk.LENGTH && front != null && shouldRender)
-				front.render();
+//				front.render();
+				needsRendered(true);
 		}
 	}
 	
@@ -267,6 +289,7 @@ public class Chunk implements IWritable
 	public void render()
 	{
 		rendered = true;
+		needsRendered = false;
 		
 		model.render(
 				left != null ? left.model : null, 

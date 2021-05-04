@@ -2,12 +2,14 @@ package com.cornchipss.cosmos.server;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
 
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
+import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class TCPClientConnection implements Runnable
@@ -88,6 +90,11 @@ public class TCPClientConnection implements Runnable
 				int off = Packet.additionalOffset(buffer, 0, buffer.length);
 				
 				p.onReceiveServer(buffer, buffer.length - off, off, connection, server);
+			}
+			catch(EOFException ex)
+			{
+				Logger.LOGGER.info("Player " + server.players().player(this).name() + " disconnected.");
+				server.players().removePlayer(this);
 			}
 			catch(IOException ex)
 			{

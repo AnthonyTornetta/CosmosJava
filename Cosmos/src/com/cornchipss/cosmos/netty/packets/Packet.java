@@ -37,7 +37,11 @@ public abstract class Packet
 	
 	public void reset()
 	{
+		int oldWritingAt = writingAt;
+		
 		writingAt = bufferOffset;
+		
+		bufferLength = oldWritingAt - writingAt + 1;
 	}
 	
 	/**

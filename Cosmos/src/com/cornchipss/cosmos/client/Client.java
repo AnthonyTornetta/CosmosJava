@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.client;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
@@ -18,6 +19,8 @@ public class Client implements Runnable
 	
 	public Client()
 	{
+		NettySide.initNettySide(NettySide.CLIENT);
+		
 		if(instance != null)
 			throw new IllegalStateException("Cannot have more than 1 running clients!");
 		instance = this;
@@ -71,6 +74,8 @@ public class Client implements Runnable
 			if(window.wasWindowResized())
 				game.onResize(window.getWidth(), window.getHeight());
 			
+			game.preUpdate();
+			
 			float delta = System.currentTimeMillis() - t; 
 			
 			if(delta < MILLIS_WAIT)
@@ -111,9 +116,12 @@ public class Client implements Runnable
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running(false);
 			
-			game.world().lock();
-			game.update(delta);
-			game.world().unlock();
+			if(nettyClient.ready())
+			{
+				game.world().lock();
+				game.update(delta);
+				game.world().unlock();
+			}
 			
 			Input.update();
 			

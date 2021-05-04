@@ -16,6 +16,11 @@ public abstract class Game
 		world.update(delta);
 	}
 	
+	public void preUpdate()
+	{
+		
+	}
+	
 	public World world()
 	{
 		return world;

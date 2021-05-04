@@ -25,7 +25,7 @@ public class ServerGame extends Game
 		
 		mainPlanet = new Planet(world(), 16*10, 16*6, 16*10, 1);
 		mainPlanet.init();
-		Biosphere def = Biospheres.newInstance("cosmos:desert");
+		Biosphere def = Biospheres.newInstance("cosmos:grass");
 		def.generatePlanet(mainPlanet);
 		
 		ship = new Ship(world(), 2);

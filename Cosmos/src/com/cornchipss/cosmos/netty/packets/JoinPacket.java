@@ -119,9 +119,9 @@ public class JoinPacket extends Packet
 		
 		for(Structure s : server.game().world().structures())
 		{
-			byte[] buf = new byte[s.width() * s.height() * s.length() * 2 + 64];
-			FullStructurePacket sp = new FullStructurePacket(buf, 0, s);
+			FullStructurePacket sp = new FullStructurePacket(s);
 			sp.init();
+			
 			try
 			{
 				c.sendTCP(sp.buffer(), sp.bufferLength());
@@ -132,14 +132,25 @@ public class JoinPacket extends Packet
 			}
 		}
 		
+		JoinFinishPacket jfp = new JoinFinishPacket(data, 0);
+		jfp.init();
+		
 		try
 		{
-			byte[] buf = new byte[1000];
-			DebugPacket dbgP = new DebugPacket(buf, 0, "TCP RECEIVED");
+			c.sendTCP(jfp.buffer(), jfp.bufferLength());
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		try
+		{
+			DebugPacket dbgP = new DebugPacket(data, 0, "TCP RECEIVED");
 			dbgP.init();
 			c.sendTCP(dbgP.buffer(), dbgP.bufferLength());
 			
-			dbgP = new DebugPacket(buf, 0, "UDP RECEIVED");
+			dbgP = new DebugPacket(data, 0, "UDP RECEIVED");
 			dbgP.init();
 			c.sendUDP(dbgP.buffer(), dbgP.bufferLength(), server);
 		}

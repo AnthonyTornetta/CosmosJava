@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
@@ -16,6 +17,11 @@ public class Server implements Runnable
 	private static CosmosNettyServer server;
 	
 	public static CosmosNettyServer nettyServer() { return server; }
+	
+	public Server()
+	{
+		NettySide.initNettySide(NettySide.SERVER);
+	}
 	
 	@Override
 	public void run()
@@ -52,11 +58,11 @@ public class Server implements Runnable
 				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
 				packet.init();
 				
-				server.sendToAllUDP(packet);
+				server.sendToAllExceptUDP(packet, p);
 			}
 			
 			return server.running();
-		}, 10);
+		}, 1000/50); // 20 tps
 		
 		Thread gameThread = new Thread(loop);
 		

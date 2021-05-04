@@ -2,11 +2,11 @@ package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
-import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.Server;
-import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
 
 public class ModifyBlockPacket extends Packet
@@ -65,7 +65,7 @@ public class ModifyBlockPacket extends Packet
 		
 		packet.reset();
 		
-		Server.nettyServer().sendToAllUDP(packet);
+		Server.nettyServer().sendToAllTCP(packet);
 	}
 
 	@Override

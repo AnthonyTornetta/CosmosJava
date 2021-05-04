@@ -7,7 +7,6 @@ import java.util.Scanner;
 
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.PacketTypes;
-import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
@@ -19,6 +18,8 @@ public class CosmosNettyClient implements Runnable
 {
 	private ServerConnection server;
 	private ClientPlayerList players;
+	
+	private boolean ready = false;
 	
 	public CosmosNettyClient()
 	{
@@ -97,7 +98,15 @@ public class CosmosNettyClient implements Runnable
 	        
 	        DisconnectedPacket dcp = new DisconnectedPacket(buffer, 0, "Disconnected");
 	        dcp.init();
-	        server.sendTCP(dcp.buffer(), dcp.bufferLength(), this);
+	        
+	        try
+	        {
+	        	server.sendTCP(dcp.buffer(), dcp.bufferLength(), this);
+	        }
+	        catch(Exception ex)
+	        {
+	        	// the connection was already closed
+	        }
 	        
 	        tcpThread.join();
 		}
@@ -115,5 +124,23 @@ public class CosmosNettyClient implements Runnable
 	public ClientGame game()
 	{
 		return ClientGame.instance();
+	}
+
+	/**
+	 * If the world is ready to be updated on the client side
+	 * @return If the world is ready to be updated on the client side
+	 */
+	public boolean ready()
+	{
+		return ready;
+	}
+	
+	/**
+	 * If the world is ready to be updated on the client side
+	 * @param b If the world is ready to be updated on the client side
+	 */
+	public void ready(boolean b)
+	{
+		ready = b;
 	}
 }

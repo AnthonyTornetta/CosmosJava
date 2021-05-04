@@ -10,6 +10,7 @@ import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
@@ -102,15 +103,18 @@ public class PlayerPacket extends Packet
 			Vector3f dPos = newPos.sub(p.body().transform().position(), new Vector3f());
 			
 			// if it's a small enough distance, move there smoothly
-			if(dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z > 5)
-			{
+//			if(dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z > 5)
+//			{
 				p.body().transform().position(newPos);
-			}
-			else
-			{
-				float time = 1 / 20.0f; // approximate
-				p.body().velocity().add(new Vector3f(dPos.x * time, dPos.y * time, dPos.z * time));
-			}
+//				
+//				Utils.println(name + " - " + Utils.toString(newPos));
+				
+//			}
+//			else
+//			{
+//				float time = 1 / 20.0f; // approximate
+//				p.body().velocity().add(new Vector3f(dPos.x * time, dPos.y * time, dPos.z * time));
+//			}
 			
 			// this hurts my eyes.  I should prob sync this
 //			p.body().transform().orientation().quaternion(packet.readQuaternionf(new Quaternionf()));

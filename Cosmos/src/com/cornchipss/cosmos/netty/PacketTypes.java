@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.FullStructurePacket;
+import com.cornchipss.cosmos.netty.packets.JoinFinishPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
@@ -17,6 +18,8 @@ public class PacketTypes
 	
 	public static void addPacketType(Packet p)
 	{
+		if(packetTypes.containsKey(p.marker()))
+			throw new IllegalArgumentException("Packet of marker " + p.marker() + " has already been registered!");
 		packetTypes.put(p.marker(), p);
 	}
 	
@@ -33,5 +36,6 @@ public class PacketTypes
 		PacketTypes.addPacketType(new ModifyBlockPacket());
 		PacketTypes.addPacketType(new FullStructurePacket());
 		PacketTypes.addPacketType(new DebugPacket());
+		PacketTypes.addPacketType(new JoinFinishPacket());
 	}
 }

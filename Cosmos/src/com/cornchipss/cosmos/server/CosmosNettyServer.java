@@ -51,6 +51,57 @@ public class CosmosNettyServer implements Runnable
 		}
 	}
 	
+	public void sendToAllTCP(Packet packet)
+	{
+		for(ServerPlayer p : players.players())
+		{
+			try
+			{
+				p.client().sendTCP(packet.buffer(), packet.bufferLength());
+			}
+			catch(IOException ex)
+			{
+				
+			}
+		}
+	}
+	
+	public void sendToAllExceptUDP(Packet packet, ServerPlayer exception)
+	{
+		for(ServerPlayer p : players.players())
+		{
+			if(!p.equals(exception))
+			{
+				try
+				{
+					p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
+				}
+				catch(IOException ex)
+				{
+					
+				}
+			}
+		}
+	}
+	
+	public void sendToAllExceptTCP(Packet packet, ServerPlayer exception)
+	{
+		for(ServerPlayer p : players.players())
+		{
+			if(!p.equals(exception))
+			{
+				try
+				{
+					p.client().sendTCP(packet.buffer(), packet.bufferLength());
+				}
+				catch(IOException ex)
+				{
+					
+				}
+			}
+		}
+	}
+	
 	private synchronized void processUDP(DatagramPacket packet, DatagramSocket serverSocket) throws IOException
 	{
 		ServerPlayer player = players.player(packet.getAddress(), packet.getPort());
@@ -150,7 +201,6 @@ public class CosmosNettyServer implements Runnable
 		
 		while(running)
 		{
-			Utils.println("Waiting for next TCP connection...");
 			try
 			{
 				Socket clientSocket = tcpSocket.accept();
@@ -159,7 +209,6 @@ public class CosmosNettyServer implements Runnable
 				
 				Thread connectionThread = new Thread(connection);
 				
-				Utils.println("TCP connection created!");
 				connectionThread.start();
 			}
 			catch (IOException e)

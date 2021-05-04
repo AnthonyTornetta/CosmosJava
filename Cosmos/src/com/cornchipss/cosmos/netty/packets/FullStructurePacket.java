@@ -29,9 +29,9 @@ public class FullStructurePacket extends Packet
 		super(buffer, bufferOffset);
 	}
 	
-	public FullStructurePacket(byte[] buffer, int bufferOffset, Structure s)
+	public FullStructurePacket(Structure s)
 	{
-		super(buffer, bufferOffset);
+		super(new byte[s.width() * s.height() * s.length() * 2 + 64], 0);
 		
 		this.s = s;
 	}

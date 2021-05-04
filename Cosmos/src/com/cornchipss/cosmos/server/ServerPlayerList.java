@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 public class ServerPlayerList
@@ -108,9 +107,17 @@ public class ServerPlayerList
 			return p;
 		}
 		
-		Utils.println("L:");
-		
 		return null;
+	}
+	
+	public void removePlayer(ServerPlayer p)
+	{
+		ClientConnection c = p.client();
+		
+		playerTCPs.remove(c.tcpConnection());
+		playerAddrs.remove(new AddressPort(c.address(), c.port()));
+		playerNames.remove(p.name().toLowerCase());
+		players.remove(p);
 	}
 	
 	public boolean removePlayer(ClientConnection c)
@@ -120,9 +127,7 @@ public class ServerPlayerList
 		if(p == null)
 			return false;
 		
-		playerNames.remove(p.name().toLowerCase());
-		players.remove(p);
-		
+		removePlayer(p);
 		return true;
 	}
 	
@@ -133,13 +138,21 @@ public class ServerPlayerList
 		if(p == null)
 			return false;
 		
-		playerAddrs.remove(new AddressPort(p.client().address(), p.client().port()));
-		playerClients.remove(p.client());
-		players.remove(p);
-		
+		removePlayer(p);
 		return true;
 	}
 
+	public boolean removePlayer(TCPClientConnection tcpClientConnection)
+	{
+		ServerPlayer p = playerTCPs.get(tcpClientConnection);
+		
+		if(p == null)
+			return false;
+		
+		removePlayer(p);
+		return true;
+	}
+	
 	public ServerPlayer player(ClientConnection client)
 	{
 		return playerClients.get(client);
@@ -160,6 +173,6 @@ public class ServerPlayerList
 		return playerTCPs.get(tcpClientConnection);
 	}
 	
+	
 	public List<ServerPlayer> players() { return players; }
-
 }
