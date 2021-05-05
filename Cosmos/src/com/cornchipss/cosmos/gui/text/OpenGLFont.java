@@ -168,6 +168,16 @@ public class OpenGLFont
 		return getOffset((char)((int)c + 1)) - getOffset(c);
 	}
 	
+	public int stringWidth(String string)
+	{
+		int w = 0;
+		for(int i = 0; i < string.length(); i++)
+		{
+			w += charWidth(string.charAt(i));
+		}
+		return w;
+	}
+	
 	/**
 	 * Gets the offset in pixels for a character in the font image
 	 * @param c The character to do this for

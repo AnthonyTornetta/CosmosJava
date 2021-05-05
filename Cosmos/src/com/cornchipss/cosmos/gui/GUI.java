@@ -4,9 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class GUI
 {
@@ -33,6 +36,11 @@ public class GUI
 	
 	public void draw()
 	{
+		GL11.glEnable(GL13.GL_TEXTURE0);
+	
+		GL30.glEnable(GL30.GL_DEPTH_TEST);
+		GL30.glDepthFunc(GL30.GL_LESS);
+		
 		GL30.glDisable(GL30.GL_DEPTH_TEST);
 		
 		for(GUIElement e : elements)

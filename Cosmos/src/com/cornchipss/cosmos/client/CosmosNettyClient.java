@@ -58,6 +58,8 @@ public class CosmosNettyClient implements Runnable
 	        Utils.println("name: ");
 	        String name = scan.nextLine();
 	        
+	        ready = true;
+	        
 	        JoinPacket joinP = new JoinPacket(buffer, 0, name);
 	        joinP.init();
 	        
@@ -65,7 +67,7 @@ public class CosmosNettyClient implements Runnable
 	        sendUDP(joinP);
 	        
 	        // udp stuff
-	        while(ClientGame.instance().running())
+	        while(Client.instance().running())
 	        {
 	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
 	        	server.socket().receive(recieved);

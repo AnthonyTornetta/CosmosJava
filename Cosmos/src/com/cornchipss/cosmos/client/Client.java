@@ -2,12 +2,13 @@ package com.cornchipss.cosmos.client;
 
 import org.lwjgl.glfw.GLFW;
 
-import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.client.states.MainMenuState;
+import com.cornchipss.cosmos.client.states.State;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
-import com.cornchipss.cosmos.utils.DebugMonitor;
+import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 
@@ -27,7 +28,8 @@ public class Client implements Runnable
 	}
 	
 	private volatile boolean running = true;
-	private ClientGame game;
+	private State state;
+	private CosmosNettyClient client;
 	
 	@Override
 	public void run()
@@ -39,98 +41,42 @@ public class Client implements Runnable
 		Initializer loader = new Initializer();
 		loader.init();
 		
-		CosmosNettyClient nettyClient = new CosmosNettyClient();
-		
-		Thread thread = new Thread(nettyClient);
-		thread.start();
-		
-		game = new ClientGame(window, nettyClient);
-		
 		PacketTypes.registerAll();
+
+		client = new CosmosNettyClient();
 		
+		Thread thread = new Thread(client);
+		thread.start();		
 		
 		Input.setWindow(window);
-		
-		long t = System.currentTimeMillis();
-		
-		final int UPS_TARGET = 70;
-		
-		final int MILLIS_WAIT = 1000 / UPS_TARGET;
-		
-		long lastSecond = t;
-		
-		int ups = 0;
-		float variance = 0;
-		
-		Input.hideCursor(true);
-		
 		Input.update();
 		
-		DebugMonitor.set("ups", 0);
-		DebugMonitor.set("ups-variance", 0.0f);
-		
-		while(!window.shouldClose() && running)
+		state(new MainMenuState());
+
+		GameLoop loop = new GameLoop((float delta) ->
 		{
-			if(window.wasWindowResized())
-				game.onResize(window.getWidth(), window.getHeight());
-			
-			game.preUpdate();
-			
-			float delta = System.currentTimeMillis() - t; 
-			
-			if(delta < MILLIS_WAIT)
-			{
-				try
-				{
-					Thread.sleep(MILLIS_WAIT - (int)delta);
-					
-					delta = (System.currentTimeMillis() - t);
-				}
-				catch (InterruptedException e)
-				{
-					e.printStackTrace();
-				}
-			}
-			
-			delta /= 1000.0f;
-			
-			if(delta > variance)
-				variance = delta;
-			
-			t = System.currentTimeMillis();
-			
-			if(lastSecond / 1000 != t / 1000)
-			{
-				DebugMonitor.set("ups", ups);
-				DebugMonitor.set("ups-variance", variance);
-				
-				lastSecond = t;
-				ups = 0;
-				variance = 0;
-			}
-			ups++;
-			
 			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
 				Input.toggleCursor();
 			
 			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running(false);
 			
-			if(nettyClient.ready())
-			{
-				game.world().lock();
-				game.update(delta);
-				game.world().unlock();
-			}
+			state.update(delta);
 			
 			Input.update();
 			
 			window.clear(0, 0, 0, 1);
 			
-			game.render(delta);
+			state.render(delta);
 			
 			window.update();
-		}
+			
+			state.postUpdate();
+			
+			return running();
+		}, 1000 / 70);
+		
+		loop.run();
 		
 		window.destroy();
 		
@@ -153,12 +99,25 @@ public class Client implements Runnable
 
 	public void running(boolean b)
 	{
-		game.running(b);
 		running = b;
 	}
 	
 	public boolean running()
 	{
-		return running;
+		return !window.shouldClose() && running;
+	}
+	
+	public void state(State state)
+	{
+		if(this.state != null)
+			this.state.remove();
+		
+		this.state = state;
+		state.init(window, client);
+	}
+	
+	public State state()
+	{
+		return state;
 	}
 }

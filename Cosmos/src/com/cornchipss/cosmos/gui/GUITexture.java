@@ -6,8 +6,8 @@ import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUITexture extends GUIElement
 {
-	private static final float UV_WIDTH = 0.5f;
-	private static final float UV_HEIGHT = 0.5f;
+	private static final float UV_WIDTH = 0.25f;
+	private static final float UV_HEIGHT = 0.25f;
 	
 	public static final int[] indices = new int[]
 			{

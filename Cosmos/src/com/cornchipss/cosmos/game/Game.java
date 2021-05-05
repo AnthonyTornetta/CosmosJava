@@ -16,7 +16,10 @@ public abstract class Game
 		world.update(delta);
 	}
 	
-	public void preUpdate()
+	/**
+	 * Called after update() is called
+	 */
+	public void postUpdate()
 	{
 		
 	}

@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
+import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
@@ -174,7 +175,7 @@ public class ClientGame extends Game
 	}
 	
 	@Override
-	public void preUpdate()
+	public void postUpdate()
 	{
 		if(nettyClient.ready())
 		{
@@ -263,7 +264,6 @@ public class ClientGame extends Game
 	
 	public boolean running()
 	{
-		return running;
+		return Client.instance().running() && running;
 	}
-
 }
