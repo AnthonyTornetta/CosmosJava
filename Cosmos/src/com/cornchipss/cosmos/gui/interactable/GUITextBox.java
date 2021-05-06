@@ -35,7 +35,8 @@ public class GUITextBox extends GUIElement implements IUpdatable
 		
 		text = "";
 		
-		textGUI = new GUIText(text, font, position.x(), position.y());
+		textGUI = new GUIText(text, font, position.x() + 6, position.y()
+				+ (height - font.height()) / 2);
 		
 		active = new GUITexture(position, width, height, 0.5f, 0.25f);
 		inactive = new GUITexture(position, width, height, 0.75f, 0.25f);
@@ -58,7 +59,7 @@ public class GUITextBox extends GUIElement implements IUpdatable
 		inactive.delete();
 		textGUI.delete();
 	}
-//	
+	
 	@Override
 	public void prepare(GUI gui)
 	{
@@ -76,9 +77,7 @@ public class GUITextBox extends GUIElement implements IUpdatable
 	{
 		super.finish(gui);
 		
-		textGUI.prepare(gui);
-		textGUI.draw(gui);
-		textGUI.finish(gui);
+		gui.draw(textGUI);
 	}
 	
 	@Override

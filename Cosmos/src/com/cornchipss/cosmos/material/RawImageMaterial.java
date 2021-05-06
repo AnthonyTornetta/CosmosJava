@@ -2,13 +2,26 @@ package com.cornchipss.cosmos.material;
 
 import org.joml.Matrix4fc;
 
-public class GuiMaterial extends Material
+import com.cornchipss.cosmos.shaders.Shader;
+
+public class RawImageMaterial extends Material
 {
 	private int guiProjLoc, guiTransLoc;
 	
-	public GuiMaterial()
+	private static Shader shader;
+	
+	/**
+	 * A raw image
+	 * @param image The image w/out the .png ending
+	 */
+	public RawImageMaterial(String image)
 	{
-		super("assets/shaders/gui", "assets/images/atlas/gui");
+		super((Shader)null, image);
+		
+		if(shader == null)
+			shader = new Shader("assets/shaders/image");
+		
+		shader(shader);
 	}
 
 	@Override
@@ -28,12 +41,12 @@ public class GuiMaterial extends Material
 	@Override
 	public float uvWidth()
 	{
-		return 16.0f / 64.0f;
+		return 1;
 	}
 
 	@Override
 	public float uvHeight()
 	{
-		return 16.0f / 64.0f;
+		return 1;
 	}
 }

@@ -80,16 +80,6 @@ public class ClientGame extends Game
 		fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-		projectionMatrix = new Matrix4f();
-		projectionMatrix.perspective((float)Math.toRadians(90), 
-				1024/720.0f,
-				0.1f, 1000);
-		
-		Matrix4f guiProjMatrix = new Matrix4f();
-		guiProjMatrix.perspective((float)Math.toRadians(90), 
-				1024/720.0f,
-				0.1f, 1000);
-		
 		initInventoryBarModels();
 	}
 	
@@ -101,6 +91,16 @@ public class ClientGame extends Game
 		instance = this;
 		
 		this.nettyClient = nettyClient;
+
+		projectionMatrix = new Matrix4f();
+		projectionMatrix.perspective((float)Math.toRadians(90), 
+				1024/720.0f,
+				0.1f, 1000);
+		
+		Matrix4f guiProjMatrix = new Matrix4f();
+		guiProjMatrix.perspective((float)Math.toRadians(90), 
+				1024/720.0f,
+				0.1f, 1000);
 	}
 	
 	public void onResize(int w, int h)

@@ -31,4 +31,16 @@ public class DefaultMaterial extends Material
 		ambientLoc = shader().uniformLocation("u_ambientLight");
 		timeLoc = shader().uniformLocation("u_time");
 	}
+
+	@Override
+	public float uvWidth()
+	{
+		return 16.0f / 256.0f;
+	}
+
+	@Override
+	public float uvHeight()
+	{
+		return 16.0f / 256.0f;
+	}
 }

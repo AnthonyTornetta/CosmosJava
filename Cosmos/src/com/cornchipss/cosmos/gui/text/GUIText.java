@@ -36,7 +36,7 @@ public class GUIText extends GUIElement
 			
 			mesh = TextRenderer.createMesh(newText, font);
 			
-			newText = text;
+			newText = null;
 		}
 		
 		super.prepare(gui);

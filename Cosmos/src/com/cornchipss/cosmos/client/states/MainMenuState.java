@@ -12,9 +12,10 @@ import com.cornchipss.cosmos.gui.interactable.GUIButton;
 import com.cornchipss.cosmos.gui.interactable.GUITextBox;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
+import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.rendering.Window;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class MainMenuState extends State
 {
@@ -34,6 +35,10 @@ public class MainMenuState extends State
 		gui.init(window.getWidth(), window.getHeight());
 	
 //		gui.addElement(new GUITexture(Maths.zero(), 100, 100, 0, 0));
+		
+		Material bgTexture = new RawImageMaterial("assets/images/screenshot-upgraded");
+		bgTexture.init();
+		GUITexture background = new GUITexture(new Vector3f(0, 0, 0), window.getWidth(), window.getHeight(), 0, 0, bgTexture);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
 		font.init();
@@ -67,6 +72,8 @@ public class MainMenuState extends State
 		
 		connectBtn = new GUIButton(pos, w, h, () ->
 		{
+			connectBtn.lock();
+			
 			String[] split = ipBox.text().split(":");
 			
 			if(split.length > 2)
@@ -124,13 +131,9 @@ public class MainMenuState extends State
 			});
 			
 			t.start();
-			
-			connectBtn.lock();
-			
-			Utils.println("ASDF");
 		});
 		
-		gui.addElement(connectBtn, btnText, dbgMessage,
+		gui.addElement(background, connectBtn, btnText, dbgMessage,
 				nameLabel, nameBox, ipLabel, ipBox);
 	}
 	

@@ -43,6 +43,11 @@ public abstract class Material
 		return shader;
 	}
 	
+	protected void shader(Shader s)
+	{
+		shader = s;
+	}
+	
 	public Texture texture()
 	{
 		return texture;
@@ -83,4 +88,7 @@ public abstract class Material
 		if(texture == null)
 			texture = Texture.loadTexture(textureLoc);
 	}
+	
+	public abstract float uvWidth();
+	public abstract float uvHeight();
 }

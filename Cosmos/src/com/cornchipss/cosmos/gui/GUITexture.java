@@ -2,13 +2,12 @@ package com.cornchipss.cosmos.gui;
 
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUITexture extends GUIElement
 {
-	private static final float UV_WIDTH = 0.25f;
-	private static final float UV_HEIGHT = 0.25f;
-	
 	public static final int[] indices = new int[]
 			{
 				0, 1, 3,
@@ -26,23 +25,37 @@ public class GUITexture extends GUIElement
 			};
 	}
 	
-	public static float[] makeUVs(float u, float v)
+	public static float[] makeUVs(float u, float v, float uWidth, float uHeight)
 	{
 		return new float[]
 			{
-				u + UV_WIDTH, v,
-				u + UV_WIDTH, v + UV_HEIGHT,
-				u, v + UV_HEIGHT,
+				u + uWidth, v,
+				u + uWidth, v + uHeight,
+				u, v + uHeight,
 				u, v
 			};
 	}
 	
 	private Mesh guiMesh;
-
+	private Material material;
+	
 	public GUITexture(Vector3fc position, float w, float h, float u, float v)
 	{
+		this(position, w, h, u, v, Materials.GUI_MATERIAL);
+	}
+	
+	public GUITexture(Vector3fc position, float w, float h, float u, float v, Material material)
+	{
 		super(position);
-		guiMesh = Mesh.createMesh(makeVerts(w, h), indices, makeUVs(u, v));
+		guiMesh = Mesh.createMesh(makeVerts(w, h), indices, makeUVs(u, v, material.uvWidth(), material.uvHeight()));
+		
+		this.material = material;
+	}
+	
+	@Override
+	public Material material()
+	{
+		return material;
 	}
 	
 	@Override

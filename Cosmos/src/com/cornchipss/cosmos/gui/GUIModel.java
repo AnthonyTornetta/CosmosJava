@@ -1,13 +1,11 @@
 package com.cornchipss.cosmos.gui;
 
-import org.joml.Matrix4f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.rendering.Mesh;
-import com.cornchipss.cosmos.utils.Maths;
 
 public class GUIModel extends GUIElement
 {
@@ -16,26 +14,19 @@ public class GUIModel extends GUIElement
 	
 	public GUIModel(Vector3fc position, float scale, CubeModel model)
 	{
-		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), model);
-	}
-	
-	public GUIModel(Matrix4f transform, CubeModel m)
-	{
-		this(transform, m.createMesh(0, 0, -1, 1, BlockFace.FRONT), m.material());
+		this(position, scale, 
+				model.createMesh(0, 0, -1, 1, BlockFace.FRONT), 
+				model.material());
 	}
 	
 	public GUIModel(Vector3fc position, float scale, Mesh m, Material mat)
 	{
-		this(Maths.createTransformationMatrix(position, 0, 0, 0, scale), m, mat);
-	}
-	
-	public GUIModel(Matrix4f transform, Mesh m, Material mat)
-	{
-		super(transform);
+		super(position, 0, 0, 0, scale);
+		
 		this.mesh = m;
 		this.mat = mat;
 	}
-	
+
 	@Override
 	public Mesh guiMesh()
 	{

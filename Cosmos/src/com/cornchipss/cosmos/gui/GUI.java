@@ -47,17 +47,8 @@ public class GUI
 		
 		for(GUIElement e : elements)
 		{
-			e.material().use();
-			e.material().initUniforms(projectionMatrix, cameraMatrix, e.transform(), true);
-			
-			e.prepare(this);
-			e.draw(this);
-			e.finish(this);
-			
-			e.material().stop();
+			draw(e);
 		}
-		
-		material.stop();
 	}
 	
 	public void update(float delta)
@@ -110,5 +101,17 @@ public class GUI
 		
 		elements.clear();
 		updatableElements.clear();
+	}
+
+	public void draw(GUIElement elem)
+	{
+		elem.material().use();
+		elem.material().initUniforms(projectionMatrix, cameraMatrix, elem.transform(), true);
+		
+		elem.prepare(this);
+		elem.draw(this);
+		elem.finish(this);
+		
+		elem.material().stop();
 	}
 }

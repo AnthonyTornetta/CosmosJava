@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.gui;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.material.Material;
@@ -12,15 +13,23 @@ import com.cornchipss.cosmos.utils.Maths;
 public abstract class GUIElement
 {
 	protected Matrix4f transform;
+	private Vector3f position;
+	private Vector3f rotation;
+	private float scale;
 	
-	public GUIElement(Matrix4fc transform)
+	private void createMatrix()
 	{
-		this.transform = new Matrix4f().set(transform);
+		Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale, transform);
 	}
 	
 	public GUIElement(Vector3fc position, float rx, float ry, float rz, float scale)
 	{
-		transform = Maths.createTransformationMatrix(position, rx, ry, rz, scale);
+		this.position = new Vector3f().set(position);
+		this.rotation = new Vector3f(rx, ry, rz);
+		this.scale = scale;
+		transform = new Matrix4f();
+		
+		createMatrix();
 	}
 	
 	public GUIElement(Vector3fc position, float scale)
@@ -63,5 +72,16 @@ public abstract class GUIElement
 	public Material material()
 	{
 		return Materials.GUI_MATERIAL;
+	}
+	
+	public Vector3fc position()
+	{
+		return position;
+	}
+	
+	public void position(Vector3fc p)
+	{
+		this.position.set(p);
+		createMatrix();
 	}
 }

@@ -31,4 +31,16 @@ public class AnimatedDefaultMaterial extends Material
 		stateLoc = shader().uniformLocation("u_animation_state");
 		ambientLoc = shader().uniformLocation("u_ambientLight");
 	}
+
+	@Override
+	public float uvWidth()
+	{
+		return 16.0f / 256.0f;
+	}
+
+	@Override
+	public float uvHeight()
+	{
+		return 16.0f / 256.0f;
+	}
 }

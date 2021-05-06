@@ -76,9 +76,9 @@ public class Maths
 		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), dest);
 	}
 	
-	public static Matrix4f createTransformationMatrix(Vector3fc position, float rx, float ry, float rz)
+	public static Matrix4f createTransformationMatrix(Vector3fc position, float rx, float ry, float rz, Matrix4f matrix)
 	{
-		return createTransformationMatrix(position, rx, ry, rz, 1);
+		return createTransformationMatrix(position, rx, ry, rz, 1, matrix);
 	}
 	
 	public static final Vector3fc 
@@ -86,9 +86,8 @@ public class Maths
 		UP = new Vector3f(0,1,0), 
 		FORWARD = new Vector3f(0,0,1);
 	
-	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx, float ry, float rz, float scale)
+	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx, float ry, float rz, float scale, Matrix4f matrix)
 	{
-        Matrix4f matrix = new Matrix4f();
         matrix.identity();
         matrix.translate(pos);
         matrix.rotate(rx, RIGHT);
