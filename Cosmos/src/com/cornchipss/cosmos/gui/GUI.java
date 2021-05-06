@@ -9,11 +9,12 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.material.Material;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.IUpdatable;
 
 public class GUI
 {
 	private List<GUIElement> elements;
+	private List<IUpdatable> updatableElements;
 	
 	private Material material;
 	
@@ -24,6 +25,7 @@ public class GUI
 	{
 		this.material = material;
 		elements = new LinkedList<>();
+		updatableElements = new LinkedList<>();
 		
 		cameraMatrix = new Matrix4f().identity();
 	}
@@ -58,6 +60,12 @@ public class GUI
 		material.stop();
 	}
 	
+	public void update(float delta)
+	{
+		for(IUpdatable elem : updatableElements)
+			elem.update(delta);
+	}
+	
 	public Material material()
 	{
 		return material;
@@ -70,12 +78,17 @@ public class GUI
 			if(elem == null)
 				throw new IllegalArgumentException("Attempt to add a null GUI element");
 			elements.add(elem);
+			
+			if(elem instanceof IUpdatable)
+				updatableElements.add((IUpdatable)elem);
 		}
 	}
 	
 	public void removeElement(GUIElement e)
 	{
 		elements.remove(e);
+		if(e instanceof IUpdatable)
+			updatableElements.remove((IUpdatable)e);
 	}
 
 	public void updateProjection(int width, int height)
@@ -88,5 +101,14 @@ public class GUI
 //				0.1f, 1000);
 		
 		projectionMatrix.ortho2D(0, 1024, 0, 720);
+	}
+
+	public void deleteAll()
+	{
+		for(GUIElement g : elements)
+			g.delete();
+		
+		elements.clear();
+		updatableElements.clear();
 	}
 }

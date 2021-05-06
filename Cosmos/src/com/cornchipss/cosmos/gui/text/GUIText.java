@@ -11,6 +11,7 @@ public class GUIText extends GUIElement
 	private Mesh mesh;
 	private OpenGLFont font;
 	private String text;
+	private String newText;
 	
 	public GUIText(String text, OpenGLFont font, float x, float y)
 	{
@@ -23,16 +24,21 @@ public class GUIText extends GUIElement
 	
 	public void text(String text)
 	{
-		this.text = text;
-		
-		if(mesh != null)
-			mesh.delete();
-		
-		mesh = TextRenderer.createMesh(text, font);
+		newText = text;
 	}
 	
 	public void prepare(GUI gui)
 	{
+		if(newText != null)
+		{
+			if(mesh != null)
+				mesh.delete();
+			
+			mesh = TextRenderer.createMesh(newText, font);
+			
+			newText = text;
+		}
+		
 		super.prepare(gui);
 		
 		font.bind();
@@ -54,5 +60,5 @@ public class GUIText extends GUIElement
 	}
 
 	public OpenGLFont font() { return font; }
-	public String text() { return text; }
+	public String text() { return newText != null ? newText : text; }
 }

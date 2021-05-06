@@ -1,28 +1,29 @@
 package com.cornchipss.cosmos.client.states;
 
 import java.awt.Font;
+import java.io.IOException;
 
 import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.client.Client;
-import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.interactable.GUIButton;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Window;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class MainMenuState extends State
 {
 	private GUI gui;
-	private CosmosNettyClient client;
+	
+	private GUIText message;
+	private GUIButton btn;
 	
 	@Override
-	public void init(Window window, CosmosNettyClient client)
+	public void init(Window window)
 	{
-		this.client = client;
-		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(window.getWidth(), window.getHeight());
 	
@@ -40,18 +41,50 @@ public class MainMenuState extends State
 		
 		GUIText btnText = new GUIText(txt, font, btnPos.x + 40, btnPos.y + 4);
 		
-		GUIButton btn = new GUIButton(btnPos, w, h);
-		gui.addElement(btn);
-		gui.addElement(btnText);
+		message = new GUIText("", font, 0, 0);
+		
+		btn = new GUIButton(btnPos, w, h, () ->
+		{
+			String ip = "127.0.0.1";
+			int port = 1337;
+			String name = "name";
+			
+			message.text("Connecting to " + ip + ":" + port + " as " + name);
+			
+			Thread t = new Thread(() ->
+			{
+				try
+				{
+					Client.instance().connectTo("127.0.0.1", 1337, "NAMO");
+				}
+				catch (IOException e)
+				{
+					String text = "Connection failed - " + e.getLocalizedMessage();
+					message.text(text);
+					
+					btn.unlock();
+				}
+			});
+			
+			t.start();
+			
+			btn.lock();
+			
+			Utils.println("ASDF");
+		});
+		
+		gui.addElement(btn, btnText, message);
 	}
-
+	
 	@Override
 	public void update(float delta)
 	{
-		if(client.ready())
+		if(Client.instance().hasCompleteConnection())
 		{
 			Client.instance().state(new GameState());
 		}
+		else
+			gui.update(delta);
 	}
 
 	@Override
@@ -69,6 +102,6 @@ public class MainMenuState extends State
 	@Override
 	public void remove()
 	{
-		
+		gui.deleteAll();
 	}
 }

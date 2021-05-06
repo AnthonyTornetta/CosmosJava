@@ -48,19 +48,12 @@ public class ClientGame extends Game
 	private static ClientGame instance;
 	public static ClientGame instance() { return instance; }
 	
-	public ClientGame(Window window, CosmosNettyClient nettyClient)
+	private void initGraphics()
 	{
-		if(instance != null)
-			throw new IllegalStateException("A game is already running.");
-		
-		instance = this;
-		
-		this.nettyClient = nettyClient;
-		
 		gui = new GUI(Materials.GUI_MATERIAL);
-		gui.init(window.getWidth(), window.getHeight());
+		gui.init(Window.instance().getWidth(), Window.instance().getHeight());
 		
-		GUITexture crosshair = new GUITexture(new Vector3f(window.getWidth() / 2.f - 16, window.getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
+		GUITexture crosshair = new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
@@ -83,28 +76,6 @@ public class ClientGame extends Game
 		fpsText = new GUIText("-- --ms", font, 0, 0);
 		gui.addElement(fpsText);
 		
-//		mainPlanet = new Planet(world(), 16*10, 16*6, 16*10);
-//		mainPlanet.init();
-//		Biosphere def = Biospheres.newInstance("cosmos:desert");
-//		def.generatePlanet(mainPlanet);
-//		world().addStructure(mainPlanet);
-		
-//		ship = new Ship(world());
-//		ship.init();
-//		world().addStructure(ship);
-		
-//		try(DataInputStream shipStr = new DataInputStream(new FileInputStream(new File("assets/structures/ships/test.struct"))))
-//		{
-//			ship.read(shipStr);
-//		}
-//		catch(IOException ex)
-//		{
-//			ex.printStackTrace();
-//			ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2, Blocks.SHIP_CORE);
-//		}
-		
-//		ship.addToWorld(new Transform());
-		
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
@@ -114,6 +85,16 @@ public class ClientGame extends Game
 		guiProjMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
+	}
+	
+	public ClientGame(CosmosNettyClient nettyClient)
+	{
+		if(instance != null)
+			throw new IllegalStateException("A game is already running.");
+		
+		instance = this;
+		
+		this.nettyClient = nettyClient;
 	}
 	
 	public void onResize(int w, int h)
@@ -148,6 +129,8 @@ public class ClientGame extends Game
 	{
 		if(player() == null)
 			return;
+		if(gui == null)
+			initGraphics();
 		else if(models == null)
 			initInventoryBarModels();
 		

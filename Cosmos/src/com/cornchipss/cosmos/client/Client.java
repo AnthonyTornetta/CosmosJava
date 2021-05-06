@@ -1,5 +1,7 @@
 package com.cornchipss.cosmos.client;
 
+import java.io.IOException;
+
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.client.states.MainMenuState;
@@ -31,6 +33,43 @@ public class Client implements Runnable
 	private State state;
 	private CosmosNettyClient client;
 	
+	private Thread nettyThread;
+	
+	public boolean connected()
+	{
+		return client != null;
+	}
+	
+	public void connectTo(String ip, int port, String name) throws IOException
+	{
+		if(connected())
+			throw new IllegalStateException("Already connected");
+		
+		client = new CosmosNettyClient();
+		try
+		{
+			client.createConnection(ip, port, name);
+		}
+		catch(IOException ex)
+		{
+			client = null;
+			throw ex;
+		}
+		
+		nettyThread = new Thread(client);
+		nettyThread.start();
+	}
+	
+	public void disconnect() throws IOException, InterruptedException
+	{
+		if(!connected())
+			throw new IllegalStateException("Not connected");
+		
+		client.disconnect();
+		nettyThread.join();
+		nettyThread = null;
+	}
+	
 	@Override
 	public void run()
 	{
@@ -42,11 +81,6 @@ public class Client implements Runnable
 		loader.init();
 		
 		PacketTypes.registerAll();
-
-		client = new CosmosNettyClient();
-		
-		Thread thread = new Thread(client);
-		thread.start();		
 		
 		Input.setWindow(window);
 		Input.update();
@@ -82,7 +116,8 @@ public class Client implements Runnable
 		
 		try
 		{
-			thread.join();
+			if(nettyThread != null)
+				nettyThread.join();
 		}
 		catch (InterruptedException e)
 		{
@@ -113,11 +148,21 @@ public class Client implements Runnable
 			this.state.remove();
 		
 		this.state = state;
-		state.init(window, client);
+		state.init(window);
 	}
 	
 	public State state()
 	{
 		return state;
+	}
+
+	public boolean hasCompleteConnection()
+	{
+		return client != null && client.ready();
+	}
+
+	public CosmosNettyClient nettyClient()
+	{
+		return client;
 	}
 }

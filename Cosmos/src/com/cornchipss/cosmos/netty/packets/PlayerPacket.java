@@ -5,13 +5,12 @@ import java.io.IOException;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
-import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
-import com.cornchipss.cosmos.utils.Utils;
-import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerPacket extends Packet
@@ -100,7 +99,7 @@ public class PlayerPacket extends Packet
 		{
 			Vector3f newPos = packet.readVector3f(new Vector3f());
 
-			Vector3f dPos = newPos.sub(p.body().transform().position(), new Vector3f());
+//			Vector3f dPos = newPos.sub(p.body().transform().position(), new Vector3f());
 			
 			// if it's a small enough distance, move there smoothly
 //			if(dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z > 5)

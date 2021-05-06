@@ -122,4 +122,9 @@ public class ServerConnection
 	
 	public boolean hasTCP() { return tcpServerConnection != null; }
 	public boolean hasUDP() { return addr != null; }
+
+	public TCPServerConnection tcpConnection()
+	{
+		return tcpServerConnection;
+	}
 }

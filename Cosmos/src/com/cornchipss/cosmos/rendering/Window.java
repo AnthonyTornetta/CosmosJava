@@ -34,6 +34,8 @@ public class Window
 	
 	private boolean wasWindowResized = false;
 	
+	private static Window instance;
+	
 	public boolean wasWindowResized()
 	{
 		boolean ret = wasWindowResized;
@@ -43,6 +45,8 @@ public class Window
 	
 	public Window(int w, int h, String title)
 	{
+		instance = this;
+		
 		this.width = w;
 		this.height = h;
 		
@@ -132,4 +136,9 @@ public class Window
 	
 	public int getWidth() { return width; }
 	public int getHeight() { return height; }
+
+	public static Window instance()
+	{
+		return instance;
+	}
 }

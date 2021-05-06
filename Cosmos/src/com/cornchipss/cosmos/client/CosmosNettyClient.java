@@ -12,7 +12,6 @@ import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.utils.Logger;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class CosmosNettyClient implements Runnable
 {
@@ -21,9 +20,31 @@ public class CosmosNettyClient implements Runnable
 	
 	private boolean ready = false;
 	
+	private boolean running = true;
+	
+	private String name;
+	
+	private ClientGame game;
+	
 	public CosmosNettyClient()
 	{
 		players = new ClientPlayerList();
+	}
+	
+	public void createConnection(String ip, int port, String name) throws IOException
+	{
+		this.name = name;
+		
+		TCPServerConnection tcpConnection = 
+				new TCPServerConnection(this, ip, port);
+		
+		server = new ServerConnection(
+				InetAddress.getByName(ip), port,
+				tcpConnection);
+		
+		server.initUDPSocket();
+		
+		game = new ClientGame(this);
 	}
 	
 	public void sendUDP(Packet p)
@@ -35,29 +56,23 @@ public class CosmosNettyClient implements Runnable
 	{
 		server.sendTCP(p.buffer(), p.bufferLength(), this);
 	}
+
+	public void disconnect() throws IOException
+	{
+		running = false;
+		server.tcpConnection().endConnection();
+	}
 	
 	@Override
 	public void run()
 	{
 		try(Scanner scan = new Scanner(System.in))
 		{
-			TCPServerConnection tcpConnection = 
-					new TCPServerConnection(this, "localhost", 1337);
-			
-			server = new ServerConnection(
-					InetAddress.getByName("localhost"), 1337,
-					tcpConnection);
-			
-			server.initUDPSocket();
-			
-			Thread tcpThread = new Thread(tcpConnection);
+			Thread tcpThread = new Thread(server.tcpConnection());
 			tcpThread.start();
 			
         	byte[] buffer = new byte[1024];
-	        
-	        Utils.println("name: ");
-	        String name = scan.nextLine();
-	        
+        	
 	        ready = true;
 	        
 	        JoinPacket joinP = new JoinPacket(buffer, 0, name);
@@ -67,7 +82,7 @@ public class CosmosNettyClient implements Runnable
 	        sendUDP(joinP);
 	        
 	        // udp stuff
-	        while(Client.instance().running())
+	        while(running && Client.instance().running())
 	        {
 	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
 	        	server.socket().receive(recieved);
@@ -125,7 +140,7 @@ public class CosmosNettyClient implements Runnable
 
 	public ClientGame game()
 	{
-		return ClientGame.instance();
+		return game;
 	}
 
 	/**

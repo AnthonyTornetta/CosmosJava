@@ -77,7 +77,7 @@ public class TCPServerConnection implements Runnable
 		
 		try
 		{
-			stopConnection();
+			endConnection();
 		}
 		catch(IOException ex)
 		{
@@ -87,7 +87,7 @@ public class TCPServerConnection implements Runnable
 		Logger.LOGGER.info("TCP connection to server closed.");
 	}
 	
-	public void stopConnection() throws IOException
+	public void endConnection() throws IOException
 	{
 		connected = false;
 		writer.close();
