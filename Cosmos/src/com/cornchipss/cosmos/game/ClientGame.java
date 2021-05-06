@@ -5,6 +5,7 @@ import java.awt.Font;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
@@ -23,6 +24,7 @@ import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
+import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
@@ -44,6 +46,8 @@ public class ClientGame extends Game
 	private final int startX = (int)(1024 / 2.0f - (inventorySlots.length / 2.0f) * slotDimensions);
 	
 	private volatile boolean running = true;
+	
+	private boolean drawGUI = true;
 	
 	private static ClientGame instance;
 	public static ClientGame instance() { return instance; }
@@ -85,6 +89,8 @@ public class ClientGame extends Game
 		guiProjMatrix.perspective((float)Math.toRadians(90), 
 				1024/720.0f,
 				0.1f, 1000);
+		
+		initInventoryBarModels();
 	}
 	
 	public ClientGame(CosmosNettyClient nettyClient)
@@ -131,8 +137,6 @@ public class ClientGame extends Game
 			return;
 		if(gui == null)
 			initGraphics();
-		else if(models == null)
-			initInventoryBarModels();
 		
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
@@ -154,7 +158,8 @@ public class ClientGame extends Game
 		}
 		world().unlock();
 		
-		gui.draw();
+		if(drawGUI)
+			gui.draw();
 	}
 	
 	@Override
@@ -176,8 +181,11 @@ public class ClientGame extends Game
 			
 			if(player() == null)
 				return;
-			else if(models == null)
-				initInventoryBarModels();
+			if(gui == null)
+				initGraphics();
+			
+			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
+				drawGUI = !drawGUI;
 			
 			fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
 			

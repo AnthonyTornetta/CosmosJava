@@ -67,6 +67,19 @@ public class Input
 	
 	public static float getMouseX() { return mouseListener.getMouse().x; }
 	public static float getMouseY() { return mouseListener.getMouse().y; }
+	
+	/**
+	 * Where 0,0 is the bottom left corner returns the x coordinate of the mouse
+	 * @return Where 0,0 is the bottom left corner returns the x coordinate of the mouse
+	 */
+	public static float getRelativeMouseX() { return getMouseX(); }
+	
+	/**
+	 * Where 0,0 is the bottom left corner returns the y coordinate of the mouse
+	 * @return Where 0,0 is the bottom left corner returns the y coordinate of the mouse
+	 */
+	public static float getRelativeMouseY() { return window.getHeight() - getMouseY(); }
+	
 	public static float getMouseDeltaX() { return mouseListener.getMouse().deltaX; }
 	public static float getMouseDeltaY() { return mouseListener.getMouse().deltaY; }
 

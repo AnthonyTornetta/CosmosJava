@@ -7,7 +7,9 @@ import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.gui.GUI;
+import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.interactable.GUIButton;
+import com.cornchipss.cosmos.gui.interactable.GUITextBox;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
@@ -18,8 +20,12 @@ public class MainMenuState extends State
 {
 	private GUI gui;
 	
-	private GUIText message;
-	private GUIButton btn;
+	private GUIText dbgMessage;
+	private GUIButton connectBtn;
+	
+	private GUIText nameLabel, ipLabel;
+	
+	private GUITextBox nameBox, ipBox;
 	
 	@Override
 	public void init(Window window)
@@ -32,48 +38,100 @@ public class MainMenuState extends State
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
 		font.init();
 		
+		dbgMessage = new GUIText("", font, 0, 0);
+
 		String txt = "Connect";
 		
-		int w = font.stringWidth(txt) + 80;
+		int w = 400;
 		int h = font.height() + 8;
 		
-		Vector3f btnPos = new Vector3f(window.getWidth() / 2 - w / 2, window.getHeight() / 2 - h / 2, 0);
+		Vector3f pos = new Vector3f(
+				window.getWidth() / 2 - w / 2, 
+				window.getHeight() / 2 + 200, 0);
 		
-		GUIText btnText = new GUIText(txt, font, btnPos.x + 40, btnPos.y + 4);
+		nameLabel = new GUIText("Name", font, pos.x + w / 2 - font.stringWidth("Name") / 2, pos.y);
 		
-		message = new GUIText("", font, 0, 0);
+		pos.y -= h + 8;
+		nameBox = new GUITextBox(pos, w, h, font);
 		
-		btn = new GUIButton(btnPos, w, h, () ->
+		pos.y -= h + 16;
+		
+		ipLabel = new GUIText("Server Address", font, pos.x + w / 2 - font.stringWidth("Server Address") / 2, pos.y);
+		pos.y -= h + 8;
+		ipBox = new GUITextBox(pos, w, h, font);
+		
+		pos.y -= h + 16;
+		
+		GUIText btnText = new GUIText(txt, font, 
+				pos.x + w / 2 - font.stringWidth(txt) / 2, pos.y);
+		
+		connectBtn = new GUIButton(pos, w, h, () ->
 		{
-			String ip = "127.0.0.1";
-			int port = 1337;
-			String name = "name";
+			String[] split = ipBox.text().split(":");
 			
-			message.text("Connecting to " + ip + ":" + port + " as " + name);
+			if(split.length > 2)
+			{
+				dbgMessage.text("You must specify the host and optionally port!");
+				return;
+			}
+			
+			String ip = split[0];
+			int port;
+			
+			if(split.length == 2)
+			{
+				try
+				{
+					port = Integer.parseInt(split[1]);
+				}
+				catch(NumberFormatException ex)
+				{
+					dbgMessage.text("Port must be a number!");
+					return;
+				}
+			}
+			else
+				port = 1337;
+			
+			String name = nameBox.text();
+			
+			if(name.trim().length() == 0)
+			{
+				name = System.currentTimeMillis() + "";
+			}
+			if(ip.trim().length() == 0)
+			{
+				ip = "localhost";
+			}
+			
+			dbgMessage.text("Connecting to " + ip + ":" + port + " as " + name);
+			
+			final String nameo = name;
 			
 			Thread t = new Thread(() ->
 			{
 				try
 				{
-					Client.instance().connectTo("127.0.0.1", 1337, "NAMO");
+					Client.instance().connectTo("127.0.0.1", 1337, nameo);
 				}
 				catch (IOException e)
 				{
 					String text = "Connection failed - " + e.getLocalizedMessage();
-					message.text(text);
+					dbgMessage.text(text);
 					
-					btn.unlock();
+					connectBtn.unlock();
 				}
 			});
 			
 			t.start();
 			
-			btn.lock();
+			connectBtn.lock();
 			
 			Utils.println("ASDF");
 		});
 		
-		gui.addElement(btn, btnText, message);
+		gui.addElement(connectBtn, btnText, dbgMessage,
+				nameLabel, nameBox, ipLabel, ipBox);
 	}
 	
 	@Override

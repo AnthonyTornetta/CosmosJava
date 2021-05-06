@@ -41,8 +41,8 @@ public class GUIButton extends GUIElement implements IUpdatable
 	@Override
 	public void delete()
 	{
-		active.guiMesh().delete();
-		inactive.guiMesh().delete();
+		active.delete();
+		inactive.delete();
 	}
 	
 	@Override
@@ -60,8 +60,8 @@ public class GUIButton extends GUIElement implements IUpdatable
 		if(locked())
 			return true;
 		
-		float mouseX = Input.getMouseX();
-		float mouseY = Input.getMouseY();
+		float mouseX = Input.getRelativeMouseX();
+		float mouseY = Input.getRelativeMouseY();
 		
 		if(mouseX >= minX && mouseY >= minY && mouseX <= maxX && mouseY <= maxY)
 		{
