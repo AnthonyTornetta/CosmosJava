@@ -69,8 +69,8 @@ public class ClientGame extends Game
 		{
 			inventorySlots[i] =  new GUITextureMultiple(
 					new Vector3f(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
-					0.5f, 0,
-					0, 0.5f);
+					0.25f, 0,
+					0, 0.25f);
 			
 			gui.addElement(inventorySlots[i]);
 		}

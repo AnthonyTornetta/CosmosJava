@@ -4,21 +4,16 @@ import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.gui.GUI;
-import com.cornchipss.cosmos.gui.GUIElement;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.rendering.Mesh;
-import com.cornchipss.cosmos.utils.IUpdatable;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUITextBox extends GUIElement implements IUpdatable
-{
-	private float minX, minY, maxX, maxY;
+public class GUITextBox extends GUIElementInteractable 
+{	
 	private GUITexture active, inactive;
 	private GUIText textGUI;
-	
-	private boolean locked;
 	
 	private String text;
 	
@@ -26,12 +21,7 @@ public class GUITextBox extends GUIElement implements IUpdatable
 	
 	public GUITextBox(Vector3fc position, float width, float height, OpenGLFont font)
 	{
-		super(position);
-		
-		minX = position.x();
-		minY = position.y();
-		maxX = position.x() + width;
-		maxY = position.y() + height;
+		super(position, width, height);
 		
 		text = "";
 		
@@ -40,16 +30,6 @@ public class GUITextBox extends GUIElement implements IUpdatable
 		
 		active = new GUITexture(position, width, height, 0.5f, 0.25f);
 		inactive = new GUITexture(position, width, height, 0.75f, 0.25f);
-	}
-	
-	public void typing(boolean t)
-	{
-		typing = t;
-	}
-	
-	public boolean typing()
-	{
-		return typing;
 	}
 	
 	@Override
@@ -95,18 +75,15 @@ public class GUITextBox extends GUIElement implements IUpdatable
 		if(locked())
 			return true;
 		
-		float mouseX = Input.getRelativeMouseX();
-		float mouseY = Input.getRelativeMouseY();
-		
 		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 		{
-			if(mouseX >= minX && mouseY >= minY && mouseX <= maxX && mouseY <= maxY)
+			if(hovered())
 				typing = true;
 			else
 				typing = false;
 		}
 		
-		if(!typing)
+		if(!typing())
 			return true;
 		
 		boolean shift = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || Input.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
@@ -151,23 +128,18 @@ public class GUITextBox extends GUIElement implements IUpdatable
 		return true;
 	}
 
-	public void lock()
-	{
-		locked = true;
-	}
-
-	public void unlock()
-	{
-		locked = false;
-	}
-	
-	public boolean locked()
-	{
-		return locked;
-	}
-
 	public String text()
 	{
 		return text;
+	}
+	
+	public boolean typing()
+	{
+		return typing;
+	}
+	
+	public void typing(boolean t)
+	{
+		typing = t;
 	}
 }
