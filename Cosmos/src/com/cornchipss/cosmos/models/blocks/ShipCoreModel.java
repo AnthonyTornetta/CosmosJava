@@ -1,8 +1,9 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.models.AnimatedCubeModel;
 
 public class ShipCoreModel extends AnimatedCubeModel
 {

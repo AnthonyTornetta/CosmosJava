@@ -6,4 +6,4 @@ SimplexNoise - Stefan Gustavson (stegu@itn.liu.se) + Peter Eastman (peastman@dri
 
 wood texture: https://opengameart.org/content/wood-log-pixel-art
 
-Cosmos - Anthony Tornetta (https://github.com/Cornchipss)
+Cosmos - Anthony Tornetta (https://github.com/AnthonyTornetta)

@@ -1,6 +1,7 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.models.CubeModel;
 
 public class GrassModel extends CubeModel
 {
@@ -10,11 +11,11 @@ public class GrassModel extends CubeModel
 		switch(side)
 		{
 		case TOP:
-			return 1 * CubeModel.TEXTURE_DIMENSIONS;
+			return 1 * material().uvWidth();
 		case BOTTOM:
-			return 3 * CubeModel.TEXTURE_DIMENSIONS;
+			return 3 * material().uvWidth();
 		default:
-			return 4 * CubeModel.TEXTURE_DIMENSIONS;
+			return 4 * material().uvWidth();
 		}
 	}
 

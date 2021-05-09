@@ -1,13 +1,14 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.models.CubeModel;
 
 public class DirtModel extends CubeModel
 {
 	@Override
 	public float u(BlockFace side)
 	{
-		return CubeModel.TEXTURE_DIMENSIONS * 3;
+		return material().uvWidth() * 3;
 	}
 
 	@Override

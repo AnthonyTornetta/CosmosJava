@@ -18,15 +18,20 @@ import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.GUITextureMultiple;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
+import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.material.RawImageMaterial;
+import com.cornchipss.cosmos.models.entities.PlayerModel;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
+import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ClientGame extends Game
 {
@@ -51,6 +56,9 @@ public class ClientGame extends Game
 	
 	private static ClientGame instance;
 	public static ClientGame instance() { return instance; }
+	
+	private Mesh playerMesh;
+	private Material playerMaterial;
 	
 	private void initGraphics()
 	{
@@ -81,6 +89,11 @@ public class ClientGame extends Game
 		gui.addElement(fpsText);
 		
 		initInventoryBarModels();
+		
+		playerMaterial = new RawImageMaterial("assets/images/logo");
+		playerMaterial.init();
+		
+		playerMesh = new PlayerModel(playerMaterial).createMesh(0, 0, 0, 1);
 	}
 	
 	public ClientGame(CosmosNettyClient nettyClient)
@@ -157,6 +170,27 @@ public class ClientGame extends Game
 			drawStructure(s, projectionMatrix, player);
 		}
 		world().unlock();
+		
+		for(Player p : nettyClient.players().players())
+		{
+			if(!p.equals(player))
+			{
+				playerMaterial.use();
+				
+				Matrix4fc camera = player.shipPiloting() == null ? 
+						player.camera().viewMatrix() : 
+							player.shipPiloting().body().transform().invertedMatrix();
+						
+				playerMaterial.initUniforms(projectionMatrix, camera, 
+						p.body().transform().matrix(), false);
+				
+				playerMesh.prepare();
+				playerMesh.draw();
+				playerMesh.finish();
+				
+				playerMaterial.stop();
+			}
+		}
 		
 		if(drawGUI)
 			gui.draw();

@@ -1,18 +1,19 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.models.CubeModel;
 
 public class ShipHullModel extends CubeModel
 {
 	@Override
 	public float u(BlockFace side)
 	{
-		return CubeModel.TEXTURE_DIMENSIONS * 4;
+		return material().uvWidth() * 4;
 	}
 
 	@Override
 	public float v(BlockFace side)
 	{
-		return CubeModel.TEXTURE_DIMENSIONS;
+		return material().uvHeight();
 	}
 }

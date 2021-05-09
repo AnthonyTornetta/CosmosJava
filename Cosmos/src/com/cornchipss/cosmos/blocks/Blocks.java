@@ -5,16 +5,16 @@ import java.util.Collections;
 import java.util.List;
 
 import com.cornchipss.cosmos.lights.LightSource;
-import com.cornchipss.cosmos.models.CactusModel;
-import com.cornchipss.cosmos.models.DirtModel;
-import com.cornchipss.cosmos.models.GrassModel;
-import com.cornchipss.cosmos.models.LeafModel;
-import com.cornchipss.cosmos.models.LightModel;
-import com.cornchipss.cosmos.models.LogModel;
-import com.cornchipss.cosmos.models.SandModel;
-import com.cornchipss.cosmos.models.SandStoneModel;
-import com.cornchipss.cosmos.models.ShipHullModel;
-import com.cornchipss.cosmos.models.StoneModel;
+import com.cornchipss.cosmos.models.blocks.CactusModel;
+import com.cornchipss.cosmos.models.blocks.DirtModel;
+import com.cornchipss.cosmos.models.blocks.GrassModel;
+import com.cornchipss.cosmos.models.blocks.LeafModel;
+import com.cornchipss.cosmos.models.blocks.LightModel;
+import com.cornchipss.cosmos.models.blocks.LogModel;
+import com.cornchipss.cosmos.models.blocks.SandModel;
+import com.cornchipss.cosmos.models.blocks.SandStoneModel;
+import com.cornchipss.cosmos.models.blocks.ShipHullModel;
+import com.cornchipss.cosmos.models.blocks.StoneModel;
 
 /**
  * The instance of every block in the base game

@@ -6,7 +6,7 @@ import com.cornchipss.cosmos.shaders.Shader;
 
 public class RawImageMaterial extends Material
 {
-	private int guiProjLoc, guiTransLoc;
+	private int guiProjLoc, guiTransLoc, camLoc;
 	
 	private static Shader shader;
 	
@@ -29,6 +29,7 @@ public class RawImageMaterial extends Material
 	{
 		shader().setUniformMatrix(guiTransLoc, transform);
 		shader().setUniformMatrix(guiProjLoc, projectionMatrix);
+		shader().setUniformMatrix(camLoc, cam);
 	}
 
 	@Override
@@ -36,6 +37,7 @@ public class RawImageMaterial extends Material
 	{
 		guiTransLoc = shader().uniformLocation("u_transform");
 		guiProjLoc = shader().uniformLocation("u_projection");
+		camLoc = shader().uniformLocation("u_camera");
 	}
 
 	@Override

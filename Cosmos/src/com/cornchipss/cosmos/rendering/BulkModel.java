@@ -198,8 +198,8 @@ public class BulkModel
 		float u = model.u(side);
 		float v = model.v(side);
 		
-		float uEnd = u + CubeModel.TEXTURE_DIMENSIONS;
-		float vEnd = v + CubeModel.TEXTURE_DIMENSIONS;
+		float uEnd = u + model.material().uvWidth();
+		float vEnd = v + model.material().uvHeight();
 		
 		matMesh.uvs.add(uEnd);
 		matMesh.uvs.add(vEnd);

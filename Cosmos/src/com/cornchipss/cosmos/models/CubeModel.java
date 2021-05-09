@@ -8,10 +8,8 @@ import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 
-public abstract class CubeModel
+public abstract class CubeModel implements Model
 {
-	public static final float TEXTURE_DIMENSIONS = 16.0f / 256.0f;
-	
 	public static int[] sideIndicies = new int[]
 			{
 					0, 1, 2,
@@ -23,12 +21,12 @@ public abstract class CubeModel
 	
 	public float maxU(BlockFace side)
 	{
-		return u(side) + TEXTURE_DIMENSIONS;
+		return u(side) + material().uvWidth();
 	}
 	
 	public float maxV(BlockFace side)
 	{
-		return v(side) + TEXTURE_DIMENSIONS;
+		return v(side) + material().uvHeight();
 	}
 	
 	public int[] indicies(BlockFace side)
@@ -166,14 +164,17 @@ public abstract class CubeModel
 		}
 	}
 	
+	@Override
+	public Mesh createMesh(float offX, float offY, float offZ, float scale)
+	{
+		return createMesh(offX, offY, offZ, scale, 
+				BlockFace.RIGHT, BlockFace.LEFT,
+				BlockFace.BOTTOM, BlockFace.TOP,
+				BlockFace.FRONT, BlockFace.BACK);
+	}
+	
 	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
 	{
-		if(sides.length == 0)
-			sides = new BlockFace[] { 
-					BlockFace.RIGHT, BlockFace.LEFT,
-					BlockFace.BOTTOM, BlockFace.TOP,
-					BlockFace.FRONT, BlockFace.BACK};
-		
 		List<Float> verts = new LinkedList<>();
 		List<Integer> indicies = new LinkedList<>();
 		List<Float> uvs = new LinkedList<>();
@@ -238,7 +239,7 @@ public abstract class CubeModel
 		
 		return Mesh.createMesh(asArrVerts, asArrIndicies, asArrUvs);
 	}
-	
+
 	public boolean opaque()
 	{
 		return true;

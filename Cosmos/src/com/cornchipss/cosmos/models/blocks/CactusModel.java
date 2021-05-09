@@ -1,13 +1,14 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.models.CubeModel;
 
 public class CactusModel extends CubeModel
 {
 	@Override
 	public float u(BlockFace side)
 	{
-		return CubeModel.TEXTURE_DIMENSIONS * 10;
+		return material().uvWidth() * 10;
 	}
 
 	@Override

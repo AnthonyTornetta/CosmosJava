@@ -1,6 +1,7 @@
-package com.cornchipss.cosmos.models;
+package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.models.CubeModel;
 
 public class LogModel extends CubeModel
 {
@@ -10,17 +11,17 @@ public class LogModel extends CubeModel
 		switch(side)
 		{
 		case TOP:
-			return 1 * CubeModel.TEXTURE_DIMENSIONS;
+			return 1 * material().uvWidth();
 		case BOTTOM:
-			return 1 * CubeModel.TEXTURE_DIMENSIONS;
+			return 1 * material().uvWidth();
 		default:
-			return 2 * CubeModel.TEXTURE_DIMENSIONS;
+			return 2 * material().uvWidth();
 		}
 	}
 
 	@Override
 	public float v(BlockFace side)
 	{
-		return CubeModel.TEXTURE_DIMENSIONS;
+		return material().uvHeight();
 	}
 }
