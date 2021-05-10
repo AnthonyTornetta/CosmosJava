@@ -94,47 +94,49 @@ public class ModelLoader
 			{
 				line = line.trim();
 				
+				if(line.length() == 0)
+					continue;
+				
 				if(mode == 0)
 				{
-					if(line.length() > 1)
-						throw new IOException("File must begin with the mode (v/u/i)");
+					mode = Character.toLowerCase(line.charAt(0));
+					if(mode != 'u' && mode != 'v' && mode != 'i')
+						throw new IOException("File must begin with the mode (v/u/i) - began with " + mode);
 					
-					mode = line.charAt(0);
+					line = line.substring(1);
 				}
-				else
+				
+				if(line.length() == 0 || line.charAt(0) == '#')
+					continue;
+				
+				String[] split = line.split(" ");
+				
+				for(String s : split)
 				{
-					if(line.length() == 0 || line.charAt(0) == '#')
-						continue;
-					
-					String[] split = line.split(" ");
-					
-					for(String s : split)
-					{
-						if(s.length() != 0)
-						{							
-							// Checks for mode updates
-							if(s.length() == 1)
+					if(s.length() != 0)
+					{							
+						// Checks for mode updates
+						if(s.length() == 1)
+						{
+							char c = Character.toLowerCase(s.charAt(0));
+							if(c == 'u' || c == 'v' || c == 'i')
 							{
-								char c = Character.toLowerCase(s.charAt(0));
-								if(c == 'u' || c == 'v' || c == 'i')
-								{
-									mode = c;
-									continue;
-								}
+								mode = c;
+								continue;
 							}
-							
-							switch(mode)
-							{
-							case 'v':
-								verts.add(Float.parseFloat(s));
-								break;
-							case 'u':
-								uvs.add(Float.parseFloat(s));
-								break;
-							case 'i':
-								indices.add(Integer.parseInt(s));
-								break;
-							}
+						}
+						
+						switch(mode)
+						{
+						case 'v':
+							verts.add(Float.parseFloat(s));
+							break;
+						case 'u':
+							uvs.add(Float.parseFloat(s));
+							break;
+						case 'i':
+							indices.add(Integer.parseInt(s));
+							break;
 						}
 					}
 				}
