@@ -18,6 +18,21 @@ public class LoadedModel implements Model
 		tempVerts = new float[verts.length];
 	}
 	
+	public float[] vertices()
+	{
+		return verts;
+	}
+	
+	public float[] uvs()
+	{
+		return uvs;
+	}
+	
+	public int[] indices()
+	{
+		return indices;
+	}
+	
 	@Override
 	public Mesh createMesh(float offX, float offY, float offZ, float scale)
 	{
