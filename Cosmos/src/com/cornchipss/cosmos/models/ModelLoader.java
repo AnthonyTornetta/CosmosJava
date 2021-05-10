@@ -103,12 +103,15 @@ public class ModelLoader
 				}
 				else
 				{
+					if(line.length() == 0 || line.charAt(0) == '#')
+						continue;
+					
 					String[] split = line.split(" ");
 					
 					for(String s : split)
 					{
 						if(s.length() != 0)
-						{
+						{							
 							// Checks for mode updates
 							if(s.length() == 1)
 							{

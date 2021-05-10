@@ -90,7 +90,7 @@ public class ClientGame extends Game
 		
 		initInventoryBarModels();
 		
-		playerMaterial = new RawImageMaterial("assets/images/logo");
+		playerMaterial = new RawImageMaterial("assets/images/atlas/player");
 		playerMaterial.init();
 		
 		playerMesh = new PlayerModel(playerMaterial).createMesh(0, 0, 0, 1);
