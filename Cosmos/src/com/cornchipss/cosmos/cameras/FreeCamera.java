@@ -6,12 +6,12 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.Orientation;
-import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class FreeCamera extends Camera
 {
-	private PhysicalObject parent;
+	private Transform parent;
 	
 	private Orientation orientation;
 	
@@ -20,7 +20,7 @@ public class FreeCamera extends Camera
 	 * <p>See <a href="https://en.wikipedia.org/wiki/Gimbal_lock">https://en.wikipedia.org/wiki/Gimbal_lock</a></p>
 	 * @param parent The parent this camera sits on
 	 */
-	public FreeCamera(PhysicalObject parent)
+	public FreeCamera(Transform parent)
 	{
 		this.parent = parent;
 		
@@ -58,7 +58,7 @@ public class FreeCamera extends Camera
 	 * @param transform The camera's new parent
 	 */
 	@Override
-	public void parent(PhysicalObject transform)
+	public void parent(Transform transform)
 	{
 		this.parent = transform;
 	}
@@ -68,7 +68,7 @@ public class FreeCamera extends Camera
 	 * @return The camera's parent
 	 */
 	@Override
-	public PhysicalObject parent()
+	public Transform parent()
 	{
 		return parent;
 	}

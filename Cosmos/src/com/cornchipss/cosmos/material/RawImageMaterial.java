@@ -28,7 +28,7 @@ public class RawImageMaterial extends Material
 	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc cam, Matrix4fc transform, boolean isGUI)
 	{
 		shader().setUniformMatrix(guiTransLoc, transform);
-		shader().setUniformMatrix(guiProjLoc, projectionMatrix);
+		shader().setUniformMatrix(guiProjLoc, projectionMatrix);		
 		shader().setUniformMatrix(camLoc, cam);
 	}
 

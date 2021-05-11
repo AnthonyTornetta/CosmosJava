@@ -5,7 +5,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Maths;
 
 /**
@@ -15,7 +15,7 @@ import com.cornchipss.cosmos.utils.Maths;
 public class GimbalLockCamera extends Camera
 {
 	private Matrix4f matrix;
-	private PhysicalObject parent;
+	private Transform parent;
 	
 	private Vector3f forward, right, up;
 	private Vector3f rot;
@@ -25,7 +25,7 @@ public class GimbalLockCamera extends Camera
 	 * <p>See <a href="https://en.wikipedia.org/wiki/Gimbal_lock">https://en.wikipedia.org/wiki/Gimbal_lock</a></p>
 	 * @param parent The parent this camera sits on
 	 */
-	public GimbalLockCamera(PhysicalObject parent)
+	public GimbalLockCamera(Transform parent)
 	{
 		this.parent = parent;
 		
@@ -44,23 +44,20 @@ public class GimbalLockCamera extends Camera
 	 */
 	public void update()
 	{
-		if(parent.initialized())
-		{
-			rot.x = Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2);
-			
-			Maths.createViewMatrix(position(), new Vector3f(rot), matrix);
-			
-			forward.x = Maths.sin(rot.y()) * Maths.cos(rot.x());
-		    forward.y = Maths.sin(-rot.x());
-		    forward.z = -Maths.cos(rot.x()) * Maths.cos(rot.y());
-		    
-		    right.x = Maths.cos(rot.y());
-		    right.z = Maths.sin(rot.y());
-		    
-		    up.x = Maths.sin(rot.y()) * Maths.sin(rot.x());
-		    up.y = Maths.cos(rot.x());
-		    up.z = -Maths.sin(rot.x()) * Maths.cos(rot.y());
-		}
+		rot.x = Maths.clamp(rot.x(), -Maths.PI / 2, Maths.PI / 2);
+		
+		Maths.createViewMatrix(position(), new Vector3f(rot), matrix);
+		
+		forward.x = Maths.sin(rot.y()) * Maths.cos(rot.x());
+	    forward.y = Maths.sin(-rot.x());
+	    forward.z = -Maths.cos(rot.x()) * Maths.cos(rot.y());
+	    
+	    right.x = Maths.cos(rot.y());
+	    right.z = Maths.sin(rot.y());
+	    
+	    up.x = Maths.sin(rot.y()) * Maths.sin(rot.x());
+	    up.y = Maths.cos(rot.x());
+	    up.z = -Maths.sin(rot.x()) * Maths.cos(rot.y());
 	}
 	
 	/**
@@ -107,13 +104,13 @@ public class GimbalLockCamera extends Camera
 	}
 
 	@Override
-	public void parent(PhysicalObject transform)
+	public void parent(Transform parent)
 	{
-		this.parent = transform;
+		this.parent = parent;
 	}
 	
 	@Override
-	public PhysicalObject parent()
+	public Transform parent()
 	{
 		return parent;
 	}

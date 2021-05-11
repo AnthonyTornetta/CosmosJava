@@ -14,6 +14,7 @@ import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -26,8 +27,14 @@ public class ClientPlayer extends Player
 	public ClientPlayer(World world, String name)
 	{
 		super(world, name);
+	}
+	
+	@Override
+	public void addToWorld(Transform transform)
+	{
+		super.addToWorld(transform);
 		
-		cam = new GimbalLockCamera(this);
+		cam = new GimbalLockCamera(transform);
 	}
 	
 	@Override
@@ -193,6 +200,6 @@ public class ClientPlayer extends Player
 	{
 		super.body(b);
 		
-		cam.parent(this);
+		cam.parent(b.transform());
 	}
 }
