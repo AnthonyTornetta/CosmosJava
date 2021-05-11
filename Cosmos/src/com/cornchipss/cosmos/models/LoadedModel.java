@@ -1,6 +1,11 @@
 package com.cornchipss.cosmos.models;
 
+import java.util.Map;
+
+import org.joml.Vector2i;
+
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class LoadedModel implements Model
 {
@@ -9,13 +14,17 @@ public class LoadedModel implements Model
 	
 	private float[] tempVerts;
 	
-	public LoadedModel(float[] verts, float[] uvs, int[] indices)
+	private Map<String, Vector2i> subcomponents;
+	
+	public LoadedModel(float[] verts, float[] uvs, int[] indices, 
+			Map<String, Vector2i> components)
 	{
 		this.verts = verts;
 		this.uvs = uvs;
 		this.indices = indices;
-		
 		tempVerts = new float[verts.length];
+		
+		subcomponents = components;
 	}
 	
 	public float[] vertices()
@@ -49,5 +58,19 @@ public class LoadedModel implements Model
 			
 			return Mesh.createMesh(tempVerts, indices, uvs);
 		}
+	}
+
+	public String groupContaining(int index)
+	{
+		for(String s : subcomponents.keySet())
+		{
+			Vector2i range = subcomponents.get(s);
+			if(range.x <= index && range.y >= index)
+			{
+				return s;
+			}
+		}
+		
+		return null;
 	}
 }

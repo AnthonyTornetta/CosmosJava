@@ -22,6 +22,7 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.GameLoop;
+import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 
@@ -50,14 +51,12 @@ public class ModelCreator
 		projMatrix.perspective((float)Math.toRadians(90), 
 				window.getWidth() / (float)window.getHeight(),
 				0.1f, 1000);
-				
+		
 		GimbalLockCamera cam = new GimbalLockCamera(trans);
 		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
 			window.clear(0, 0.2f, 0.5f, 1);
-			
-			handleMovements(cam, trans, delta);
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
@@ -74,7 +73,7 @@ public class ModelCreator
 			else
 				GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_POINT);
 			
-			update(delta, playerModel, cam, projMatrix, window);
+			update(delta, playerModel, cam, projMatrix, window, trans);
 			
 			Input.update();
 			
@@ -104,27 +103,29 @@ public class ModelCreator
 		window.destroy();
 	}
 	
-	private void update(float delta, LoadedModel m, Camera cam, Matrix4fc projection,
+	private int processMouse(float delta, LoadedModel m, Camera cam, Matrix4fc projection,
 			Window window)
 	{
 		Matrix4f projTotal = projection.mul(cam.viewMatrix(), new Matrix4f());
 		
+		int[] viewBounds = new int[]
+				{
+					0, 0, window.getWidth(), window.getHeight()
+				};
+		
 		Vector4f from4 = projTotal.unproject(
-				Input.getRelativeMouseX(), Input.getRelativeMouseY(), 0, 
-				new int[] {
-						0, 0, 1024, 720
-				}, new Vector4f());
+				Input.getRelativeMouseX(), Input.getRelativeMouseY(), 0, viewBounds, new Vector4f());
 		
 		Vector4f to4 = projTotal.unproject(
-				Input.getRelativeMouseX(), Input.getRelativeMouseY(), 1, 
-				new int[] {
-						0, 0, 1024, 720
-				}, new Vector4f());
+				Input.getRelativeMouseX(), Input.getRelativeMouseY(), 1, viewBounds, new Vector4f());
 		
 		Vector3f from, to;
 		
 		from = new Vector3f(from4.x, from4.y, from4.z);
 		to = new Vector3f(to4.x, to4.y, to4.z);
+		
+		float closestDist = 0;
+		int startingIndex = -1;
 		
 		for(int i = 0; i < m.indices().length; i += 3)
 		{
@@ -141,8 +142,41 @@ public class ModelCreator
 
 			if(Intersectionf.intersectLineSegmentTriangle(from, to,
 					pos1, pos2, pos3, (float) 1E-9, collisionAt))
-				Utils.println(collisionAt);
+			{
+				if(startingIndex == -1)
+				{
+					closestDist = Maths.distSqrd(collisionAt, from);
+					startingIndex = i;
+				}
+				else
+				{
+					float distSqrd = Maths.distSqrd(collisionAt, from);
+					if(distSqrd < closestDist)
+					{
+						closestDist = distSqrd;
+						startingIndex = i;
+					}
+				}
+			}
 		}
+		
+		return startingIndex;
+	}
+	
+	private void update(float delta, LoadedModel m, Camera cam, Matrix4fc projection,
+			Window window, Transform transform)
+	{
+		if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+		{
+			int res = processMouse(delta, m, cam, projection, window);
+			
+			if(res != -1)
+			{
+				Utils.println(m.groupContaining(res));
+			}
+		}
+		
+		handleMovements(cam, transform, delta);
 	}
 	
 	public static void main(String[] args) throws IOException

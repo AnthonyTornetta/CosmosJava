@@ -6,13 +6,18 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import org.joml.Vector2i;
 
 public class ModelLoader
 {
 	public static void toFile(String file,
 			float[] vertices, float[] uvs, int[] indices,
+			Map<String, Integer> groups,
 			boolean pretty) throws IOException
 	{
 		StringBuilder str = new StringBuilder();	
@@ -61,6 +66,15 @@ public class ModelLoader
 		
 		for(int i = 0; i < indices.length; i++)
 		{
+			for(String g : groups.keySet())
+			{
+				if(groups.get(g) == i)
+				{
+					str.append(g + ": ");
+					break;
+				}
+			}
+			
 			str.append(indices[i] + " ");
 			if(pretty && (i + 1) % 3 == 0)
 			{
@@ -74,9 +88,10 @@ public class ModelLoader
 	}
 	
 	public static void toFile(String file,
-			float[] vertices, float[] uvs, int[] indices) throws IOException
+			float[] vertices, float[] uvs, int[] indices,
+			Map<String, Integer> groups) throws IOException
 	{
-		toFile(file, vertices, uvs, indices, false);
+		toFile(file, vertices, uvs, indices, groups, false);
 	}
 	
 	public static LoadedModel fromFile(String file) throws IOException
@@ -87,8 +102,12 @@ public class ModelLoader
 			List<Float> verts = new LinkedList<>();
 			List<Integer> indices = new LinkedList<>();
 			List<Float> uvs = new LinkedList<>();
+			Map<String, Vector2i> groups = new HashMap<>();
 			
 			char mode = 0;
+			
+			String prevGroup = null;
+			int prevIndex = -1;
 			
 			for(String line = br.readLine(); line != null; line = br.readLine())
 			{
@@ -114,7 +133,7 @@ public class ModelLoader
 				for(String s : split)
 				{
 					if(s.length() != 0)
-					{							
+					{
 						// Checks for mode updates
 						if(s.length() == 1)
 						{
@@ -126,20 +145,48 @@ public class ModelLoader
 							}
 						}
 						
-						switch(mode)
+						if(s.charAt(s.length() - 1) == ':')
 						{
-						case 'v':
-							verts.add(Float.parseFloat(s));
-							break;
-						case 'u':
-							uvs.add(Float.parseFloat(s));
-							break;
-						case 'i':
-							indices.add(Integer.parseInt(s));
-							break;
+							String group = s.substring(0, s.length() - 1);
+							if(prevGroup == null)
+							{
+								prevGroup = group;
+								prevIndex = indices.size();
+							}
+							else
+							{
+								groups.put(prevGroup, new Vector2i(prevIndex, indices.size() - 1));
+								
+								prevGroup = group;
+								prevIndex = indices.size();
+							}
+						}
+						else
+						{
+							switch(mode)
+							{
+							case 'v':
+								verts.add(Float.parseFloat(s));
+								break;
+							case 'u':
+								uvs.add(Float.parseFloat(s));
+								break;
+							case 'i':
+								indices.add(Integer.parseInt(s));
+								break;
+							}
 						}
 					}
 				}
+			}
+			
+			if(prevGroup != null)
+			{
+				groups.put(prevGroup, new Vector2i(prevIndex, indices.size() - 1));
+			}
+			else
+			{
+				groups.put("main", new Vector2i(0, indices.size() - 1));
 			}
 			
 			float[] vertsArr = new float[verts.size()];
@@ -158,7 +205,7 @@ public class ModelLoader
 			for(int idx : indices)
 				indicesArr[i++] = idx;
 			
-			return new LoadedModel(vertsArr, uvsArr, indicesArr);
+			return new LoadedModel(vertsArr, uvsArr, indicesArr, groups);
 		}
 	}
 }
