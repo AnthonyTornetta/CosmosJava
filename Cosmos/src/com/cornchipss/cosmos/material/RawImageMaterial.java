@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.material;
 
 import org.joml.Matrix4fc;
 
+import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.shaders.Shader;
 
 public class RawImageMaterial extends Material
@@ -15,6 +16,20 @@ public class RawImageMaterial extends Material
 	 * @param image The image w/out the .png ending
 	 */
 	public RawImageMaterial(String image)
+	{
+		super((Shader)null, image);
+		
+		if(shader == null)
+			shader = new Shader("assets/shaders/image");
+		
+		shader(shader);
+	}
+	
+	/**
+	 * A raw image
+	 * @param image The image
+	 */
+	public RawImageMaterial(Texture image)
 	{
 		super((Shader)null, image);
 		

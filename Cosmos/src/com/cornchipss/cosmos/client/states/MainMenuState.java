@@ -32,7 +32,7 @@ public class MainMenuState extends State
 	public void init(Window window)
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
-		gui.init(window.getWidth(), window.getHeight());
+		gui.init(0, 0, window.getWidth(), window.getHeight());
 	
 //		gui.addElement(new GUITexture(Maths.zero(), 100, 100, 0, 0));
 		

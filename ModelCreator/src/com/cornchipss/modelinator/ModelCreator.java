@@ -1,5 +1,6 @@
 package com.cornchipss.modelinator;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import org.joml.Intersectionf;
@@ -14,7 +15,13 @@ import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
+import com.cornchipss.cosmos.gui.GUI;
+import com.cornchipss.cosmos.gui.GUIRectangle;
+import com.cornchipss.cosmos.gui.interactable.GUITextBox;
+import com.cornchipss.cosmos.gui.text.Fonts;
+import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.models.LoadedModel;
 import com.cornchipss.cosmos.models.ModelLoader;
@@ -23,18 +30,24 @@ import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 
 public class ModelCreator
 {
 	private int renderMode = 0;
 	
+	private GUIText textSelectedName;
+	
+	private GUITextBox txtBox;
+	
 	public ModelCreator() throws IOException
 	{
 		Window window = new Window(1024, 720, "Model-Intator");
 		Input.setWindow(window);
 		Input.update();
+		
+		Materials.initMaterials();
+		Fonts.init();
 		
 		LoadedModel playerModel = ModelLoader.fromFile("assets/models/player");
 		
@@ -54,9 +67,30 @@ public class ModelCreator
 		
 		GimbalLockCamera cam = new GimbalLockCamera(trans);
 		
+		GUI gui = new GUI(Materials.GUI_MATERIAL);
+		gui.init(0, 0, window.getWidth(), window.getHeight());
+		
+		GUIRectangle rect = new GUIRectangle(new Vector3f(0, 0, 0), window.getWidth(), 100, Color.gray);
+		GUIRectangle rect2 = new GUIRectangle(new Vector3f(0, 0, 0), window.getWidth(), 105, Color.DARK_GRAY);
+		
+		textSelectedName = new GUIText("", Fonts.ARIAL_28, 10, 100 - Fonts.ARIAL_28.height() - 10);
+		txtBox = new GUITextBox(new Vector3f(0, 0, 0), 30, Fonts.ARIAL_8.height(), Fonts.ARIAL_8);
+		
+		gui.addElement(rect2, rect, textSelectedName, txtBox);
+		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
-			window.clear(0, 0.2f, 0.5f, 1);
+			window.clear(0.3f, 0.3f, 0.3f, 1);
+			
+			if(window.wasWindowResized())
+			{
+				projMatrix.identity();
+				projMatrix.perspective((float)Math.toRadians(90), 
+						window.getWidth() / (float)window.getHeight(),
+						0.1f, 1000);
+				
+				gui.updateProjection(0, 0, window.getWidth(), window.getHeight());
+			}
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);
 			
@@ -74,6 +108,7 @@ public class ModelCreator
 				GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_POINT);
 			
 			update(delta, playerModel, cam, projMatrix, window, trans);
+			gui.update(delta);
 			
 			Input.update();
 			
@@ -87,6 +122,9 @@ public class ModelCreator
 			m.finish();
 			
 			mat.stop();
+			
+			GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
+			gui.draw();
 			
 			window.update();
 			
@@ -110,7 +148,8 @@ public class ModelCreator
 		
 		int[] viewBounds = new int[]
 				{
-					0, 0, window.getWidth(), window.getHeight()
+					window.viewportOffsetX(), window.viewportOffsetY(), 
+					window.viewportWidth(), window.viewportHeight()
 				};
 		
 		Vector4f from4 = projTotal.unproject(
@@ -172,7 +211,11 @@ public class ModelCreator
 			
 			if(res != -1)
 			{
-				Utils.println(m.groupContaining(res));
+				String group = m.groupContaining(res);
+				textSelectedName.text(group);
+				
+				int[] indices = m.indicesForGroup(group);
+				txtBox.text(indices[0] + "");
 			}
 		}
 		

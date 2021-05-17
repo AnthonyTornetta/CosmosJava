@@ -30,9 +30,9 @@ public class GUI
 		cameraMatrix = new Matrix4f().identity();
 	}
 	
-	public void init(int width, int height)
+	public void init(int offX, int offY, int width, int height)
 	{
-		updateProjection(width, height);
+		updateProjection(offX, offY, width, height);
 		
 	}
 	
@@ -82,7 +82,7 @@ public class GUI
 			updatableElements.remove((IUpdatable)e);
 	}
 
-	public void updateProjection(int width, int height)
+	public void updateProjection(int offX, int offY, int width, int height)
 	{
 		if(projectionMatrix == null)
 			projectionMatrix = new Matrix4f();
@@ -91,7 +91,7 @@ public class GUI
 //				width/(float)height,
 //				0.1f, 1000);
 		
-		projectionMatrix.ortho2D(0, 1024, 0, 720);
+		projectionMatrix.ortho2D(offX, width, offY, height);
 	}
 
 	public void deleteAll()

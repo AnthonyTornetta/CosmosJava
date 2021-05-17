@@ -5,7 +5,6 @@ import java.util.Map;
 import org.joml.Vector2i;
 
 import com.cornchipss.cosmos.rendering.Mesh;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class LoadedModel implements Model
 {
@@ -72,5 +71,23 @@ public class LoadedModel implements Model
 		}
 		
 		return null;
+	}
+
+	public int[] indicesForGroup(String group)
+	{
+		if(!subcomponents.containsKey(group))
+			return null;
+		
+		int rangeLow = subcomponents.get(group).x;
+		int rangeHigh = subcomponents.get(group).y;
+		
+		int[] ret = new int[rangeHigh - rangeLow + 1];
+		
+		for(int i = rangeLow; i <= rangeHigh; i++)
+		{
+			ret[i - rangeLow] = indices[i];
+		}
+		
+		return ret;
 	}
 }

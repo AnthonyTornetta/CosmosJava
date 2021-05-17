@@ -30,8 +30,6 @@ public class Window
 	private static long window;
 	private int width, height;
 	
-	private final float ogAspectRatio;
-	
 	private boolean wasWindowResized = false;
 	
 	private static Window instance;
@@ -49,8 +47,6 @@ public class Window
 		
 		this.width = w;
 		this.height = h;
-		
-		ogAspectRatio = width / (float)height;
 		
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -80,20 +76,26 @@ public class Window
 			{
 				wasWindowResized = true;
 				
-				int dX = 0, dY = 0;
+//				if(width / (float)height > ogAspectRatio)
+//				{
+//					float desiredHeight = (width / ogAspectRatio);
+//					viewportOffY = -Math.round((desiredHeight - height) / 2) / 2;
+//				}
+//				else
+//				{
+//					float desiredWidth = (height * ogAspectRatio);
+//					viewportOffX = -Math.round((desiredWidth - width) / 2) / 2;
+//				}
 				
-				if(width / (float)height > ogAspectRatio)
-				{
-					float desiredHeight = (width / ogAspectRatio);
-					dY = -Math.round((desiredHeight - height) / 2);
-				}
-				else
-				{
-					float desiredWidth = (height * ogAspectRatio);
-					dX = -Math.round((desiredWidth - width) / 2);
-				}
+//				GL20.glViewport(viewportOffX, viewportOffY, width - viewportOffX, height - viewportOffY);
 				
-				GL20.glViewport(dX, dY, width - dX, height - dY);
+//				Utils.println(width + ", " + height);
+//				Utils.println(getWidth() + ", " + getHeight());
+				
+				instance().width = width;
+				instance().height = height;
+				
+				GL20.glViewport(0, 0, width, height);
 			}
 		});
 		
@@ -101,6 +103,28 @@ public class Window
 		glfwShowWindow(window);
 		
 		GL.createCapabilities();
+	}
+	
+	private int viewportOffX, viewportOffY;
+	
+	public int viewportOffsetY()
+	{
+		return viewportOffY;
+	}
+	
+	public int viewportOffsetX()
+	{
+		return viewportOffX;
+	}
+	
+	public int viewportWidth()
+	{
+		return getWidth() - viewportOffsetX();
+	}
+	
+	public int viewportHeight()
+	{
+		return getHeight() - viewportOffsetY();
 	}
 	
 	public void update()

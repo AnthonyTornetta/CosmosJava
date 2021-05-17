@@ -123,7 +123,7 @@ public class GUITextBox extends GUIElementInteractable
 				text = text.substring(0, text.length() - 1);
 		}
 		
-		textGUI.text(text);
+		text(text);
 		
 		return true;
 	}
@@ -141,5 +141,11 @@ public class GUITextBox extends GUIElementInteractable
 	public void typing(boolean t)
 	{
 		typing = t;
+	}
+
+	public void text(String string)
+	{
+		text = string;
+		textGUI.text(text);
 	}
 }

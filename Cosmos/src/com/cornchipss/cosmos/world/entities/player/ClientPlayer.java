@@ -200,6 +200,7 @@ public class ClientPlayer extends Player
 	{
 		super.body(b);
 		
-		cam.parent(b.transform());
+		if(cam != null)
+			cam.parent(b.transform());
 	}
 }

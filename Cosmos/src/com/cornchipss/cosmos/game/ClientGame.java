@@ -63,7 +63,7 @@ public class ClientGame extends Game
 	private void initGraphics()
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
-		gui.init(Window.instance().getWidth(), Window.instance().getHeight());
+		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
 		GUITexture crosshair = new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
@@ -107,12 +107,7 @@ public class ClientGame extends Game
 
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float)Math.toRadians(90), 
-				1024/720.0f,
-				0.1f, 1000);
-		
-		Matrix4f guiProjMatrix = new Matrix4f();
-		guiProjMatrix.perspective((float)Math.toRadians(90), 
-				1024/720.0f,
+				Window.instance().getWidth()/(float)Window.instance().getHeight(),
 				0.1f, 1000);
 	}
 	
@@ -123,7 +118,7 @@ public class ClientGame extends Game
 				w/(float)h,
 				0.1f, 1000);
 		
-		gui.updateProjection(w, h);
+		gui.updateProjection(0, 0, w, h);
 	}
 	
 	private void initInventoryBarModels()
