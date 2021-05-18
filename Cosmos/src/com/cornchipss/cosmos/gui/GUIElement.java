@@ -3,41 +3,54 @@ package com.cornchipss.cosmos.gui;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.Maths;
 
 public abstract class GUIElement
 {
 	protected Matrix4f transform;
-	private Vector3f position;
+	private MeasurementPair position;
 	private Vector3f rotation;
 	private float scale;
 	
-	private void createMatrix()
+	private Vector3f positionVector;
+	
+	protected void createMatrix()
 	{
-		Maths.createTransformationMatrix(position, rotation.x, rotation.y, rotation.z, scale, transform);
+		positionVector.set(position.x().actualValue(Window.instance().getWidth()),
+				position.y().actualValue(Window.instance().getHeight()),
+				0);
+		
+		Maths.createTransformationMatrix(positionVector, rotation.x, rotation.y, rotation.z, scale, transform);
 	}
 	
-	public GUIElement(Vector3fc position, float rx, float ry, float rz, float scale)
+	public GUIElement(MeasurementPair position, float rx, float ry, float rz, float scale)
 	{
-		this.position = new Vector3f().set(position);
+		this.position = position;
 		this.rotation = new Vector3f(rx, ry, rz);
 		this.scale = scale;
 		transform = new Matrix4f();
+		positionVector = new Vector3f();
 		
 		createMatrix();
 	}
 	
-	public GUIElement(Vector3fc position, float scale)
+	public void onResize(float w, float h)
+	{
+		createMatrix();
+	}
+	
+	public GUIElement(MeasurementPair position, float scale)
 	{
 		this(position, 0, 0, 0, 1);
 	}
 	
-	public GUIElement(Vector3fc position)
+	public GUIElement(MeasurementPair position)
 	{
 		this(position, 1);
 	}
@@ -74,14 +87,14 @@ public abstract class GUIElement
 		return Materials.GUI_MATERIAL;
 	}
 	
-	public Vector3fc position()
+	public MeasurementPair position()
 	{
 		return position;
 	}
 	
-	public void position(Vector3fc p)
+	public void position(MeasurementPair position)
 	{
-		this.position.set(p);
+		this.position = position;
 		createMatrix();
 	}
 }

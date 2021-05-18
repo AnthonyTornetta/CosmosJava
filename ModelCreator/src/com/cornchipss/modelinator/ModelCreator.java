@@ -18,6 +18,9 @@ import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIRectangle;
 import com.cornchipss.cosmos.gui.interactable.GUITextBox;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
+import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.material.Material;
@@ -70,11 +73,36 @@ public class ModelCreator
 		GUI gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, window.getWidth(), window.getHeight());
 		
-		GUIRectangle rect = new GUIRectangle(new Vector3f(0, 0, 0), window.getWidth(), 100, Color.gray);
-		GUIRectangle rect2 = new GUIRectangle(new Vector3f(0, 0, 0), window.getWidth(), 105, Color.DARK_GRAY);
+		GUIRectangle rect = new GUIRectangle(
+					new MeasurementPair(
+				PixelMeasurement.ZERO, 
+				PixelMeasurement.ZERO), 
+					new MeasurementPair(
+				PercentMeasurement.ONE, 
+				new PixelMeasurement(100)), Color.gray);
 		
-		textSelectedName = new GUIText("", Fonts.ARIAL_28, 10, 100 - Fonts.ARIAL_28.height() - 10);
-		txtBox = new GUITextBox(new Vector3f(0, 0, 0), 30, Fonts.ARIAL_8.height(), Fonts.ARIAL_8);
+		GUIRectangle rect2 = new GUIRectangle(
+				new MeasurementPair(
+					PixelMeasurement.ZERO, 
+					PixelMeasurement.ZERO), 
+				new MeasurementPair(
+					PercentMeasurement.ONE, 
+					new PixelMeasurement(105)), 
+				Color.DARK_GRAY);
+		
+		textSelectedName = new GUIText("", Fonts.ARIAL_28, 
+				new MeasurementPair(
+					new PixelMeasurement(10),
+					new PixelMeasurement(100 - Fonts.ARIAL_28.height() - 10)));
+		
+		txtBox = new GUITextBox(
+				new MeasurementPair(
+					PixelMeasurement.ZERO, 
+					PixelMeasurement.ZERO), 
+				new MeasurementPair(
+					new PixelMeasurement(30), 
+					new PixelMeasurement(Fonts.ARIAL_8.height())),
+				Fonts.ARIAL_8);
 		
 		gui.addElement(rect2, rect, textSelectedName, txtBox);
 		
@@ -89,7 +117,7 @@ public class ModelCreator
 						window.getWidth() / (float)window.getHeight(),
 						0.1f, 1000);
 				
-				gui.updateProjection(0, 0, window.getWidth(), window.getHeight());
+				gui.onResize(window.getWidth(), window.getHeight());
 			}
 			
 			GL11.glEnable(GL13.GL_TEXTURE0);

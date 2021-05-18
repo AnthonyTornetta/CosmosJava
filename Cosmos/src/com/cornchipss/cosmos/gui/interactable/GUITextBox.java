@@ -1,10 +1,10 @@
 package com.cornchipss.cosmos.gui.interactable;
 
-import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.rendering.Mesh;
@@ -19,17 +19,20 @@ public class GUITextBox extends GUIElementInteractable
 	
 	private boolean typing = false;
 	
-	public GUITextBox(Vector3fc position, float width, float height, OpenGLFont font)
+	public GUITextBox(MeasurementPair position, MeasurementPair dimensions, OpenGLFont font)
 	{
-		super(position, width, height);
+		super(position, dimensions);
 		
 		text = "";
 		
-		textGUI = new GUIText(text, font, position.x() + 6, position.y()
-				+ (height - font.height()) / 2);
+//		MeasurementLocation offset = new MeasurementLocation(
+//				new PixelMeasurement(6), 
+//				new PixelMeasurement(dimensions.y().actualValue(Window.instance().getHeight()) - font.height() / 2));
 		
-		active = new GUITexture(position, width, height, 0.5f, 0.25f);
-		inactive = new GUITexture(position, width, height, 0.75f, 0.25f);
+		textGUI = new GUIText(text, font, position);
+		
+		active = new GUITexture(position, dimensions, 0.5f, 0.25f);
+		inactive = new GUITexture(position, dimensions, 0.75f, 0.25f);
 	}
 	
 	@Override

@@ -81,8 +81,18 @@ public class GUI
 		if(e instanceof IUpdatable)
 			updatableElements.remove((IUpdatable)e);
 	}
+	
+	public void onResize(float w, float h)
+	{
+		updateProjection(0, 0, w, h);
+		
+		for(GUIElement e : elements)
+		{
+			e.onResize(w, h);
+		}
+	}
 
-	public void updateProjection(int offX, int offY, int width, int height)
+	public void updateProjection(float offX, float offY, float width, float height)
 	{
 		if(projectionMatrix == null)
 			projectionMatrix = new Matrix4f();

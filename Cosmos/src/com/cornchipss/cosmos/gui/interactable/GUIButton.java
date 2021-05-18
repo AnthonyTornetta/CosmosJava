@@ -1,9 +1,9 @@
 package com.cornchipss.cosmos.gui.interactable;
 
-import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.gui.GUITexture;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.io.Input;
 
@@ -13,15 +13,17 @@ public class GUIButton extends GUIElementInteractable
 	
 	private Runnable onclick;
 	
-	public GUIButton(Vector3fc position, float width, float height,
+	private boolean wasHovered = false;
+	
+	public GUIButton(MeasurementPair position, MeasurementPair dim,
 			Runnable onclick)
 	{
-		super(position, width, height);
+		super(position, dim);
 		
 		this.onclick = onclick;
 		
-		active = new GUITexture(position, width, height, 0.5f, 0.0f);
-		inactive = new GUITexture(position, width, height, 0.75f, 0.0f);
+		active = new GUITexture(position, dim, 0.5f, 0.0f);
+		inactive = new GUITexture(position, dim, 0.75f, 0.0f);
 	}
 	
 	@Override
@@ -34,7 +36,7 @@ public class GUIButton extends GUIElementInteractable
 	@Override
 	public Mesh guiMesh()
 	{
-		if(!locked() && hovered())
+		if(!locked() && wasHovered)
 			return active.guiMesh();
 		else
 			return inactive.guiMesh();
@@ -46,10 +48,15 @@ public class GUIButton extends GUIElementInteractable
 		if(locked())
 			return true;
 		
-		if(hovered() && Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+		if(hovered())
 		{
-			onclick.run();
+			wasHovered = true;
+			
+			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+				onclick.run();
 		}
+		else
+			wasHovered = false;
 		
 		return true;
 	}

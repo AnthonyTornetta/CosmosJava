@@ -1,17 +1,18 @@
 package com.cornchipss.cosmos.gui;
 
-import org.joml.Vector3fc;
-
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.rendering.Window;
 
 public class GUITextureMultiple extends GUITexture
 {
 	private Mesh[] meshes;
 	private int state;
 	
-	public GUITextureMultiple(Vector3fc position, float w, float h, float... uvs)
+	public GUITextureMultiple(MeasurementPair position, MeasurementPair dimensions, 
+			float... uvs)
 	{
-		super(position, w, h, uvs[0], uvs[1]);
+		super(position, dimensions, uvs[0], uvs[1]);
 		
 		assert uvs.length % 2 != 0 || uvs.length < 2;
 		
@@ -21,7 +22,9 @@ public class GUITextureMultiple extends GUITexture
 		
 		meshes[0] = super.guiMesh();
 		
-		float[] verts = makeVerts(w, h);
+		float[] verts = 
+				makeVerts(dimensions.x().actualValue(Window.instance().getWidth()),
+						dimensions.y().actualValue(Window.instance().getHeight()));
 		
 		for(int i = 2; i < uvs.length; i+=2)
 		{

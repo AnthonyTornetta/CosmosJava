@@ -1,9 +1,8 @@
 package com.cornchipss.cosmos.gui.text;
 
-import org.joml.Vector3f;
-
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIElement;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUIText extends GUIElement
@@ -13,9 +12,9 @@ public class GUIText extends GUIElement
 	private String text;
 	private String newText;
 	
-	public GUIText(String text, OpenGLFont font, float x, float y)
+	public GUIText(String text, OpenGLFont font, MeasurementPair position)
 	{
-		super(new Vector3f(x, y, 0));
+		super(position);
 		
 		this.font = font;
 		
