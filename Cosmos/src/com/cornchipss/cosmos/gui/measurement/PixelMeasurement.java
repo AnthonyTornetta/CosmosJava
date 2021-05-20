@@ -1,12 +1,14 @@
 package com.cornchipss.cosmos.gui.measurement;
 
-public class PixelMeasurement extends Measurement
+public class PixelMeasurement implements Measurement
 {
 	public static final PixelMeasurement ZERO = new PixelMeasurement(0);
 	
+	private float value;
+	
 	public PixelMeasurement(float v)
 	{
-		super(v);
+		value = v;
 	}
 
 	@Override
@@ -14,4 +16,7 @@ public class PixelMeasurement extends Measurement
 	{
 		return value();
 	}
+	
+	public float value() { return value; }
+	public void value(float f) { value = f; }
 }

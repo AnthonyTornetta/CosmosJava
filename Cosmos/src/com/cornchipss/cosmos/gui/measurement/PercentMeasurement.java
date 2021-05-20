@@ -1,13 +1,15 @@
 package com.cornchipss.cosmos.gui.measurement;
 
-public class PercentMeasurement extends Measurement
+public class PercentMeasurement implements Measurement
 {
 	public static final PercentMeasurement ONE = new PercentMeasurement(1);
 	public static final PercentMeasurement HALF = new PercentMeasurement(0.5f);
 	
+	private float value;
+	
 	public PercentMeasurement(float v)
 	{
-		super(v);
+		value = v;
 	}
 
 	@Override
@@ -15,4 +17,7 @@ public class PercentMeasurement extends Measurement
 	{
 		return value() * dimension;
 	}
+	
+	public float value() { return value; }
+	public void value(float f) { value = f; }
 }

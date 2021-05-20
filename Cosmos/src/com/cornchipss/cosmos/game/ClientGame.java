@@ -16,6 +16,10 @@ import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.GUITextureMultiple;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
+import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
+import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Material;
@@ -65,7 +69,17 @@ public class ClientGame extends Game
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
-		GUITexture crosshair = new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
+		GUITexture crosshair = new GUITexture(
+				new MeasurementPair(new SubtractedMeasurement(
+						new PercentMeasurement(0.5f), new PixelMeasurement(16)),
+					new SubtractedMeasurement(
+						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 
+				new MeasurementPair(new SubtractedMeasurement(
+						new PercentMeasurement(0.5f), new PixelMeasurement(16)),
+					new SubtractedMeasurement(
+						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 0, 0);
+		
+		//new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
@@ -73,19 +87,25 @@ public class ClientGame extends Game
 		
 		inventorySlots = new GUITextureMultiple[10];
 		
+		PixelMeasurement slotDims = new PixelMeasurement(slotDimensions);
+		
 		for(int i = 0; i < inventorySlots.length; i++)
 		{
-			inventorySlots[i] =  new GUITextureMultiple(
-					new Vector3f(startX + i * slotDimensions, 0, 0), slotDimensions, slotDimensions, 
-					0.25f, 0,
-					0, 0.25f);
+			inventorySlots[i] =  
+					new GUITextureMultiple(
+						new MeasurementPair(
+								new PixelMeasurement(startX + i * slotDimensions), 
+								PixelMeasurement.ZERO), 
+						new MeasurementPair(slotDims, slotDims), 
+						0.25f, 0, 0, 0.25f);
 			
 			gui.addElement(inventorySlots[i]);
 		}
 		
 		inventorySlots[selectedSlot].state(1);
 		
-		fpsText = new GUIText("-- --ms", font, 0, 0);
+		fpsText = new GUIText("-- --ms", font, 
+				new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
 		
 		initInventoryBarModels();
@@ -131,7 +151,9 @@ public class ClientGame extends Game
 			{
 				int margin = 4;
 				
-				models[i] = new GUIModel(new Vector3f(startX + i * slotDimensions + margin, margin, 0), 
+				models[i] = new GUIModel(new MeasurementPair(
+						new PixelMeasurement(startX + i * slotDimensions + margin),
+						new PixelMeasurement(margin)), 
 						slotDimensions - margin * 2, player.inventory().block(0, i).model());
 				
 				gui.addElement(models[i]);

@@ -10,6 +10,11 @@ import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.interactable.GUIButton;
 import com.cornchipss.cosmos.gui.interactable.GUITextBox;
+import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
+import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
+import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
+import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Material;
@@ -33,44 +38,85 @@ public class MainMenuState extends State
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, window.getWidth(), window.getHeight());
-	
-//		gui.addElement(new GUITexture(Maths.zero(), 100, 100, 0, 0));
 		
 		Material bgTexture = new RawImageMaterial("assets/images/screenshot-upgraded");
 		bgTexture.init();
-		GUITexture background = new GUITexture(new Vector3f(0, 0, 0), window.getWidth(), window.getHeight(), 0, 0, bgTexture);
+		GUITexture background = new GUITexture(
+				new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO), 
+				new MeasurementPair(PercentMeasurement.ONE, PercentMeasurement.ONE), 
+				0, 0, bgTexture);
 		
 		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
 		font.init();
 		
-		dbgMessage = new GUIText("", font, 0, 0);
-
+		dbgMessage = new GUIText("", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
+		
 		String txt = "Connect";
 		
 		int w = 400;
 		int h = font.height() + 8;
 		
-		Vector3f pos = new Vector3f(
-				window.getWidth() / 2 - w / 2, 
-				window.getHeight() / 2 + 200, 0);
+		MeasurementPair widthHeight = new MeasurementPair(new PixelMeasurement(w), new PixelMeasurement(h));
+
+		nameLabel = new GUIText("Name", font, 
+				new MeasurementPair(
+						new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(w / 2)),
+						new AddedMeasurement(
+								PercentMeasurement.HALF, 
+								new PixelMeasurement(h + 8*2))));
 		
-		nameLabel = new GUIText("Name", font, pos.x + w / 2 - font.stringWidth("Name") / 2, pos.y);
+		nameBox = new GUITextBox(
+				new MeasurementPair(
+						new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(w / 2)
+						),
+						PercentMeasurement.HALF
+					), widthHeight, 
+				font);
 		
-		pos.y -= h + 8;
-		nameBox = new GUITextBox(pos, w, h, font);
-		
-		pos.y -= h + 16;
-		
-		ipLabel = new GUIText("Server Address", font, pos.x + w / 2 - font.stringWidth("Server Address") / 2, pos.y);
-		pos.y -= h + 8;
-		ipBox = new GUITextBox(pos, w, h, font);
-		
-		pos.y -= h + 16;
+		ipLabel = new GUIText("Server Address", font, 
+				new MeasurementPair(
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF, 
+							new PixelMeasurement(w / 2)),
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(h + 8)
+					)
+				));
+
+		ipBox = new GUITextBox(new MeasurementPair(
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(w / 2)),
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(h * 2 + 8 * 2))
+				), widthHeight, font);
 		
 		GUIText btnText = new GUIText(txt, font, 
-				pos.x + w / 2 - font.stringWidth(txt) / 2, pos.y);
+				new MeasurementPair(
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(font.stringWidth(txt) / 2)),
+					new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(h * 3 + 8 * 3)
+						)
+				));
 		
-		connectBtn = new GUIButton(pos, w, h, () ->
+		connectBtn = new GUIButton(new MeasurementPair(
+				new SubtractedMeasurement(
+						PercentMeasurement.HALF,
+						new PixelMeasurement(w / 2)),
+				new SubtractedMeasurement(
+						PercentMeasurement.HALF,
+						new PixelMeasurement(h * 3 + 8 * 3)
+					)
+			), widthHeight, () ->
 		{
 			connectBtn.lock();
 			
