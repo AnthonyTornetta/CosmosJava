@@ -14,7 +14,7 @@ public class GUIModel extends GUIElement
 	public GUIModel(MeasurementPair position, float scale, CubeModel model)
 	{
 		this(position, scale, 
-				model.createMesh(0, 0, -1, 1, BlockFace.FRONT), 
+				model.createMesh(0, 0, -1, scale, BlockFace.FRONT), 
 				model.material());
 	}
 	

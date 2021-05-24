@@ -20,4 +20,10 @@ public class PercentMeasurement implements Measurement
 	
 	public float value() { return value; }
 	public void value(float f) { value = f; }
+	
+	@Override
+	public String toString()
+	{
+		return value * 100 + "%";
+	}
 }

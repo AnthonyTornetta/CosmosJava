@@ -21,4 +21,10 @@ public class AddedMeasurement implements Measurement
 
 	public Measurement b() { return b; }
 	public void b(Measurement b) { this.b = b; }
+	
+	@Override
+	public String toString()
+	{
+		return a + " + " + b;
+	}
 }

@@ -1,10 +1,7 @@
 package com.cornchipss.cosmos.game;
 
-import java.awt.Font;
-
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -16,10 +13,12 @@ import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.GUITextureMultiple;
+import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
+import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Material;
@@ -52,8 +51,6 @@ public class ClientGame extends Game
 	
 	private final int slotDimensions = 64;
 	
-	private final int startX = (int)(1024 / 2.0f - (inventorySlots.length / 2.0f) * slotDimensions);
-	
 	private volatile boolean running = true;
 	
 	private boolean drawGUI = true;
@@ -74,28 +71,31 @@ public class ClientGame extends Game
 						new PercentMeasurement(0.5f), new PixelMeasurement(16)),
 					new SubtractedMeasurement(
 						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 
-				new MeasurementPair(new SubtractedMeasurement(
-						new PercentMeasurement(0.5f), new PixelMeasurement(16)),
-					new SubtractedMeasurement(
-						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 0, 0);
+				new MeasurementPair(
+						new PixelMeasurement(16),
+						new PixelMeasurement(16)), 
+				0, 0);
 		
 		//new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
 		
-		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
-		font.init();
+		OpenGLFont font = Fonts.ARIAL_28;
 		
 		inventorySlots = new GUITextureMultiple[10];
 		
 		PixelMeasurement slotDims = new PixelMeasurement(slotDimensions);
+		
+		int offset = -slotDimensions * (inventorySlots.length / 2);
 		
 		for(int i = 0; i < inventorySlots.length; i++)
 		{
 			inventorySlots[i] =  
 					new GUITextureMultiple(
 						new MeasurementPair(
-								new PixelMeasurement(startX + i * slotDimensions), 
-								PixelMeasurement.ZERO), 
+								new AddedMeasurement(
+										new PixelMeasurement(offset + i * slotDimensions),
+										PercentMeasurement.HALF
+								), PixelMeasurement.ZERO), 
 						new MeasurementPair(slotDims, slotDims), 
 						0.25f, 0, 0, 0.25f);
 			
@@ -138,12 +138,14 @@ public class ClientGame extends Game
 				w/(float)h,
 				0.1f, 1000);
 		
-		gui.updateProjection(0, 0, w, h);
+		gui.onResize(w, h);
 	}
 	
 	private void initInventoryBarModels()
 	{
 		models = new GUIModel[10];
+		
+		int offset = -slotDimensions * (models.length / 2);
 		
 		for(int i = 0; i < player.inventory().columns(); i++)
 		{
@@ -152,8 +154,10 @@ public class ClientGame extends Game
 				int margin = 4;
 				
 				models[i] = new GUIModel(new MeasurementPair(
-						new PixelMeasurement(startX + i * slotDimensions + margin),
-						new PixelMeasurement(margin)), 
+						new AddedMeasurement(
+								new PixelMeasurement(offset + i * slotDimensions + margin),
+								PercentMeasurement.HALF
+						), new PixelMeasurement(margin)), 
 						slotDimensions - margin * 2, player.inventory().block(0, i).model());
 				
 				gui.addElement(models[i]);
@@ -167,7 +171,7 @@ public class ClientGame extends Game
 			return;
 		if(gui == null)
 			initGraphics();
-		
+
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
 		GL30.glEnable(GL30.GL_DEPTH_TEST);

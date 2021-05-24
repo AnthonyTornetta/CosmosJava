@@ -1,9 +1,6 @@
 package com.cornchipss.cosmos.client.states;
 
-import java.awt.Font;
 import java.io.IOException;
-
-import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.gui.GUI;
@@ -15,6 +12,7 @@ import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
+import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Material;
@@ -28,8 +26,6 @@ public class MainMenuState extends State
 	
 	private GUIText dbgMessage;
 	private GUIButton connectBtn;
-	
-	private GUIText nameLabel, ipLabel;
 	
 	private GUITextBox nameBox, ipBox;
 	
@@ -46,8 +42,7 @@ public class MainMenuState extends State
 				new MeasurementPair(PercentMeasurement.ONE, PercentMeasurement.ONE), 
 				0, 0, bgTexture);
 		
-		OpenGLFont font = new OpenGLFont(new Font("Arial", Font.PLAIN, 28));
-		font.init();
+		OpenGLFont font = Fonts.ARIAL_28;
 		
 		dbgMessage = new GUIText("", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		
@@ -58,11 +53,20 @@ public class MainMenuState extends State
 		
 		MeasurementPair widthHeight = new MeasurementPair(new PixelMeasurement(w), new PixelMeasurement(h));
 
-		nameLabel = new GUIText("Name", font, 
+		GUIText titleLabel = new GUIText("COSMOS", Fonts.ARIAL_72, 
 				new MeasurementPair(
 						new SubtractedMeasurement(
 							PercentMeasurement.HALF,
-							new PixelMeasurement(w / 2)),
+							new PixelMeasurement(Fonts.ARIAL_72.stringWidth("COSMOS") / 2.f)),
+						new AddedMeasurement(
+								PercentMeasurement.HALF, 
+								new PixelMeasurement(128*1.5f))));
+		
+		GUIText nameLabel = new GUIText("Name", font, 
+				new MeasurementPair(
+						new SubtractedMeasurement(
+							PercentMeasurement.HALF,
+							new PixelMeasurement(w / 2 - 16)),
 						new AddedMeasurement(
 								PercentMeasurement.HALF, 
 								new PixelMeasurement(h + 8*2))));
@@ -77,7 +81,7 @@ public class MainMenuState extends State
 					), widthHeight, 
 				font);
 		
-		ipLabel = new GUIText("Server Address", font, 
+		GUIText ipLabel = new GUIText("Server Address", font, 
 				new MeasurementPair(
 					new SubtractedMeasurement(
 							PercentMeasurement.HALF, 
@@ -180,7 +184,7 @@ public class MainMenuState extends State
 		});
 		
 		gui.addElement(background, connectBtn, btnText, dbgMessage,
-				nameLabel, nameBox, ipLabel, ipBox);
+				nameLabel, nameBox, ipLabel, ipBox, titleLabel);
 	}
 	
 	@Override

@@ -6,6 +6,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.client.states.MainMenuState;
 import com.cornchipss.cosmos.client.states.State;
+import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
@@ -85,8 +86,10 @@ public class Client implements Runnable
 		Input.setWindow(window);
 		Input.update();
 		
+		Fonts.init();
+		
 		state(new MainMenuState());
-
+		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
 			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))

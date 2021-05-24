@@ -10,7 +10,7 @@ public class PixelMeasurement implements Measurement
 	{
 		value = v;
 	}
-
+	
 	@Override
 	public float actualValue(float dimension)
 	{
@@ -19,4 +19,10 @@ public class PixelMeasurement implements Measurement
 	
 	public float value() { return value; }
 	public void value(float f) { value = f; }
+	
+	@Override
+	public String toString()
+	{
+		return value + "";
+	}
 }

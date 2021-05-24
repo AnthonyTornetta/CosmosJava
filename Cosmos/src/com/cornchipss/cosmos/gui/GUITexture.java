@@ -5,7 +5,6 @@ import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class GUITexture extends GUIElement
 {
@@ -80,6 +79,8 @@ public class GUITexture extends GUIElement
 	@Override
 	public void onResize(float w, float h)
 	{
+		super.onResize(w, h);
+		
 		float newWidth = dimensions.x().actualValue(w);
 		float newHeight = dimensions.y().actualValue(h);
 		
