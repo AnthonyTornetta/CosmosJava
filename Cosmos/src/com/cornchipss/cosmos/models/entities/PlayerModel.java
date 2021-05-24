@@ -24,7 +24,7 @@ public class PlayerModel implements Model
 		{
 			try
 			{
-				baseModel = ModelLoader.fromFile("assets/models/player-min");
+				baseModel = ModelLoader.fromFile("assets/models/player");
 				
 //				ModelLoader.toFile("assets/models/player-min.model", 
 //						baseModel.vertices(), baseModel.uvs(), baseModel.indices());

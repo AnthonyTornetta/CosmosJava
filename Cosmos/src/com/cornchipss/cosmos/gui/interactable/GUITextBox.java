@@ -35,6 +35,13 @@ public class GUITextBox extends GUIElementInteractable
 		inactive = new GUITexture(position, dimensions, 0.75f, 0.25f);
 	}
 	
+	public void onResize(float w, float h)
+	{
+		super.onResize(w, h);
+		
+		textGUI.onResize(w, h);
+	}
+	
 	@Override
 	public void delete()
 	{

@@ -72,8 +72,8 @@ public class ClientGame extends Game
 					new SubtractedMeasurement(
 						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 
 				new MeasurementPair(
-						new PixelMeasurement(16),
-						new PixelMeasurement(16)), 
+						new PixelMeasurement(32),
+						new PixelMeasurement(32)), 
 				0, 0);
 		
 		//new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);

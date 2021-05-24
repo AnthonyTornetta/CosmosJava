@@ -201,6 +201,11 @@ public class MainMenuState extends State
 	@Override
 	public void render(float delta)
 	{
+		if(Window.instance().wasWindowResized())
+		{
+			gui.onResize(Window.instance().getWidth(), Window.instance().getHeight());
+		}
+		
 		gui.draw();
 	}
 
