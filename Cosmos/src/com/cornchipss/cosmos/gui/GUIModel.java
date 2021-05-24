@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.gui;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.rendering.Mesh;
@@ -20,7 +21,9 @@ public class GUIModel extends GUIElement
 	
 	public GUIModel(MeasurementPair position, float scale, Mesh m, Material mat)
 	{
-		super(position, scale);
+		super(position, 
+				new MeasurementPair(new PixelMeasurement(scale), new PixelMeasurement(scale)), 
+				scale);
 		
 		this.mesh = m;
 		this.mat = mat;

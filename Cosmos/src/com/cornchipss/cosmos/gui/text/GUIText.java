@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.gui.text;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIElement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.rendering.Mesh;
 
 public class GUIText extends GUIElement
@@ -14,7 +15,9 @@ public class GUIText extends GUIElement
 	
 	public GUIText(String text, OpenGLFont font, MeasurementPair position)
 	{
-		super(position);
+		super(position, new MeasurementPair(
+				new PixelMeasurement(font.stringWidth(text)), 
+				new PixelMeasurement(font.height())));
 		
 		this.font = font;
 		
@@ -34,6 +37,9 @@ public class GUIText extends GUIElement
 				mesh.delete();
 			
 			mesh = TextRenderer.createMesh(newText, font);
+			dimensions(new MeasurementPair(
+					new PixelMeasurement(font.stringWidth(newText)), 
+					new PixelMeasurement(font.height())));
 			
 			newText = null;
 		}

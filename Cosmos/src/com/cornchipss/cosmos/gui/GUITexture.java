@@ -39,8 +39,6 @@ public class GUITexture extends GUIElement
 	private Mesh guiMesh;
 	private Material material;
 	
-	private MeasurementPair dimensions;
-	
 	private float initialWidth, initialHeight;
 	
 	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v)
@@ -50,12 +48,10 @@ public class GUITexture extends GUIElement
 	
 	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v, Material material)
 	{
-		super(position);
+		super(position, dimensions);
 		
 		initialWidth = dimensions.x().actualValue(Window.instance().getWidth());
 		initialHeight = dimensions.y().actualValue(Window.instance().getHeight());
-		
-		this.dimensions = dimensions;
 		
 		guiMesh = Mesh.createMesh(
 				makeVerts(initialWidth, initialHeight), 
@@ -81,8 +77,8 @@ public class GUITexture extends GUIElement
 	{
 		super.onResize(w, h);
 		
-		float newWidth = dimensions.x().actualValue(w);
-		float newHeight = dimensions.y().actualValue(h);
+		float newWidth = dimensions().x().actualValue(w);
+		float newHeight = dimensions().y().actualValue(h);
 		
 		float scaleX = 1 + (newWidth - initialWidth) / initialWidth, 
 				scaleY = 1 + (newHeight - initialHeight) / initialHeight;

@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.gui.interactable;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.gui.GUI;
+import com.cornchipss.cosmos.gui.GUIElement;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.text.GUIText;
@@ -10,7 +11,7 @@ import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUITextBox extends GUIElementInteractable 
+public class GUITextBox extends GUIElement implements IGUIInteractable 
 {	
 	private GUITexture active, inactive;
 	private GUIText textGUI;
@@ -18,6 +19,7 @@ public class GUITextBox extends GUIElementInteractable
 	private String text;
 	
 	private boolean typing = false;
+	private boolean locked = false;
 	
 	public GUITextBox(MeasurementPair position, MeasurementPair dimensions, OpenGLFont font)
 	{
@@ -157,5 +159,23 @@ public class GUITextBox extends GUIElementInteractable
 	{
 		text = string;
 		textGUI.text(text);
+	}
+
+	@Override
+	public boolean locked()
+	{
+		return locked;
+	}
+
+	@Override
+	public void lock()
+	{
+		locked = true;
+	}
+
+	@Override
+	public void unlock()
+	{
+		locked = false;
 	}
 }

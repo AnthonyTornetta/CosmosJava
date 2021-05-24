@@ -18,6 +18,7 @@ import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIRectangle;
 import com.cornchipss.cosmos.gui.interactable.GUITextBox;
+import com.cornchipss.cosmos.gui.interactable.ScrollBox;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
@@ -104,11 +105,16 @@ public class ModelCreator
 					new PixelMeasurement(Fonts.ARIAL_8.height())),
 				Fonts.ARIAL_8);
 		
-		gui.addElement(rect2, rect, textSelectedName, txtBox);
+		ScrollBox box = new ScrollBox(new MeasurementPair
+				(PixelMeasurement.ZERO, PixelMeasurement.ZERO),
+				new MeasurementPair(PercentMeasurement.HALF, PercentMeasurement.HALF),
+				Color.blue);
+		
+		gui.addElement(rect2, rect, textSelectedName, txtBox, box);
 		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
-			window.clear(0.3f, 0.3f, 0.3f, 1);
+			window.clear(0.17f, 0.17f, 0.17f, 1);
 			
 			if(window.wasWindowResized())
 			{
@@ -194,19 +200,13 @@ public class ModelCreator
 		float closestDist = 0;
 		int startingIndex = -1;
 		
+		Vector3f pos1 = new Vector3f(), pos2 = new Vector3f(), pos3 = new Vector3f();
+		Vector3f collisionAt = new Vector3f();
+		
 		for(int i = 0; i < m.indices().length; i += 3)
 		{
-			Vector3f pos1 = new Vector3f(m.vertices()[m.indices()[i]*3], 
-					m.vertices()[m.indices()[i]*3 + 1], m.vertices()[m.indices()[i]*3 + 2]);
+			verticesAtIndex(i, pos1, pos2, pos3, m);
 			
-			Vector3f pos2 = new Vector3f(m.vertices()[m.indices()[i+1]*3], 
-					m.vertices()[m.indices()[i+1]*3 + 1], m.vertices()[m.indices()[i+1]*3 + 2]);
-			
-			Vector3f pos3 = new Vector3f(m.vertices()[m.indices()[i+2]*3], 
-					m.vertices()[m.indices()[i+2]*3 + 1], m.vertices()[m.indices()[i+2]*3 + 2]);
-			
-			Vector3f collisionAt = new Vector3f();
-
 			if(Intersectionf.intersectLineSegmentTriangle(from, to,
 					pos1, pos2, pos3, (float) 1E-9, collisionAt))
 			{
@@ -230,6 +230,23 @@ public class ModelCreator
 		return startingIndex;
 	}
 	
+	private void select(int[] indices)
+	{
+		txtBox.text(indices[0] + " - " + indices[indices.length - 1]);
+	}
+	
+	private void verticesAtIndex(int i, Vector3f a, Vector3f b, Vector3f c, LoadedModel m)
+	{
+		a.set(m.vertices()[m.indices()[i]*3], 
+				m.vertices()[m.indices()[i]*3 + 1], m.vertices()[m.indices()[i]*3 + 2]);
+		
+		b.set(m.vertices()[m.indices()[i+1]*3], 
+				m.vertices()[m.indices()[i+1]*3 + 1], m.vertices()[m.indices()[i+1]*3 + 2]);
+		
+		c.set(m.vertices()[m.indices()[i+2]*3], 
+				m.vertices()[m.indices()[i+2]*3 + 1], m.vertices()[m.indices()[i+2]*3 + 2]);
+	}
+	
 	private void update(float delta, LoadedModel m, Camera cam, Matrix4fc projection,
 			Window window, Transform transform)
 	{
@@ -243,7 +260,8 @@ public class ModelCreator
 				textSelectedName.text(group);
 				
 				int[] indices = m.indicesForGroup(group);
-				txtBox.text(indices[0] + "");
+				
+				select(indices);
 			}
 		}
 		

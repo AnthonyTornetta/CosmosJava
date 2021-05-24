@@ -2,17 +2,19 @@ package com.cornchipss.cosmos.gui.interactable;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.cosmos.gui.GUIElement;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUIButton extends GUIElementInteractable
+public class GUIButton extends GUIElement implements IGUIInteractable
 {
 	private GUITexture active, inactive;
 	
 	private Runnable onclick;
 	
+	private boolean locked = false;	
 	private boolean wasHovered = false;
 	
 	public GUIButton(MeasurementPair position, MeasurementPair dim,
@@ -59,5 +61,23 @@ public class GUIButton extends GUIElementInteractable
 			wasHovered = false;
 		
 		return true;
+	}
+
+	@Override
+	public boolean locked()
+	{
+		return locked;
+	}
+
+	@Override
+	public void lock()
+	{
+		locked = true;
+	}
+
+	@Override
+	public void unlock()
+	{
+		locked = false;
 	}
 }

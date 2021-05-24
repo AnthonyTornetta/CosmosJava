@@ -10,6 +10,7 @@ public class Input
 	
 	private static KeyListener keyListener;
 	private static MouseListener mouseListener;
+	private static ScrollListener scrollListener;
 	
 	private Input() { throw new IllegalStateException("Cannot instantiate the Input class!"); }
 	
@@ -17,6 +18,7 @@ public class Input
 	{
 		keyListener.update();
 		mouseListener.update();
+		scrollListener.update();
 	}
 	
 	public static void setWindow(Window window)
@@ -28,9 +30,11 @@ public class Input
 		
 		keyListener = new KeyListener();
 		mouseListener = new MouseListener(window.getId());
+		scrollListener = new ScrollListener();
 		
 		GLFW.glfwSetMouseButtonCallback(window.getId(), mouseListener);
 		GLFW.glfwSetKeyCallback(window.getId(), keyListener);
+		GLFW.glfwSetScrollCallback(window.getId(), scrollListener);
 	}
 
 	public static boolean isKeyDown(int key)
@@ -63,6 +67,16 @@ public class Input
 		{
 			GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
 		}
+	}
+	
+	public static boolean scrollWheelScrolled()
+	{
+		return scrollListener.scrollOffset() != 0;
+	}
+	
+	public static float scrollAmount()
+	{
+		return (float)scrollListener.scrollOffset();
 	}
 	
 	public static float getMouseX() { return mouseListener.getMouse().x; }

@@ -10,11 +10,13 @@ import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.io.Input;
 
 public abstract class GUIElement
 {
 	protected Matrix4f transform;
 	private MeasurementPair position;
+	private MeasurementPair dimensions;
 	private Vector3f rotation;
 	private float scale;
 	
@@ -29,10 +31,11 @@ public abstract class GUIElement
 		Maths.createTransformationMatrix(positionVector, rotation.x, rotation.y, rotation.z, scale, transform);
 	}
 	
-	public GUIElement(MeasurementPair position, float rx, float ry, float rz, float scale)
+	public GUIElement(MeasurementPair position, MeasurementPair dimensions, float rx, float ry, float rz, float scale)
 	{
 		this.position = position;
 		this.rotation = new Vector3f(rx, ry, rz);
+		this.dimensions = dimensions;
 		this.scale = scale;
 		transform = new Matrix4f();
 		positionVector = new Vector3f();
@@ -40,19 +43,36 @@ public abstract class GUIElement
 		createMatrix();
 	}
 	
+	public GUIElement(MeasurementPair position, MeasurementPair dimensions)
+	{
+		this(position, dimensions, 0, 0, 0, 1);
+	}
+	
+	public boolean hovered()
+	{
+		float width = Window.instance().getWidth();
+		float height = Window.instance().getHeight();
+		
+		float minX = position().x().actualValue(width);
+		float minY = position().y().actualValue(height);
+		float maxX = position().x().actualValue(width) + this.dimensions.x().actualValue(width);
+		float maxY = position().y().actualValue(height) + this.dimensions.y().actualValue(height);
+		
+		float mouseX = Input.getRelativeMouseX();
+		float mouseY = Input.getRelativeMouseY();
+		
+		return mouseX >= minX && mouseY >= minY 
+				&& mouseX <= maxX && mouseY <= maxY;
+	}
+	
 	public void onResize(float w, float h)
 	{
 		createMatrix();
 	}
 	
-	public GUIElement(MeasurementPair position, float scale)
+	public GUIElement(MeasurementPair position, MeasurementPair dimensions, float scale)
 	{
-		this(position, 0, 0, 0, 1);
-	}
-	
-	public GUIElement(MeasurementPair position)
-	{
-		this(position, 1);
+		this(position, dimensions, 0, 0, 0, scale);
 	}
 	
 	public void prepare(GUI gui)
@@ -96,5 +116,15 @@ public abstract class GUIElement
 	{
 		this.position = position;
 		createMatrix();
+	}
+	
+	public MeasurementPair dimensions()
+	{
+		return dimensions;
+	}
+	
+	public void dimensions(MeasurementPair p)
+	{
+		this.dimensions = p;
 	}
 }
