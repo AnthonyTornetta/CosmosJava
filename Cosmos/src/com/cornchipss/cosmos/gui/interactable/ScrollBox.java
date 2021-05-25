@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.gui.interactable;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.cornchipss.cosmos.gui.GUIContainer;
@@ -18,15 +19,21 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 	
 	private boolean locked = false;
 	
+	private PixelMeasurement scrollOffset;
+	
 	public ScrollBox(MeasurementPair position, MeasurementPair dimensions, Color color)
 	{
 		super(position, dimensions, color);
+		
+		children = new ArrayList<>();
+		
+		scrollOffset = new PixelMeasurement(0);
 	}
 	
 	@Override
 	public List<GUIElement> children()
 	{
-		return null;
+		return children;
 	}
 
 	@Override
@@ -34,12 +41,14 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 	{
 		if(Input.scrollWheelScrolled())
 		{
-			float amt = Input.scrollAmount();
+			float amt = Input.scrollAmount() * 8;
 			
-			position(new MeasurementPair(
-					new AddedMeasurement(position().x(), 
-							new PixelMeasurement(amt)), 
-					position().y()));
+			scrollOffset.value(scrollOffset.value() + amt);
+			
+			for(GUIElement c : children)
+			{
+				c.updateTransform();
+			}
 		}
 		
 		return false;
@@ -61,5 +70,29 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 	public void unlock()
 	{
 		locked = false;
+	}
+
+	@Override
+	public void addChild(GUIElement elem)
+	{
+		children.add(elem);
+		
+		MeasurementPair p = elem.position();
+		
+		p.y(new AddedMeasurement(p.x(), scrollOffset));
+		elem.position(p);
+		
+		Utils.println(elem.position());
+	}
+
+	@Override
+	public void removeChild(GUIElement elem)
+	{
+		children.remove(elem);
+		
+		MeasurementPair p = elem.position();
+		
+		p.y(((AddedMeasurement)p.y()).a());
+		elem.position(p);
 	}
 }

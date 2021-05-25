@@ -127,4 +127,9 @@ public abstract class GUIElement
 	{
 		this.dimensions = p;
 	}
+
+	public void updateTransform()
+	{
+		createMatrix();
+	}
 }

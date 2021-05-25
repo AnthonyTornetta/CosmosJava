@@ -33,7 +33,6 @@ public class GUI
 	public void init(int offX, int offY, int width, int height)
 	{
 		updateProjection(offX, offY, width, height);
-		
 	}
 	
 	public void draw()
@@ -54,7 +53,23 @@ public class GUI
 	public void update(float delta)
 	{
 		for(IUpdatable elem : updatableElements)
-			elem.update(delta);
+		{
+			update(elem, delta);
+		}
+	}
+	
+	private void update(IUpdatable element, float delta)
+	{
+		element.update(delta);
+		
+		if(element instanceof GUIContainer)
+		{
+			for(GUIElement child : ((GUIContainer)element).children())
+			{
+				if(child instanceof IUpdatable)
+					update((IUpdatable)child, delta);
+			}
+		}
 	}
 	
 	public Material material()
@@ -123,5 +138,13 @@ public class GUI
 		elem.finish(this);
 		
 		elem.material().stop();
+		
+		if(elem instanceof GUIContainer)
+		{
+			for(GUIElement child : ((GUIContainer)elem).children())
+			{
+				draw(child);
+			}
+		}
 	}
 }

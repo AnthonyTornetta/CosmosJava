@@ -110,7 +110,9 @@ public class ModelCreator
 				new MeasurementPair(PercentMeasurement.HALF, PercentMeasurement.HALF),
 				Color.blue);
 		
-		gui.addElement(rect2, rect, textSelectedName, txtBox, box);
+		box.addChild(textSelectedName);
+		
+		gui.addElement(rect2, rect, txtBox, box);
 		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
