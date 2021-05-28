@@ -79,7 +79,7 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 		
 		MeasurementPair p = elem.position();
 		
-		p.y(new AddedMeasurement(p.x(), scrollOffset));
+		p.y(new AddedMeasurement(p.y(), scrollOffset));
 		elem.position(p);
 		
 		Utils.println(elem.position());

@@ -22,6 +22,7 @@ import com.cornchipss.cosmos.gui.interactable.ScrollBox;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
+import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.material.Material;
@@ -94,7 +95,10 @@ public class ModelCreator
 		textSelectedName = new GUIText("", Fonts.ARIAL_28, 
 				new MeasurementPair(
 					new PixelMeasurement(10),
-					new PixelMeasurement(100 - Fonts.ARIAL_28.height() - 10)));
+					new SubtractedMeasurement(
+							PercentMeasurement.ONE,
+							new PixelMeasurement(Fonts.ARIAL_28.height() + 10))
+					));
 		
 		txtBox = new GUITextBox(
 				new MeasurementPair(
@@ -107,8 +111,10 @@ public class ModelCreator
 		
 		ScrollBox box = new ScrollBox(new MeasurementPair
 				(PixelMeasurement.ZERO, PixelMeasurement.ZERO),
-				new MeasurementPair(PercentMeasurement.HALF, PercentMeasurement.HALF),
-				Color.blue);
+				new MeasurementPair(
+						new PixelMeasurement(200), 
+						PercentMeasurement.ONE),
+				Color.gray);
 		
 		box.addChild(textSelectedName);
 		
