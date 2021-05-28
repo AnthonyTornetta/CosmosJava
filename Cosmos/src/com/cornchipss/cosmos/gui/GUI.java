@@ -103,7 +103,20 @@ public class GUI
 		
 		for(GUIElement e : elements)
 		{
-			e.onResize(w, h);
+			handleResize(w, h, e);
+		}
+	}
+	
+	private void handleResize(float w, float h, GUIElement e)
+	{
+		e.onResize(w, h);
+		
+		if(e instanceof GUIContainer)
+		{
+			for(GUIElement child : ((GUIContainer)e).children())
+			{
+				handleResize(w, h, child);
+			}
 		}
 	}
 

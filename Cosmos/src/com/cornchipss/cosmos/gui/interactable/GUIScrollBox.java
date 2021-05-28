@@ -13,7 +13,7 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInteractable	
+public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInteractable	
 {
 	private List<GUIElement> children;
 	
@@ -21,7 +21,7 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 	
 	private PixelMeasurement scrollOffset;
 	
-	public ScrollBox(MeasurementPair position, MeasurementPair dimensions, Color color)
+	public GUIScrollBox(MeasurementPair position, MeasurementPair dimensions, Color color)
 	{
 		super(position, dimensions, color);
 		
@@ -39,9 +39,9 @@ public class ScrollBox extends GUIRectangle implements GUIContainer, IGUIInterac
 	@Override
 	public boolean update(float delta)
 	{
-		if(Input.scrollWheelScrolled())
+		if(hovered() && Input.scrollWheelScrolled())
 		{
-			float amt = Input.scrollAmount() * 8;
+			float amt = -Input.scrollAmount() * 8;
 			
 			scrollOffset.value(scrollOffset.value() + amt);
 			

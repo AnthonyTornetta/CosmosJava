@@ -18,7 +18,7 @@ import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIRectangle;
 import com.cornchipss.cosmos.gui.interactable.GUITextBox;
-import com.cornchipss.cosmos.gui.interactable.ScrollBox;
+import com.cornchipss.cosmos.gui.interactable.GUIScrollBox;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
@@ -72,6 +72,9 @@ public class ModelCreator
 		
 		GimbalLockCamera cam = new GimbalLockCamera(trans);
 		
+		final Color GREY = new Color(43+20, 43+20, 43+20);
+		final Color LIGHTER_GREY = new Color(43+40, 43+40, 43+40);
+		
 		GUI gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, window.getWidth(), window.getHeight());
 		
@@ -81,19 +84,28 @@ public class ModelCreator
 				PixelMeasurement.ZERO), 
 					new MeasurementPair(
 				PercentMeasurement.ONE, 
-				new PixelMeasurement(100)), Color.gray);
+				new PixelMeasurement(100)), GREY);
 		
 		GUIRectangle rect2 = new GUIRectangle(
 				new MeasurementPair(
 					PixelMeasurement.ZERO, 
 					PixelMeasurement.ZERO), 
 				new MeasurementPair(
+						new PixelMeasurement(205), 
+						PercentMeasurement.ONE), 
+				LIGHTER_GREY);
+		
+		GUIRectangle rect3 = new GUIRectangle(
+				new MeasurementPair(
+					PixelMeasurement.ZERO, 
+					PixelMeasurement.ZERO), 
+				new MeasurementPair(
 					PercentMeasurement.ONE, 
 					new PixelMeasurement(105)), 
-				Color.DARK_GRAY);
+				LIGHTER_GREY);
 		
 		textSelectedName = new GUIText("", Fonts.ARIAL_28, 
-				new MeasurementPair(
+				new MeasurementPair( 
 					new PixelMeasurement(10),
 					new SubtractedMeasurement(
 							PercentMeasurement.ONE,
@@ -109,16 +121,16 @@ public class ModelCreator
 					new PixelMeasurement(Fonts.ARIAL_8.height())),
 				Fonts.ARIAL_8);
 		
-		ScrollBox box = new ScrollBox(new MeasurementPair
+		GUIScrollBox box = new GUIScrollBox(new MeasurementPair
 				(PixelMeasurement.ZERO, PixelMeasurement.ZERO),
 				new MeasurementPair(
 						new PixelMeasurement(200), 
 						PercentMeasurement.ONE),
-				Color.gray);
+				GREY);
 		
 		box.addChild(textSelectedName);
 		
-		gui.addElement(rect2, rect, txtBox, box);
+		gui.addElement(rect2, rect3, rect, txtBox, box);
 		
 		GameLoop loop = new GameLoop((float delta) ->
 		{
