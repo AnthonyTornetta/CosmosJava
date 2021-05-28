@@ -10,7 +10,7 @@ import com.cornchipss.cosmos.gui.GUIRectangle;
 import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 
 public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInteractable	
@@ -43,7 +43,15 @@ public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInte
 		{
 			float amt = -Input.scrollAmount() * 8;
 			
-			scrollOffset.value(scrollOffset.value() + amt);
+			float maxScroll = maxScroll();
+			
+			if(scrollOffset.value() + amt < 0)
+				scrollOffset.value(0);
+			else if(scrollOffset.value() + amt < maxScroll)
+				scrollOffset.value(scrollOffset.value() + amt);
+			else
+				scrollOffset.value(maxScroll);
+			
 			
 			for(GUIElement c : children)
 			{
@@ -53,7 +61,7 @@ public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInte
 		
 		return false;
 	}
-
+	
 	@Override
 	public boolean locked()
 	{
@@ -71,6 +79,22 @@ public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInte
 	{
 		locked = false;
 	}
+	
+	private float maxScroll()
+	{
+		float maxY = 0;
+		
+		for(GUIElement elem : children)
+		{
+			float y = elem.position().x().actualValue(Window.instance().getHeight());
+			float height = elem.dimensions().y().actualValue(Window.instance().getHeight());
+			
+			if(y + height > maxY)
+				maxY = y;
+		}
+		
+		return maxY;
+	}
 
 	@Override
 	public void addChild(GUIElement elem)
@@ -81,8 +105,6 @@ public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInte
 		
 		p.y(new AddedMeasurement(p.y(), scrollOffset));
 		elem.position(p);
-		
-		Utils.println(elem.position());
 	}
 
 	@Override
