@@ -101,7 +101,7 @@ public abstract class GUIElement
 	{
 		guiMesh().delete();
 	}
-
+	
 	public Material material()
 	{
 		return Materials.GUI_MATERIAL;

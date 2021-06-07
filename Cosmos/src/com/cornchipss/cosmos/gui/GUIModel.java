@@ -23,7 +23,7 @@ public class GUIModel extends GUIElement
 	{
 		super(position, 
 				new MeasurementPair(new PixelMeasurement(scale), new PixelMeasurement(scale)), 
-				scale);
+				1);
 		
 		this.mesh = m;
 		this.mat = mat;

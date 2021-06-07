@@ -19,6 +19,8 @@ public class Block implements IHasModel
 	
 	private String name;
 	
+	private int mass;
+	
 	/**
 	 * <p>A block in the world</p>
 	 * <p>Only one instance of each block should ever be present</p>
@@ -28,11 +30,12 @@ public class Block implements IHasModel
 	 * @param m The model the block has
 	 * @param name The name used to refer to the block in the registry
 	 */
-	public Block(CubeModel m, String name)
+	public Block(CubeModel m, String name, int mass)
 	{
 		this.model = m;
-		
 		this.name = name;
+		this.mass = mass;
+		
 		id = -1;
 	}
 	
@@ -68,6 +71,11 @@ public class Block implements IHasModel
 		return true;
 	}
 	
+	public int mass()
+	{
+		return mass;
+	}
+	
 	@Override
 	public boolean equals(Object o)
 	{
@@ -93,6 +101,6 @@ public class Block implements IHasModel
 	@Override
 	public String toString()
 	{
-		return name;
+		return "Block [" + name() + "]";
 	}
 }

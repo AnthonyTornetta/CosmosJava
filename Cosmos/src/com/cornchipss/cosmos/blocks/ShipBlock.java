@@ -21,7 +21,7 @@ public class ShipBlock extends Block
 	 */
 	public ShipBlock(CubeModel m, String name)
 	{
-		super(m, name);
+		super(m, name, 10);
 	}
 	
 	@Override

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.cornchipss.cosmos.blocks.individual.ShipCoreBlock;
+import com.cornchipss.cosmos.blocks.individual.ThrusterBlock;
 import com.cornchipss.cosmos.lights.LightSource;
 import com.cornchipss.cosmos.models.blocks.CactusModel;
 import com.cornchipss.cosmos.models.blocks.DirtModel;
@@ -24,17 +26,18 @@ public class Blocks
 	private static List<Block> allBlocks;
 	
 	public static final Block
-		GRASS = new Block(new GrassModel(), "grass"),
-		DIRT  = new Block(new DirtModel(), "dirt"),
-		STONE = new Block(new StoneModel(), "stone"),
-		LIGHT = new LitBlock(new LightModel(), new LightSource(16), "light"),
-		LOG   = new Block(new LogModel(), "log"),
-		LEAF  = new Block(new LeafModel(), "leaf"),
+		GRASS = new Block(new GrassModel(), "grass", 10),
+		DIRT  = new Block(new DirtModel(), "dirt", 10),
+		STONE = new Block(new StoneModel(), "stone", 20),
+		LIGHT = new LitBlock(new LightModel(), new LightSource(16), "light", 5),
+		LOG   = new Block(new LogModel(), "log", 15),
+		LEAF  = new Block(new LeafModel(), "leaf", 2),
 		SHIP_CORE = new ShipCoreBlock(),
-		SHIP_HULL = new Block(new ShipHullModel(), "ship_hull"),
-		SAND = new Block(new SandModel(), "sand"),
-		SAND_STONE = new Block(new SandStoneModel(), "sand_stone"),
-		CACTUS = new Block(new CactusModel(), "cactus");
+		SHIP_HULL = new Block(new ShipHullModel(), "ship_hull", 20),
+		THRUSTER  = new ThrusterBlock(),
+		SAND = new Block(new SandModel(), "sand", 10),
+		SAND_STONE = new Block(new SandStoneModel(), "sand_stone", 20),
+		CACTUS = new Block(new CactusModel(), "cactus", 5);
 	
 	/**
 	 * Adds all the blocks to a list
@@ -44,7 +47,7 @@ public class Blocks
 		allBlocks = Collections.unmodifiableList(
 				Arrays.asList(STONE, GRASS, DIRT, 
 						LIGHT, LOG, LEAF, SHIP_CORE, SHIP_HULL,
-						SAND, SAND_STONE, CACTUS));
+						SAND, SAND_STONE, CACTUS, THRUSTER));
 		
 		for(short i = 0; i < allBlocks.size(); i++)
 			allBlocks.get(i).blockId((short)(i + 1));

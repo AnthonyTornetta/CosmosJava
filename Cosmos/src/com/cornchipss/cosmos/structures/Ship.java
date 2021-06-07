@@ -1,9 +1,15 @@
 package com.cornchipss.cosmos.structures;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.cosmos.blocks.Block;
+import com.cornchipss.cosmos.blocks.IThrustProducer;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -21,9 +27,13 @@ public class Ship extends Structure
 	
 	private Vector3f corePos = new Vector3f();
 	
+	private List<Vector3i> thrusterPositions;
+	
 	public Ship(World world, int id)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
+		
+		thrusterPositions = new LinkedList<>();
 	}
 	
 	public Vector3fc corePosition()
@@ -32,7 +42,26 @@ public class Ship extends Structure
 		return corePos;
 	}
 	
-	int temp = 0;
+	@Override
+	public void block(int x, int y, int z, Block b)
+	{
+		Block previous = block(x, y, z);
+		
+		if(!Utils.equals(previous, b))
+		{
+			if(previous instanceof IThrustProducer
+					&& !(b instanceof IThrustProducer))
+			{
+				thrusterPositions.remove(new Vector3i(x, y, z));
+			}
+			else if(b instanceof IThrustProducer)
+			{
+				thrusterPositions.add(new Vector3i(x, y, z));
+			}
+		}
+		
+		super.block(x, y, z, b);
+	}
 	
 	@Override
 	public void update(float delta)
@@ -109,5 +138,10 @@ public class Ship extends Structure
 	public Player pilot()
 	{
 		return pilot;
+	}
+	
+	public int thrusterCount()
+	{
+		return thrusterPositions.size();
 	}
 }
