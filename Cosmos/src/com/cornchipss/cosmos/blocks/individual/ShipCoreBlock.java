@@ -21,7 +21,7 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	 */
 	public ShipCoreBlock()
 	{
-		super(new ShipCoreModel(), "ship_core");
+		super(new ShipCoreModel(), "ship_core", 10);
 	}
 
 	@Override

@@ -143,14 +143,7 @@ public class GUI
 
 	public void draw(GUIElement elem)
 	{
-		elem.material().use();
-		elem.material().initUniforms(projectionMatrix, cameraMatrix, elem.transform(), true);
-		
-		elem.prepare(this);
-		elem.draw(this);
-		elem.finish(this);
-		
-		elem.material().stop();
+		elem.fullDraw(this, projectionMatrix, cameraMatrix);
 		
 		if(elem instanceof GUIContainer)
 		{

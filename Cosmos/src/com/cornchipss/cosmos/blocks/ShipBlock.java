@@ -19,9 +19,9 @@ public class ShipBlock extends Block
 	 * @param m The model the block has
 	 * @param name The name used to refer to the block in the registry
 	 */
-	public ShipBlock(CubeModel m, String name)
+	public ShipBlock(CubeModel m, String name, int mass)
 	{
-		super(m, name, 10);
+		super(m, name, mass);
 	}
 	
 	@Override

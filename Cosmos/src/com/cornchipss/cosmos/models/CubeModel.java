@@ -7,6 +7,7 @@ import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.utils.Utils;
 
 public abstract class CubeModel implements Model
 {
@@ -173,30 +174,41 @@ public abstract class CubeModel implements Model
 				BlockFace.FRONT, BlockFace.BACK);
 	}
 	
-	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
+	protected void fillVertices(List<Float> vertices,
+			float offX, float offY, float offZ, float scale, BlockFace... sides)
 	{
-		List<Float> verts = new LinkedList<>();
-		List<Integer> indicies = new LinkedList<>();
-		List<Float> uvs = new LinkedList<>();
-		
+		for(BlockFace s : sides)
+		{
+			for(float f : verticies(s, offX, offY, offZ))
+				vertices.add(f * scale);
+		}
+	}
+	
+	protected void fillIndices(List<Integer> indices,
+			float offX, float offY, float offZ, float scale, BlockFace... sides)
+	{
 		int maxI = 0;
 		
 		for(BlockFace s : sides)
 		{
-			for(float f : verticies(s, offX, offY, offZ))
-				verts.add(f * scale);
-			
 			int tempMax = maxI;
 			
 			for(int i : indicies(s))
 			{
-				indicies.add(maxI + i);
+				indices.add(maxI + i);
 				if(i + maxI > tempMax - 1)
 					tempMax = maxI + i + 1;
 			}
 			
 			maxI = tempMax;
-			
+		}
+	}
+	
+	protected void fillUVs(List<Float> uvs,
+			float offX, float offY, float offZ, float scale, BlockFace... sides)
+	{
+		for(BlockFace s : sides)
+		{
 			float u = u(s);
 			float v = v(s);
 			
@@ -215,29 +227,28 @@ public abstract class CubeModel implements Model
 			uvs.add(u);
 			uvs.add(vEnd);
 		}
+	}
+	
+	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
+	{
+		return createMesh(true, offX, offY, offZ, scale, sides);
+	}
+	
+	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scale, BlockFace... sides)
+	{
+		List<Float> verts = new LinkedList<>();
+		List<Integer> indices = new LinkedList<>();
+		List<Float> uvs = new LinkedList<>();
 		
-		float[] asArrVerts = new float[verts.size()];
-		int i = 0;
-		for(float f : verts)
-		{
-			asArrVerts[i++] = f;
-		}
+		fillVertices(verts, offX, offY, offZ, scale, sides);
+		fillIndices(indices, offX, offY, offZ, scale, sides);
+		fillUVs(uvs, offX, offY, offZ, scale, sides);
 		
-		int[] asArrIndicies = new int[indicies.size()];
-		i = 0;
-		for(int index : indicies)
-		{
-			asArrIndicies[i++] = index;
-		}
+		float[] asArrVerts = Utils.toArray(verts);
+		int[] asArrIndicies = Utils.toArrayInt(indices);
+		float[] asArrUvs = Utils.toArray(uvs);
 		
-		float[] asArrUvs = new float[uvs.size()];
-		i = 0;
-		for(float uv : uvs)
-		{
-			asArrUvs[i++] = uv;
-		}
-		
-		return Mesh.createMesh(asArrVerts, asArrIndicies, asArrUvs);
+		return Mesh.createMesh(asArrVerts, asArrIndicies, asArrUvs, unbind);
 	}
 
 	public boolean opaque()

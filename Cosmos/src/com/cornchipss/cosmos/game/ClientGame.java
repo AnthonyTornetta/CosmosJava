@@ -42,12 +42,12 @@ public class ClientGame extends Game
 	private ClientPlayer player;
 	private GUI gui;
 	private int selectedSlot;
-	private GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
 	private GUIText fpsText;
 	private CosmosNettyClient nettyClient;
 	public CosmosNettyClient nettyClient() { return nettyClient; }
 	
-	private	GUIModel[] models;
+	private GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
+	private	GUIModel[] inventoryModels;
 	
 	private final int slotDimensions = 64;
 	
@@ -143,9 +143,9 @@ public class ClientGame extends Game
 	
 	private void initInventoryBarModels()
 	{
-		models = new GUIModel[10];
+		inventoryModels = new GUIModel[10];
 		
-		int offset = -slotDimensions * (models.length / 2);
+		int offset = -slotDimensions * (inventoryModels.length / 2);
 		
 		for(int i = 0; i < player.inventory().columns(); i++)
 		{
@@ -153,14 +153,14 @@ public class ClientGame extends Game
 			{
 				int margin = 4;
 				
-				models[i] = new GUIModel(new MeasurementPair(
+				inventoryModels[i] = new GUIModel(new MeasurementPair(
 						new AddedMeasurement(
 								new PixelMeasurement(offset + i * slotDimensions + margin),
 								PercentMeasurement.HALF
 						), new PixelMeasurement(margin)), 
 						slotDimensions - margin * 2, player.inventory().block(0, i).model());
 				
-				gui.addElement(models[i]);
+				gui.addElement(inventoryModels[i]);
 			}
 		}
 	}

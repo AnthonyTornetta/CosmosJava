@@ -34,10 +34,16 @@ public abstract class Player extends PhysicalObject
 		
 		inventory = new Inventory(4, 10);
 		
-		for(int i = 0; i < Blocks.all().size() && i < inventory.rows() * inventory.columns(); i++)
-		{
-			inventory.block(i / inventory.columns(), i % inventory.columns(), Blocks.all().get(i));
-		}
+		inventory.block(0, 0, Blocks.GRASS);
+		inventory.block(0, 1, Blocks.DIRT);
+		inventory.block(0, 2, Blocks.STONE);
+		inventory.block(0, 3, Blocks.LIGHT);
+		inventory.block(0, 4, Blocks.SHIP_HULL);
+		inventory.block(0, 5, Blocks.THRUSTER);
+		inventory.block(0, 6, Blocks.SAND);
+		inventory.block(0, 7, Blocks.SAND_STONE);
+		inventory.block(0, 8, Blocks.LOG);
+		inventory.block(0, 9, Blocks.LEAF);
 	}
 	
 	public abstract void update(float delta);

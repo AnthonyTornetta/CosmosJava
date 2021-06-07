@@ -75,6 +75,19 @@ public abstract class GUIElement
 		this(position, dimensions, 0, 0, 0, scale);
 	}
 	
+	public void fullDraw(GUI gui, Matrix4fc projectionMatrix, Matrix4fc cameraMatrix)
+	{
+		material().use();
+		
+		material().initUniforms(projectionMatrix, cameraMatrix, transform(), true);
+		
+		prepare(gui);
+		draw(gui);
+		finish(gui);
+		
+		material().stop();
+	}
+	
 	public void prepare(GUI gui)
 	{
 		guiMesh().prepare();

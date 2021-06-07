@@ -17,6 +17,7 @@ public class Mesh
 	public static final int COLOR_INDEX  = 1;
 	public static final int UV_INDEX     = 2;
 	public static final int LIGHT_INDEX  = 3;
+	public static final int ANIMATION_INDEX = 4;
 	
 	final private int vao;
 	final private int verticies;
@@ -59,7 +60,12 @@ public class Mesh
 		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW);
 	}
 	
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs)
+	public static Mesh createMesh(float[] vertices, int[] indices, float[] uvs)
+	{
+		return createMesh(vertices, indices, uvs, true);
+	}
+	
+	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, boolean unbind)
 	{
 		Mesh m = new Mesh(indicies.length);
 		GL30.glBindVertexArray(m.vao());
@@ -72,7 +78,9 @@ public class Mesh
 		
 		// hey idiot. are you adding something and it's not working? make sure you enable all the required GL buffers when you draw it.
 
-		GL30.glBindVertexArray(0);
+		if(unbind)
+			GL30.glBindVertexArray(0);
+		
 		return m;
 	}
 	
