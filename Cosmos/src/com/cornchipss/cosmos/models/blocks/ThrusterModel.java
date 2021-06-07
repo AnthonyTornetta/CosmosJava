@@ -10,7 +10,14 @@ public class ThrusterModel extends AnimatedCubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return 0;
+		if(side == BlockFace.FRONT)
+			return 0;
+		else if(side == BlockFace.BACK)
+			return material().uvWidth() * 6;
+		else if(side == BlockFace.LEFT || side == BlockFace.RIGHT)
+			return material().uvWidth() * 4;
+		else
+			return material().uvWidth() * 2;
 	}
 	
 	@Override
@@ -22,7 +29,10 @@ public class ThrusterModel extends AnimatedCubeModel
 	@Override
 	public int maxAnimationStage(BlockFace side)
 	{
-		return 2;
+		if(side != BlockFace.BACK)
+			return 2;
+		else
+			return 1;
 	}
 
 	@Override
