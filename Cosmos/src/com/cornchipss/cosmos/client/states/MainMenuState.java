@@ -66,7 +66,7 @@ public class MainMenuState extends State
 				new MeasurementPair(
 						new SubtractedMeasurement(
 							PercentMeasurement.HALF,
-							new PixelMeasurement(w / 2 - 16)),
+							new PixelMeasurement(w / 2)),
 						new AddedMeasurement(
 								PercentMeasurement.HALF, 
 								new PixelMeasurement(h + 8*2))));
