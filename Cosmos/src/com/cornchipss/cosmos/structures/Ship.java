@@ -27,6 +27,10 @@ public class Ship extends Structure
 	
 	private Vector3f corePos = new Vector3f();
 	
+	private float totalMass = 0;
+	private float thrustForce = 0;
+	private float thrustEnergy = 0;
+	
 	private List<Vector3i> thrusterPositions;
 	
 	public Ship(World world, int id)
@@ -47,11 +51,33 @@ public class Ship extends Structure
 	{
 		Block previous = block(x, y, z);
 		
+		if(previous != null)
+		{
+			totalMass -= previous.mass();
+		}
+		
+		if(b != null)
+		{
+			totalMass += b.mass();
+		}
+		
 		if(!Utils.equals(previous, b))
 		{
+			if(previous instanceof IThrustProducer)
+			{
+				thrustForce -= ((IThrustProducer)previous).thrustGeneratedPerTick();
+				thrustEnergy -= ((IThrustProducer)previous).powerUsedPerTick();
+			}
+			
+			if(b instanceof IThrustProducer)
+			{
+				thrustForce += ((IThrustProducer)b).thrustGeneratedPerTick();
+				thrustEnergy += ((IThrustProducer)b).powerUsedPerTick();
+			}
+			
 			if(previous instanceof IThrustProducer
 					&& !(b instanceof IThrustProducer))
-			{
+			{				
 				thrusterPositions.remove(new Vector3i(x, y, z));
 			}
 			else if(b instanceof IThrustProducer)
@@ -86,9 +112,13 @@ public class Ship extends Structure
 			if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 				dVel.sub(body().transform().up());
 			
-			dVel.x = (dVel.x() * (delta * 20));
-			dVel.z = (dVel.z() * (delta * 20));
-			dVel.y = (dVel.y() * (delta * 20));
+			float accel = thrustForce / mass();
+			
+			Utils.println(accel);
+			
+			dVel.x = (dVel.x() * (delta * accel));
+			dVel.z = (dVel.z() * (delta * accel));
+			dVel.y = (dVel.y() * (delta * accel));
 			
 			Vector3f dRot = new Vector3f();
 			
@@ -143,5 +173,10 @@ public class Ship extends Structure
 	public int thrusterCount()
 	{
 		return thrusterPositions.size();
+	}
+	
+	public float mass()
+	{
+		return totalMass;
 	}
 }

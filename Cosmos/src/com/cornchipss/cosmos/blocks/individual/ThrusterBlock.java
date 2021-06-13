@@ -12,14 +12,14 @@ public class ThrusterBlock extends ShipBlock implements IThrustProducer
 	}
 
 	@Override
-	public float thrustGenerated(float delta)
+	public float thrustGeneratedPerTick()
 	{
-		return 200*delta;
+		return 2000;
 	}
 
 	@Override
-	public float powerUsed(float delta)
+	public float powerUsedPerTick()
 	{
-		return 200*delta;
+		return 200;
 	}
 }

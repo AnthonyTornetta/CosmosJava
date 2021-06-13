@@ -7,12 +7,12 @@ public interface IThrustProducer
 	 * @param delta the time
 	 * @return The amount of thrust this generated in the given time in Newtons
 	 */
-	public float thrustGenerated(float delta);
+	public float thrustGeneratedPerTick();
 	
 	/**
 	 * The energy consumed during that time
 	 * @param delta the time
 	 * @return The amount of thrust this generated in the given time in Newtons
 	 */
-	public float powerUsed(float delta);
+	public float powerUsedPerTick();
 }
