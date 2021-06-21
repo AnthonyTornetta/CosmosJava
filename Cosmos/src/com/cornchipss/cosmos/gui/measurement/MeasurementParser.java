@@ -1,18 +1,9 @@
 package com.cornchipss.cosmos.gui.measurement;
 
-import com.cornchipss.cosmos.utils.Utils;
-
-public class MeaurementParser
+public class MeasurementParser
 {
-	private MeaurementParser() {} // no
+	private MeasurementParser() {} // no
 	
-	public static void main(String[] args)
-	{
-		Measurement m = parse("100 + 2% / 2% * 80 / 5");
-		
-		Utils.println(m + " ->\n" + m.actualValue(100));
-	}
-		
 	private static Measurement parseInnards(String s)
 	{
 		String num = "";
@@ -67,7 +58,7 @@ public class MeaurementParser
 		throw new IllegalStateException("oops");
 	}
 	
-	private static Measurement parse(String m)
+	public static Measurement parse(String m)
 	{
 		m = m.replace(" ", "");
 		

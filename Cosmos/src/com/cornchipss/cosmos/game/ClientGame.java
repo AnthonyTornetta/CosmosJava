@@ -16,6 +16,7 @@ import com.cornchipss.cosmos.gui.GUITextureMultiple;
 import com.cornchipss.cosmos.gui.interactable.GUIButton;
 import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
+import com.cornchipss.cosmos.gui.measurement.MeasurementParser;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
@@ -72,25 +73,21 @@ public class ClientGame extends Game
 		
 		final float BTN_Y_POS = 100;
 		final float BTN_HEIGHT = 60;
-		final float BTN_WIDTH = 300;
 		
 		GUIText quitText = new GUIText("QUIT", Fonts.ARIAL_28, 
 				new MeasurementPair(
-						new SubtractedMeasurement(
-								PercentMeasurement.HALF, 
-								new PixelMeasurement(
-										Fonts.ARIAL_28.stringWidth("QUIT") / 2)),
-						new SubtractedMeasurement(
-								new PixelMeasurement(BTN_Y_POS + BTN_HEIGHT / 2),
-								new PixelMeasurement(Fonts.ARIAL_28.height() / 2))));
+						MeasurementParser.parse("50% - " + 
+								Fonts.ARIAL_28.stringWidth("QUIT") / 2),
+						MeasurementParser.parse((BTN_Y_POS + BTN_HEIGHT / 2) + 
+								" - " + (Fonts.ARIAL_28.height() / 2))));
 		
 		GUIButton quitBtn = new GUIButton(
 				new MeasurementPair(
-						new SubtractedMeasurement(
-								PercentMeasurement.HALF, 
-								new PixelMeasurement(BTN_WIDTH / 2)), 
-						new PixelMeasurement(BTN_Y_POS)), 
-				new MeasurementPair(new PixelMeasurement(BTN_WIDTH), new PixelMeasurement(BTN_HEIGHT)), 
+						MeasurementParser.parse("50% - 150"), 
+						new PixelMeasurement(100)), 
+				new MeasurementPair(
+						new PixelMeasurement(300), 
+						new PixelMeasurement(60)), 
 				() ->
 				{
 					Client.instance().quit();
@@ -107,16 +104,14 @@ public class ClientGame extends Game
 		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
 		GUITexture crosshair = new GUITexture(
-				new MeasurementPair(new SubtractedMeasurement(
-						new PercentMeasurement(0.5f), new PixelMeasurement(16)),
-					new SubtractedMeasurement(
-						new PercentMeasurement(0.5f), new PixelMeasurement(16))), 
+				new MeasurementPair(
+						MeasurementParser.parse("50% - 16"),
+						MeasurementParser.parse("50% - 16")),
 				new MeasurementPair(
 						new PixelMeasurement(32),
 						new PixelMeasurement(32)), 
 				0, 0);
 		
-		//new GUITexture(new Vector3f(Window.instance().getWidth() / 2.f - 16, Window.instance().getHeight() / 2.f - 16, 0), 32, 32, 0, 0);
 		gui.addElement(crosshair);
 		
 		OpenGLFont font = Fonts.ARIAL_28;
