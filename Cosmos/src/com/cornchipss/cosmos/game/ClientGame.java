@@ -13,6 +13,7 @@ import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.GUITextureMultiple;
+import com.cornchipss.cosmos.gui.interactable.GUIButton;
 import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
@@ -61,8 +62,47 @@ public class ClientGame extends Game
 	private Mesh playerMesh;
 	private Material playerMaterial;
 	
+	private GUI pauseMenu;
+	private boolean showPauseMenu = false;
+	
+	private void initPauseMenu()
+	{
+		pauseMenu = new GUI(Materials.GUI_PAUSE_MENU);
+		pauseMenu.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
+		
+		final float BTN_Y_POS = 100;
+		final float BTN_HEIGHT = 60;
+		final float BTN_WIDTH = 300;
+		
+		GUIText quitText = new GUIText("QUIT", Fonts.ARIAL_28, 
+				new MeasurementPair(
+						new SubtractedMeasurement(
+								PercentMeasurement.HALF, 
+								new PixelMeasurement(
+										Fonts.ARIAL_28.stringWidth("QUIT") / 2)),
+						new SubtractedMeasurement(
+								new PixelMeasurement(BTN_Y_POS + BTN_HEIGHT / 2),
+								new PixelMeasurement(Fonts.ARIAL_28.height() / 2))));
+		
+		GUIButton quitBtn = new GUIButton(
+				new MeasurementPair(
+						new SubtractedMeasurement(
+								PercentMeasurement.HALF, 
+								new PixelMeasurement(BTN_WIDTH / 2)), 
+						new PixelMeasurement(BTN_Y_POS)), 
+				new MeasurementPair(new PixelMeasurement(BTN_WIDTH), new PixelMeasurement(BTN_HEIGHT)), 
+				() ->
+				{
+					Client.instance().quit();
+				});
+		
+		pauseMenu.addElement(quitBtn, quitText);
+	}
+	
 	private void initGraphics()
 	{
+		initPauseMenu();
+		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
@@ -215,6 +255,9 @@ public class ClientGame extends Game
 		
 		if(drawGUI)
 			gui.draw();
+		
+		if(showPauseMenu)
+			pauseMenu.draw();
 	}
 	
 	@Override
@@ -230,7 +273,18 @@ public class ClientGame extends Game
 	@Override
 	public void update(float delta)
 	{
-		if(nettyClient.ready())
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_P))
+		{
+			showPauseMenu = !showPauseMenu;
+			
+			Input.toggleCursor();
+		}
+		
+		if(showPauseMenu)
+		{
+			pauseMenu.update(delta);
+		}
+		else if(nettyClient.ready())
 		{
 			super.update(delta);
 			

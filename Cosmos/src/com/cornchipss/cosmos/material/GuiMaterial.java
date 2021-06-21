@@ -10,6 +10,11 @@ public class GuiMaterial extends Material
 	{
 		super("assets/shaders/gui", "assets/images/atlas/gui");
 	}
+	
+	public GuiMaterial(String atlas)
+	{
+		super("assets/shaders/gui", atlas);
+	}
 
 	@Override
 	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc cam, Matrix4fc transform, boolean isGUI)

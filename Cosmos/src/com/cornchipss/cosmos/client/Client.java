@@ -168,4 +168,9 @@ public class Client implements Runnable
 	{
 		return client;
 	}
+
+	public void quit()
+	{
+		running(false);
+	}
 }

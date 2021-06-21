@@ -25,6 +25,6 @@ public class AddedMeasurement implements Measurement
 	@Override
 	public String toString()
 	{
-		return a + " + " + b;
+		return "(" + a + " + " + b + ")";
 	}
 }
