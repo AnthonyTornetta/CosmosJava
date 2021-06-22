@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.client;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.util.Scanner;
 
 import com.cornchipss.cosmos.game.ClientGame;
@@ -52,7 +53,7 @@ public class CosmosNettyClient implements Runnable
 		server.sendUDP(p.buffer(), p.bufferLength(), this);
 	}
 	
-	public void sendTCP(Packet p)
+	public void sendTCP(Packet p) throws IOException
 	{
 		server.sendTCP(p.buffer(), p.bufferLength(), this);
 	}
@@ -83,18 +84,25 @@ public class CosmosNettyClient implements Runnable
 	        
 	        // udp stuff
 	        while(running && Client.instance().running())
-	        {
-	        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
-	        	server.socket().receive(recieved);
+	        {	        	
+	        	try
+	        	{
+		        	DatagramPacket recieved = new DatagramPacket(buffer, buffer.length);
+
+		        	server.socket().setSoTimeout(1000);
+		        	server.socket().receive(recieved);
 	        	
-	        	byte marker = Packet.findMarker(buffer, recieved.getOffset(), recieved.getLength());
-	    		
-	    		Packet p = PacketTypes.packet(marker);
-	    		if(p == null)
-	    			Logger.LOGGER.error("WARNING: Invalid packet type (" + marker + ") received from server");
-	    		else
-	    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
-	    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
+		        	byte marker = Packet.findMarker(buffer, recieved.getOffset(), recieved.getLength());
+		    		
+		    		Packet p = PacketTypes.packet(marker);
+		    		if(p == null)
+		    			Logger.LOGGER.error("WARNING: Invalid packet type (" + marker + ") received from server");
+		    		else
+		    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
+		    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
+	        	}
+	        	catch(SocketTimeoutException ex)
+	        	{}
 	        	
 	    		try
 	    		{
@@ -112,20 +120,24 @@ public class CosmosNettyClient implements Runnable
 	        	server.sendUDP(pp.buffer(), pp.bufferLength(), this);
 	        }
 	        
+	        Logger.LOGGER.debug("Sending disconnect packet");
 	        
-	        DisconnectedPacket dcp = new DisconnectedPacket(buffer, 0, "Disconnected");
+	        DisconnectedPacket dcp = new DisconnectedPacket(buffer, 0, game().player().name(), "Disconnected");
 	        dcp.init();
 	        
 	        try
 	        {
-	        	server.sendTCP(dcp.buffer(), dcp.bufferLength(), this);
+	        	sendTCP(dcp);
 	        }
-	        catch(Exception ex)
+	        catch(IOException ex)
 	        {
+	        	Logger.LOGGER.info("Could not send disconnect packet - already lost connection");
 	        	// the connection was already closed
 	        }
 	        
+	        Logger.LOGGER.info("TCP thread joining");
 	        tcpThread.join();
+	        Logger.LOGGER.info("TCP thread exited gracefully");
 		}
 		catch(IOException | InterruptedException ex)
 		{

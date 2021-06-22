@@ -94,16 +94,9 @@ public class ServerConnection
 		return socket;
 	}
 
-	public void sendTCP(byte[] buffer, int length, CosmosNettyClient client)
+	public void sendTCP(byte[] buffer, int length, CosmosNettyClient client) throws IOException
 	{
-		try
-		{
-			tcpServerConnection.sendData(buffer, 0, length);
-		}
-		catch(IOException ex)
-		{
-			ex.printStackTrace();
-		}
+		tcpServerConnection.sendData(buffer, 0, length);
 	}
 	
 	public void sendUDP(byte[] buffer, int length, CosmosNettyClient client)

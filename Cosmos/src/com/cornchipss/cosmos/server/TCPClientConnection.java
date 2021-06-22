@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import com.cornchipss.cosmos.netty.PacketTypes;
+import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.utils.Logger;
@@ -55,6 +56,8 @@ public class TCPClientConnection implements Runnable
 			throw new RuntimeException(ex);
 		}
 		
+		String name = null;
+		
 		while(server.running() && active())
 		{
 			try
@@ -79,8 +82,14 @@ public class TCPClientConnection implements Runnable
 				else
 					continue;
 				
+				if(player != null)
+				{
+					name = player.name();
+				}
+				
 				if(p == null)
 				{
+					// TODO: dont do this - make it a packet
 					Utils.println("INVALID PACKET TYPE");
 					buffer[0] = -1; // we can reuse the same buffer
 					connection.sendTCP(buffer, 1);
@@ -93,12 +102,19 @@ public class TCPClientConnection implements Runnable
 			}
 			catch(EOFException ex)
 			{
-				Logger.LOGGER.info("Player " + server.players().player(this).name() + " disconnected.");
+				name = server.players().player(this).name();
+
+				Logger.LOGGER.info("Player " + name + " disconnected.");
 				server.players().removePlayer(this);
+				active(false);
 			}
-			catch(IOException ex)
+			catch(Exception ex)
 			{
-				throw new RuntimeException(ex);
+				name = server.players().player(this).name();
+
+				Logger.LOGGER.info("Player " + name + " made an invalid packet - removing them.");
+				server.players().removePlayer(this);
+				active(false);
 			}
 		}
 		
@@ -114,7 +130,31 @@ public class TCPClientConnection implements Runnable
 			
 		}
 		
+		if(name != null)
+			announceClosingToOthers(name);
+		else
+			Utils.println("!!! NO NAME DICONNECTED !!!");
+		
 		Utils.println("TCP connection closed.");
+	}
+	
+	private void announceClosingToOthers(String name)
+	{
+		byte[] buf = new byte[256];
+		DisconnectedPacket packet = new DisconnectedPacket(buf, 0, name, "Disconnected by User");
+		packet.init();
+		
+		for(ServerPlayer pl : Server.nettyServer().players().players())
+		{
+			try
+			{
+				pl.client().sendTCP(packet.buffer(), packet.bufferLength());
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

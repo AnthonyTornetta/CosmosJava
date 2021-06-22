@@ -13,6 +13,7 @@ import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 
 public class Client implements Runnable
@@ -117,10 +118,14 @@ public class Client implements Runnable
 		
 		window.destroy();
 		
+		Logger.LOGGER.info("Window Destroyed");
+		
 		try
 		{
+			Logger.LOGGER.info("Netty thread joined");
 			if(nettyThread != null)
 				nettyThread.join();
+			Logger.LOGGER.info("Netty thread terminated gracefully");
 		}
 		catch (InterruptedException e)
 		{
