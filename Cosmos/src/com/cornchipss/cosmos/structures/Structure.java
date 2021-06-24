@@ -3,8 +3,6 @@ package com.cornchipss.cosmos.structures;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -22,6 +20,7 @@ import com.cornchipss.cosmos.physx.StructureShape;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
@@ -43,7 +42,6 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	
 	public StructureShape shape() { return shape; }
 	
-	private Set<Chunk> bulkUpdate;
 	private int id;
 	
 	public Structure(World world, int id)
@@ -75,8 +73,6 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		chunks = new Chunk[cLength * cHeight * cWidth];
 		
 		shape = new StructureShape(this);
-		
-		bulkUpdate = null;
 	}
 	
 	/**
@@ -87,10 +83,15 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		
 	}
 	
+	/**
+	 * <p><b>Deprecated</b>: does not send data to server<p>
+	 * <p>Removes blocks in a sphere originating from pos with the specified radius
+	 * @param radius The radius of blocks to remove
+	 * @param pos The sphere's origin
+	 */
+	@Deprecated
 	public void explode(int radius, Vector3i pos)
 	{
-		beginBulkUpdate();
-		
 		Vector3f temp = new Vector3f();
 		Vector3f tempPos = new Vector3f(pos.x, pos.y, pos.z);
 		
@@ -118,56 +119,8 @@ public abstract class Structure extends PhysicalObject implements IWritable
 				}
 			}
 		}
+	}
 		
-		endBulkUpdate();
-	}
-	
-	public boolean bulkUpdating()
-	{
-		return bulkUpdate != null;
-	}
-
-	public void beginBulkUpdate()
-	{
-		if(!bulkUpdating())
-			bulkUpdate = new LinkedHashSet<>();
-	}
-
-	public void endBulkUpdate()
-	{
-		if(bulkUpdating())
-		{
-			calculateLights(true);
-			
-			Set<Chunk> all = new LinkedHashSet<>();
-		
-			for(Chunk c : bulkUpdate)
-			{
-				// not the best way for account for all changes, given that large light sources would invalidate this, but it works for now
-				all.add(c);
-				if(c.leftNeighbor() != null)
-					all.add(c.leftNeighbor());
-				if(c.rightNeighbor() != null)
-					all.add(c.rightNeighbor());
-				if(c.topNeighbor() != null)
-					all.add(c.topNeighbor());
-				if(c.bottomNeighbor() != null)
-					all.add(c.bottomNeighbor());
-				if(c.frontNeighbor() != null)
-					all.add(c.frontNeighbor());
-				if(c.backNeighbor() != null)
-					all.add(c.backNeighbor());
-			}
-			
-			for(Chunk c : all)
-				c.render();
-		}
-		else
-			throw new IllegalStateException("Cannot end a bulk update when there is no bulk update currently happening");
-		
-		bulkUpdate = null;
-	}
-	
 	@Override
 	public void addToWorld(Transform transform)
 	{
@@ -272,7 +225,7 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		}
 	}
 	
-	public void calculateLights(boolean render)
+	public void calculateLights()
 	{
 		long start = System.currentTimeMillis();
 		
@@ -282,39 +235,36 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		
 		Logger.LOGGER.debug(end - start + "ms to calculate light map");
 		
-		if(render)
+		Vector3i extremeNeg = changedArea[0];
+		Vector3i extremePos = changedArea[1];
+		
+		if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
 		{
-			Vector3i extremeNeg = changedArea[0];
-			Vector3i extremePos = changedArea[1];
+			// TODO: fix this, for some reason the extremeNeg + Pos calcs don't work. Idk why
+			extremeNeg.x = Maths.min(extremeNeg.x - Chunk.WIDTH, 0);
+			extremeNeg.y = Maths.min(extremeNeg.y - Chunk.HEIGHT, 0);
+			extremeNeg.z = Maths.min(extremeNeg.z - Chunk.LENGTH, 0);
 			
-			if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
+			extremePos.x = Maths.min(extremePos.x + Chunk.WIDTH, width());
+			extremePos.y = Maths.min(extremePos.y + Chunk.HEIGHT, height());
+			extremePos.z = Maths.min(extremePos.z + Chunk.LENGTH, length());
+			
+			// Account for the +2 size of the light map
+			extremeNeg.x += 1;
+			extremeNeg.y += 1;
+			extremeNeg.z += 1;
+			
+			extremePos.x -= 1;
+			extremePos.y -= 1;
+			extremePos.z -= 1;
+			
+			for(int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
 			{
-				// TODO: fix this, for some reason the extremeNeg + Pos calcs don't work. Idk why
-				extremeNeg.x = Maths.min(extremeNeg.x - Chunk.WIDTH, 0);
-				extremeNeg.y = Maths.min(extremeNeg.y - Chunk.HEIGHT, 0);
-				extremeNeg.z = Maths.min(extremeNeg.z - Chunk.LENGTH, 0);
-				
-				extremePos.x = Maths.min(extremePos.x + Chunk.WIDTH, width());
-				extremePos.y = Maths.min(extremePos.y + Chunk.HEIGHT, height());
-				extremePos.z = Maths.min(extremePos.z + Chunk.LENGTH, length());
-				
-				// Account for the +2 size of the light map
-				extremeNeg.x += 1;
-				extremeNeg.y += 1;
-				extremeNeg.z += 1;
-				
-				extremePos.x -= 1;
-				extremePos.y -= 1;
-				extremePos.z -= 1;
-				
-				for(int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
+				for(int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
 				{
-					for(int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
+					for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
 					{
-						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
-						{
-							chunks[flatten(cx, cy, cz)].needsRendered(true);
-						}
+						chunks[flatten(cx, cy, cz)].needsRendered(true);
 					}
 				}
 			}
@@ -363,8 +313,6 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		
 		shape = new StructureShape(this);
 		
-		bulkUpdate = null;
-		
 		init();
 		
 		for(int z = 0; z < chunksLength(); z++)
@@ -400,10 +348,7 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		{
 			Chunk c = chunk(x, y, z);
 			
-			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b, !bulkUpdating());
-			
-			if(bulkUpdating())
-				bulkUpdate.add(c);
+			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
 		}
 		else
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
@@ -432,19 +377,6 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	public int length() { return length; }
 	public int height() { return height; }
 	public int width() { return width; }
-
-	/**
-	 * Not implemented
-	 * TODO implement this
-	 * @param r
-	 * @param x
-	 * @param y
-	 * @param z
-	 */
-	public void rotation(float r, float x, float y, float z)
-	{
-		throw new RuntimeException("Not yet implemented D;");
-	}
 	
 	public Matrix4fc openGLMatrix()
 	{
@@ -573,5 +505,42 @@ public abstract class Structure extends PhysicalObject implements IWritable
 			return ((Structure)o).id == id;
 		}
 		return false;
+	}
+
+	public void calculateLightsAndApply()
+	{
+		Vector3i[] range = lightMap().calculateLightMap();
+		
+		Utils.println(range[0]);
+		Utils.println(range[1]);
+		
+		for(int z = range[0].z - Chunk.LENGTH; z <= range[1].z + Chunk.LENGTH; z++)
+		{
+			z = Math.max(0, z);
+			int zz = z / Chunk.LENGTH;
+			
+			if(zz == chunksLength())
+				break;
+			
+			for(int y = range[0].y - Chunk.HEIGHT; y <= range[1].y + Chunk.HEIGHT; y++)
+			{
+				y = Math.max(0, y);
+				int yy = y / Chunk.HEIGHT;
+				
+				if(yy == chunksHeight())
+					break;
+				
+				for(int x = range[0].x - Chunk.WIDTH; x <= range[1].x + Chunk.WIDTH; x++)
+				{					
+					x = Math.max(0, x);
+					int xx = x / Chunk.WIDTH;
+					
+					if(xx == chunksWidth())
+						break;
+					
+					chunks[flatten(xx, yy, zz)].needsRendered(true);
+				}
+			}
+		}
 	}
 }

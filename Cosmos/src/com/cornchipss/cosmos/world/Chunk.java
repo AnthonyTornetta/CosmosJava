@@ -12,7 +12,6 @@ import org.joml.Vector3ic;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
-import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.Structure;
@@ -26,6 +25,11 @@ public class Chunk implements IWritable
 	private boolean rendered;
 	
 	private boolean needsRendered;
+	
+	public boolean lightmapNeedsUpdating()
+	{
+		return false;
+	}
 	
 	public boolean needsRendered()
 	{
@@ -191,11 +195,6 @@ public class Chunk implements IWritable
 	}
 	
 	private Matrix4f transformMatrix;
-
-	public void block(int x, int y, int z, Block block)
-	{
-		block(x, y, z, block, true);
-	}
 	
 	public boolean within(int x, int y, int z)
 	{
@@ -213,12 +212,12 @@ public class Chunk implements IWritable
 	 * @param block The block to set it to
 	 * @param shouldRender If true, the chunk will update the lightmap + re-render the mesh. If the chunk has not been rendered yet - this will be false no matter what is passed
 	 */
-	public void block(int x, int y, int z, Block block, boolean shouldRender)
+	public void block(int x, int y, int z, Block block)
 	{	
 		if(!within(x, y, z))
 			throw new IllegalArgumentException("Bad x,y,z: " + x + ", " + y + ", " + z);
 		
-		shouldRender = rendered && shouldRender && NettySide.side() == NettySide.CLIENT;
+		boolean shouldRender = false;//rendered && shouldRender && NettySide.side() == NettySide.CLIENT;
 		
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
@@ -236,49 +235,29 @@ public class Chunk implements IWritable
 				
 				structure.lightMap().lightSource(x + offset.x(), y + offset.y(), z + offset.z(), 
 							((LitBlock) block).lightSource());
-				
-				if(shouldRender)
-				{
-					structure.calculateLights(true);
-				}
 			}
 			else if(structure.lightMap().hasLightSource(x + offset.x(), y + offset.y(), z + offset.z()))
 			{
 				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
-				
-				if(shouldRender)
-					structure.calculateLights(true);
-			}
-			else if(shouldRender)
-			{
-				structure.calculateLights(true);
 			}
 			
-			if(shouldRender) // only if the chunk has been rendered at least 1 time before
-//				render(); // update the chunk's model for the new block
-				needsRendered(true);
+			needsRendered(true);
 			
 			// Make sure if this block is neighboring another chunk, that chunk updates aswell
 			if(x == 0 && left != null && shouldRender)
-//				left.render();
-				needsRendered(true);
+				left.needsRendered(true);
 			if(x + 1 == Chunk.WIDTH && right != null && shouldRender)
-//				right.render();
-				needsRendered(true);
+				right.needsRendered(true);
 			
 			if(y == 0 && bottom != null && shouldRender)
-//				bottom.render();
-				needsRendered(true);
+				bottom.needsRendered(true);
 			if(y + 1 == Chunk.HEIGHT && top != null && shouldRender)
-//				top.render();
-				needsRendered(true);
+				top.needsRendered(true);
 			
 			if(z == 0 && back != null && shouldRender)
-//				back.render();
-				needsRendered(true);
+				back.needsRendered(true);
 			if(z + 1 == Chunk.LENGTH && front != null && shouldRender)
-//				front.render();
-				needsRendered(true);
+				front.needsRendered(true);
 		}
 	}
 	

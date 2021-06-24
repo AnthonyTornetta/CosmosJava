@@ -19,7 +19,6 @@ import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.MeasurementParser;
 import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
-import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
@@ -216,12 +215,12 @@ public class ClientGame extends Game
 		
 		world().lock();
 		for(Structure s : world().structures())
-		{
-			if(!s.hasBeenRendered())
-			{
-				s.calculateLights(false);
-				s.render();
-			}
+		{			
+//			if(!s.hasBeenRendered())
+//			{
+//				s.calculateLights();
+//				s.render();
+//			}
 			
 			drawStructure(s, projectionMatrix, player);
 		}
@@ -309,6 +308,9 @@ public class ClientGame extends Game
 	
 	private static void updateStructureGraphics(Structure s)
 	{
+		if(s.lightMap().needsCalculated())
+			s.calculateLightsAndApply();
+		
 		for(Chunk c : s.chunks())
 			if(c.needsRendered())
 				c.render();

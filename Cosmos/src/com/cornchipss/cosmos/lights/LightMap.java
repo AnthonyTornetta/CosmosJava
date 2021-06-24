@@ -16,7 +16,8 @@ public class LightMap
 	
 	private float[][][] lightMap;
 	
-	private boolean calculated = false;
+	private boolean needsCalculated = false;
+	private boolean calculatedOnce = false;
 	
 	public LightMap(int w, int h, int l)
 	{
@@ -25,6 +26,8 @@ public class LightMap
 	
 	public void addBlocking(int x, int y, int z)
 	{
+		if(lightMap[z][y][x] != BLOCKED)
+			needsCalculated = true;
 		lightMap[z][y][x] = BLOCKED;
 	}
 	
@@ -33,12 +36,15 @@ public class LightMap
 		boolean blocked = lightMap[z][y][x] == BLOCKED;
 		
 		if(blocked)
+		{
 			lightMap[z][y][x] = 0.0f;
+			needsCalculated = true;
+		}
 		
 		return blocked;
 	}
 	
-	public boolean calculated() { return calculated; }
+	public boolean needsCalculated() { return needsCalculated; }
 		
 	/**
 	 * Calculates the light map from scratch - overrides any previous light values
@@ -52,7 +58,7 @@ public class LightMap
 	{
 		float[][][] oldMap = null;
 		
-		if(calculated)
+		if(calculatedOnce)
 		{
 			// TODO: make this better
 			
@@ -130,7 +136,7 @@ public class LightMap
 			}
 		}
 		
-		if(calculated)
+		if(calculatedOnce)
 		{
 			for(int z = 0; z < lightMap.length; z++)
 			{
@@ -159,7 +165,8 @@ public class LightMap
 			}
 		}
 		
-		calculated = true;
+		calculatedOnce = true;
+		needsCalculated = false;
 		
 		return new Vector3i[] { extremeNeg, extremePos };
 	}
@@ -188,7 +195,8 @@ public class LightMap
 	
 	public void removeLightSource(int x, int y, int z)
 	{
-		lightSources.remove(new Vector3i(x, y, z));
+		if(lightSources.remove(new Vector3i(x, y, z)) != null)
+			needsCalculated = true;
 	}
 
 	public boolean hasLightSource(int x, int y, int z, int offX, int offY, int offZ)
@@ -203,8 +211,12 @@ public class LightMap
 	
 	public void lightSource(int x, int y, int z, LightSource src)
 	{
-		// TODO: check for existing source
+		if(hasLightSource(x, y, z))
+			removeLightSource(x, y, z);
+		
 		lightSources.put(new Vector3i(x, y, z), src);
+		
+		needsCalculated = true;
 	}
 	
 	public void lightSource(int x, int y, int z, int offX, int offY, int offZ, LightSource src)
