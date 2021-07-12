@@ -62,9 +62,9 @@ public class GUI
 	{
 		element.update(delta);
 		
-		if(element instanceof GUIContainer)
+		if(element instanceof IGUIContainer)
 		{
-			for(GUIElement child : ((GUIContainer)element).children())
+			for(GUIElement child : ((IGUIContainer)element).children())
 			{
 				if(child instanceof IUpdatable)
 					update((IUpdatable)child, delta);
@@ -111,9 +111,9 @@ public class GUI
 	{
 		e.onResize(w, h);
 		
-		if(e instanceof GUIContainer)
+		if(e instanceof IGUIContainer)
 		{
-			for(GUIElement child : ((GUIContainer)e).children())
+			for(GUIElement child : ((IGUIContainer)e).children())
 			{
 				handleResize(w, h, child);
 			}
@@ -145,9 +145,9 @@ public class GUI
 	{
 		elem.fullDraw(this, projectionMatrix, cameraMatrix);
 		
-		if(elem instanceof GUIContainer)
+		if(elem instanceof IGUIContainer)
 		{
-			for(GUIElement child : ((GUIContainer)elem).children())
+			for(GUIElement child : ((IGUIContainer)elem).children())
 			{
 				draw(child);
 			}

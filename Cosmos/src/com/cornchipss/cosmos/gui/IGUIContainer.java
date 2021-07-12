@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.gui;
 
 import java.util.List;
 
-public interface GUIContainer
+public interface IGUIContainer
 {
 	public List<GUIElement> children();
 	

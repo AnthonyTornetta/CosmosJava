@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.cornchipss.cosmos.gui.GUIContainer;
+import com.cornchipss.cosmos.gui.IGUIContainer;
 import com.cornchipss.cosmos.gui.GUIElement;
 import com.cornchipss.cosmos.gui.GUIRectangle;
 import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
@@ -13,7 +13,7 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUIScrollBox extends GUIRectangle implements GUIContainer, IGUIInteractable	
+public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInteractable	
 {
 	private List<GUIElement> children;
 	

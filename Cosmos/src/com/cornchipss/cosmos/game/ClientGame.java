@@ -13,7 +13,7 @@ import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.GUITextureMultiple;
-import com.cornchipss.cosmos.gui.interactable.GUIButton;
+import com.cornchipss.cosmos.gui.interactable.GUIButtonText;
 import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.MeasurementParser;
@@ -70,29 +70,31 @@ public class ClientGame extends Game
 		pauseMenu = new GUI(Materials.GUI_PAUSE_MENU);
 		pauseMenu.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
-		final float BTN_Y_POS = 100;
-		final float BTN_HEIGHT = 60;
-		
-		GUIText quitText = new GUIText("QUIT", Fonts.ARIAL_28, 
-				new MeasurementPair(
-						MeasurementParser.parse("50% - " + 
-								Fonts.ARIAL_28.stringWidth("QUIT") / 2),
-						MeasurementParser.parse((BTN_Y_POS + BTN_HEIGHT / 2) + 
-								" - " + (Fonts.ARIAL_28.height() / 2))));
-		
-		GUIButton quitBtn = new GUIButton(
+		GUIButtonText quitBtn = new GUIButtonText("QUIT",
 				new MeasurementPair(
 						MeasurementParser.parse("50% - 150"), 
-						new PixelMeasurement(100)), 
+						MeasurementParser.parse("50% - 30 - 50")), 
 				new MeasurementPair(
 						new PixelMeasurement(300), 
-						new PixelMeasurement(60)), 
+						new PixelMeasurement(60)), 	
 				() ->
 				{
 					Client.instance().quit();
 				});
 		
-		pauseMenu.addElement(quitBtn, quitText);
+		GUIButtonText resumeBtn = new GUIButtonText("RESUME",
+				new MeasurementPair(
+						MeasurementParser.parse("50% - 150"), 
+						MeasurementParser.parse("50% - 30 + 50")), 
+				new MeasurementPair(
+						new PixelMeasurement(300), 
+						new PixelMeasurement(60)), 	
+				() ->
+				{
+					togglePause();
+				});
+		
+		pauseMenu.addElement(quitBtn, resumeBtn);
 	}
 	
 	private void initGraphics()
@@ -173,6 +175,7 @@ public class ClientGame extends Game
 				0.1f, 1000);
 		
 		gui.onResize(w, h);
+		pauseMenu.onResize(w, h);
 	}
 	
 	private void initInventoryBarModels()
@@ -264,14 +267,19 @@ public class ClientGame extends Game
 		}
 	}
 	
+	private void togglePause()
+	{
+		showPauseMenu = !showPauseMenu;
+		
+		Input.toggleCursor();
+	}
+	
 	@Override
 	public void update(float delta)
 	{
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_P))
 		{
-			showPauseMenu = !showPauseMenu;
-			
-			Input.toggleCursor();
+			togglePause();
 		}
 		
 		if(showPauseMenu)
