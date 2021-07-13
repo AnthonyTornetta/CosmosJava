@@ -11,17 +11,17 @@ public class LogModel extends CubeModel
 		switch(side)
 		{
 		case TOP:
-			return 1 * material().uvWidth();
+			return 1 * material().uLength();
 		case BOTTOM:
-			return 1 * material().uvWidth();
+			return 1 * material().uLength();
 		default:
-			return 2 * material().uvWidth();
+			return 2 * material().uLength();
 		}
 	}
 
 	@Override
 	public float v(BlockFace side)
 	{
-		return material().uvHeight();
+		return material().vLength();
 	}
 }

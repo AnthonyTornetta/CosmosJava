@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.blocks;
+package com.cornchipss.cosmos.blocks.modifiers;
 
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.world.entities.player.Player;

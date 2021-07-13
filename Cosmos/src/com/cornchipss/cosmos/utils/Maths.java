@@ -35,6 +35,23 @@ public class Maths
 	 */
 	public static final float EQUALS_PRECISION = 0.0001f;
 	
+	private static final Vector3fc X_VECTOR = new Vector3f(1, 0, 0), Y_VECTOR = new Vector3f(0, 1, 0), Z_VECTOR = new Vector3f(0, 0, 1);
+	
+	public static final Vector3fc x()
+	{
+		return X_VECTOR;
+	}
+	
+	public static final Vector3fc y()
+	{
+		return Y_VECTOR;
+	}
+	
+	public static final Vector3fc z()
+	{
+		return Z_VECTOR;
+	}
+	
 	/**
 	 * Creates a view matrix based on coordinates + rotations
 	 * @param x X
@@ -139,27 +156,7 @@ public class Maths
 	
 	public static Matrix4f createCombinedRotationMatrix(Vector3fc rotation)
 	{
-		return createRotationMatrix(Utils.x(), rotation.x()).mul(createRotationMatrix(Utils.y(), rotation.y()).mul(createRotationMatrix(Utils.z(), rotation.z())));
-	}
-	
-	@Deprecated
-	/**
-	 * idk if this works 
-	 * @param pos
-	 * @param rotations
-	 * @return
-	 */
-	public static Vector3f getPositionActual(Vector3fc pos, Matrix4fc... rotations)
-	{
-		Matrix4f rotationFinal = new Matrix4f();
-		rotationFinal.identity();
-		
-		for(Matrix4fc rot : rotations)
-			rotationFinal.mul(rot);
-		
-		Vector4f vec = new Vector4f(pos.x(), pos.y(), pos.z(), 0).mul(rotationFinal);
-		
-		return new Vector3f(vec.x, vec.y, vec.z);
+		return createRotationMatrix(x(), rotation.x()).mul(createRotationMatrix(y(), rotation.y()).mul(createRotationMatrix(z(), rotation.z())));
 	}
 	
 	public static float cos(float theta)

@@ -9,7 +9,8 @@ import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
-import com.cornchipss.cosmos.blocks.IThrustProducer;
+import com.cornchipss.cosmos.blocks.modifiers.IThrustProducer;
+import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -19,7 +20,7 @@ import com.cornchipss.cosmos.world.entities.player.Player;
 /**
  * A structure representing a ship
  */
-public class Ship extends Structure
+public class Ship extends Structure implements IEnergyHolder
 {
 	private final static int MAX_DIMENSIONS = 16 * 10;
 	
@@ -29,7 +30,8 @@ public class Ship extends Structure
 	
 	private float totalMass = 0;
 	private float thrustForce = 0;
-	private float thrustEnergy = 0;
+	
+	private float energy = 0;
 	
 	private List<Vector3i> thrusterPositions;
 	
@@ -65,14 +67,14 @@ public class Ship extends Structure
 		{
 			if(previous instanceof IThrustProducer)
 			{
-				thrustForce -= ((IThrustProducer)previous).thrustGeneratedPerTick();
-				thrustEnergy -= ((IThrustProducer)previous).powerUsedPerTick();
+				thrustForce -= ((IThrustProducer)previous).thrustGeneratedPerSecond();
+				energy -= ((IThrustProducer)previous).powerUsedPerSecond();
 			}
 			
 			if(b instanceof IThrustProducer)
 			{
-				thrustForce += ((IThrustProducer)b).thrustGeneratedPerTick();
-				thrustEnergy += ((IThrustProducer)b).powerUsedPerTick();
+				thrustForce += ((IThrustProducer)b).thrustGeneratedPerSecond();
+				energy += ((IThrustProducer)b).powerUsedPerSecond();
 			}
 			
 			if(previous instanceof IThrustProducer
@@ -113,8 +115,6 @@ public class Ship extends Structure
 				dVel.sub(body().transform().up());
 			
 			float accel = thrustForce / mass();
-			
-			Utils.println(accel);
 			
 			dVel.x = (dVel.x() * (delta * accel));
 			dVel.z = (dVel.z() * (delta * accel));
@@ -178,5 +178,33 @@ public class Ship extends Structure
 	public float mass()
 	{
 		return totalMass;
+	}
+
+	@Override
+	public float energy()
+	{
+		return energy;
+	}
+
+	@Override
+	public float maxEnergy()
+	{
+		return 1000;
+	}
+
+	@Override
+	public void useEnergy(float amount)
+	{
+		energy -= amount;
+		if(energy < 0)
+			energy = 0;
+	}
+
+	@Override
+	public void addEnergy(float amount)
+	{
+		energy += amount;
+		if(energy > maxEnergy())
+			energy = maxEnergy();
 	}
 }

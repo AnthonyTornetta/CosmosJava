@@ -8,7 +8,7 @@ public class CactusModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return material().uvWidth() * 10;
+		return material().uLength() * 10;
 	}
 
 	@Override

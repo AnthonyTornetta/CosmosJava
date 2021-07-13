@@ -14,6 +14,6 @@ public class LightModel extends CubeModel
 	@Override
 	public float v(BlockFace side)
 	{
-		return material().uvHeight();
+		return material().vLength();
 	}
 }

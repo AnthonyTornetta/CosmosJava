@@ -33,13 +33,13 @@ public class AnimatedDefaultMaterial extends Material
 	}
 
 	@Override
-	public float uvWidth()
+	public float uLength()
 	{
 		return 16.0f / 256.0f;
 	}
 
 	@Override
-	public float uvHeight()
+	public float vLength()
 	{
 		return 16.0f / 256.0f;
 	}

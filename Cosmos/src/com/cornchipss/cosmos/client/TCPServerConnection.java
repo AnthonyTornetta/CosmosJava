@@ -55,7 +55,7 @@ public class TCPServerConnection implements Runnable
 				
 				if(p == null)
 				{
-					Utils.println("INVALID PACKET TYPE - " + marker);
+					Logger.LOGGER.error("INVALID PACKET TYPE - " + marker);
 					buffer[0] = -1; // we can reuse the same buffer
 					server.sendTCP(buffer, 1, client);
 					return;

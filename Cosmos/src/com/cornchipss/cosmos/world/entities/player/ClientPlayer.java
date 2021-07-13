@@ -7,7 +7,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
-import com.cornchipss.cosmos.blocks.IInteractable;
+import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.game.ClientGame;

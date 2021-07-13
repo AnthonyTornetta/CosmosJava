@@ -55,7 +55,7 @@ public class GUITexture extends GUIElement
 		
 		guiMesh = Mesh.createMesh(
 				makeVerts(initialWidth, initialHeight), 
-				indices, makeUVs(u, v, material.uvWidth(), material.uvHeight()));
+				indices, makeUVs(u, v, material.uLength(), material.vLength()));
 		
 		this.material = material;
 	}

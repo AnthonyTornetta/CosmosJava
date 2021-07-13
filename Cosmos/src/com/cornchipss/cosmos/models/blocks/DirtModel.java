@@ -8,7 +8,7 @@ public class DirtModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return material().uvWidth() * 3;
+		return material().uLength() * 3;
 	}
 
 	@Override

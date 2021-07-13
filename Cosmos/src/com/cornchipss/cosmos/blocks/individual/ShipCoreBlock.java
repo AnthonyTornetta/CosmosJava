@@ -1,9 +1,9 @@
 package com.cornchipss.cosmos.blocks.individual;
 
-import com.cornchipss.cosmos.blocks.IHasData;
-import com.cornchipss.cosmos.blocks.IInteractable;
 import com.cornchipss.cosmos.blocks.ShipBlock;
 import com.cornchipss.cosmos.blocks.data.BlockData;
+import com.cornchipss.cosmos.blocks.modifiers.IHasData;
+import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.models.blocks.ShipCoreModel;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;

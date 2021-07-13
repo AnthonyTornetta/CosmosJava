@@ -13,7 +13,6 @@ import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 
 public class Client implements Runnable

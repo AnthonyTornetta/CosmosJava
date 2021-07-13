@@ -8,7 +8,7 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.Logger;
 
 public class World
 {
@@ -78,7 +78,7 @@ public class World
 			if(!structures.contains(s))
 				structures.add(s);
 			else
-				Utils.println(":O");
+				Logger.LOGGER.error("Duplicate structure attempted to be added");
 		}
 		else
 			structuresToAdd.add(s);

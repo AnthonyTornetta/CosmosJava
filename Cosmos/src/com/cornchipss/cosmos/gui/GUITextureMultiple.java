@@ -29,7 +29,7 @@ public class GUITextureMultiple extends GUITexture
 		for(int i = 2; i < uvs.length; i+=2)
 		{
 			meshes[i/2] = Mesh.createMesh(verts, indices, 
-					makeUVs(uvs[i], uvs[i + 1], material().uvWidth(), material().uvHeight()));
+					makeUVs(uvs[i], uvs[i + 1], material().uLength(), material().vLength()));
 		}
 	}
 	

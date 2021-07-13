@@ -5,40 +5,30 @@ import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.models.AnimatedCubeModel;
 
-public class ThrusterModel extends AnimatedCubeModel
+public class ReactorModel extends AnimatedCubeModel
 {
 	@Override
 	public float u(BlockFace side)
 	{
-		if(side == BlockFace.FRONT)
-			return 0;
-		else if(side == BlockFace.BACK)
-			return material().uLength() * 6;
-		else if(side == BlockFace.LEFT || side == BlockFace.RIGHT)
-			return material().uLength() * 4;
-		else
-			return material().uLength() * 2;
+		return 0;
 	}
 	
 	@Override
 	public float v(BlockFace side)
 	{
-		return material().vLength();
+		return material().vLength() * 2;
 	}
 	
 	@Override
 	public int maxAnimationStage(BlockFace side)
 	{
-		if(side != BlockFace.BACK)
-			return 2;
-		else
-			return 1;
+		return 8;
 	}
 
 	@Override
 	public float animationDelay(BlockFace side)
 	{
-		return 1/3.0f;
+		return 1/10.0f;
 	}
 	
 	@Override

@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.blocks;
 
 import com.cornchipss.cosmos.blocks.data.BlockData;
+import com.cornchipss.cosmos.blocks.modifiers.IHasData;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.models.IHasModel;
 import com.cornchipss.cosmos.structures.Structure;

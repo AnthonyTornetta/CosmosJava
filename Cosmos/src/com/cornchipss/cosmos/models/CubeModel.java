@@ -22,12 +22,12 @@ public abstract class CubeModel implements Model
 	
 	public float maxU(BlockFace side)
 	{
-		return u(side) + material().uvWidth();
+		return u(side) + material().uLength();
 	}
 	
 	public float maxV(BlockFace side)
 	{
-		return v(side) + material().uvHeight();
+		return v(side) + material().vLength();
 	}
 	
 	public int[] indicies(BlockFace side)

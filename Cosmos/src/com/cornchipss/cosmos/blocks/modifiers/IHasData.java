@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.blocks;
+package com.cornchipss.cosmos.blocks.modifiers;
 
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.structures.Structure;

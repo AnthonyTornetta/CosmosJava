@@ -20,7 +20,6 @@ import com.cornchipss.cosmos.physx.StructureShape;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
@@ -510,9 +509,6 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	public void calculateLightsAndApply()
 	{
 		Vector3i[] range = lightMap().calculateLightMap();
-		
-		Utils.println(range[0]);
-		Utils.println(range[1]);
 		
 		for(int z = range[0].z - Chunk.LENGTH; z <= range[1].z + Chunk.LENGTH; z++)
 		{

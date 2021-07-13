@@ -8,12 +8,12 @@ public class ShipHullModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return material().uvWidth() * 4;
+		return material().uLength() * 4;
 	}
 
 	@Override
 	public float v(BlockFace side)
 	{
-		return material().uvHeight();
+		return material().vLength();
 	}
 }

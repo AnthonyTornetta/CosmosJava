@@ -40,8 +40,8 @@ public abstract class Player extends PhysicalObject
 		inventory.block(0, 3, Blocks.LIGHT);
 		inventory.block(0, 4, Blocks.SHIP_HULL);
 		inventory.block(0, 5, Blocks.THRUSTER);
-		inventory.block(0, 6, Blocks.SAND);
-		inventory.block(0, 7, Blocks.SAND_STONE);
+		inventory.block(0, 6, Blocks.REACTOR);
+		inventory.block(0, 7, Blocks.SAND);
 		inventory.block(0, 8, Blocks.LOG);
 		inventory.block(0, 9, Blocks.LEAF);
 	}

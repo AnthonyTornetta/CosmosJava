@@ -22,8 +22,6 @@ public class Chunk implements IWritable
 {
 	private BulkModel model;
 	
-	private boolean rendered;
-	
 	private boolean needsRendered;
 	
 	public boolean lightmapNeedsUpdating()
@@ -64,7 +62,6 @@ public class Chunk implements IWritable
 		
 		this.structure = s;
 		
-		rendered = false;
 		needsRendered = true;
 		
 		blocks = new Block[LENGTH][HEIGHT][WIDTH];
@@ -267,7 +264,6 @@ public class Chunk implements IWritable
 	 */
 	public void render()
 	{
-		rendered = true;
 		needsRendered = false;
 		
 		model.render(

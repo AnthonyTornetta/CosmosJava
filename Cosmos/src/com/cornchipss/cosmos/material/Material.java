@@ -89,6 +89,6 @@ public abstract class Material
 			texture = Texture.loadTexture(textureLoc);
 	}
 	
-	public abstract float uvWidth();
-	public abstract float uvHeight();
+	public abstract float uLength();
+	public abstract float vLength();
 }

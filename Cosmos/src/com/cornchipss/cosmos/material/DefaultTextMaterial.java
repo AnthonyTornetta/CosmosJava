@@ -26,14 +26,14 @@ public class DefaultTextMaterial extends Material
 	}
 
 	@Override
-	public float uvWidth()
+	public float uLength()
 	{
 		// not needed
 		return 0;
 	}
 
 	@Override
-	public float uvHeight()
+	public float vLength()
 	{
 		// not needed
 		return 0;

@@ -8,7 +8,7 @@ public class SandStoneModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return material().uvWidth() * 8;
+		return material().uLength() * 8;
 	}
 
 	@Override

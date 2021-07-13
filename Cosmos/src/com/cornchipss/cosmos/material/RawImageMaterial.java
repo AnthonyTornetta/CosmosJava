@@ -56,13 +56,13 @@ public class RawImageMaterial extends Material
 	}
 
 	@Override
-	public float uvWidth()
+	public float uLength()
 	{
 		return 1;
 	}
 
 	@Override
-	public float uvHeight()
+	public float vLength()
 	{
 		return 1;
 	}

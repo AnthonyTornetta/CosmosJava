@@ -11,11 +11,11 @@ public class GrassModel extends CubeModel
 		switch(side)
 		{
 		case TOP:
-			return 1 * material().uvWidth();
+			return 1 * material().uLength();
 		case BOTTOM:
-			return 3 * material().uvWidth();
+			return 3 * material().uLength();
 		default:
-			return 4 * material().uvWidth();
+			return 4 * material().uLength();
 		}
 	}
 

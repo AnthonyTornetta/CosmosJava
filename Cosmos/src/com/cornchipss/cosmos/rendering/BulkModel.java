@@ -198,8 +198,8 @@ public class BulkModel
 		float u = model.u(side);
 		float v = model.v(side);
 		
-		float uEnd = u + model.material().uvWidth();
-		float vEnd = v + model.material().uvHeight();
+		float uEnd = u + model.material().uLength();
+		float vEnd = v + model.material().vLength();
 		
 		matMesh.uvs.add(uEnd);
 		matMesh.uvs.add(vEnd);

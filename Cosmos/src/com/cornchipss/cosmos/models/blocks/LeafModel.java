@@ -8,12 +8,12 @@ public class LeafModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		return material().uvWidth() * 3;
+		return material().uLength() * 3;
 	}
 
 	@Override
 	public float v(BlockFace side)
 	{
-		return material().uvHeight();
+		return material().vLength();
 	}
 }
