@@ -44,4 +44,15 @@ public class StructureBlock
 	{
 		structure.block(x, y, z, to);
 	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(!(o instanceof StructureBlock))
+			return false;
+		
+		StructureBlock otr = (StructureBlock)o;
+		
+		return x == otr.x && y == otr.y && z == otr.z && structure.equals(otr.structure);
+	}
 }

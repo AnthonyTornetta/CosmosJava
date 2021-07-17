@@ -3,6 +3,10 @@ package com.cornchipss.cosmos.structures;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -13,18 +17,22 @@ import org.joml.Vector3ic;
 import org.joml.Vector4f;
 
 import com.cornchipss.cosmos.blocks.Block;
+import com.cornchipss.cosmos.blocks.StructureBlock;
+import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.StructureShape;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.structures.types.IEnergyHolder;
+import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
 
-public abstract class Structure extends PhysicalObject implements IWritable
+public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder
 {
 	private Chunk[] chunks;
 	
@@ -43,6 +51,13 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	
 	private int id;
 	
+	private float energy;
+	private float maxEnergy;
+	
+	private float totalMass = 0;
+	
+	Map<BlockSystem, List<StructureBlock>> systems = new HashMap<>();
+
 	public Structure(World world, int id)
 	{
 		super(world);
@@ -79,7 +94,49 @@ public abstract class Structure extends PhysicalObject implements IWritable
 	 */
 	public void update(float delta)
 	{
+		for(BlockSystem sys : systems.keySet())
+		{
+			sys.update(this, systems.get(sys), delta);
+		}
+	}
+
+	@Override
+	public float energy()
+	{
+		return energy;
+	}
+
+	@Override
+	public float maxEnergy()
+	{
+		return maxEnergy;
+	}
+
+	@Override
+	public boolean hasEnoughEnergyToUse(float amount)
+	{
+		return amount <= energy();
+	}
+	
+	@Override
+	public boolean useEnergy(float amount)
+	{
+		if(!hasEnoughEnergyToUse(amount))
+			return false;
 		
+		energy -= amount;
+		if(energy < 0)
+			energy = 0;
+		
+		return true;
+	}
+
+	@Override
+	public void addEnergy(float amount)
+	{
+		energy += amount;
+		if(energy > maxEnergy())
+			energy = maxEnergy();
 	}
 	
 	/**
@@ -347,7 +404,46 @@ public abstract class Structure extends PhysicalObject implements IWritable
 		{
 			Chunk c = chunk(x, y, z);
 			
+			StructureBlock structBlock = new StructureBlock(this, x, y, z);
+			
+			Block old = c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
+			
+			if(old != null)
+			{
+				totalMass -= old.mass();
+			}
+			
+			if(b != null)
+			{
+				totalMass += b.mass();
+			}
+			
+			if(old instanceof ISystemBlock)
+			{
+				BlockSystem[] systems = ((ISystemBlock) old).systems();
+				
+				for(BlockSystem sys : systems)
+				{
+					sys.removeBlock(structBlock, this.systems.get(sys));
+					this.systems.get(sys).remove(structBlock);
+				}
+			}
+			
 			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
+			
+			if(b instanceof ISystemBlock)
+			{
+				BlockSystem[] systems = ((ISystemBlock) b).systems();
+				
+				for(BlockSystem sys : systems)
+				{
+					if(!this.systems.containsKey(sys))
+						this.systems.put(sys, new LinkedList<>());
+					
+					sys.addBlock(structBlock, this.systems.get(sys));
+					this.systems.get(sys).add(structBlock);
+				}
+			}
 		}
 		else
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
@@ -538,5 +634,20 @@ public abstract class Structure extends PhysicalObject implements IWritable
 				}
 			}
 		}
+	}
+
+	public void increasePowerCapacity(float delta)
+	{
+		maxEnergy += delta;
+	}
+	
+	public void decreasePowerCapacity(float delta)
+	{
+		maxEnergy -= delta;
+	}
+	
+	public float mass()
+	{
+		return totalMass;
 	}
 }

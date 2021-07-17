@@ -6,7 +6,9 @@ public interface IEnergyHolder
 	
 	public float maxEnergy();
 	
-	public void useEnergy(float amount);
+	public boolean hasEnoughEnergyToUse(float amount);
+	
+	public boolean useEnergy(float amount);
 	
 	public void addEnergy(float amount);
 }

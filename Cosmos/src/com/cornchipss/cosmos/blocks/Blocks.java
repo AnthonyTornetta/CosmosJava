@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.cornchipss.cosmos.blocks.individual.EnergyStorageBlock;
 import com.cornchipss.cosmos.blocks.individual.ReactorBlock;
 import com.cornchipss.cosmos.blocks.individual.ShipCoreBlock;
 import com.cornchipss.cosmos.blocks.individual.ThrusterBlock;
@@ -39,7 +40,8 @@ public class Blocks
 		SAND = new Block(new SandModel(), "sand", 10),
 		SAND_STONE = new Block(new SandStoneModel(), "sand_stone", 20),
 		CACTUS = new Block(new CactusModel(), "cactus", 5),
-		REACTOR = new ReactorBlock();
+		REACTOR = new ReactorBlock(),
+		ENERGY_STORAGE = new EnergyStorageBlock();
 	
 	/**
 	 * Adds all the blocks to a list
@@ -49,7 +51,7 @@ public class Blocks
 		allBlocks = Collections.unmodifiableList(
 				Arrays.asList(STONE, GRASS, DIRT, 
 						LIGHT, LOG, LEAF, SHIP_CORE, SHIP_HULL,
-						SAND, SAND_STONE, CACTUS, THRUSTER, REACTOR));
+						SAND, SAND_STONE, CACTUS, THRUSTER, REACTOR, ENERGY_STORAGE));
 		
 		for(short i = 0; i < allBlocks.size(); i++)
 			allBlocks.get(i).blockId((short)(i + 1));

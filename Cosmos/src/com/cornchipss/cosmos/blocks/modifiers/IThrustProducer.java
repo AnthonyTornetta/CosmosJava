@@ -1,6 +1,6 @@
 package com.cornchipss.cosmos.blocks.modifiers;
 
-public interface IThrustProducer
+public interface IThrustProducer extends ISystemBlock
 {
 	/**
 	 * The amount of thrust this generated in the given time in Newtons
