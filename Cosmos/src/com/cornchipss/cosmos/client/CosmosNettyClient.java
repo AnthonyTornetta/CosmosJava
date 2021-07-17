@@ -98,8 +98,17 @@ public class CosmosNettyClient implements Runnable
 		    		if(p == null)
 		    			Logger.LOGGER.error("WARNING: Invalid packet type (" + marker + ") received from server");
 		    		else
-		    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
-		    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
+		    		{
+		    			try
+		    			{
+			    			p.onReceiveClient(recieved.getData(), recieved.getLength(), recieved.getOffset()
+			    					+ Packet.additionalOffset(recieved.getData(), recieved.getOffset(), recieved.getLength()), server, this);
+		    			}
+		    			catch(Exception ex)
+		    			{
+		    				ex.printStackTrace();
+		    			}
+		    		}
 	        	}
 	        	catch(SocketTimeoutException ex)
 	        	{}

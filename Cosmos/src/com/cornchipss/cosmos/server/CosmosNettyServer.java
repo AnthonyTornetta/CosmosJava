@@ -11,7 +11,7 @@ import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.server.command.CommandHandler;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.Logger;
 
 public class CosmosNettyServer implements Runnable
 {
@@ -114,7 +114,7 @@ public class CosmosNettyServer implements Runnable
 		
 		if(p == null)
 		{
-			Utils.println("INVALID PACKET TYPE - " + marker);
+			Logger.LOGGER.error("INVALID PACKET TYPE - " + marker);
 			buffer[0] = -1; // we can reuse the same buffer
 			player.client().sendUDP(buffer, 1, this);
 			return;
@@ -156,7 +156,7 @@ public class CosmosNettyServer implements Runnable
 		{
 			byte[] buffer = new byte[1024];  // 1kb max data
 			
-			Utils.println("UDP server listening...");
+			Logger.LOGGER.info("UDP server listening...");
 			
 			while(running)
 			{
