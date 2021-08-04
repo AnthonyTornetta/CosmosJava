@@ -90,7 +90,7 @@ public class TCPClientConnection implements Runnable
 				if(p == null)
 				{
 					// TODO: dont do this - make it a packet
-					Utils.println("INVALID PACKET TYPE");
+					Logger.LOGGER.error("INVALID PACKET TYPE");
 					buffer[0] = -1; // we can reuse the same buffer
 					connection.sendTCP(buffer, 1);
 					return;
@@ -112,6 +112,8 @@ public class TCPClientConnection implements Runnable
 			{
 				name = server.players().player(this).name();
 
+				ex.printStackTrace();
+				
 				Logger.LOGGER.info("Player " + name + " made an invalid packet - removing them.");
 				server.players().removePlayer(this);
 				active(false);
@@ -133,9 +135,9 @@ public class TCPClientConnection implements Runnable
 		if(name != null)
 			announceClosingToOthers(name);
 		else
-			Utils.println("!!! NO NAME DICONNECTED !!!");
+			Logger.LOGGER.error("!!! NO NAME DICONNECTED !!!");
 		
-		Utils.println("TCP connection closed.");
+		Logger.LOGGER.info("TCP connection closed.");
 	}
 	
 	private void announceClosingToOthers(String name)

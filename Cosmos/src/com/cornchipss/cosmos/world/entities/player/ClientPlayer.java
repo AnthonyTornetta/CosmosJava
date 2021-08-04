@@ -17,6 +17,7 @@ import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
 import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
+import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
@@ -74,18 +75,22 @@ public class ClientPlayer extends Player
 			handleInteractions();
 		}
 		else if(Input.isKeyJustDown(GLFW.GLFW_KEY_R))
-			shipPiloting(null);
+		{
+			// 	shipPiloting(null);
+			ExitShipPacket esp = new ExitShipPacket(buffer, 0);
+			esp.init();
+			try {
+				Client.instance().nettyClient().sendTCP(esp);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 		
 		camera().update();
 		
 		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
 		cmp.init();
-		try {
-			Client.instance().nettyClient().sendTCP(cmp);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		Client.instance().nettyClient().sendUDP(cmp);
 	}
 	
 	private void handleInteractions()

@@ -8,7 +8,6 @@ import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class ClientInteractPacket extends Packet
 {
@@ -47,7 +46,7 @@ public class ClientInteractPacket extends Packet
 			ClientConnection client, CosmosNettyServer server)
 	{
 		ClientInteractPacket packet = new ClientInteractPacket(data, offset);
-				
+		
 		int id = packet.readInt();
 		Structure s = Server.nettyServer().game().world().structureFromID(id);
 		
@@ -59,13 +58,8 @@ public class ClientInteractPacket extends Packet
 		
 		if(block.block() instanceof IInteractable)
 		{
-			Utils.println("INTERACTED!");
 			((IInteractable)block.block()).
 					onInteract(block, Server.nettyServer().players().player(client));
-		}
-		else
-		{
-			Utils.println(":(");
 		}
 	}
 	

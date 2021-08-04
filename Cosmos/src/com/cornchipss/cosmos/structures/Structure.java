@@ -20,7 +20,6 @@ import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
-import com.cornchipss.cosmos.netty.INeedsSynced;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.StructureShape;

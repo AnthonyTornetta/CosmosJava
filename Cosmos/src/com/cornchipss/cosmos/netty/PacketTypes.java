@@ -7,6 +7,7 @@ import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
 import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
 import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
+import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.FullStructurePacket;
 import com.cornchipss.cosmos.netty.packets.JoinFinishPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
@@ -46,15 +47,16 @@ public class PacketTypes
 	
 	public static void registerAll()
 	{
-		PacketTypes.addPacketType(new JoinPacket());
-		PacketTypes.addPacketType(new PlayerPacket());
-		PacketTypes.addPacketType(new DisconnectedPacket());
-		PacketTypes.addPacketType(new ModifyBlockPacket());
-		PacketTypes.addPacketType(new FullStructurePacket());
-		PacketTypes.addPacketType(new DebugPacket());
-		PacketTypes.addPacketType(new JoinFinishPacket());
-		PacketTypes.addPacketType(new ClientMovementPacket());
-		PacketTypes.addPacketType(new ShipMovementPacket());
-		PacketTypes.addPacketType(new ClientInteractPacket());
+		addPacketType(new JoinPacket());
+		addPacketType(new PlayerPacket());
+		addPacketType(new DisconnectedPacket());
+		addPacketType(new ModifyBlockPacket());
+		addPacketType(new FullStructurePacket());
+		addPacketType(new DebugPacket());
+		addPacketType(new JoinFinishPacket());
+		addPacketType(new ClientMovementPacket());
+		addPacketType(new ShipMovementPacket());
+		addPacketType(new ClientInteractPacket());
+		addPacketType(new ExitShipPacket());
 	}
 }

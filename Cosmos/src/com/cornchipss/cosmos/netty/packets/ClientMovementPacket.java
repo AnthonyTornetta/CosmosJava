@@ -3,11 +3,9 @@ package com.cornchipss.cosmos.netty.packets;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.physx.Movement;
-import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.ServerPlayer;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class ClientMovementPacket extends Packet
 {
@@ -36,7 +34,6 @@ public class ClientMovementPacket extends Packet
 		super.init();
 		
 		writeInt(movement.code());
-//		writeInt(1);
 	}
 	
 	@Override

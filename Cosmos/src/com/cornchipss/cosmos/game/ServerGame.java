@@ -14,7 +14,6 @@ import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class ServerGame extends Game
 {
@@ -62,16 +61,10 @@ public class ServerGame extends Game
 			{
 				Ship ship = (Ship)s;
 				
-				Utils.println(ship.body().transform().position());
-				
 				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship, s.position());
 				smp.init();
 				
 				Server.nettyServer().sendToAllUDP(smp);
-//				if(!ship.movement().equals(Movement.movement(MovementType.NONE)))
-//				{
-//					
-//				}
 			}
 		}
 	}
