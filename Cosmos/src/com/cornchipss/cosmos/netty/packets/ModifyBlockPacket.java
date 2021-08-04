@@ -83,10 +83,4 @@ public class ModifyBlockPacket extends Packet
 		
 		s.block(x, y, z, block);
 	}
-
-	@Override
-	public byte marker()
-	{
-		return 21;
-	}
 }

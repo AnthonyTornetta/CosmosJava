@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.blocks.individual;
 
 import com.cornchipss.cosmos.blocks.ShipBlock;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.blocks.modifiers.IHasData;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
@@ -39,9 +40,9 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	}
 
 	@Override
-	public void onInteract(Structure s, Player p)
+	public void onInteract(StructureBlock s, Player p)
 	{
-		Ship ship = (Ship)s; // this will always be on a ship
+		Ship ship = (Ship)s.structure(); // this will always be on a ship
 		
 		ship.setPilot(p);
 	}

@@ -7,10 +7,14 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.netty.packets.ShipMovementPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
+import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class ServerGame extends Game
 {
@@ -43,6 +47,33 @@ public class ServerGame extends Game
 		
 		ship.addToWorld(new Transform());
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
+	}
+	
+	private byte[] buffer = new byte[128];
+	
+	@Override
+	public void update(float delta)
+	{
+		super.update(delta);
+		
+		for(Structure s : world().structures())
+		{
+			if(s instanceof Ship)
+			{
+				Ship ship = (Ship)s;
+				
+				Utils.println(ship.body().transform().position());
+				
+				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship, s.position());
+				smp.init();
+				
+				Server.nettyServer().sendToAllUDP(smp);
+//				if(!ship.movement().equals(Movement.movement(MovementType.NONE)))
+//				{
+//					
+//				}
+			}
+		}
 	}
 
 	public static ServerGame instance()

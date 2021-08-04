@@ -133,10 +133,4 @@ public class FullStructurePacket extends Packet
 		trans.orientation(new Orientation(rot));
 		s.addToWorld(trans);
 	}
-	
-	@Override
-	public byte marker()
-	{
-		return 20;
-	}
 }

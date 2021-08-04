@@ -6,10 +6,12 @@ import org.joml.Vector3fc;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
+import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
@@ -25,6 +27,8 @@ public abstract class Player extends PhysicalObject
 	
 	private String name;
 	public String name() { return name; }
+	
+	private Movement movement;
 	
 	public Player(World world, String name)
 	{
@@ -44,6 +48,8 @@ public abstract class Player extends PhysicalObject
 		inventory.block(0, 7, Blocks.ENERGY_STORAGE);
 		inventory.block(0, 8, Blocks.LOG);
 		inventory.block(0, 9, Blocks.LEAF);
+		
+		movement = Movement.movement(MovementType.NONE);
 	}
 	
 	public abstract void update(float delta);
@@ -147,4 +153,14 @@ public abstract class Player extends PhysicalObject
 	
 	public Inventory inventory() { return inventory; }
 	public void inventory(Inventory i) { inventory = i; }
+
+	public void movement(Movement movement)
+	{
+		this.movement = movement;
+	}
+	
+	public Movement movement()
+	{
+		return movement;
+	}
 }

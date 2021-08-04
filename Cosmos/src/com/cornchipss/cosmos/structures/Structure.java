@@ -20,6 +20,7 @@ import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
+import com.cornchipss.cosmos.netty.INeedsSynced;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.StructureShape;
@@ -32,7 +33,8 @@ import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
 
-public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder
+public abstract class Structure extends PhysicalObject implements 
+			IWritable, IEnergyHolder
 {
 	private Chunk[] chunks;
 	
@@ -99,7 +101,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			sys.update(this, systems.get(sys), delta);
 		}
 	}
-
+	
 	@Override
 	public float energy()
 	{

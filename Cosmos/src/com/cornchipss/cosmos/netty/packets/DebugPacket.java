@@ -53,11 +53,4 @@ public class DebugPacket extends Packet
 		
 		Logger.LOGGER.debug("DEBUG PACKET> " + msg);
 	}
-
-	@Override
-	public byte marker()
-	{
-		return 123;
-	}
-
 }

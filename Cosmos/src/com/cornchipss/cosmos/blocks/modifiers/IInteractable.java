@@ -1,6 +1,6 @@
 package com.cornchipss.cosmos.blocks.modifiers;
 
-import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 /**
@@ -13,5 +13,5 @@ public interface IInteractable
 	 * @param s The structure this is a part of
 	 * @param p The player that interacted with this
 	 */
-	public void onInteract(Structure s, Player p);
+	public void onInteract(StructureBlock s, Player p);
 }

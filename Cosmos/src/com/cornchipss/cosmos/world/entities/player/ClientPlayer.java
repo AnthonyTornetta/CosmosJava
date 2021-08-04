@@ -1,5 +1,7 @@
 package com.cornchipss.cosmos.world.entities.player;
 
+import java.io.IOException;
+
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
@@ -7,11 +9,17 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
+import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
+import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
+import com.cornchipss.cosmos.physx.Movement;
+import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
@@ -37,9 +45,26 @@ public class ClientPlayer extends Player
 		cam = new GimbalLockCamera(transform);
 	}
 	
+	private byte[] buffer = new byte[128];
+	
 	@Override
 	public void update(float delta)
 	{
+		movement(Movement.movement(MovementType.NONE));
+		
+		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
+			movement().add(MovementType.FORWARD);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
+			movement().add(MovementType.BACKWARD);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
+			movement().add(MovementType.LEFT);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
+			movement().add(MovementType.RIGHT);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
+			movement().add(MovementType.UP);
+		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
+			movement().add(MovementType.DOWN);
+		
 		if(!isPilotingShip())
 		{
 			handleHotbar();
@@ -52,6 +77,15 @@ public class ClientPlayer extends Player
 			shipPiloting(null);
 		
 		camera().update();
+		
+		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
+		cmp.init();
+		try {
+			Client.instance().nettyClient().sendTCP(cmp);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void handleInteractions()
@@ -110,8 +144,22 @@ public class ClientPlayer extends Player
 				{
 					if(lookingAt.block(pos.x, pos.y, pos.z) instanceof IInteractable)
 					{
-						((IInteractable)lookingAt.block(pos.x, pos.y, pos.z))
-							.onInteract(lookingAt, this);
+						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, 
+								new StructureBlock(lookingAt, pos.x, pos.y, pos.z));
+						cip.init();
+						
+						try
+						{
+							Client.instance().nettyClient().sendTCP(cip);
+							
+							// TODO: move this
+							((IInteractable)lookingAt.block(pos.x, pos.y, pos.z))
+								.onInteract(new StructureBlock(lookingAt, pos.x, pos.y, pos.z), this);
+						}
+						catch (IOException e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
@@ -126,17 +174,17 @@ public class ClientPlayer extends Player
 	{
 		Vector3f dVel = new Vector3f();
 	    
-		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
+		if(movement().forward())
 			dVel.add(camera().forward());
-		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
+		if(movement().backward())
 			dVel.sub(camera().forward());
-		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
+		if(movement().right())
 			dVel.add(camera().right());
-		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
+		if(movement().left())
 			dVel.sub(camera().right());
-		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
+		if(movement().up())
 			dVel.add(camera().up());
-		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
+		if(movement().down())
 			dVel.sub(camera().up());
 		
 		dVel.x = (dVel.x() * (delta * 1000));

@@ -74,12 +74,6 @@ public class PlayerPacket extends Packet
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	public byte marker()
-	{
-		return 1;
-	}
 
 	@Override
 	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)

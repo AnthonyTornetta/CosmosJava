@@ -11,6 +11,7 @@ import org.joml.Vector3ic;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 
@@ -163,7 +164,10 @@ public abstract class Packet
 	public abstract void onReceiveClient(byte[] data, int len, int offset, 
 			ServerConnection server, CosmosNettyClient client);
 	
-	public abstract byte marker();
+	public byte marker()
+	{
+		return PacketTypes.marker(this.getClass());
+	}
 	
 	public byte[] buffer() { return buffer; }
 	public void buffer(byte[] buf) { buffer = buf; }

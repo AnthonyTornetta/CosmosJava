@@ -16,6 +16,8 @@ public class ServerPlayer extends Player
 	{
 		super(world, name);
 		
+//		movement = Movement.movement(MovementType.NONE);
+		
 		this.serverClient = serverClient;
 	}
 	
@@ -30,7 +32,12 @@ public class ServerPlayer extends Player
 	@Override
 	public void update(float delta)
 	{
-		
+//		if(isPilotingShip())
+//		{
+//			Vector3f movementDir = movement.direction(new Vector3f());
+//			
+//			
+//		}
 	}
 
 	@Override

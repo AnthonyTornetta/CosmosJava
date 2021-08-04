@@ -27,6 +27,11 @@ public class RigidBody
 		this.velocity = new Vector3f().set(vel);
 		this.angularVelocity = new Vector3f().set(angularVel);
 	}
+
+	public void navigateTowards(Vector3fc vec)
+	{
+		vec.sub(transform.position(), this.velocity);
+	}
 	
 	/**
 	 * @return the transform

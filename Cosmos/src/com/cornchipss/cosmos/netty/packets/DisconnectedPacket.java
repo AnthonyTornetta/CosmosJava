@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.netty.packets;
 import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.utils.Logger;
@@ -36,7 +37,9 @@ public class DisconnectedPacket extends Packet
 	{
 		super.init();
 		
-		writeString(name);
+		if(NettySide.side() == NettySide.SERVER)
+			writeString(name);
+		
 		writeString(reason);
 	}
 	
@@ -44,16 +47,10 @@ public class DisconnectedPacket extends Packet
 	public void onReceiveServer(byte[] data, int len, int offset, ClientConnection client, CosmosNettyServer server)
 	{
 		DisconnectedPacket p = new DisconnectedPacket(data, offset);
-		Logger.LOGGER.info(server.players().player(client).name() + " disconnected (" + p.readString() + " - " + p.readString() + ")");
+		Logger.LOGGER.info(server.players().player(client).name() + " disconnected (" + p.readString() + ")");
 		
 		server.players().removePlayer(client);
 		client.terminateConnection();
-	}
-
-	@Override
-	public byte marker()
-	{
-		return 10;
 	}
 
 	@Override

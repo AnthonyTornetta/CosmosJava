@@ -4,6 +4,8 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Block;
+import com.cornchipss.cosmos.physx.Movement;
+import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
@@ -18,11 +20,15 @@ public class Ship extends Structure
 	
 	private Player pilot;
 	
+	private Movement movement;
+	
 	private Vector3f corePos = new Vector3f();
 	
 	public Ship(World world, int id)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
+		
+		movement = Movement.movement(MovementType.NONE);
 	}
 	
 	public Vector3fc corePosition()
@@ -43,13 +49,17 @@ public class Ship extends Structure
 		super.update(delta);
 		
 		if(pilot == null)
+		{
 			body().velocity(body().velocity().mul(0.99f)); // no more drifting into space once the pilot leaves
+			movement = Movement.movement(MovementType.NONE);
+		}
 		else
 		{
 			pilot.body().velocity(Maths.zero());
 			pilot.body().transform().position(localCoordsToWorldCoords(width()/2, height()/2, length()/2));
 			
 			pilot.body().transform().orientation(body().transform().orientation());
+			movement = pilot.movement();
 		}
 	}
 
@@ -57,6 +67,8 @@ public class Ship extends Structure
 	{
 		if(!Utils.equals(pilot, p))
 		{
+			movement(Movement.movement(MovementType.NONE));
+			
 			if(pilot != null)
 				pilot.shipPiloting(null);
 			
@@ -69,5 +81,15 @@ public class Ship extends Structure
 	public Player pilot()
 	{
 		return pilot;
+	}
+
+	public void movement(Movement movement)
+	{
+		this.movement = movement;
+	}
+	
+	public Movement movement()
+	{
+		return movement;
 	}
 }
