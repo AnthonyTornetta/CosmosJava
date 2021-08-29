@@ -16,7 +16,7 @@ public class ThrusterSystem extends BlockSystem
 	@Override
 	public void update(Structure s, List<StructureBlock> blocks, float delta)
 	{
-		if(NettySide.side() == NettySide.CLIENT)
+		if(NettySide.side() == NettySide.CLIENT || blocks.size() == 0)
 			return;
 		
 		if(s instanceof Ship)
@@ -54,10 +54,10 @@ public class ThrusterSystem extends BlockSystem
 			dVel.z = (dVel.z() * (accel));
 			dVel.y = (dVel.y() * (accel));
 			
-			Vector3f vel = ship.body().velocity();
+			Vector3f vel = new Vector3f(ship.body().velocity());
 
 			vel.add(dVel);
-	
+			
 			vel = Maths.safeNormalize(vel, 100.0f);
 			
 			ship.body().velocity(vel);

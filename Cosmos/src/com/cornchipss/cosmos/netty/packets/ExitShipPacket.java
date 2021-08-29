@@ -7,7 +7,6 @@ import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class ExitShipPacket extends Packet
 {

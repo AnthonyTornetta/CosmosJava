@@ -46,17 +46,17 @@ public class RigidBody
 	/**
 	 * @return the velocity
 	 */
-	public Vector3f velocity() { return velocity; }
+	public Vector3fc velocity() { return velocity; }
 
 	/**
 	 * @param velocity the velocity to set
 	 */
-	public void velocity(Vector3f velocity) { this.velocity = velocity; }
+	public void velocity(Vector3fc velocity) { this.velocity.set(velocity); }
 
 	/**
 	 * @return the angularVelocity
 	 */
-	public Vector3f angularVelocity() { return angularVelocity; }
+	public Vector3fc angularVelocity() { return angularVelocity; }
 
 	/**
 	 * @param angularVelocity the angularVelocity to set

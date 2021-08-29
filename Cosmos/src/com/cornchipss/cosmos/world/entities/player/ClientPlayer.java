@@ -209,7 +209,7 @@ public class ClientPlayer extends Player
 		
 		cam.rotate(dRot);
 		
-		Vector3f vel = body().velocity();
+		Vector3f vel = new Vector3f(body().velocity());
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel.mul(0.75f);

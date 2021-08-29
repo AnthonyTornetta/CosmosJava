@@ -28,6 +28,7 @@ import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
@@ -383,6 +384,27 @@ public abstract class Structure extends PhysicalObject implements
 			}
 		}
 		
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					if(hasBlock(x, y, z))
+					{
+						Block b = block(x, y, z);
+						
+						totalMass += b.mass();
+						
+						if(b instanceof ISystemBlock)
+						{
+							handleSystemBlock((ISystemBlock)b, new StructureBlock(this, x, y, z));
+						}
+					}
+				}
+			}
+		}
+		
 		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to read " + width() + "x" + height + "x" + length() + " structure.");
 	}
 	
@@ -434,20 +456,25 @@ public abstract class Structure extends PhysicalObject implements
 			
 			if(b instanceof ISystemBlock)
 			{
-				BlockSystem[] systems = ((ISystemBlock) b).systems();
-				
-				for(BlockSystem sys : systems)
-				{
-					if(!this.systems.containsKey(sys))
-						this.systems.put(sys, new LinkedList<>());
-					
-					sys.addBlock(structBlock, this.systems.get(sys));
-					this.systems.get(sys).add(structBlock);
-				}
+				handleSystemBlock((ISystemBlock)b, structBlock);
 			}
 		}
 		else
 			throw new IndexOutOfBoundsException(x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
+	}
+	
+	private void handleSystemBlock(ISystemBlock b, StructureBlock block)
+	{
+		BlockSystem[] syses = b.systems();
+		
+		for(BlockSystem sys : syses)
+		{
+			if(!systems.containsKey(sys))
+				systems.put(sys, new LinkedList<>());
+			
+			sys.addBlock(block, this.systems.get(sys));
+			this.systems.get(sys).add(block);
+		}
 	}
 	
 	public Block block(int x, int y, int z)

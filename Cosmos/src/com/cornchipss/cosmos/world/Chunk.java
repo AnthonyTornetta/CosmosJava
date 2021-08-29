@@ -127,9 +127,8 @@ public class Chunk implements IWritable
 				int y = (position - z * HEIGHT * WIDTH) / HEIGHT;
 				int x = position - z * HEIGHT * WIDTH - y * HEIGHT;
 				
-				if(id != 0) 
-				
-				block(x, y, z, Blocks.fromNumericId(id));
+				if(id != 0)
+					block(x, y, z, Blocks.fromNumericId(id));
 				
 				position++;
 			}

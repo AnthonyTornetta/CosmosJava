@@ -50,7 +50,7 @@ public class Ship extends Structure
 		
 		if(pilot == null)
 		{
-			body().velocity(body().velocity().mul(0.99f)); // no more drifting into space once the pilot leaves
+			body().velocity(body().velocity().mul(0.99f, new Vector3f())); // no more drifting into space once the pilot leaves
 			movement = Movement.movement(MovementType.NONE);
 		}
 		else
