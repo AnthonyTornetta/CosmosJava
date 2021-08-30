@@ -28,7 +28,6 @@ import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;

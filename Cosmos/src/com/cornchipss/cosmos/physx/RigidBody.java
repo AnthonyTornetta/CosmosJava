@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.physx;
 
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -31,6 +32,11 @@ public class RigidBody
 	public void navigateTowards(Vector3fc vec)
 	{
 		vec.sub(transform.position(), this.velocity);
+	}
+	
+	public void rotateTowards(Quaternionfc quat)
+	{
+//		transform.orientation().lerpTowards(quat, 0.1f);
 	}
 	
 	/**

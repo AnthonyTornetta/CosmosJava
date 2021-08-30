@@ -66,6 +66,14 @@ public class ClientPlayer extends Player
 		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
 			movement().add(MovementType.DOWN);
 		
+		Vector3f dRot = new Vector3f();
+		
+		dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.0025f);
+		
+		dRot.x = (dRot.x() - Input.getMouseDeltaY() * 0.0025f);
+		
+		movement().addDeltaRotation(dRot);
+		
 		if(!isPilotingShip())
 		{
 			handleHotbar();
@@ -199,13 +207,7 @@ public class ClientPlayer extends Player
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
 			dVel.mul(0.001f);
 		
-		Vector3f dRot = new Vector3f();
-		
-		dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.1f);
-		
-		dRot.x = (dRot.x() - Input.getMouseDeltaY() * 0.1f);
-		
-		dRot.mul(delta);
+		Vector3fc dRot = movement().deltaRotation();
 		
 		cam.rotate(dRot);
 		
@@ -213,9 +215,9 @@ public class ClientPlayer extends Player
 		
 		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel.mul(0.75f);
-
+		
 		vel.add(dVel);
-
+		
 		vel = Maths.safeNormalize(vel, 50.0f);
 		
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
@@ -223,7 +225,7 @@ public class ClientPlayer extends Player
 		
 		body().velocity(vel);
 	}
-
+	
 	private void handleHotbar()
 	{
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_0))

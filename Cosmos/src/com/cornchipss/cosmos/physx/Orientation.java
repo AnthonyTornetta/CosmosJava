@@ -8,7 +8,7 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.utils.Maths;
 
-public class Orientation
+public class Orientation implements Cloneable
 {
 	private Quaternionf rotation;
 	
@@ -107,5 +107,17 @@ public class Orientation
 	public Vector3fc right()
 	{
 		return right;
+	}
+	
+	@Override
+	public Orientation clone()
+	{
+		return new Orientation(rotation);
+	}
+
+	public void lerpTowards(Quaternionfc quat, float f)
+	{
+		quaternion(quat);
+//		quaternion(quaternion().nlerp(quat, f, rotation));
 	}
 }

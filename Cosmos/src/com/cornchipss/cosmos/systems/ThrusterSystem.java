@@ -42,7 +42,10 @@ public class ThrusterSystem extends BlockSystem
 			if(ship.movement().down())
 				dVel.sub(ship.body().transform().up());
 			
-			if(dVel.x != 0 || dVel.y != 0 || dVel.z != 0)
+			if(dVel.x != 0 || dVel.y != 0 || dVel.z != 0 || 
+					ship.movement().deltaRotation().x() != 0 || 
+					ship.movement().deltaRotation().y() != 0 || 
+					ship.movement().deltaRotation().z() != 0)
 			{
 				if(!ship.useEnergy(energyCost))
 					return;
@@ -62,20 +65,7 @@ public class ThrusterSystem extends BlockSystem
 			
 			ship.body().velocity(vel);
 			
-//				Vector3f dRot = new Vector3f();
-//
-//				if(Input.isKeyDown(GLFW.GLFW_KEY_C))
-//					dRot.z += 2;
-//				if(Input.isKeyDown(GLFW.GLFW_KEY_Z))
-//					dRot.z -= 2;
-//				
-//				dRot.y = Input.getMouseDeltaX() * 0.1f;
-//				
-//				dRot.x = Input.getMouseDeltaY() * 0.1f;
-//				
-//				dRot.mul(0.01f);
-//				
-//				ship.body().transform().rotateRelative(dRot);
+			ship.body().transform().rotateRelative(ship.movement().deltaRotation().negate(new Vector3f()));
 		}
 	}
 

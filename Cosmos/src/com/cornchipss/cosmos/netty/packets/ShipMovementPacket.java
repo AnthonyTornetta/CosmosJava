@@ -1,7 +1,7 @@
 package com.cornchipss.cosmos.netty.packets;
 
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
@@ -13,9 +13,6 @@ import com.cornchipss.cosmos.structures.Structure;
 public class ShipMovementPacket extends Packet
 {
 	private Ship s;
-	
-	// for client only
-	private Vector3fc vec;
 	
 	public ShipMovementPacket()
 	{
@@ -34,12 +31,11 @@ public class ShipMovementPacket extends Packet
 	 * @param s 
 	 * @param vec If it's set client side it's the thrust directions, otherwise it's the ship's position
 	 */
-	public ShipMovementPacket(byte[] buffer, int bufferOffset, Ship s, Vector3fc vec)
+	public ShipMovementPacket(byte[] buffer, int bufferOffset, Ship s)
 	{
 		super(buffer, bufferOffset);
 		
 		this.s = s;
-		this.vec = vec;
 	}
 	
 	@Override
@@ -48,7 +44,8 @@ public class ShipMovementPacket extends Packet
 		super.init();
 		
 		writeInt(s.id());
-		writeVector3fc(vec);
+		writeVector3fc(s.position());
+		writeQuaternionfc(s.body().transform().orientation().quaternion());
 	}
 	
 	@Override
@@ -74,8 +71,12 @@ public class ShipMovementPacket extends Packet
 		int id = packet.readInt();
 		Structure s = client.game().world().structureFromID(id);
 		Vector3f vec = packet.readVector3f(new Vector3f());
+		Quaternionf q = packet.readQuaternionf(new Quaternionf());
 		
 		if(s != null) // may not have loaded yet
+		{
 			s.body().navigateTowards(vec);
+			s.body().rotateTowards(q);
+		}
 	}
 }

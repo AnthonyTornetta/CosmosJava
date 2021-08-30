@@ -49,6 +49,7 @@ public class Transform
 	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
 	{
 		orientation.rotateRelative(dRot, right, up, forward);
+		updateMatrix();
 	}
 	
 	public Transform(Vector3fc pos)
@@ -74,7 +75,7 @@ public class Transform
 	
 	public void orientation(Orientation o)
 	{
-		this.orientation = o;
+		this.orientation = o.clone();
 		updateMatrix();
 	}
 

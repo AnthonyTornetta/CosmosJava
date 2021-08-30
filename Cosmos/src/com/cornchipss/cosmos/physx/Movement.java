@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.physx;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public class Movement
 {
@@ -28,6 +29,7 @@ public class Movement
 	}
 	
 	private int code;
+	private Vector3f deltaRot;
 	
 	public int code()
 	{
@@ -37,6 +39,7 @@ public class Movement
 	private Movement(int code)
 	{
 		this.code = code;
+		deltaRot = new Vector3f();
 	}
 	
 	public static Movement movement(MovementType... movements)
@@ -95,10 +98,20 @@ public class Movement
 		return (code & MovementType.DOWN.code) != 0;
 	}
 	
-	public Vector3f direction(Vector3f v)
+	public Vector3f movementDirection(Vector3f v)
 	{
 		v.set(right() ? 1 : 0, up() ? 1 : 0, forward() ? 1 : 0);
 		v.sub(left() ? 1 : 0, down() ? 1 : 0, backward() ? 1 : 0);
 		return v;
+	}
+
+	public void addDeltaRotation(Vector3fc delta)
+	{
+		deltaRot.add(delta);
+	}
+	
+	public Vector3fc deltaRotation()
+	{
+		return deltaRot;
 	}
 }

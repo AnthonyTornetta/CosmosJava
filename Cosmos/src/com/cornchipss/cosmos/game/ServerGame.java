@@ -61,7 +61,7 @@ public class ServerGame extends Game
 			{
 				Ship ship = (Ship)s;
 				
-				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship, s.position());
+				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship);
 				smp.init();
 				
 				Server.nettyServer().sendToAllUDP(smp);

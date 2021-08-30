@@ -39,9 +39,16 @@ public class PlayerPacket extends Packet
 	{
 		super.init();
 		
-		writeString(player.name());
-		writeVector3fc(player.body().transform().position());
-		writeQuaternionfc(player.body().transform().orientation().quaternion());
+		try
+		{
+			writeString(player.name());
+			writeVector3fc(player.body().transform().position());
+			writeQuaternionfc(player.body().transform().orientation().quaternion());
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	
 	@Override

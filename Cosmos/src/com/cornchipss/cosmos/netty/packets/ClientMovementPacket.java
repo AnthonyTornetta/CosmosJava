@@ -1,5 +1,7 @@
 package com.cornchipss.cosmos.netty.packets;
 
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.physx.Movement;
@@ -34,6 +36,7 @@ public class ClientMovementPacket extends Packet
 		super.init();
 		
 		writeInt(movement.code());
+		writeVector3fc(movement.deltaRotation());
 	}
 	
 	@Override
@@ -43,10 +46,12 @@ public class ClientMovementPacket extends Packet
 		ClientMovementPacket packet = new ClientMovementPacket(data, offset);
 		
 		int movement = packet.readInt();
+		Vector3f rotation = packet.readVector3f(new Vector3f());
 		
 		ServerPlayer player = server.players().player(client);
 		
 		player.movement(Movement.movementFromCode(movement));
+		player.movement().addDeltaRotation(rotation);
 	}
 	
 	@Override
