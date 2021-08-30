@@ -122,11 +122,15 @@ public class CosmosNettyClient implements Runnable
 					e.printStackTrace();
 				}
 	    		
+	    		
 	    		// send player info - TODO: move this
-	        	PlayerPacket pp = new PlayerPacket(buffer, 0, game().player());
-	        	pp.init();
-	        	
-	        	server.sendUDP(pp.buffer(), pp.bufferLength(), this);
+	    		if(game().player() != null)
+	    		{
+		        	PlayerPacket pp = new PlayerPacket(buffer, 0, game().player());
+		        	pp.init();
+		        	
+		        	server.sendUDP(pp.buffer(), pp.bufferLength(), this);
+	    		}
 	        }
 	        
 	        Logger.LOGGER.debug("Sending disconnect packet");
