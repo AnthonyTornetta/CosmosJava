@@ -36,7 +36,7 @@ public class RigidBody
 	
 	public void rotateTowards(Quaternionfc quat)
 	{
-//		transform.orientation().lerpTowards(quat, 0.1f);
+		transform.orientation().lerpTowards(quat, 0.1f);
 	}
 	
 	/**

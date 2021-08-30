@@ -11,7 +11,6 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerPacket extends Packet
@@ -40,7 +39,6 @@ public class PlayerPacket extends Packet
 	{
 		super.init();
 		
-		Utils.println(player);
 		writeString(player.name());
 		writeVector3fc(player.body().transform().position());
 		writeQuaternionfc(player.body().transform().orientation().quaternion());
