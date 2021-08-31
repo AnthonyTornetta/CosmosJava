@@ -101,6 +101,16 @@ public abstract class Structure extends PhysicalObject implements
 		}
 	}
 	
+	public void energy(float f)
+	{
+		energy = f;
+	}
+
+	public void maxEnergy(float f)
+	{
+		maxEnergy = f;
+	}
+	
 	@Override
 	public float energy()
 	{

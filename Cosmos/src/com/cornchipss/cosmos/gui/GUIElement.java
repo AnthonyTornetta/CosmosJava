@@ -75,6 +75,25 @@ public abstract class GUIElement
 		this(position, dimensions, 0, 0, 0, scale);
 	}
 	
+
+	/**
+	 * If this is true, no attempt to draw this element or its children will be made.
+	 * @return 
+	 */
+	public boolean hidden()
+	{
+		return false;
+	}
+	
+	/**
+	 * If this is false, no attempt to draw this element will be made.  Its children will go through the normal drawing steps
+	 * @return 
+	 */
+	public boolean canBeDrawn()
+	{
+		return true;
+	}
+	
 	public void fullDraw(GUI gui, Matrix4fc projectionMatrix, Matrix4fc cameraMatrix)
 	{
 		material().use();

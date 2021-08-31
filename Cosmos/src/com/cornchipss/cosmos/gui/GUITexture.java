@@ -85,4 +85,10 @@ public class GUITexture extends GUIElement
 		
 		this.transform.scale(scaleX, scaleY, 1);
 	}
+	
+	@Override
+	public void dimensions(MeasurementPair dimensions)
+	{
+		onResize(dimensions.x().actualValue(Window.instance().getWidth()), dimensions.y().actualValue(Window.instance().getHeight()));
+	}
 }

@@ -46,6 +46,8 @@ public class ShipMovementPacket extends Packet
 		writeInt(s.id());
 		writeVector3fc(s.position());
 		writeQuaternionfc(s.body().transform().orientation().quaternion());
+		writeFloat(s.energy());
+		writeFloat(s.maxEnergy());
 	}
 	
 	@Override
@@ -73,10 +75,16 @@ public class ShipMovementPacket extends Packet
 		Vector3f vec = packet.readVector3f(new Vector3f());
 		Quaternionf q = packet.readQuaternionf(new Quaternionf());
 		
+		float energy = packet.readFloat();
+		float maxEnergy = packet.readFloat();
+		
 		if(s != null) // may not have loaded yet
 		{
 			s.body().navigateTowards(vec);
 			s.body().rotateTowards(q);
+			
+			s.energy(energy);
+			s.maxEnergy(maxEnergy);
 		}
 	}
 }

@@ -87,6 +87,8 @@ public class GUI
 			
 			if(elem instanceof IUpdatable)
 				updatableElements.add((IUpdatable)elem);
+			if(elem instanceof IHasGUIAddEvent)
+				((IHasGUIAddEvent)elem).onAdd(this);
 		}
 	}
 	
@@ -143,7 +145,11 @@ public class GUI
 
 	public void draw(GUIElement elem)
 	{
-		elem.fullDraw(this, projectionMatrix, cameraMatrix);
+		if(elem.hidden())
+			return;
+		
+		if(elem.canBeDrawn())
+			elem.fullDraw(this, projectionMatrix, cameraMatrix);
 		
 		if(elem instanceof IGUIContainer)
 		{

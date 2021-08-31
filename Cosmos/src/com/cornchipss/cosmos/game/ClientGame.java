@@ -10,14 +10,12 @@ import org.lwjgl.opengl.GL30;
 import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.gui.GUI;
-import com.cornchipss.cosmos.gui.GUIModel;
 import com.cornchipss.cosmos.gui.GUITexture;
-import com.cornchipss.cosmos.gui.GUITextureMultiple;
-import com.cornchipss.cosmos.gui.interactable.GUIButtonText;
-import com.cornchipss.cosmos.gui.measurement.AddedMeasurement;
+import com.cornchipss.cosmos.gui.guis.HotbarGUI;
+import com.cornchipss.cosmos.gui.guis.PauseMenuGUI;
+import com.cornchipss.cosmos.gui.guis.ShipGUI;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.MeasurementParser;
-import com.cornchipss.cosmos.gui.measurement.PercentMeasurement;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
@@ -32,6 +30,7 @@ import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
@@ -42,15 +41,11 @@ public class ClientGame extends Game
 	private Matrix4f projectionMatrix;
 	private ClientPlayer player;
 	private GUI gui;
-	private int selectedSlot;
 	private GUIText fpsText;
 	private CosmosNettyClient nettyClient;
 	public CosmosNettyClient nettyClient() { return nettyClient; }
 	
-	private GUITextureMultiple[] inventorySlots = new GUITextureMultiple[10];
-	private	GUIModel[] inventoryModels;
-	
-	private final int slotDimensions = 64;
+	private HotbarGUI hotbarGUI;
 	
 	private volatile boolean running = true;
 	
@@ -62,48 +57,33 @@ public class ClientGame extends Game
 	private Mesh playerMesh;
 	private Material playerMaterial;
 	
-	private GUI pauseMenu;
-	private boolean showPauseMenu = false;
+	private PauseMenuGUI pauseMenu;
+	
+	private ShipGUI shipGUI;
 	
 	private void initPauseMenu()
 	{
-		pauseMenu = new GUI(Materials.GUI_PAUSE_MENU);
-		pauseMenu.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
+		pauseMenu = new PauseMenuGUI(() ->
+		{
+			togglePause();
+		}, MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		
-		GUIButtonText quitBtn = new GUIButtonText("QUIT",
-				new MeasurementPair(
-						MeasurementParser.parse("50% - 150"), 
-						MeasurementParser.parse("50% - 30 - 50")), 
-				new MeasurementPair(
-						new PixelMeasurement(300), 
-						new PixelMeasurement(60)), 	
-				() ->
-				{
-					Client.instance().quit();
-				});
-		
-		GUIButtonText resumeBtn = new GUIButtonText("RESUME",
-				new MeasurementPair(
-						MeasurementParser.parse("50% - 150"), 
-						MeasurementParser.parse("50% - 30 + 50")), 
-				new MeasurementPair(
-						new PixelMeasurement(300), 
-						new PixelMeasurement(60)), 	
-				() ->
-				{
-					togglePause();
-				});
-		
-		pauseMenu.addElement(quitBtn, resumeBtn);
+		gui.addElement(pauseMenu);
 	}
 	
 	private void initGraphics()
 	{
-		initPauseMenu();
-		
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 		
+		initPauseMenu();
+		
+		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		gui.addElement(hotbarGUI);
+		
+		shipGUI = new ShipGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		gui.addElement(shipGUI);
+
 		GUITexture crosshair = new GUITexture(
 				new MeasurementPair(
 						MeasurementParser.parse("50% - 16"),
@@ -117,34 +97,10 @@ public class ClientGame extends Game
 		
 		OpenGLFont font = Fonts.ARIAL_28;
 		
-		inventorySlots = new GUITextureMultiple[10];
-		
-		PixelMeasurement slotDims = new PixelMeasurement(slotDimensions);
-		
-		int offset = -slotDimensions * (inventorySlots.length / 2);
-		
-		for(int i = 0; i < inventorySlots.length; i++)
-		{
-			inventorySlots[i] =  
-					new GUITextureMultiple(
-						new MeasurementPair(
-								new AddedMeasurement(
-										new PixelMeasurement(offset + i * slotDimensions),
-										PercentMeasurement.HALF
-								), PixelMeasurement.ZERO), 
-						new MeasurementPair(slotDims, slotDims), 
-						0.25f, 0, 0, 0.25f);
-			
-			gui.addElement(inventorySlots[i]);
-		}
-		
-		inventorySlots[selectedSlot].state(1);
 		
 		fpsText = new GUIText("-- --ms", font, 
 				new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
-		
-		initInventoryBarModels();
 		
 		playerMaterial = new RawImageMaterial("assets/images/atlas/player");
 		playerMaterial.init();
@@ -176,30 +132,6 @@ public class ClientGame extends Game
 		
 		gui.onResize(w, h);
 		pauseMenu.onResize(w, h);
-	}
-	
-	private void initInventoryBarModels()
-	{
-		inventoryModels = new GUIModel[10];
-		
-		int offset = -slotDimensions * (inventoryModels.length / 2);
-		
-		for(int i = 0; i < player.inventory().columns(); i++)
-		{
-			if(player.inventory().block(0, i) != null)
-			{
-				int margin = 4;
-				
-				inventoryModels[i] = new GUIModel(new MeasurementPair(
-						new AddedMeasurement(
-								new PixelMeasurement(offset + i * slotDimensions + margin),
-								PercentMeasurement.HALF
-						), new PixelMeasurement(margin)), 
-						slotDimensions - margin * 2, player.inventory().block(0, i).model());
-				
-				gui.addElement(inventoryModels[i]);
-			}
-		}
 	}
 	
 	public void render(float delta)
@@ -250,11 +182,10 @@ public class ClientGame extends Game
 			}
 		}
 		
+		gui.update(delta);
+		
 		if(drawGUI)
 			gui.draw();
-		
-		if(showPauseMenu)
-			pauseMenu.draw();
 	}
 	
 	@Override
@@ -269,24 +200,25 @@ public class ClientGame extends Game
 	
 	private void togglePause()
 	{
-		showPauseMenu = !showPauseMenu;
+		pauseMenu.active(!pauseMenu.active());
 		
-		Input.toggleCursor();
+		Input.hideCursor(!pauseMenu.active());
 	}
 	
 	@Override
 	public void update(float delta)
 	{
+		if(!Utils.equals(player.shipPiloting(), shipGUI.ship()))
+		{
+			shipGUI.ship(player.shipPiloting());
+		}
+		
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_P))
 		{
 			togglePause();
 		}
 		
-		if(showPauseMenu)
-		{
-			pauseMenu.update(delta);
-		}
-		else if(nettyClient.ready())
+		if(!pauseMenu.active() && nettyClient.ready())
 		{
 			super.update(delta);
 			
@@ -308,8 +240,7 @@ public class ClientGame extends Game
 			
 			if(prevRow != row)
 			{
-				inventorySlots[prevRow].state(0);
-				inventorySlots[row].state(1);
+				hotbarGUI.select(row);
 			}
 		}
 	}
