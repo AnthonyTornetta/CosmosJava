@@ -54,7 +54,7 @@ public class GUIButton extends GUIElement implements IGUIInteractable
 		{
 			wasHovered = true;
 			
-			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+			if(!hidden() && Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 				onclick.run();
 		}
 		else

@@ -164,20 +164,12 @@ public class ClientPlayer extends Player
 						try
 						{
 							Client.instance().nettyClient().sendTCP(cip);
-							
-							// TODO: move this
-							((IInteractable)lookingAt.block(pos.x, pos.y, pos.z))
-								.onInteract(new StructureBlock(lookingAt, pos.x, pos.y, pos.z), this);
 						}
 						catch (IOException e)
 						{
 							e.printStackTrace();
 						}
 					}
-				}
-				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3))
-				{
-					lookingAt.explode(20, pos);
 				}
 			}
 		}

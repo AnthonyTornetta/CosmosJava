@@ -7,17 +7,17 @@ import com.cornchipss.cosmos.gui.interactable.GUIButtonText;
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
 import com.cornchipss.cosmos.gui.measurement.MeasurementParser;
 import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
+import com.cornchipss.cosmos.utils.io.Input;
 
 public class PauseMenuGUI extends GUIElementHolder
 {
-	private Runnable togglePause;
 	private boolean active = false;
 	
-	public PauseMenuGUI(Runnable togglePause, MeasurementPair xy, MeasurementPair wh)
+	private boolean hideCursorOnClose;
+	
+	public PauseMenuGUI(MeasurementPair xy, MeasurementPair wh)
 	{
 		super(xy, wh);
-		
-		this.togglePause = togglePause;
 	}
 	
 	@Override
@@ -44,7 +44,7 @@ public class PauseMenuGUI extends GUIElementHolder
 					new PixelMeasurement(60)), 	
 			() ->
 			{
-				togglePause.run();
+				active(false);
 			});
 	
 		addChild(quitBtn);
@@ -59,6 +59,16 @@ public class PauseMenuGUI extends GUIElementHolder
 	
 	public void active(boolean a)
 	{
+		if(a)
+		{
+			hideCursorOnClose = !Input.cursorShown();
+			Input.hideCursor(false);
+		}
+		else
+		{
+			Input.hideCursor(hideCursorOnClose);
+		}
+		
 		active = a;
 	}
 

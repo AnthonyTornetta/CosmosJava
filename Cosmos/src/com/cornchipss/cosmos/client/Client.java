@@ -100,12 +100,12 @@ public class Client implements Runnable
 			
 			state.update(delta);
 			
-			Input.update();
-			
 			window.clear(0, 0, 0, 1);
 			
 			state.render(delta);
 			
+			Input.update();
+
 			window.update();
 			
 			state.postUpdate();

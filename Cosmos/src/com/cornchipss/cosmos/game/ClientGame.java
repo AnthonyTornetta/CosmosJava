@@ -63,10 +63,7 @@ public class ClientGame extends Game
 	
 	private void initPauseMenu()
 	{
-		pauseMenu = new PauseMenuGUI(() ->
-		{
-			togglePause();
-		}, MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		
 		gui.addElement(pauseMenu);
 	}
@@ -208,9 +205,12 @@ public class ClientGame extends Game
 	@Override
 	public void update(float delta)
 	{
-		if(!Utils.equals(player.shipPiloting(), shipGUI.ship()))
+		if(shipGUI != null)
 		{
-			shipGUI.ship(player.shipPiloting());
+			if(!Utils.equals(player.shipPiloting(), shipGUI.ship()))
+			{
+				shipGUI.ship(player.shipPiloting());
+			}
 		}
 		
 		if(Input.isKeyJustDown(GLFW.GLFW_KEY_P))
@@ -218,7 +218,7 @@ public class ClientGame extends Game
 			togglePause();
 		}
 		
-		if(!pauseMenu.active() && nettyClient.ready())
+		if((pauseMenu == null || !pauseMenu.active()) && nettyClient.ready())
 		{
 			super.update(delta);
 			

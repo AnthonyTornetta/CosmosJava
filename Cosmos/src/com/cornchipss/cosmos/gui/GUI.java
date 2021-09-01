@@ -14,7 +14,6 @@ import com.cornchipss.cosmos.utils.IUpdatable;
 public class GUI
 {
 	private List<GUIElement> elements;
-	private List<IUpdatable> updatableElements;
 	
 	private Material material;
 	
@@ -25,7 +24,6 @@ public class GUI
 	{
 		this.material = material;
 		elements = new LinkedList<>();
-		updatableElements = new LinkedList<>();
 		
 		cameraMatrix = new Matrix4f().identity();
 	}
@@ -52,22 +50,32 @@ public class GUI
 	
 	public void update(float delta)
 	{
-		for(IUpdatable elem : updatableElements)
+		for(GUIElement elem : elements)
 		{
-			update(elem, delta);
+			if(elem instanceof IGUIContainer)
+			{
+				update((IGUIContainer)elem, delta);
+			}
+			
+			if(elem instanceof IUpdatable)
+			{
+				((IUpdatable) elem).update(delta);
+			}
 		}
 	}
 	
-	private void update(IUpdatable element, float delta)
+	private void update(IGUIContainer g, float delta)
 	{
-		element.update(delta);
-		
-		if(element instanceof IGUIContainer)
+		for(GUIElement elem : g.children())
 		{
-			for(GUIElement child : ((IGUIContainer)element).children())
+			if(elem instanceof IGUIContainer)
 			{
-				if(child instanceof IUpdatable)
-					update((IUpdatable)child, delta);
+				update((IGUIContainer)elem, delta);
+			}
+			
+			if(elem instanceof IUpdatable)
+			{
+				((IUpdatable) elem).update(delta);
 			}
 		}
 	}
@@ -85,8 +93,6 @@ public class GUI
 				throw new IllegalArgumentException("Attempt to add a null GUI element");
 			elements.add(elem);
 			
-			if(elem instanceof IUpdatable)
-				updatableElements.add((IUpdatable)elem);
 			if(elem instanceof IHasGUIAddEvent)
 				((IHasGUIAddEvent)elem).onAdd(this);
 		}
@@ -95,8 +101,6 @@ public class GUI
 	public void removeElement(GUIElement e)
 	{
 		elements.remove(e);
-		if(e instanceof IUpdatable)
-			updatableElements.remove((IUpdatable)e);
 	}
 	
 	public void onResize(float w, float h)
@@ -140,7 +144,6 @@ public class GUI
 			g.delete();
 		
 		elements.clear();
-		updatableElements.clear();
 	}
 
 	public void draw(GUIElement elem)

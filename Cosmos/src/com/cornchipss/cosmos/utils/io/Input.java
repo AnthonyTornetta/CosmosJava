@@ -99,6 +99,11 @@ public class Input
 
 	public static void toggleCursor()
 	{
-		hideCursor(GLFW.glfwGetInputMode(window.getId(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_NORMAL);
+		hideCursor(cursorShown());
+	}
+
+	public static boolean cursorShown()
+	{
+		return GLFW.glfwGetInputMode(window.getId(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_NORMAL;
 	}
 }

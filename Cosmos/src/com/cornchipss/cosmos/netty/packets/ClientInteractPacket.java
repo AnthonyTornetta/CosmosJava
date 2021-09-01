@@ -2,12 +2,14 @@ package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
+import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ClientInteractPacket extends Packet
 {
@@ -48,7 +50,7 @@ public class ClientInteractPacket extends Packet
 		ClientInteractPacket packet = new ClientInteractPacket(data, offset);
 		
 		int id = packet.readInt();
-		Structure s = Server.nettyServer().game().world().structureFromID(id);
+		Structure s = server.game().world().structureFromID(id);
 		
 		int x = packet.readInt();
 		int y = packet.readInt();
@@ -60,12 +62,34 @@ public class ClientInteractPacket extends Packet
 		{
 			((IInteractable)block.block()).
 					onInteract(block, Server.nettyServer().players().player(client));
+			
+			ClientInteractPacket cpt = new ClientInteractPacket(new byte[1024], 0, block);
+			cpt.init();
+			cpt.writeString(Server.nettyServer().players().player(client).name());
+			
+			Server.nettyServer().sendToAllTCP(cpt);
 		}
 	}
 	
 	@Override
 	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
 	{
-		// never will be
+		ClientInteractPacket packet = new ClientInteractPacket(data, offset);
+		
+		int id = packet.readInt();
+		Structure s = client.game().world().structureFromID(id);
+		
+		int x = packet.readInt();
+		int y = packet.readInt();
+		int z = packet.readInt();
+		String name = packet.readString();
+
+		StructureBlock block = new StructureBlock(s, x, y, z);
+		
+		Player player = Client.instance().nettyClient().players().player(name);
+		
+		((IInteractable)s.block(x, y, z))
+			.onInteract(block, player);
+
 	}
 }
