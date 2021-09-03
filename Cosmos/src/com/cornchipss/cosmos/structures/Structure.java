@@ -23,8 +23,8 @@ import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
-import com.cornchipss.cosmos.physx.StructureShape;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
@@ -49,6 +49,7 @@ public abstract class Structure extends PhysicalObject implements
 	
 	private StructureShape shape;
 	
+	@Override
 	public StructureShape shape() { return shape; }
 	
 	private int id;
@@ -584,6 +585,11 @@ public abstract class Structure extends PhysicalObject implements
 	}
 	
 	public Vector3f localCoordsToWorldCoords(Vector3fc v, Vector3f storage)
+	{
+		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
+	}
+	
+	public Vector3f localCoordsToWorldCoords(Vector3ic v, Vector3f storage)
 	{
 		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
 	}

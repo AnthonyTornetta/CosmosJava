@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.physx;
+package com.cornchipss.cosmos.physx.shapes;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,10 +10,13 @@ import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.physx.Orientation;
+import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
-public class StructureShape
+public class StructureShape implements PhysicsShape
 {
 	private Structure s;
 	
@@ -73,7 +76,7 @@ public class StructureShape
 					
 					if(b != null)
 					{
-						PhysicsShape sh = new CubeShape();
+						CubeShape sh = new CubeShape();
 						
 						for(int i = 0; i < sh.sides().length; i+=3)
 						{
@@ -104,5 +107,81 @@ public class StructureShape
 		RayResult res = new RayResult(from, to, s, hits, faces);
 		
 		return res;
+	}
+
+	@Override
+	public boolean pointIntersects(Vector3fc point, Vector3fc position, Orientation orientation)
+	{
+		Vector3f delta = new Vector3f(point.x() - position.x(), point.y() - position.y(), point.z() - position.z());
+		
+		orientation.applyInverseRotation(delta, delta);
+		
+		delta.add(position);
+		
+		Vector3i v = s.worldCoordsToStructureCoords(delta.x, delta.y, delta.z);
+		
+		Utils.println(v);
+		
+		if(s.hasBlock(v.x, v.y, v.z))
+		{
+			Block b = s.block(v.x, v.y, v.z);
+			Utils.println(b);
+			
+			Vector3f aaa = s.localCoordsToWorldCoords(v.x + 0.5f, v.y + 0.5f, v.z + 0.5f);
+			
+			Utils.println(aaa);
+			
+			Utils.println(delta);
+			
+			return b.shape().pointIntersects(delta, 
+					aaa, orientation);
+		}
+		
+		return false;
+	}
+
+	@Override
+	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
+			Vector3fc position, Orientation orientation, Vector3f res)
+	{
+		Vector3f delta = lineEnd.sub(lineStart, new Vector3f());
+		
+		float totalDist = lineEnd.distance(lineStart);
+		
+		delta = Maths.safeNormalize(delta, 1);
+		
+		Vector3f pos = new Vector3f(lineStart);
+		Vector3i localCoords = s.worldCoordsToStructureCoords(pos);
+		
+		float dist = 0;
+		
+		while(dist < totalDist)
+		{
+			if(s.hasBlock(localCoords.x, localCoords.y, localCoords.z))
+			{
+				Block b = s.block(localCoords.x, localCoords.y, localCoords.z);
+				b.shape().lineIntersects(lineStart, lineEnd, 
+						s.localCoordsToWorldCoords(localCoords, new Vector3f()), orientation, 
+						res);
+				
+				return true;
+			}
+			
+			dist++;
+		}
+		
+		localCoords = s.worldCoordsToStructureCoords(lineEnd);
+		
+		if(s.hasBlock(localCoords.x, localCoords.y, localCoords.z))
+		{
+			Block b = s.block(localCoords.x, localCoords.y, localCoords.z);
+			b.shape().lineIntersects(lineStart, lineEnd, 
+					s.localCoordsToWorldCoords(localCoords, new Vector3f()), orientation, 
+					res);
+			
+			return true;
+		}
+		
+		return false;
 	}
 }

@@ -1,12 +1,17 @@
-package com.cornchipss.cosmos.physx;
+package com.cornchipss.cosmos.physx.shapes;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
 
-public class CubeShape implements PhysicsShape
+public class CubeShape extends RectangleShape
 {
+	public CubeShape()
+	{
+		super(1f, 1f, 1f);
+	}
+	
 	private static final BlockFace[] faces = new BlockFace[]
 			{
 					BlockFace.BACK,
@@ -84,17 +89,14 @@ public class CubeShape implements PhysicsShape
 					new Vector3f(0, 1, 1),
 					new Vector3f(0, 1, 0)
 			};
-
-	@Override
+	
 	public BlockFace[] faces()
 	{
 		return faces;
 	}
 
-	@Override
 	public Vector3fc[] sides()
 	{
 		return sides;
 	}
-
 }

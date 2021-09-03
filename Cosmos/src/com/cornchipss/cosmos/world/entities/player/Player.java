@@ -8,11 +8,12 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
 import com.cornchipss.cosmos.physx.Movement;
+import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.physx.Movement.MovementType;
+import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
@@ -179,5 +180,11 @@ public abstract class Player extends PhysicalObject
 	public Movement movement()
 	{
 		return movement;
+	}
+
+	@Override
+	public PhysicsShape shape()
+	{
+		return null;
 	}
 }

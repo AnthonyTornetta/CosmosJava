@@ -56,10 +56,7 @@ public class PhysicsWorld
 							||
 							a.aabb(pos, aA).testAABB(aB))
 					{
-						a.body().velocity(a.body().velocity().negate(vel)); // any vector could replace vel here, but it's being re-assigned down below so it doesn't matter
-						
-						vel.set(a.body().velocity()).mul(delta);
-						vel.add(a.body().transform().position(), pos);
+						handlePotentialCollision(a, b, vel, pos, delta);
 					}
 				}
 			}
@@ -68,6 +65,16 @@ public class PhysicsWorld
 		}
 	}
 	
+	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3f vel, Vector3f pos, float delta)
+	{
+		
+		
+		a.body().velocity(a.body().velocity().negate(vel)); // any vector could replace vel here, but it's being re-assigned down below so it doesn't matter
+		
+		vel.set(a.body().velocity()).mul(delta);
+		vel.add(a.body().transform().position(), pos);
+	}
+
 	public boolean locked()
 	{
 		return locked;

@@ -10,7 +10,7 @@ import com.cornchipss.cosmos.utils.Maths;
 
 public class Orientation implements Cloneable
 {
-	private Quaternionf rotation;
+	private Quaternionf rotation, inverted;
 	
 	private Quaternionf temp;
 	
@@ -20,6 +20,7 @@ public class Orientation implements Cloneable
 	{
 		rotation = Maths.clone(starting);
 		temp = Maths.blankQuaternion();
+		inverted = Maths.blankQuaternion();
 		 
 		forward = new Vector3f(0, 0, 1);
 		up = new Vector3f(0, 1, 0);
@@ -30,19 +31,24 @@ public class Orientation implements Cloneable
 	
 	public Orientation()
 	{
-		rotation = Maths.blankQuaternion();
-		temp = Maths.blankQuaternion();
-		 
-		forward = new Vector3f(0, 0, 1);
-		up = new Vector3f(0, 1, 0);
-		right = new Vector3f(1, 0, 0);
+		this(Maths.blankQuaternion());
 	}
 	
 	public void applyRotation(Matrix4f transMatrix)
 	{
 		transMatrix.rotate(rotation);
 	}
-
+	
+	public void applyRotation(Vector3fc src, Vector3f dest)
+	{
+		src.rotate(rotation, dest);
+	}
+	
+	public void applyInverseRotation(Vector3fc src, Vector3f dest)
+	{
+		src.rotate(inverted, dest);
+	}
+	
 	public void rotateRelative(Vector3fc dRot)
 	{
 		rotateRelative(dRot, right, up, forward);
@@ -86,6 +92,8 @@ public class Orientation implements Cloneable
 		rotation.transform(1, 0, 0, right);
 		
 		rotation.transform(0, 1, 0, up);
+		
+		rotation.invert(inverted);
 	}
 	
 	public void zero()
