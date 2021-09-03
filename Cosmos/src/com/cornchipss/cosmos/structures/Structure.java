@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.AABBf;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3f;
@@ -101,6 +102,20 @@ public abstract class Structure extends PhysicalObject implements
 		}
 	}
 	
+	@Override
+	public AABBf aabb(Vector3fc position, AABBf dest)
+	{
+		dest.minX = position.x() - width() / 2.f;
+		dest.minY = position.y() - height() / 2.f;
+		dest.minZ = position.z() - length() / 2.f;
+		
+		dest.maxX = position.x() + width() / 2.f;
+		dest.maxY = position.y() + height() / 2.f;
+		dest.maxZ = position.z() + length() / 2.f;
+		
+		return dest;
+	}
+	
 	public void energy(float f)
 	{
 		energy = f;
@@ -192,7 +207,7 @@ public abstract class Structure extends PhysicalObject implements
 	public void addToWorld(Transform transform)
 	{
 		body(new RigidBody(transform));
-		world().addRigidBody(body());
+		world().addPhysicalObject(this);
 		world().addStructure(this);
 	}
 	

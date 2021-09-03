@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.physx;
 
+import org.joml.AABBf;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.world.World;
@@ -9,10 +10,7 @@ public abstract class PhysicalObject
 	private RigidBody body;
 	private World world;
 	
-	private AABB aabb;
-	
-	public AABB aabb() { return aabb; }
-	public void aabb(AABB aabb) { this.aabb = aabb; }
+	public abstract AABBf aabb(Vector3fc originCenter, AABBf dest);
 	
 	public PhysicalObject(World world)
 	{

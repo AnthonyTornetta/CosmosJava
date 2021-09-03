@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.world.entities.player;
 
+import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -30,6 +31,8 @@ public abstract class Player extends PhysicalObject
 	
 	private Movement movement;
 	
+	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
+	
 	public Player(World world, String name)
 	{
 		super(world);
@@ -58,7 +61,21 @@ public abstract class Player extends PhysicalObject
 	public void addToWorld(Transform transform)
 	{
 		body(new RigidBody(transform));
-		world().addRigidBody(body());
+		world().addPhysicalObject(this);
+	}
+	
+	@Override
+	public AABBf aabb(Vector3fc position, AABBf dest)
+	{
+		dest.minX = position.x() - WIDTH / 2.f;
+		dest.minY = position.y() - HEIGHT / 2.f;
+		dest.minZ = position.z() - LENGTH / 2.f;
+		
+		dest.maxX = position.x() + WIDTH / 2.f;
+		dest.maxY = position.y() + HEIGHT / 2.f;
+		dest.maxZ = position.z() + LENGTH / 2.f;
+		
+		return dest;
 	}
 	
 	public Structure calculateLookingAt()
