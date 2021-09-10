@@ -16,7 +16,6 @@ import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class StructureShapeTest

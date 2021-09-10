@@ -15,7 +15,6 @@ import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class StructureShape implements PhysicsShape
 {
@@ -152,26 +151,26 @@ public class StructureShape implements PhysicsShape
 	}
 	
 	@Override
-	public boolean lineIntersects(Vector3fc ls, Vector3fc le, 
+	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
 			Vector3fc position, Orientation orientation, Vector3f res)
 	{		
-		Vector3f lineStart = new Vector3f(ls);
-		Vector3f lineEnd = new Vector3f(le);
+		Vector3f lineStartMod = new Vector3f(lineStart);
+		Vector3f lineEndMod = new Vector3f(lineEnd);
 		
-		orientation.applyInverseRotation(lineStart, lineStart);
-		orientation.applyInverseRotation(lineEnd, lineEnd);
+		orientation.applyInverseRotation(lineStartMod, lineStartMod);
+		orientation.applyInverseRotation(lineEndMod, lineEndMod);
 		
-		Vector3f delta = lineEnd.sub(lineStart, new Vector3f());
+		Vector3f delta = lineEndMod.sub(lineStartMod, new Vector3f());
 		
 		float totalDist = Maths.sqrt(delta.dot(delta));
 		
 		delta = Maths.safeNormalize(delta, 1);
 		
-		Vector3f pos = new Vector3f(lineStart);
+		Vector3f pos = new Vector3f(lineStartMod);
 		
 		Vector3i localCoords = s.worldCoordsToStructureCoords(pos);
 		
-		if(check(pos, lineEnd, localCoords, orientation, res))
+		if(check(pos, lineEndMod, localCoords, orientation, res))
 			return true;
 		
 		float dist = 1;
@@ -181,14 +180,14 @@ public class StructureShape implements PhysicsShape
 			pos.add(delta);
 			
 			localCoords = s.worldCoordsToStructureCoords(pos);
-			if(check(pos, lineEnd, localCoords, orientation, res))
+			if(check(pos, lineEndMod, localCoords, orientation, res))
 				return true;
 			
 			dist++;
 		}
 		
-		localCoords = s.worldCoordsToStructureCoords(lineEnd);
-		if(check(pos, lineEnd, localCoords, orientation, res))
+		localCoords = s.worldCoordsToStructureCoords(lineEndMod);
+		if(check(lineStartMod, lineEndMod, localCoords, orientation, res))
 			return true;
 		
 		return false;
