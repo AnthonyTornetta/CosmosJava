@@ -16,18 +16,20 @@ import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class StructureShapeTest
 {
 	private StructureShape rs;
+	private Structure s;
 	
 	@BeforeEach
 	public void setup()
 	{
 		World w = new World();
 		
-		Structure s = new Planet(w, 16, 16, 16, 0);
+		s = new Planet(w, 16, 16, 16, 0);
 		s.init();
 
 		for(int z = 0; z < s.length(); z++)
@@ -49,6 +51,7 @@ class StructureShapeTest
 	public void tearDown()
 	{
 		rs = null;
+		s = null;
 	}
 	
 	@Test
@@ -103,5 +106,21 @@ class StructureShapeTest
 		Vector3f out = new Vector3f();
 		assertTrue(rs.lineIntersects(new Vector3f(-8, 0, 0), new Vector3f(-9f, 0, 0), new Vector3f(), new Orientation(), out));
 		assertEquals(new Vector3f(-8, 0, 0), out);
+	}
+	
+	@Test
+	public void testRotated()
+	{
+		Orientation o = new Orientation(Maths.quaternionFromRotation(0, Maths.PI / 4f, 0));
+		assertTrue(rs.pointIntersects(new Vector3f(0, 7.9f, 0), new Vector3f(), o));
+		
+		s.body().transform().position(new Vector3f(0, 20, 0));
+		s.body().transform().orientation(o);
+		
+		assertTrue(rs.pointIntersects(new Vector3f(0, 27.9f, 0), s.position(), s.body().transform().orientation()));
+		
+		Vector3f out = new Vector3f();
+		
+		assertTrue(rs.lineIntersects(new Vector3f(-20, 17, 0), new Vector3f(20, 23, 0), s.position(), s.body().transform().orientation(), out));
 	}
 }

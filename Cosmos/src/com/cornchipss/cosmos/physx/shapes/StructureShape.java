@@ -15,6 +15,7 @@ import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class StructureShape implements PhysicsShape
 {
@@ -135,14 +136,14 @@ public class StructureShape implements PhysicsShape
 
 	private boolean check(Vector3fc start, Vector3fc end, Vector3ic localCoords, Orientation or, Vector3f res)
 	{
-		
 		if(s.hasBlock(localCoords.x(), localCoords.y(), localCoords.z()))
 		{
 			Block b = s.block(localCoords.x(), localCoords.y(), localCoords.z());
 			if(b.shape().lineIntersects(start, end, 
-					s.localCoordsToWorldCoords(localCoords, new Vector3f()), or, 
+					s.localCoordsToWorldCoords(localCoords, new Vector3f()), new Orientation(), 
 					res))
 			{
+				or.applyRotation(res, res);
 				return true;
 			}
 		}
@@ -151,9 +152,15 @@ public class StructureShape implements PhysicsShape
 	}
 	
 	@Override
-	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
+	public boolean lineIntersects(Vector3fc ls, Vector3fc le, 
 			Vector3fc position, Orientation orientation, Vector3f res)
 	{		
+		Vector3f lineStart = new Vector3f(ls);
+		Vector3f lineEnd = new Vector3f(le);
+		
+		orientation.applyInverseRotation(lineStart, lineStart);
+		orientation.applyInverseRotation(lineEnd, lineEnd);
+		
 		Vector3f delta = lineEnd.sub(lineStart, new Vector3f());
 		
 		float totalDist = Maths.sqrt(delta.dot(delta));
