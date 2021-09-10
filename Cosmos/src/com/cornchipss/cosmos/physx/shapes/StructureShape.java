@@ -154,11 +154,14 @@ public class StructureShape implements PhysicsShape
 	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
 			Vector3fc position, Orientation orientation, Vector3f res)
 	{		
-		Vector3f lineStartMod = new Vector3f(lineStart);
-		Vector3f lineEndMod = new Vector3f(lineEnd);
+		Vector3f lineStartMod = new Vector3f(lineStart).sub(position);
+		Vector3f lineEndMod = new Vector3f(lineEnd).sub(position);
 		
 		orientation.applyInverseRotation(lineStartMod, lineStartMod);
 		orientation.applyInverseRotation(lineEndMod, lineEndMod);
+		
+		lineStartMod.add(position);
+		lineEndMod.add(position);
 		
 		Vector3f delta = lineEndMod.sub(lineStartMod, new Vector3f());
 		

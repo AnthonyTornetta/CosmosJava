@@ -60,6 +60,12 @@ class StructureShapeTest
 	}
 	
 	@Test
+	void testSmallLineAtHalf()
+	{
+		assertTrue(rs.lineIntersects(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.6f, 0.6f, 0.6f), new Vector3f(), new Orientation(), new Vector3f()));
+	}
+	
+	@Test
 	public void testPointAtOnEdge()
 	{
 		assertFalse(rs.pointIntersects(new Vector3f(0, 8, 0), new Vector3f(), new Orientation()));

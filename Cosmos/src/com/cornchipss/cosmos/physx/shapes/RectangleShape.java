@@ -95,6 +95,26 @@ public class RectangleShape implements PhysicsShape
 	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
 			Vector3fc position, Orientation orientation, Vector3f res)
 	{
+		Vector3f invS = new Vector3f(lineStart).sub(position), invE = new Vector3f(lineEnd).sub(position);
+		
+		orientation.applyInverseRotation(invS, invS);
+		orientation.applyInverseRotation(invE, invE);
+		
+		invS.add(position);
+		invE.add(position);
+		
+		if(pointIntersects(invS, position, new Orientation()))
+		{
+			res.set(lineStart);
+			return true;
+		}
+		
+		if(pointIntersects(invE, position, new Orientation()))
+		{
+			res.set(lineEnd);
+			return true;
+		}
+		
 		Vector3f delta = new Vector3f(w, h, l);
 		orientation.applyRotation(delta, delta);
 		
