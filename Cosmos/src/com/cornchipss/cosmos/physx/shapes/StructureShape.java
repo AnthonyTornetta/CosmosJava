@@ -7,6 +7,7 @@ import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
+import org.joml.Vector3ic;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
@@ -14,7 +15,6 @@ import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class StructureShape implements PhysicsShape
 {
@@ -120,67 +120,69 @@ public class StructureShape implements PhysicsShape
 		
 		Vector3i v = s.worldCoordsToStructureCoords(delta.x, delta.y, delta.z);
 		
-		Utils.println(v);
-		
 		if(s.hasBlock(v.x, v.y, v.z))
 		{
 			Block b = s.block(v.x, v.y, v.z);
-			Utils.println(b);
 			
-			Vector3f aaa = s.localCoordsToWorldCoords(v.x + 0.5f, v.y + 0.5f, v.z + 0.5f);
-			
-			Utils.println(aaa);
-			
-			Utils.println(delta);
+			Vector3f aaa = s.localCoordsToWorldCoords(v.x, v.y, v.z);
 			
 			return b.shape().pointIntersects(delta, 
-					aaa, orientation);
+					aaa, new Orientation());
 		}
 		
 		return false;
 	}
 
+	private boolean check(Vector3fc start, Vector3fc end, Vector3ic localCoords, Orientation or, Vector3f res)
+	{
+		
+		if(s.hasBlock(localCoords.x(), localCoords.y(), localCoords.z()))
+		{
+			Block b = s.block(localCoords.x(), localCoords.y(), localCoords.z());
+			if(b.shape().lineIntersects(start, end, 
+					s.localCoordsToWorldCoords(localCoords, new Vector3f()), or, 
+					res))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
 	@Override
 	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
 			Vector3fc position, Orientation orientation, Vector3f res)
-	{
+	{		
 		Vector3f delta = lineEnd.sub(lineStart, new Vector3f());
 		
-		float totalDist = lineEnd.distance(lineStart);
+		float totalDist = Maths.sqrt(delta.dot(delta));
 		
 		delta = Maths.safeNormalize(delta, 1);
 		
 		Vector3f pos = new Vector3f(lineStart);
+		
 		Vector3i localCoords = s.worldCoordsToStructureCoords(pos);
 		
-		float dist = 0;
+		if(check(pos, lineEnd, localCoords, orientation, res))
+			return true;
+		
+		float dist = 1;
 		
 		while(dist < totalDist)
 		{
-			if(s.hasBlock(localCoords.x, localCoords.y, localCoords.z))
-			{
-				Block b = s.block(localCoords.x, localCoords.y, localCoords.z);
-				b.shape().lineIntersects(lineStart, lineEnd, 
-						s.localCoordsToWorldCoords(localCoords, new Vector3f()), orientation, 
-						res);
-				
+			pos.add(delta);
+			
+			localCoords = s.worldCoordsToStructureCoords(pos);
+			if(check(pos, lineEnd, localCoords, orientation, res))
 				return true;
-			}
 			
 			dist++;
 		}
 		
 		localCoords = s.worldCoordsToStructureCoords(lineEnd);
-		
-		if(s.hasBlock(localCoords.x, localCoords.y, localCoords.z))
-		{
-			Block b = s.block(localCoords.x, localCoords.y, localCoords.z);
-			b.shape().lineIntersects(lineStart, lineEnd, 
-					s.localCoordsToWorldCoords(localCoords, new Vector3f()), orientation, 
-					res);
-			
+		if(check(pos, lineEnd, localCoords, orientation, res))
 			return true;
-		}
 		
 		return false;
 	}

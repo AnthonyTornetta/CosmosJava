@@ -1,9 +1,12 @@
 package tests.physx.shapes;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.cornchipss.cosmos.blocks.Blocks;
@@ -17,11 +20,11 @@ import com.cornchipss.cosmos.world.World;
 
 class StructureShapeTest
 {
-	@Test
-	void test()
+	private StructureShape rs;
+	
+	@BeforeEach
+	public void setup()
 	{
-		// pointIntersects
-		
 		World w = new World();
 		
 		Structure s = new Planet(w, 16, 16, 16, 0);
@@ -39,16 +42,66 @@ class StructureShapeTest
 		}
 		s.addToWorld(new Transform());
 		
-		StructureShape rs = new StructureShape(s);
-		
+		rs = new StructureShape(s);
+	}
+	
+	@AfterEach
+	public void tearDown()
+	{
+		rs = null;
+	}
+	
+	@Test
+	void testPointAtZero()
+	{
 		assertTrue(rs.pointIntersects(new Vector3f(), new Vector3f(), new Orientation()));
-		
+	}
+	
+	@Test
+	public void testPointAtOnEdge()
+	{
 		assertFalse(rs.pointIntersects(new Vector3f(0, 8, 0), new Vector3f(), new Orientation()));
+	}
+	
+	@Test
+	public void testPointInEdge()
+	{
 		assertTrue(rs.pointIntersects(new Vector3f(0, 7.9f, 0), new Vector3f(), new Orientation()));
-		
+	}
+	
+	@Test
+	public void testPointRotated()
+	{
 		Orientation o = new Orientation(Maths.quaternionFromRotation(0, Maths.PI / 4f, 0));
 		assertFalse(rs.pointIntersects(new Vector3f(0, 8, 0), new Vector3f(), o));
+	}
+	
+	@Test
+	public void testPointRotated2()
+	{
+		Orientation o = new Orientation(Maths.quaternionFromRotation(0, Maths.PI / 4f, 0));
 		assertTrue(rs.pointIntersects(new Vector3f(0, 7.9f, 0), new Vector3f(), o));
-		
+	}
+	
+	@Test
+	public void testLineInside()
+	{
+		assertTrue(rs.lineIntersects(new Vector3f(0, 0, 0), new Vector3f(1.0f, 0, 0), new Vector3f(), new Orientation(), new Vector3f()));
+	}
+	
+	@Test
+	public void testLineOutsideToEdge()
+	{
+		Vector3f out = new Vector3f();
+		assertTrue(rs.lineIntersects(new Vector3f(-9, 0, 0), new Vector3f(-8f, 0, 0), new Vector3f(), new Orientation(), out));
+		assertEquals(new Vector3f(-8, 0, 0), out);
+	}
+	
+	@Test
+	public void testLineInsideEdgeToOut()
+	{
+		Vector3f out = new Vector3f();
+		assertTrue(rs.lineIntersects(new Vector3f(-8, 0, 0), new Vector3f(-9f, 0, 0), new Vector3f(), new Orientation(), out));
+		assertEquals(new Vector3f(-8, 0, 0), out);
 	}
 }

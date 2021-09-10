@@ -574,7 +574,7 @@ public abstract class Structure extends PhysicalObject implements
 		
 		body().transform().matrix().transform(c);
 		
-		storage.set(c.x, c.y, c.z);
+		storage.set(c.x + 0.5f, c.y + 0.5f, c.z + 0.5f);
 		
 		return storage;
 	}
