@@ -24,6 +24,17 @@ public class LightSource
 		this.color = new Vector3f(r, g, b);
 	}
 	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof LightSource)
+		{
+			LightSource src = (LightSource)o;
+			return color.equals(src.color) && strength() == src.strength();
+		}
+		return false;
+	}
+	
 	public int strength() { return dist; }
 	
 	public Vector3fc color() { return color; }
