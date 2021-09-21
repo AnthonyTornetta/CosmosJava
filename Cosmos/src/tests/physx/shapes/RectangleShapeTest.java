@@ -36,14 +36,18 @@ class RectangleShapeTest
 		// lineIntersects
 		// There should be more tests
 		Vector3f res = new Vector3f();
+		Vector3f norm = new Vector3f();
 		
-		assertTrue(rs.lineIntersects(new Vector3f(-10, 0, 0), new Vector3f(10, 0, 0), new Vector3f(), new Orientation(), res));
+		assertTrue(rs.lineIntersects(new Vector3f(-10, 0, 0), new Vector3f(10, 0, 0), new Vector3f(), new Orientation(), res, norm));
 		assertEquals(res, new Vector3f(-0.25f, 0, 0));
+		assertEquals(norm, new Vector3f(-1, 0, 0));
 		
-		assertFalse(rs.lineIntersects(new Vector3f(-10, 10, 0), new Vector3f(10, 0, 0), new Vector3f(), new Orientation(), res));
+		assertFalse(rs.lineIntersects(new Vector3f(-10, 10, 0), new Vector3f(10, 0, 0), new Vector3f(), new Orientation(), res, norm));
 		assertEquals(res, new Vector3f(-0.25f, 0, 0));
+		assertEquals(norm, new Vector3f(-1, 0, 0));
 		
-		assertTrue(rs.lineIntersects(new Vector3f(0, -10, 0), new Vector3f(0, 10, 0), new Vector3f(), new Orientation(), res));
+		assertTrue(rs.lineIntersects(new Vector3f(0, -10, 0), new Vector3f(0, 10, 0), new Vector3f(), new Orientation(), res, norm));
 		assertEquals(res, new Vector3f(0, -0.5f, 0));
+		assertEquals(norm, new Vector3f(0, -1, 0));
 	}
 }

@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.physx.shapes;
 
+import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -12,6 +13,27 @@ public class RectangleShape implements PhysicsShape
 	private final float w, h, l;
 	
 	public static final float EPSILON = 1E-7f;
+	
+	private static final Vector3fc[] normals = new Vector3fc[]
+			{
+					// Back
+					new Vector3f(0, 0, -1),
+					
+					// Front
+					new Vector3f(0, 0, 1),
+					
+					// Left
+					new Vector3f(-1, 0, 0),
+					
+					// Right
+					new Vector3f(1, 0, 0),
+					
+					// Bottom
+					new Vector3f(0, -1, 0),
+					
+					// Top
+					new Vector3f(0, 1, 0)
+			};
 	
 	private static final Vector3fc[] sides = new Vector3fc[]
 			{
@@ -93,7 +115,7 @@ public class RectangleShape implements PhysicsShape
 	
 	@Override
 	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
-			Vector3fc position, Orientation orientation, Vector3f res)
+			Vector3fc position, Orientation orientation, Vector3f res, Vector3f normal)
 	{
 		Vector3f invS = new Vector3f(lineStart).sub(position), invE = new Vector3f(lineEnd).sub(position);
 		
@@ -103,15 +125,16 @@ public class RectangleShape implements PhysicsShape
 		invS.add(position);
 		invE.add(position);
 		
-		if(pointIntersects(invS, position, new Orientation()))
+		if(pointIntersects(invS, position, new Orientation())
+				&& pointIntersects(invE, position, new Orientation()))
 		{
 			res.set(lineStart);
-			return true;
-		}
-		
-		if(pointIntersects(invE, position, new Orientation()))
-		{
-			res.set(lineEnd);
+			lineStart.sub(position, normal);
+			if(normal.x == 0 && normal.y == 0 && normal.z == 0)
+				normal.set(1, 0, 0);
+			else
+				normal.normalize();
+			
 			return true;
 		}
 		
@@ -136,10 +159,17 @@ public class RectangleShape implements PhysicsShape
 				{
 					bestDist = dist;
 					res.set(temp);
+					normal.set(normals[i / 6]);
 				}
 			}
 		}
 		
 		return bestDist != -1;
+	}
+	
+	@Override
+	public Vector3fc[] verticesWithin(AABBf aaBBa)
+	{
+		return sides;
 	}
 }

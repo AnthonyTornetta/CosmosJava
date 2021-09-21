@@ -1,8 +1,10 @@
 package com.cornchipss.cosmos.physx.shapes;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -133,16 +135,17 @@ public class StructureShape implements PhysicsShape
 		return false;
 	}
 
-	private boolean check(Vector3fc start, Vector3fc end, Vector3ic localCoords, Orientation or, Vector3f res)
+	private boolean check(Vector3fc start, Vector3fc end, Vector3ic localCoords, Orientation or, Vector3f res, Vector3f normal)
 	{
 		if(s.hasBlock(localCoords.x(), localCoords.y(), localCoords.z()))
 		{
 			Block b = s.block(localCoords.x(), localCoords.y(), localCoords.z());
 			if(b.shape().lineIntersects(start, end, 
 					s.localCoordsToWorldCoords(localCoords, new Vector3f()), new Orientation(), 
-					res))
+					res, normal))
 			{
 				or.applyRotation(res, res);
+				or.applyRotation(normal, normal);
 				return true;
 			}
 		}
@@ -152,8 +155,8 @@ public class StructureShape implements PhysicsShape
 	
 	@Override
 	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, 
-			Vector3fc position, Orientation orientation, Vector3f res)
-	{		
+			Vector3fc position, Orientation orientation, Vector3f res, Vector3f normal)
+	{	
 		Vector3f lineStartMod = new Vector3f(lineStart).sub(position);
 		Vector3f lineEndMod = new Vector3f(lineEnd).sub(position);
 		
@@ -171,28 +174,47 @@ public class StructureShape implements PhysicsShape
 		
 		Vector3f pos = new Vector3f(lineStartMod);
 		
-		Vector3i localCoords = s.worldCoordsToStructureCoords(pos);
-		
-		if(check(pos, lineEndMod, localCoords, orientation, res))
-			return true;
-		
-		float dist = 1;
+		Vector3i localCoords;
+		float dist = 0;
 		
 		while(dist < totalDist)
 		{
-			pos.add(delta);
-			
 			localCoords = s.worldCoordsToStructureCoords(pos);
-			if(check(pos, lineEndMod, localCoords, orientation, res))
+			if(check(pos, lineEndMod, localCoords, orientation, res, normal))
 				return true;
 			
+			pos.add(delta);
+
 			dist++;
 		}
 		
 		localCoords = s.worldCoordsToStructureCoords(lineEndMod);
-		if(check(lineStartMod, lineEndMod, localCoords, orientation, res))
+		if(check(lineStartMod, lineEndMod, localCoords, orientation, res, normal))
 			return true;
 		
 		return false;
+	}
+
+	@Override
+	public Vector3fc[] verticesWithin(AABBf aaBB)
+	{
+		List<Vector3f> generated = new ArrayList<>();
+		
+		for(float z = aaBB.minZ; z <= aaBB.maxZ; z++)
+		{
+			for(float y = aaBB.minY; y <= aaBB.maxY; y++)
+			{
+				for(float x = aaBB.minX; x <= aaBB.maxX; x++)
+				{
+					Vector3ic local = s.worldCoordsToStructureCoords(x, y, z);
+					
+					if(s.withinBlocks(local.x(), local.y(), local.z()))
+					{
+						
+					}
+				}
+			}
+		}
+		return null;
 	}
 }

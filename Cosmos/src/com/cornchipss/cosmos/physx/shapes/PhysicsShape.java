@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.physx.shapes;
 
+import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -16,5 +17,7 @@ public interface PhysicsShape
 	 */
 	public boolean pointIntersects(Vector3fc point, Vector3fc position, Orientation orientation);
 	
-	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, Vector3fc position, Orientation orientation, Vector3f res);
+	public boolean lineIntersects(Vector3fc lineStart, Vector3fc lineEnd, Vector3fc position, Orientation orientation, Vector3f res, Vector3f normal);
+
+	public Vector3fc[] verticesWithin(AABBf aaBBa);
 }

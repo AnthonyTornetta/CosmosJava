@@ -4,6 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 import org.joml.Vector3f;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,11 +15,13 @@ import org.junit.jupiter.api.Test;
 
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.physx.Orientation;
+import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class StructureShapeTest
@@ -54,6 +60,14 @@ class StructureShapeTest
 	}
 	
 	@Test
+	void raycastTest()
+	{
+		RayResult rr = s.shape().raycast(new Vector3f(-20, 0, 0), new Vector3f(100, 0, 0));
+		
+		Utils.println(rr.positionsHit().size());
+	}
+	
+	@Test
 	void testPointAtZero()
 	{
 		assertTrue(rs.pointIntersects(new Vector3f(), new Vector3f(), new Orientation()));
@@ -62,7 +76,7 @@ class StructureShapeTest
 	@Test
 	void testSmallLineAtHalf()
 	{
-		assertTrue(rs.lineIntersects(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.6f, 0.6f, 0.6f), new Vector3f(), new Orientation(), new Vector3f()));
+		assertTrue(rs.lineIntersects(new Vector3f(0.5f, 0.5f, 0.5f), new Vector3f(0.6f, 0.6f, 0.6f), new Vector3f(), new Orientation(), new Vector3f(), new Vector3f()));
 	}
 	
 	@Test
@@ -94,23 +108,29 @@ class StructureShapeTest
 	@Test
 	public void testLineInside()
 	{
-		assertTrue(rs.lineIntersects(new Vector3f(0, 0, 0), new Vector3f(1.0f, 0, 0), new Vector3f(), new Orientation(), new Vector3f()));
+		assertTrue(rs.lineIntersects(new Vector3f(0, 0, 0), new Vector3f(1.0f, 0, 0), new Vector3f(), new Orientation(), new Vector3f(), new Vector3f()));
 	}
 	
 	@Test
 	public void testLineOutsideToEdge()
 	{
 		Vector3f out = new Vector3f();
-		assertTrue(rs.lineIntersects(new Vector3f(-9, 0, 0), new Vector3f(-8f, 0, 0), new Vector3f(), new Orientation(), out));
+		Vector3f norm = new Vector3f();
+		
+		assertTrue(rs.lineIntersects(new Vector3f(-9, 0, 0), new Vector3f(-8f, 0, 0), new Vector3f(), new Orientation(), out, norm));
 		assertEquals(new Vector3f(-8, 0, 0), out);
+		assertEquals(new Vector3f(-1, 0, 0), norm);
 	}
 	
 	@Test
 	public void testLineInsideEdgeToOut()
 	{
 		Vector3f out = new Vector3f();
-		assertTrue(rs.lineIntersects(new Vector3f(-8, 0, 0), new Vector3f(-9f, 0, 0), new Vector3f(), new Orientation(), out));
+		Vector3f norm = new Vector3f();
+		
+		assertTrue(rs.lineIntersects(new Vector3f(-8, 0, 0), new Vector3f(-9f, 0, 0), new Vector3f(), new Orientation(), out, norm));
 		assertEquals(new Vector3f(-8, 0, 0), out);
+		assertEquals(new Vector3f(-1, 0, 0), norm);
 	}
 	
 	@Test
@@ -125,7 +145,9 @@ class StructureShapeTest
 		assertTrue(rs.pointIntersects(new Vector3f(0, 27.9f, 0), s.position(), s.body().transform().orientation()));
 		
 		Vector3f out = new Vector3f();
+		Vector3f norm = new Vector3f();
 		
-		assertTrue(rs.lineIntersects(new Vector3f(-20, 17, 0), new Vector3f(20, 23, 0), s.position(), s.body().transform().orientation(), out));
+		assertTrue(rs.lineIntersects(new Vector3f(-20, 17, 0), new Vector3f(20, 23, 0), s.position(), s.body().transform().orientation(), out, norm));
+		assertEquals(new Vector3f(0, -1, 0), norm);
 	}
 }

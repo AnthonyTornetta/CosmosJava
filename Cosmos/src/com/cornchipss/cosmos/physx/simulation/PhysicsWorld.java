@@ -56,7 +56,7 @@ public class PhysicsWorld
 							||
 							a.aabb(pos, aA).testAABB(aB))
 					{
-						handlePotentialCollision(a, b, vel, pos, delta);
+						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
 					}
 				}
 			}
@@ -65,9 +65,9 @@ public class PhysicsWorld
 		}
 	}
 	
-	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3f vel, Vector3f pos, float delta)
+	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3f vel, Vector3f pos, float delta, AABBf aaBBa, AABBf aaBBb)
 	{
-		
+		a.shape().verticesWithin(aaBBa);
 		
 		a.body().velocity(a.body().velocity().negate(vel)); // any vector could replace vel here, but it's being re-assigned down below so it doesn't matter
 		
