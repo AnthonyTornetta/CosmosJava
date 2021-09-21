@@ -220,7 +220,7 @@ public class Chunk implements IWritable
 			blocks[z][y][x] = block;
 			
 			if(block != null)
-				structure.lightMap().addBlocking(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().setBlocking(x + offset.x(), y + offset.y(), z + offset.z());
 			else
 				structure.lightMap().removeBlocking(x + offset.x(), y + offset.y(), z + offset.z());
 			

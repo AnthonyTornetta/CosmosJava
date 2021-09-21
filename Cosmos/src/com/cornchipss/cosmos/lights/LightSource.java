@@ -17,11 +17,22 @@ public class LightSource
 		this(dist, 1, 1, 1);
 	}
 	
-	protected LightSource(int dist, float r, float g, float b)
+	public LightSource(int dist, float r, float g, float b)
 	{
 		this.dist = dist;
 		
 		this.color = new Vector3f(r, g, b);
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof LightSource)
+		{
+			LightSource src = (LightSource)o;
+			return color.equals(src.color) && strength() == src.strength();
+		}
+		return false;
 	}
 	
 	public int strength() { return dist; }

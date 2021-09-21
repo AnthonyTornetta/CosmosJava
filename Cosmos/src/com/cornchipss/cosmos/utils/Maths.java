@@ -552,6 +552,14 @@ public class Maths
 		return safeNormalize(vec.x(), vec.y(), vec.z(), max);
 	}
 	
+	public static void normalizeIfNotZero(Vector3f in, int mag, Vector3f out)
+	{
+		if(in.x == 0 && in.y == 0 && in.z == 0)
+			return;
+		
+		in.normalize(mag);
+	}
+	
 	public static Vector3f safeNormalize(float x, float y, float z, float max)
 	{
 		if(x * x + y * y + z * z <= max * max)
