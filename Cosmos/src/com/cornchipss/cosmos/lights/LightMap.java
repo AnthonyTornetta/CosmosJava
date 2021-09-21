@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
-import com.cornchipss.cosmos.utils.Maths;
-
 public class LightMap
 {
+	private Map<Vector3ic, Integer> changes = new HashMap<>();
+	
 	private static class LightResult
 	{
 		LightSource src;
@@ -48,7 +49,8 @@ public class LightMap
 				totalLight.add(rs.src.r() * ratio, rs.src.g() * ratio, rs.src.b() * ratio);
 			}
 			
-			Maths.normalizeIfNotZero(totalLight, 1, totalLight);
+			if(totalLight.lengthSquared() > 1)
+				totalLight.normalize();
 		}
 		
 		void addLightResult(LightResult r)
@@ -71,7 +73,7 @@ public class LightMap
 			{
 				if(lr.src.equals(res.src))
 				{
-					return lr.strength > res.strength;
+					return lr.strength >= res.strength;
 				}
 			}
 			return false;
@@ -83,8 +85,6 @@ public class LightMap
 	private LitBlock[][][] lightMap;
 	private Vector3f[][][] calculatedMap;
 	private boolean[][][]  blocked;
-	
-	List<Vector3ic> recalcLights = new LinkedList<>();
 	
 	public LightMap(int w, int h, int l)
 	{
@@ -115,6 +115,11 @@ public class LightMap
 		return lightMap[z][y][x].lightResults.size() != 0;
 	}
 	
+	public Vector3fc lightAt(int x, int y, int z)
+	{
+		return calculatedMap[z][y][x];
+	}
+	
 	private boolean isBlocked(int x, int y, int z)
 	{
 		return blocked[z][y][x];
@@ -137,11 +142,15 @@ public class LightMap
 	 * @param src The light source to spread
 	 */
 	private void propagateAt(int x, int y, int z, int strength, LightSource src)
-	{
+	{		
 		List<Vector3ic> pts = new LinkedList<>();
 		List<Vector3ic> nextPts = new LinkedList<>();
 		
-		pts.add(new Vector3i(x, y, z));
+		Vector3i here = new Vector3i(x, y, z);
+		
+		changes.put(here, Math.max(Math.abs(strength), changes.getOrDefault(here, 0)));
+		
+		pts.add(here);
 		
 		while(pts.size() != 0) // strength is checked when adding points
 		{
@@ -162,19 +171,38 @@ public class LightMap
 					
 					if(strength > 1 || strength < -1)
 					{
-						if(within(x + 1, y, z) && !isBlocked(x + 1, y, z))
-							nextPts.add(new Vector3i(x + 1, y, z));
-						if(within(x - 1, y, z) && !isBlocked(x - 1, y, z))
-							nextPts.add(new Vector3i(x - 1, y, z));
-						if(within(x, y + 1, z) && !isBlocked(x, y + 1, z))
-							nextPts.add(new Vector3i(x, y + 1, z));
-						if(within(x, y - 1, z) && !isBlocked(x, y - 1, z))
-							nextPts.add(new Vector3i(x, y - 1, z));
-						if(within(x, y, z + 1) && !isBlocked(x, y, z + 1))
-							nextPts.add(new Vector3i(x, y, z + 1));
-						if(within(x, y, z - 1) && !isBlocked(x, y, z - 1))
-							nextPts.add(new Vector3i(x, y, z - 1));
+						if(within(pt.x() + 1, pt.y(), pt.z()) && !isBlocked(pt.x() + 1, pt.y(), pt.z()))
+							nextPts.add(new Vector3i(pt.x() + 1, pt.y(), pt.z()));
+						if(within(pt.x() - 1, pt.y(), pt.z()) && !isBlocked(pt.x() - 1, pt.y(), pt.z()))
+							nextPts.add(new Vector3i(pt.x() - 1, pt.y(), pt.z()));
+						if(within(pt.x(), pt.y() + 1, pt.z()) && !isBlocked(pt.x(), pt.y() + 1, pt.z()))
+							nextPts.add(new Vector3i(pt.x(), pt.y() + 1, pt.z()));
+						if(within(pt.x(), pt.y() - 1, pt.z()) && !isBlocked(pt.x(), pt.y() - 1, pt.z()))
+							nextPts.add(new Vector3i(pt.x(), pt.y() - 1, pt.z()));
+						if(within(pt.x(), pt.y(), pt.z() + 1) && !isBlocked(pt.x(), pt.y(), pt.z() + 1))
+							nextPts.add(new Vector3i(pt.x(), pt.y(), pt.z() + 1));
+						if(within(pt.x(), pt.y(), pt.z() - 1) && !isBlocked(pt.x(), pt.y(), pt.z() - 1))
+							nextPts.add(new Vector3i(pt.x(), pt.y(), pt.z() - 1));
 					}
+				}
+			}
+			
+			if(strength < 0 && nextPts.size() == 0)
+			{
+				for(Vector3ic pt : pts)
+				{
+					if(within(pt.x() - 1, pt.y(), pt.z()))
+						propagateAll(pt.x() - 1, pt.y(), pt.z());
+					if(within(pt.x() + 1, pt.y(), pt.z()))
+						propagateAll(pt.x() + 1, pt.y(), pt.z());
+					if(within(pt.x(), pt.y() - 1, pt.z()))
+						propagateAll(pt.x(), pt.y() - 1, pt.z());
+					if(within(pt.x(), pt.y() + 1, pt.z()))
+						propagateAll(pt.x(), pt.y() + 1, pt.z());
+					if(within(pt.x(), pt.y(), pt.z() - 1))
+						propagateAll(pt.x(), pt.y(), pt.z() - 1);
+					if(within(pt.x(), pt.y(), pt.z() + 1))
+						propagateAll(pt.x(), pt.y(), pt.z() + 1);
 				}
 			}
 			
@@ -184,7 +212,7 @@ public class LightMap
 		}
 	}
 	
-	public void removeLights(int x, int y, int z)
+	private void removeAllLightsAt(int x, int y, int z)
 	{
 		if(hasLightSource(x, y, z))
 		{
@@ -193,7 +221,7 @@ public class LightMap
 				
 		for(LightResult lr : lightMap[z][y][x].lightResults)
 		{
-			propagateAt(x, y, z, lr.strength, lr.src);
+			propagateAt(x, y, z, -lr.strength, lr.src);
 		}
 		
 		lightMap[z][y][x].lightResults.clear();
@@ -206,7 +234,7 @@ public class LightMap
 		
 		if(hasLight(x, y, z))
 		{
-			removeLights(x, y, z);
+			removeAllLightsAt(x, y, z);
 		}
 	}
 	
@@ -220,14 +248,36 @@ public class LightMap
 			
 			if(within(x - 1, y, z))
 				propagateAll(x - 1, y, z);
+			if(within(x + 1, y, z))
+				propagateAll(x + 1, y, z);
+			if(within(x, y - 1, z))
+				propagateAll(x, y - 1, z);
+			if(within(x, y + 1, z))
+				propagateAll(x, y + 1, z);
+			if(within(x, y, z - 1))
+				propagateAll(x, y, z - 1);
+			if(within(x, y, z + 1))
+				propagateAll(x, y, z + 1);
 		}
 		
 		return b;
 	}
 	
-	public void updateLightmap()
+	public void addLight(LightSource l, int x, int y, int z)
 	{
-		
+		lights.put(new Vector3i(x, y, z), l);
+		propagateAt(x, y, z, l.strength(), l);
+	}
+	
+	public void removeLight(int x, int y, int z)
+	{
+		lights.remove(new Vector3i(x, y, z));
+		removeAllLightsAt(x, y, z);
+	}
+	
+	public boolean hasChanges()
+	{
+		return changes.size() != 0;
 	}
 	
 //	/**

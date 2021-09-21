@@ -17,7 +17,7 @@ public class LightSource
 		this(dist, 1, 1, 1);
 	}
 	
-	protected LightSource(int dist, float r, float g, float b)
+	public LightSource(int dist, float r, float g, float b)
 	{
 		this.dist = dist;
 		
