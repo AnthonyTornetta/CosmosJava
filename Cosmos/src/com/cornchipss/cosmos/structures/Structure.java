@@ -310,47 +310,29 @@ public abstract class Structure extends PhysicalObject implements
 	
 	public void calculateLights()
 	{
-		long start = System.currentTimeMillis();
-		
-		Vector3i[] changedArea = lightMap.calculateLightMap();
-		
-		long end = System.currentTimeMillis();
-		
-		Logger.LOGGER.debug(end - start + "ms to calculate light map");
-		
-		Vector3i extremeNeg = changedArea[0];
-		Vector3i extremePos = changedArea[1];
-		
-		if(extremeNeg.x() != -1) // if it isn't -1, then none of them are negative 1
+		if(lightMap.hasChanges())
 		{
-			// TODO: fix this, for some reason the extremeNeg + Pos calcs don't work. Idk why
-			extremeNeg.x = Maths.min(extremeNeg.x - Chunk.WIDTH, 0);
-			extremeNeg.y = Maths.min(extremeNeg.y - Chunk.HEIGHT, 0);
-			extremeNeg.z = Maths.min(extremeNeg.z - Chunk.LENGTH, 0);
+			Map<Vector3ic, Integer> changedAreas = lightMap.changes();
 			
-			extremePos.x = Maths.min(extremePos.x + Chunk.WIDTH, width());
-			extremePos.y = Maths.min(extremePos.y + Chunk.HEIGHT, height());
-			extremePos.z = Maths.min(extremePos.z + Chunk.LENGTH, length());
-			
-			// Account for the +2 size of the light map
-			extremeNeg.x += 1;
-			extremeNeg.y += 1;
-			extremeNeg.z += 1;
-			
-			extremePos.x -= 1;
-			extremePos.y -= 1;
-			extremePos.z -= 1;
-			
-			for(int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
+			for(Vector3ic point : changedAreas.keySet())
 			{
-				for(int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
+				int radius = changedAreas.get(point);
+				Vector3i extremeNeg = new Vector3i(point.x() - radius, point.y() - radius, point.z() - radius);
+				Vector3i extremePos = new Vector3i(point.x() + radius, point.y() + radius, point.z() + radius);
+				
+				for(int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
 				{
-					for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
+					for(int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
 					{
-						chunks[flatten(cx, cy, cz)].needsRendered(true);
+						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
+						{
+							chunks[flatten(cx, cy, cz)].needsRendered(true);
+						}
 					}
 				}
 			}
+			
+			lightMap.clearChanges();
 		}
 	}
 	
@@ -659,41 +641,7 @@ public abstract class Structure extends PhysicalObject implements
 		}
 		return false;
 	}
-
-	public void calculateLightsAndApply()
-	{
-		Vector3i[] range = lightMap().calculateLightMap();
-		
-		for(int z = range[0].z - Chunk.LENGTH; z <= range[1].z + Chunk.LENGTH; z++)
-		{
-			z = Math.max(0, z);
-			int zz = z / Chunk.LENGTH;
-			
-			if(zz == chunksLength())
-				break;
-			
-			for(int y = range[0].y - Chunk.HEIGHT; y <= range[1].y + Chunk.HEIGHT; y++)
-			{
-				y = Math.max(0, y);
-				int yy = y / Chunk.HEIGHT;
-				
-				if(yy == chunksHeight())
-					break;
-				
-				for(int x = range[0].x - Chunk.WIDTH; x <= range[1].x + Chunk.WIDTH; x++)
-				{					
-					x = Math.max(0, x);
-					int xx = x / Chunk.WIDTH;
-					
-					if(xx == chunksWidth())
-						break;
-					
-					chunks[flatten(xx, yy, zz)].needsRendered(true);
-				}
-			}
-		}
-	}
-
+	
 	public void increasePowerCapacity(float delta)
 	{
 		maxEnergy += delta;

@@ -248,7 +248,7 @@ public class ClientGame extends Game
 	private static void updateStructureGraphics(Structure s)
 	{
 		if(s.lightMap().hasChanges())
-			s.calculateLightsAndApply();
+			s.calculateLights();
 		
 		for(Chunk c : s.chunks())
 			if(c.needsRendered())

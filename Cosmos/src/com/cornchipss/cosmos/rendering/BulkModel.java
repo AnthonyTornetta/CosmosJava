@@ -164,7 +164,7 @@ public class BulkModel
 	{
 		float col = 0;
 		if(lightMap.within(offX + x, offY + y, offZ + z))
-			col = lightMap.at(x, y, z, offX, offY, offZ);
+			col = lightMap.lightAt(x + offX, y + offY, z + offZ).x();
 		
 		matMesh.lights.add(col);
 		matMesh.lights.add(col);

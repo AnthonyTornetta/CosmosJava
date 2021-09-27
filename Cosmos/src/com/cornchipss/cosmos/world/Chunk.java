@@ -201,7 +201,7 @@ public class Chunk implements IWritable
 	
 	/**
 	 * <p>Sets the block at the given coordinates relative to this chunk.</p>
-	 * <p>If {@link Chunk#render()} has been called previously, this will also call it.</p>
+	 * <p>Sets the needs rendered flag to true</p>
 	 * @param x The X coordinate relative to this chunk
 	 * @param y The Y coordinate relative to this chunk
 	 * @param z The Z coordinate relative to this chunk
@@ -227,14 +227,14 @@ public class Chunk implements IWritable
 			if(block instanceof LitBlock)
 			{
 				// remove it if there is already one
-				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().removeLight(x + offset.x(), y + offset.y(), z + offset.z());
 				
-				structure.lightMap().lightSource(x + offset.x(), y + offset.y(), z + offset.z(), 
-							((LitBlock) block).lightSource());
+				structure.lightMap().addLight(((LitBlock) block).lightSource(),
+						x + offset.x(), y + offset.y(), z + offset.z());
 			}
 			else if(structure.lightMap().hasLightSource(x + offset.x(), y + offset.y(), z + offset.z()))
 			{
-				structure.lightMap().removeLightSource(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().removeLight(x + offset.x(), y + offset.y(), z + offset.z());
 			}
 			
 			needsRendered(true);

@@ -49,10 +49,32 @@ class LightmapTest
 			}
 		}
 		
+		map.printMap();
+		
 		for(int y = 0; y < H; y++)
 			assertArrayEquals(actualMap[y], generated[y]);
 		
 		
-//		fail("Not yet implemented");
+		map.removeLight(0, 0, 0);
+		
+		for(int z = 0; z < 1; z++)
+			for(int y = 0; y < H; y++)
+				for(int x = 0; x < W; x++)
+					assertEquals(new Vector3f(0, 0, 0), map.lightAt(x, y, z));
+		
+		map.addLight(src, W / 2, H / 2, 0);
+		map.addLight(src, 0, H / 2, 0);
+		
+		map.printMap();
+		
+		map.removeLight(W / 2, H / 2, 0);
+		
+		map.printMap();
+		
+		map.setBlocking(1, H/2, 0);
+		map.printMap();
+		
+		map.removeBlocking(1, H / 2, 0);
+		map.printMap();
 	}
 }
