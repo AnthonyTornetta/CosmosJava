@@ -115,6 +115,6 @@ class LightmapTest
 		map.setBlocking(W / 2 + 1, H / 2, 0);
 		map.updateMap();
 		
-		map.printDBG();
+		map.printDBGCombo();
 	}
 }

@@ -213,7 +213,7 @@ public class LightMap
 	}
 	
 	private void calculateNextPoints(int x, int y, int z, int strength, 
-			Vector3ic origin, Set<Vector3i> nextPoints)
+			Vector3ic origin, Set<Vector3i> nextPoints, Set<Vector3i> onReserve)
 	{		
 		if(within(x, y, z))
 		{
@@ -231,6 +231,10 @@ public class LightMap
 					if(strength <= -lr.strength)
 					{
 						nextPoints.add(new Vector3i(x, y, z));
+					}
+					else
+					{
+						onReserve.add(new Vector3i(x, y, z));
 					}
 				}
 			}
@@ -251,6 +255,7 @@ public class LightMap
 	{
 		Set<Vector3i> points = new HashSet<>();
 		Set<Vector3i> nextPoints = new HashSet<>();
+		Set<Vector3i> onReserve = new HashSet<>();
 		
 		points.add(new Vector3i(x, y, z));
 		
@@ -273,12 +278,12 @@ public class LightMap
 						
 						if(strength - 1 != 0)
 						{
-							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints);
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints, onReserve);
 						}
 					}
 				}
@@ -297,12 +302,12 @@ public class LightMap
 
 						if(strength + 1 != 0)
 						{
-							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints);
-							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints);
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints, onReserve);
 						}
 						else
 						{
@@ -312,6 +317,13 @@ public class LightMap
 							propagateSourceAt(pt.x, pt.y + 1, pt.z, src, origin);
 							propagateSourceAt(pt.x, pt.y, pt.z - 1, src, origin);
 							propagateSourceAt(pt.x, pt.y, pt.z + 1, src, origin);
+							
+							for(Vector3i nextPt : onReserve)
+							{
+								propagateSourceAt(nextPt.x, nextPt.y, nextPt.z, src, origin);
+							}
+							
+							onReserve.clear();
 						}
 					}
 				}
@@ -351,9 +363,9 @@ public class LightMap
 	}
 	
 	private void setBlockingFin(int x, int y, int z)
-	{
+	{		
 		blocked[z][y][x] = true;
-		
+
 		if(hasLight(x, y, z))
 		{
 			removeAllLightsAt(x, y, z);
@@ -575,6 +587,13 @@ public class LightMap
 		
 		System.out.println("COMBO");
 		
+		printDBGCombo();
+	}
+	
+	public void printDBGCombo()
+	{
+		DecimalFormat df = new DecimalFormat("00");
+
 		for(int z = 0; z < length(); z++)
 		{
 			for(int y = 0; y < height(); y++)
