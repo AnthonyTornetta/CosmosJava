@@ -184,7 +184,7 @@ public class StructureShape implements PhysicsShape
 				return true;
 			
 			pos.add(delta);
-
+			
 			dist++;
 		}
 		

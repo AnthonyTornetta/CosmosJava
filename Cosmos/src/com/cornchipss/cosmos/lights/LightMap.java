@@ -73,12 +73,35 @@ public class LightMap
 			totalLight.y = Maths.sqrt(totalLight.y);
 			totalLight.z = Maths.sqrt(totalLight.z);
 			
-			if(totalLight.x > 1)
+			if(totalLight.x >= 1 && totalLight.x >= totalLight.y && totalLight.x >= totalLight.z)
+			{
+				float ratioY = totalLight.y / totalLight.x;
+				float ratioZ = totalLight.z / totalLight.x;
+				
 				totalLight.x = 1;
-			if(totalLight.y > 1)
+				totalLight.y = ratioY;
+				totalLight.z = ratioZ;
+			}
+			
+			if(totalLight.y >= 1 && totalLight.y >= totalLight.x && totalLight.y >= totalLight.z)
+			{
+				float ratioX = totalLight.x / totalLight.y;
+				float ratioZ = totalLight.z / totalLight.y;
+				
+				totalLight.x = ratioX;
 				totalLight.y = 1;
-			if(totalLight.z > 1)
+				totalLight.z = ratioZ;
+			}
+			
+			if(totalLight.z >= 1 && totalLight.z >= totalLight.x && totalLight.z >= totalLight.y)
+			{
+				float ratioX = totalLight.x / totalLight.z;
+				float ratioY = totalLight.y / totalLight.z;
+				
+				totalLight.x = ratioX;
+				totalLight.y = ratioY;
 				totalLight.z = 1;
+			}
 		}
 		
 		void addLightResult(LightResult r)

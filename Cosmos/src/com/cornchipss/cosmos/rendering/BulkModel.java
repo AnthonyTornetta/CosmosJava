@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.material.Material;
@@ -162,25 +164,25 @@ public class BulkModel
 	
 	private void lighting(int offX, int offY, int offZ, int x, int y, int z, LightMap lightMap, MaterialMeshGenerator matMesh)
 	{
-		float col = 0;
+		Vector3f col = new Vector3f();
 		if(lightMap.within(offX + x, offY + y, offZ + z))
-			col = lightMap.lightAt(x + offX, y + offY, z + offZ).x();
+			col.set(lightMap.lightAt(x + offX, y + offY, z + offZ));
 		
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
+		matMesh.lights.add(col.x);
+		matMesh.lights.add(col.y);
+		matMesh.lights.add(col.z);
 		
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
+		matMesh.lights.add(col.x);
+		matMesh.lights.add(col.y);
+		matMesh.lights.add(col.z);
 		
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
+		matMesh.lights.add(col.x);
+		matMesh.lights.add(col.y);
+		matMesh.lights.add(col.z);
 		
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
-		matMesh.lights.add(col);
+		matMesh.lights.add(col.x);
+		matMesh.lights.add(col.y);
+		matMesh.lights.add(col.z);
 	}
 	
 	private int indiciesAndUvs(BlockFace side, CubeModel model, MaterialMeshGenerator matMesh)
