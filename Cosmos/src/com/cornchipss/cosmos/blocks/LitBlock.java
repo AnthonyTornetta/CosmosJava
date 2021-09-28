@@ -26,6 +26,6 @@ public class LitBlock extends Block
 	
 	public LightSource lightSource()
 	{
-		return new LightSource(16, 0.5f, 0.5f, 1.0f);
+		return source;
 	}
 }
