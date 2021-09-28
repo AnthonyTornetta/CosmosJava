@@ -45,21 +45,21 @@ public class PhysicsWorld
 			vel.set(a.body().velocity()).mul(delta);
 			vel.add(a.body().transform().position(), pos);
 			
-			for(PhysicalObject b : bodies)
-			{
-				if(!b.equals(a))
-				{
-					AABBf aA = new AABBf();
-					AABBf aB = new AABBf();
-					
-					if(a.aabb(a.position(), aA).testAABB(b.aabb(b.position(), aB))
-							||
-							a.aabb(pos, aA).testAABB(aB))
-					{
-						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
-					}
-				}
-			}
+//			for(PhysicalObject b : bodies)
+//			{
+//				if(!b.equals(a))
+//				{
+//					AABBf aA = new AABBf();
+//					AABBf aB = new AABBf();
+//					
+//					if(a.aabb(a.position(), aA).testAABB(b.aabb(b.position(), aB))
+//							||
+//							a.aabb(pos, aA).testAABB(aB))
+//					{
+//						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
+//					}
+//				}
+//			}
 			
 			a.body().transform().position(pos);
 		}

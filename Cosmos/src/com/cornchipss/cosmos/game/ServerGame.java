@@ -5,11 +5,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.netty.packets.ShipMovementPacket;
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.server.Server;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
@@ -26,10 +24,19 @@ public class ServerGame extends Game
 	{
 		instance = this;
 		
-		mainPlanet = new Planet(world(), 16*10, 16*6, 16*10, 1);
+		mainPlanet = new Planet(world(), 16, 16, 16, 1);
 		mainPlanet.init();
-		Biosphere def = Biospheres.newInstance("cosmos:grass");
-		def.generatePlanet(mainPlanet);
+		
+		for(int i = 0; i < mainPlanet.width(); i++)
+		{
+			for(int z = 0; z < mainPlanet.length(); z++)
+			{
+				mainPlanet.block(i, 0, z, Blocks.GRASS);
+			}
+		}
+		
+//		Biosphere def = Biospheres.newInstance("cosmos:grass");
+//		def.generatePlanet(mainPlanet);
 		
 		ship = new Ship(world(), 2);
 		ship.init();

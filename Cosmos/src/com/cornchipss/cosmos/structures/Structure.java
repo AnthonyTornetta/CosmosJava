@@ -310,13 +310,14 @@ public abstract class Structure extends PhysicalObject implements
 	
 	public void calculateLights()
 	{
-		if(lightMap.hasChanges())
+		if(lightMap.needsUpdating())
 		{
-			Map<Vector3ic, Integer> changedAreas = lightMap.changes();
+			Map<Vector3ic, Integer> changedAreas = lightMap.updateMap();
 			
 			for(Vector3ic point : changedAreas.keySet())
 			{
 				int radius = changedAreas.get(point);
+				
 				Vector3i extremeNeg = new Vector3i(point.x() - radius, point.y() - radius, point.z() - radius);
 				Vector3i extremePos = new Vector3i(point.x() + radius, point.y() + radius, point.z() + radius);
 				
@@ -326,13 +327,12 @@ public abstract class Structure extends PhysicalObject implements
 					{
 						for(int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
 						{
-							chunks[flatten(cx, cy, cz)].needsRendered(true);
+							if(within(cx, cy, cz))
+								chunks[flatten(cx, cy, cz)].needsRendered(true);
 						}
 					}
 				}
 			}
-			
-			lightMap.clearChanges();
 		}
 	}
 	

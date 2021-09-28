@@ -1,14 +1,20 @@
 package com.cornchipss.cosmos.lights;
 
+import java.text.DecimalFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
+
+import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class LightMap
 {
@@ -20,10 +26,10 @@ public class LightMap
 	public int height() { return h; }
 	public int length() { return l; }
 	
-	private Map<Vector3i, LightSource> lightsToAdd;
-	private List<Vector3i> lightsToRemove;
-	private List<Vector3i> blockingsToCreate;
-	private List<Vector3i> blockingsToRemove;
+	private Map<Vector3i, LightSource> lightsToAdd = new HashMap<>();
+	private List<Vector3i> lightsToRemove = new LinkedList<>();
+	private List<Vector3i> blockingsToCreate = new LinkedList<>();
+	private List<Vector3i> blockingsToRemove = new LinkedList<>();
 	
 	private static class LightResult
 	{
@@ -58,11 +64,21 @@ public class LightMap
 			for(LightResult rs : lightResults.values())
 			{
 				float ratio = rs.strength / (float)rs.src.strength();
-				totalLight.add(rs.src.r() * ratio, rs.src.g() * ratio, rs.src.b() * ratio);
+				totalLight.add(rs.src.r() * ratio * rs.src.r() * ratio, 
+						rs.src.g() * ratio * rs.src.g() * ratio, 
+						rs.src.b() * ratio * rs.src.b() * ratio);
 			}
 			
-			if(totalLight.lengthSquared() > 1)
-				totalLight.normalize();
+			totalLight.x = Maths.sqrt(totalLight.x);
+			totalLight.y = Maths.sqrt(totalLight.y);
+			totalLight.z = Maths.sqrt(totalLight.z);
+			
+			if(totalLight.x > 1)
+				totalLight.x = 1;
+			if(totalLight.y > 1)
+				totalLight.y = 1;
+			if(totalLight.z > 1)
+				totalLight.z = 1;
 		}
 		
 		void addLightResult(LightResult r)
@@ -103,7 +119,7 @@ public class LightMap
 			
 			return null;
 		}
-
+		
 		public LightResult largestLightResult()
 		{
 			int max = 0;
@@ -186,13 +202,38 @@ public class LightMap
 		}
 	}
 	
-	private void dewIt(int x, int y, int z, LightSource src, Vector3ic origin)
+	private void propagateSourceAt(int x, int y, int z, LightSource src, Vector3ic origin)
 	{
 		if(within(x, y, z))
 		{
 			LightResult lr = lightMap[z][y][x].lightResults.get(origin);
 			if(lr != null)
 				propagateAt(x, y, z, lr.strength, src, origin);
+		}
+	}
+	
+	private void calculateNextPoints(int x, int y, int z, int strength, 
+			Vector3ic origin, Set<Vector3i> nextPoints)
+	{		
+		if(within(x, y, z))
+		{
+			if(strength < 0 || !blocked[z][y][x])
+			{
+				LightResult lr = lightMap[z][y][x].lightResults.get(origin);
+				
+				if(strength > 0)
+				{
+					if(lr == null || lr.strength < strength - 1)
+						nextPoints.add(new Vector3i(x, y, z));
+				}
+				else if(lr != null)
+				{
+					if(strength <= -lr.strength)
+					{
+						nextPoints.add(new Vector3i(x, y, z));
+					}
+				}
+			}
 		}
 	}
 	
@@ -206,15 +247,15 @@ public class LightMap
 	 * @param origin The origin of the light source you are spreading
 	 */
 	private void propagateAt(int x, int y, int z, int strength, 
-			LightSource src, Vector3ic origin)
+			LightSource src, final Vector3ic origin)
 	{
-		List<Vector3i> points = new LinkedList<>();
-		List<Vector3i> nextPoints = new LinkedList<>();
+		Set<Vector3i> points = new HashSet<>();
+		Set<Vector3i> nextPoints = new HashSet<>();
 		
 		points.add(new Vector3i(x, y, z));
 		
 		while(points.size() != 0)
-		{
+		{		
 			for(Vector3i pt : points)
 			{
 				if(strength > 0)
@@ -232,18 +273,12 @@ public class LightMap
 						
 						if(strength - 1 != 0)
 						{
-							if(within(pt.x - 1, pt.y, pt.z))
-								nextPoints.add(new Vector3i(pt.x - 1, pt.y, pt.z));
-							if(within(pt.x + 1, pt.y, pt.z))
-								nextPoints.add(new Vector3i(pt.x + 1, pt.y, pt.z));
-							if(within(pt.x, pt.y - 1, pt.z))
-								nextPoints.add(new Vector3i(pt.x, pt.y - 1, pt.z));
-							if(within(pt.x, pt.y + 1, pt.z))
-								nextPoints.add(new Vector3i(pt.x, pt.y + 1, pt.z));
-							if(within(pt.x, pt.y, pt.z - 1))
-								nextPoints.add(new Vector3i(pt.x, pt.y, pt.z - 1));
-							if(within(pt.x, pt.y, pt.z + 1))
-								nextPoints.add(new Vector3i(pt.x, pt.y, pt.z + 1));
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints);
 						}
 					}
 				}
@@ -262,27 +297,21 @@ public class LightMap
 
 						if(strength + 1 != 0)
 						{
-							if(within(pt.x - 1, pt.y, pt.z))
-								nextPoints.add(new Vector3i(pt.x - 1, pt.y, pt.z));
-							if(within(pt.x + 1, pt.y, pt.z))
-								nextPoints.add(new Vector3i(pt.x + 1, pt.y, pt.z));
-							if(within(pt.x, pt.y - 1, pt.z))
-								nextPoints.add(new Vector3i(pt.x, pt.y - 1, pt.z));
-							if(within(pt.x, pt.y + 1, pt.z))
-								nextPoints.add(new Vector3i(pt.x, pt.y + 1, pt.z));
-							if(within(pt.x, pt.y, pt.z - 1))
-								nextPoints.add(new Vector3i(pt.x, pt.y, pt.z - 1));
-							if(within(pt.x, pt.y, pt.z + 1))
-								nextPoints.add(new Vector3i(pt.x, pt.y, pt.z + 1));
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints);
 						}
 						else
 						{
-							dewIt(pt.x - 1, pt.y, pt.z, src, origin);
-							dewIt(pt.x + 1, pt.y, pt.z, src, origin);
-							dewIt(pt.x, pt.y - 1, pt.z, src, origin);
-							dewIt(pt.x, pt.y + 1, pt.z, src, origin);
-							dewIt(pt.x, pt.y, pt.z - 1, src, origin);
-							dewIt(pt.x, pt.y, pt.z + 1, src, origin);
+							propagateSourceAt(pt.x - 1, pt.y, pt.z, src, origin);
+							propagateSourceAt(pt.x + 1, pt.y, pt.z, src, origin);
+							propagateSourceAt(pt.x, pt.y - 1, pt.z, src, origin);
+							propagateSourceAt(pt.x, pt.y + 1, pt.z, src, origin);
+							propagateSourceAt(pt.x, pt.y, pt.z - 1, src, origin);
+							propagateSourceAt(pt.x, pt.y, pt.z + 1, src, origin);
 						}
 					}
 				}
@@ -291,7 +320,7 @@ public class LightMap
 			strength -= Math.signum(strength);
 			
 			points = nextPoints;
-			nextPoints = new LinkedList<>();
+			nextPoints = new HashSet<>();
 		}
 	}
 	
@@ -321,7 +350,7 @@ public class LightMap
 		lightMap[z][y][x].totalLight.set(0,0,0);
 	}
 	
-	public void setBlocking(int x, int y, int z)
+	private void setBlockingFin(int x, int y, int z)
 	{
 		blocked[z][y][x] = true;
 		
@@ -331,13 +360,16 @@ public class LightMap
 		}
 	}
 	
-	public boolean removeBlocking(int x, int y, int z)
+	public void setBlocking(int x, int y, int z)
 	{
-		boolean b = isBlocked(x, y, z);
-		
+		blockingsToCreate.add(new Vector3i(x, y, z));
+	}
+	
+	private void removeBlockingFin(int x, int y, int z)
+	{
 		Vector3i here = new Vector3i(x, y, z);
 		
-		if(b)
+		if(isBlocked(x, y, z))
 		{
 			blocked[z][y][x] = false;
 			
@@ -396,11 +428,14 @@ public class LightMap
 				propagateAll(x, y, z + 1);
 			}
 		}
-		
-		return b;
 	}
 	
-	public void addLight(LightSource l, int x, int y, int z)
+	public void removeBlocking(int x, int y, int z)
+	{
+		blockingsToRemove.add(new Vector3i(x, y, z));
+	}
+	
+	private void addLightFin(LightSource l, int x, int y, int z)
 	{
 		Vector3i key = new Vector3i(x, y, z);
 		changes.put(key, Math.max(changes.getOrDefault(key, 0), l.strength()));
@@ -411,7 +446,12 @@ public class LightMap
 		propagateAt(x, y, z, l.strength(), l, origin);
 	}
 	
-	public void removeLight(int x, int y, int z)
+	public void addLight(LightSource l, int x, int y, int z)
+	{
+		lightsToAdd.put(new Vector3i(x, y, z), l);
+	}
+	
+	private void removeLightFin(int x, int y, int z)
 	{
 		Vector3i key = new Vector3i(x, y, z);
 		
@@ -427,14 +467,52 @@ public class LightMap
 		}
 	}
 	
-	public boolean hasChanges()
+	public void removeLight(int x, int y, int z)
 	{
-		return changes.size() != 0;
+		Vector3i pt = new Vector3i(x, y, z);
+		
+		if(lights.containsKey(pt))
+			lightsToRemove.add(pt);
+		else if(lightsToAdd.containsKey(pt))
+			lightsToAdd.remove(pt);
 	}
 	
-	public void clearChanges()
+	public boolean needsUpdating()
 	{
+		return blockingsToCreate.size() != 0 || blockingsToRemove.size() != 0 ||
+				lightsToRemove.size() != 0 || lightsToAdd.size() != 0;
+	}
+	
+	public Map<Vector3ic, Integer> updateMap()
+	{
+		for(Vector3i b : lightsToRemove)
+		{
+			removeLightFin(b.x, b.y, b.z);
+		}
+		
+		for(Vector3i b : blockingsToRemove)
+		{
+			removeBlockingFin(b.x, b.y, b.z);
+		}
+		
+		for(Vector3i b : blockingsToCreate)
+		{
+			setBlockingFin(b.x, b.y, b.z);
+		}
+		
+		for(Vector3i b : lightsToAdd.keySet())
+		{
+			addLightFin(lightsToAdd.get(b), b.x, b.y, b.z);
+		}
+		
+		blockingsToCreate.clear();
+		blockingsToRemove.clear();
+		lightsToRemove.clear();
+		lightsToAdd.clear();
+		
+		Map<Vector3ic, Integer> ret = new HashMap<>(changes);
 		changes.clear();
+		return ret;
 	}
 	
 	public void printMap()
@@ -445,7 +523,75 @@ public class LightMap
 			{
 				for(int x = 0; x < width(); x++)
 				{
-					System.out.print(lightAt(x, y, z).x() + " ");
+					System.out.print(Utils.toEasyString(lightAt(x, y, z).x()) + " ");
+				}
+				System.out.println();
+			}
+			
+			System.out.println();
+		}
+	}
+	
+
+	public void printDBG()
+	{
+		printMap();
+		
+		System.out.println("BLOCKED");
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					System.out.print(blocked[z][y][x] ? 1 : 0);
+				}
+				System.out.println();
+			}
+			
+			System.out.println();
+		}
+		
+		System.out.println("STRENGTHS");
+		
+		DecimalFormat df = new DecimalFormat("00");
+		
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					if(lightMap[z][y][x].lightResults.size() == 0)
+						System.out.print("00 ");
+					else
+						System.out.print(df.format(lightMap[z][y][x].lightResults.values().iterator().next().strength) + " ");
+				}
+				System.out.println();
+			}
+			
+			System.out.println();
+		}
+		
+		System.out.println("COMBO");
+		
+		for(int z = 0; z < length(); z++)
+		{
+			for(int y = 0; y < height(); y++)
+			{
+				for(int x = 0; x < width(); x++)
+				{
+					if(blocked[z][y][x])
+					{
+						System.out.print("-1 ");
+					}
+					else
+					{
+						if(lightMap[z][y][x].lightResults.size() == 0)
+							System.out.print("00 ");
+						else
+							System.out.print(df.format(lightMap[z][y][x].lightResults.values().iterator().next().strength) + " ");
+					}
 				}
 				System.out.println();
 			}
