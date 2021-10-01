@@ -7,6 +7,9 @@ import org.joml.AABBf;
 import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
+import com.cornchipss.cosmos.physx.collision.IntersectionCollisionChecker;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class PhysicsWorld
 {
@@ -21,10 +24,14 @@ public class PhysicsWorld
 	
 	private List<PhysicalObject> bodiesToAdd;
 	
+	private ICollisionChecker strategy;
+	
 	public PhysicsWorld()
 	{
 		bodies = new LinkedList<>();
 		bodiesToAdd = new LinkedList<>();
+		
+		strategy = new IntersectionCollisionChecker();
 	}
 	
 	public void addPhysicalObject(PhysicalObject bdy)
@@ -45,21 +52,21 @@ public class PhysicsWorld
 			vel.set(a.body().velocity()).mul(delta);
 			vel.add(a.body().transform().position(), pos);
 			
-//			for(PhysicalObject b : bodies)
-//			{
-//				if(!b.equals(a))
-//				{
-//					AABBf aA = new AABBf();
-//					AABBf aB = new AABBf();
-//					
-//					if(a.aabb(a.position(), aA).testAABB(b.aabb(b.position(), aB))
-//							||
-//							a.aabb(pos, aA).testAABB(aB))
-//					{
-//						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
-//					}
-//				}
-//			}
+			for(PhysicalObject b : bodies)
+			{
+				if(!b.equals(a))
+				{
+					AABBf aA = new AABBf();
+					AABBf aB = new AABBf();
+					
+					if(a.aabb(a.position(), aA).testAABB(b.aabb(b.position(), aB))
+							||
+							a.aabb(pos, aA).testAABB(aB))
+					{
+						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
+					}
+				}
+			}
 			
 			a.body().transform().position(pos);
 		}
@@ -67,12 +74,18 @@ public class PhysicsWorld
 	
 	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3f vel, Vector3f pos, float delta, AABBf aaBBa, AABBf aaBBb)
 	{
-		a.shape().verticesWithin(aaBBa);
-		
-		a.body().velocity(a.body().velocity().negate(vel)); // any vector could replace vel here, but it's being re-assigned down below so it doesn't matter
-		
-		vel.set(a.body().velocity()).mul(delta);
-		vel.add(a.body().transform().position(), pos);
+		Vector3f normal = new Vector3f();		
+		if(strategy.colliding(a, b, normal))
+		{
+			Utils.println(a.getClass().getSimpleName() + " hit " + b.getClass().getSimpleName() + " NORM: " + Utils.toString(normal));
+			
+			a.body().velocity(a.body().velocity().add(a.body().velocity().mul(normal, new Vector3f(0)), new Vector3f()));
+			
+		}
+//		a.body().velocity(a.body().velocity().negate(vel)); // any vector could replace vel here, but it's being re-assigned down below so it doesn't matter
+//		
+//		vel.set(a.body().velocity()).mul(delta);
+//		vel.add(a.body().transform().position(), pos);
 	}
 
 	public boolean locked()

@@ -21,7 +21,6 @@ import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
-import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;

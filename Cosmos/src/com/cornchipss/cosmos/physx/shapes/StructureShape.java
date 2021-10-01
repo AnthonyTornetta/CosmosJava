@@ -1,10 +1,8 @@
 package com.cornchipss.cosmos.physx.shapes;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -194,27 +192,9 @@ public class StructureShape implements PhysicsShape
 		
 		return false;
 	}
-
-	@Override
-	public Vector3fc[] verticesWithin(AABBf aaBB)
+	
+	public Structure structure()
 	{
-		List<Vector3f> generated = new ArrayList<>();
-		
-		for(float z = aaBB.minZ; z <= aaBB.maxZ; z++)
-		{
-			for(float y = aaBB.minY; y <= aaBB.maxY; y++)
-			{
-				for(float x = aaBB.minX; x <= aaBB.maxX; x++)
-				{
-					Vector3ic local = s.worldCoordsToStructureCoords(x, y, z);
-					
-					if(s.withinBlocks(local.x(), local.y(), local.z()))
-					{
-						
-					}
-				}
-			}
-		}
-		return null;
+		return s;
 	}
 }

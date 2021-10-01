@@ -1,6 +1,5 @@
 package com.cornchipss.cosmos.physx.shapes;
 
-import org.joml.AABBf;
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -165,11 +164,5 @@ public class RectangleShape implements PhysicsShape
 		}
 		
 		return bestDist != -1;
-	}
-	
-	@Override
-	public Vector3fc[] verticesWithin(AABBf aaBBa)
-	{
-		return sides;
 	}
 }
