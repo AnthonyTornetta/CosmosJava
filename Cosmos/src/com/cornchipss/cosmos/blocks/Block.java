@@ -1,5 +1,8 @@
 package com.cornchipss.cosmos.blocks;
 
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
+
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.blocks.modifiers.IHasData;
 import com.cornchipss.cosmos.models.CubeModel;
@@ -112,5 +115,18 @@ public class Block implements IHasModel
 	public String toString()
 	{
 		return "Block [" + name() + "]";
+	}
+
+	/**
+	 * Halfwidths for OBB collision detection
+	 */
+	private Vector3fc halfwidths = new Vector3f(0.5f, 0.5f, 0.5f);
+	
+	/**
+	 * Halfwidths for OBB collision detection
+	 */
+	public Vector3fc halfWidths()
+	{
+		return halfwidths;
 	}
 }

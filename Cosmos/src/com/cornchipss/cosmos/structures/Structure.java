@@ -24,6 +24,7 @@ import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
@@ -257,6 +258,18 @@ public abstract class Structure extends PhysicalObject implements
 		chunkAt(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH, c);
 	}
 	
+	public Vector3f chunkRelativePos(Chunk c)
+	{
+		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(), c.localPosition().z());
+	}
+	
+	public Vector3f chunkRelativePos(int x, int y, int z)
+	{
+		return new Vector3f(Chunk.WIDTH * (x - chunksWidth() / 2.f),
+				Chunk.HEIGHT * (x - chunksHeight() / 2.f),
+				Chunk.LENGTH * (x - chunksLength() / 2.f));
+	}
+	
 	public void init()
 	{
 		initialized = true;
@@ -268,7 +281,14 @@ public abstract class Structure extends PhysicalObject implements
 				for(int x = 0; x < chunksWidth(); x++)
 				{
 					int i = flatten(x, y, z);
-					chunks[i] = new Chunk(x * Chunk.WIDTH + 1, y * Chunk.HEIGHT + 1, z * Chunk.LENGTH + 1, this);
+					chunks[i] = new Chunk(
+							x, y, z,
+							(x - cWidth / 2.f) * Chunk.WIDTH, 
+							(y - cHeight / 2.f) * Chunk.HEIGHT, 
+							(z - cLength / 2.f) * Chunk.LENGTH,
+							x * Chunk.WIDTH + 1, 
+							y * Chunk.HEIGHT + 1, 
+							z * Chunk.LENGTH + 1, this);
 					
 					chunks[i].transformMatrix(
 							Maths.createTransformationMatrix(
@@ -423,6 +443,16 @@ public abstract class Structure extends PhysicalObject implements
 	public boolean withinBlocks(int x, int y, int z)
 	{
 		return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
+	}
+	
+	public Vector3i structureCoordsToChunkCoords(Vector3ic local)
+	{
+		return new Vector3i(local.x() % Chunk.WIDTH, local.y() % Chunk.HEIGHT, local.z() % Chunk.LENGTH);
+	}
+
+	public Vector3i worldCoordsToChunkCoords(Vector3fc v)
+	{
+		return structureCoordsToChunkCoords(worldCoordsToStructureCoords(v));
 	}
 	
 	public void block(int x, int y, int z, Block b)
@@ -603,6 +633,11 @@ public abstract class Structure extends PhysicalObject implements
 		return -1;
 	}
 
+	public boolean hasBlock(Vector3ic v)
+	{
+		return hasBlock(v.x(), v.y(), v.z());
+	}
+	
 	public boolean hasBlock(int x, int y, int z)
 	{
 		return withinBlocks(x, y, z) && block(x, y, z) != null;
@@ -655,5 +690,10 @@ public abstract class Structure extends PhysicalObject implements
 	public float mass()
 	{
 		return totalMass;
+	}
+
+	public OBBCollider obbForChunk(Chunk c)
+	{
+		return new OBBCollider(c.relativePosition(), body().transform().orientation(), Chunk.HALF_DIMENSIONS);
 	}
 }

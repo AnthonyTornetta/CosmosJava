@@ -6,12 +6,15 @@ import java.io.IOException;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.Structure;
@@ -43,22 +46,40 @@ public class Chunk implements IWritable
 	 * Dimensions of a Chunk - must be even
 	 */
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
+	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT, LENGTH);
+	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS).div(2);
 	
 	private Block[][][] blocks;
 	
 	/**
-	 * Offset relative to block structure's 0,0,0
+	 * Offset in the structure's lightmap
 	 */
-	private Vector3ic offset;
+	private Vector3ic lightingOffset;
+	
+	/**
+	 * The position of the chunk relative to the structure's 0, 0, 0 without accounting for its orientation
+	 */
+	private Vector3fc relativePos;
+	
+	/**
+	 * Where the chunk is stored in the structure
+	 */
+	private Vector3ic localPosition;
+	
 	
 	/**
 	 * block structure it's a part of
 	 */
 	private Structure structure;
 	
-	public Chunk(int offX, int offY, int offZ, Structure s)
+	public Chunk(
+			int x, int y, int z,
+			float relX, float relY, float relZ, 
+			int offX, int offY, int offZ, Structure s)
 	{
-		this.offset = new Vector3i(offX, offY, offZ);
+		this.lightingOffset = new Vector3i(offX, offY, offZ);
+		this.localPosition = new Vector3i(x, y, z);
+		this.relativePos = new Vector3f(relX, relY, relZ);
 		
 		this.structure = s;
 		
@@ -220,21 +241,21 @@ public class Chunk implements IWritable
 			blocks[z][y][x] = block;
 			
 			if(block != null)
-				structure.lightMap().setBlocking(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().setBlocking(x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z());
 			else
-				structure.lightMap().removeBlocking(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().removeBlocking(x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z());
 			
 			if(block instanceof LitBlock)
 			{
 				// remove it if there is already one
-				structure.lightMap().removeLight(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z());
 				
 				structure.lightMap().addLight(((LitBlock) block).lightSource(),
-						x + offset.x(), y + offset.y(), z + offset.z());
+						x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z());
 			}
-			else if(structure.lightMap().hasLightSource(x + offset.x(), y + offset.y(), z + offset.z()))
+			else if(structure.lightMap().hasLightSource(x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z()))
 			{
-				structure.lightMap().removeLight(x + offset.x(), y + offset.y(), z + offset.z());
+				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(), z + lightingOffset.z());
 			}
 			
 			needsRendered(true);
@@ -272,7 +293,7 @@ public class Chunk implements IWritable
 				bottom != null ? bottom.model : null, 
 				front != null ? front.model : null, 
 				back != null ? back.model : null,
-						offset.x(), offset.y(), offset.z(), structure.lightMap());
+						lightingOffset.x(), lightingOffset.y(), lightingOffset.z(), structure.lightMap());
 	}
 	
 	/**
@@ -285,6 +306,30 @@ public class Chunk implements IWritable
 	public Block block(int x, int y, int z)
 	{
 		return blocks[z][y][x];
+	}
+
+	/**
+	 * If the chunk has a block at a given point
+	 * @param x The X coordinate relative to the chunk's position
+	 * @param y The Y coordinate relative to the chunk's position
+	 * @param z The Z coordinate relative to the chunk's position
+	 * @return True if there is a block, false if not
+	 */
+	public boolean hasBlock(Vector3ic v)
+	{
+		return hasBlock(v.x(), v.y(), v.z());
+	}
+	
+	/**
+	 * If the chunk has a block at a given point
+	 * @param x The X coordinate relative to the chunk's position
+	 * @param y The Y coordinate relative to the chunk's position
+	 * @param z The Z coordinate relative to the chunk's position
+	 * @return True if there is a block, false if not
+	 */
+	public boolean hasBlock(int x, int y, int z)
+	{
+		return block(x, y, z) != null;
 	}
 	
 	/**
@@ -315,13 +360,38 @@ public class Chunk implements IWritable
 		return model;
 	}
 	
-	public Vector3ic offset()
-	{
-		return offset;
-	}
-	
 	public Structure structure()
 	{
 		return structure;
+	}
+	
+	public Vector3fc relativePosition()
+	{
+		return relativePos;
+	}
+
+	public Vector3ic localPosition()
+	{
+		return localPosition;
+	}
+
+	public OBBCollider obbForBlock(int x, int y, int z)
+	{
+		Vector3f temp = new Vector3f();
+		
+		Block block = block(x, y, z);
+		Vector3f at = new Vector3f(relativePosition());
+		
+		// + 0.5f to get to the center of a block in an even chunk
+		
+		at.add(structure().body().transform().orientation()
+				.right().mul(-Chunk.WIDTH / 2.f + x / 2.f + 0.5f, temp));
+		at.add(structure().body().transform().orientation()
+				.up().mul(-Chunk.HEIGHT / 2.f + y / 2.f + 0.5f, temp));
+		at.add(structure().body().transform().orientation()
+				.forward().mul(-Chunk.LENGTH / 2.f + z / 2.f + 0.5f, temp));
+		
+		return new OBBCollider(at, 
+				structure().body().transform().orientation(), block.halfWidths());
 	}
 }
