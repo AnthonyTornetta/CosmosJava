@@ -76,9 +76,9 @@ public class OBBCollider implements Iterable<Vector3fc>
 		}
 	}
 	
-	public Vector3f center() { return center; }
-	public Vector3f[] localAxis() { return localAxis; }
-	public Vector3f halfwidths() { return halfwidths; }
+	public Vector3fc center() { return center; }
+	public Vector3fc[] localAxis() { return localAxis; }
+	public Vector3fc halfwidths() { return halfwidths; }
 	public Orientation orientation() { return or; }
 	
 	@Override

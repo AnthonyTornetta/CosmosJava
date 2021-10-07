@@ -2,6 +2,9 @@ package com.cornchipss.cosmos.physx.collision.obb;
 
 import org.joml.Intersectionf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
+
+import com.cornchipss.cosmos.utils.Utils;
 
 public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 {
@@ -9,10 +12,10 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	public boolean testOBBOBB(OBBCollider a, OBBCollider b, Vector3f collisionNormal)
 	{
 		if(Intersectionf.testObOb(
-				a.center(), a.localAxis()[0], a.localAxis()[1], 
-				a.localAxis()[2], a.halfwidths(), 
-				b.center(), b.localAxis()[0], b.localAxis()[1], 
-				b.localAxis()[2], b.halfwidths()))
+				(Vector3f)a.center(), (Vector3f)a.localAxis()[0], (Vector3f)a.localAxis()[1], 
+				(Vector3f)a.localAxis()[2], (Vector3f)a.halfwidths(), 
+				(Vector3f)b.center(), (Vector3f)b.localAxis()[0], (Vector3f)b.localAxis()[1], 
+				(Vector3f)b.localAxis()[2], (Vector3f)b.halfwidths()))
 		{
 			if(collisionNormal != null)
 				calculateNormal(a, b, collisionNormal);
@@ -33,24 +36,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		float closest = Float.MAX_VALUE;
 		Vector3f closestVec = new Vector3f();
 		
-		for(int dz = -1; dz <= 1; dz += 2)
+		for(Vector3fc vertex : a)
 		{
-			for(int dy = -1; dy <= 1; dy += 2)
+			float dist = vertex.distanceSquared(b.center());
+			if(dist < closest)
 			{
-				for(int dx = -1; dx <= 1; dx += 2)
-				{
-					Vector3f vertex = new Vector3f(a.halfwidths());
-					vertex.mul(dx, dy, dz);
-					a.orientation().applyRotation(vertex, vertex);
-					vertex.add(a.center());
-					
-					float dist = vertex.distanceSquared(b.center());
-					if(dist < closest)
-					{
-						closest = dist;
-						closestVec.set(vertex);
-					}
-				}
+				closest = dist;
+				closestVec.set(vertex);
 			}
 		}
 		
@@ -58,20 +50,27 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		
 		Vector3f bestAxis = new Vector3f();
 		bestAxis.set(b.localAxis()[0]);
-		float bestDot = closestVec.dot(b.localAxis()[0]);
+		bestAxis.mul(-1);
+		float bestDot = closestVec.dot(bestAxis);
+				
+		Utils.println(bestAxis);
 		
 		for(int i = 1; i < b.localAxis().length * 2; i++)
 		{
-			Vector3f v = b.localAxis()[i % 2];
-			float sign = 0 - 2 * (i % 2) + 1; // -1 if odd, 1 if even
-			float dotHere = closestVec.dot(v.x * sign, v.y * sign, v.z * sign);
+			Vector3fc v = b.localAxis()[i / 2];
+			
+			float sign =  i % 2 == 0 ? 1 : -1;
+			sign = -1;
+			Utils.println(v.mul(sign, new Vector3f()));
+			
+			float dotHere = closestVec.dot(v.x() * sign, v.y() * sign, v.z() * sign);
 			if(dotHere > bestDot)
 			{
 				bestDot = dotHere;
-				bestAxis.set(v.x * sign, v.y * sign, v.z * sign);
+				bestAxis.set(v.x() * sign, v.y() * sign, v.z() * sign);
 			}
 		}
-		
+		// asdf
 		collisionNormal.set(bestAxis);
 	}
 }
