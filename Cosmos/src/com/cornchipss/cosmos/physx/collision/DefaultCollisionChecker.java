@@ -128,7 +128,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		
 		{
 			Vector3f at = new Vector3f(pos);
-			at.sub(a.structure().body().transform().orientation().forward().mul(Chunk.LENGTH / 2.f, new Vector3f()));
+			// it is add here
+			at.add(a.structure().body().transform().orientation().forward().mul(Chunk.LENGTH / 2.f, new Vector3f()));
 			
 			// Start Z
 			Vector3f halfWidthsZ = new Vector3f(Chunk.WIDTH / 2.f, Chunk.HEIGHT / 2.f, 0.5f);

@@ -1,5 +1,6 @@
 package tests.physx.collision;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
@@ -33,6 +34,7 @@ class DefaultCollisionCheckerTest
 	
 	Structure a, b;
 	DefaultCollisionChecker dcc;
+	Vector3f normal;
 
 	@BeforeEach
 	void before()
@@ -49,6 +51,8 @@ class DefaultCollisionCheckerTest
 		b.addToWorld(new Transform());
 		
 		dcc = new DefaultCollisionChecker();
+		
+		normal = new Vector3f();
 	}
 	
 	@AfterEach
@@ -56,13 +60,48 @@ class DefaultCollisionCheckerTest
 	{
 		a = b = null;
 		dcc = null;
+		normal = null;
 	}
 	
 	@Test
 	void twoStructures()
 	{
-		a.body().transform().position(new Vector3f(8.0f, 0, 0));
+		// 0 //
 		
-		assertTrue(dcc.colliding(a, b, new Vector3f()));
+		a.body().transform().position(new Vector3f(0, 0, 0));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		// X //		
+		
+		a.body().transform().position(new Vector3f(8.0f, 0, 0));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(15.95f, 0, 0));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(0, 16.05f, 0));
+		assertFalse(dcc.colliding(a, b, normal));
+		
+		// Y //
+		
+		a.body().transform().position(new Vector3f(0, 8.0f, 0));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(0, 15.95f, 0));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(0, 16.05f, 0));
+		assertFalse(dcc.colliding(a, b, normal));
+		
+		// Z //
+		
+		a.body().transform().position(new Vector3f(0, 0, 8.0f));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(0, 0, 15.95f));
+		assertTrue(dcc.colliding(a, b, normal));
+		
+		a.body().transform().position(new Vector3f(0, 0, 16.05f));
+		assertFalse(dcc.colliding(a, b, normal));
 	}
 }
