@@ -9,6 +9,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
+import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
@@ -153,13 +154,32 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				for(int x : xs)
 				{
+//					Block bbbb = a.block(x, y, z);
 					if(a.hasBlock(x, y, z))
 					{
 						OBBCollider obbBlockA = a.obbForBlock(x, y, z);
 						
-						for(Vector3fc corner : obbBlockA)
+						for(Vector3fc pointOfInterest : obbBlockA)
 						{
-							Vector3i relative = b.structure().worldCoordsToChunkCoords(corner);
+							Vector3f delta = new Vector3f();
+//							Vector3f p = a.structure().chunkWorldPosCentered(a, new Vector3f());
+							Vector3f pp = b.structure().chunkWorldPosCentered(b, new Vector3f());
+							
+							delta.x += pointOfInterest.x() - pp.x - 0.5f;
+							delta.y += pointOfInterest.y() - pp.y - 0.5f;
+							delta.z += pointOfInterest.z() - pp.z - 0.5f;
+							
+//							delta.x += Math.signum(delta.x) * .001f;
+//							delta.y += Math.signum(delta.y) * .001f;
+//							delta.z += Math.signum(delta.z) * .001f; 
+							
+							Vector3i relative = new Vector3i((int)delta.x(), (int)delta.y(), (int)delta.z());
+							
+							relative.x += Chunk.WIDTH / 2;
+							relative.y += Chunk.HEIGHT / 2;
+							relative.z += Chunk.LENGTH / 2;
+							
+//							Block bbb = b.block(relative.x, relative.y, relative.z);
 							
 							if(b.hasBlock(relative))
 							{
@@ -191,7 +211,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			
 			for(Chunk aC : chunks.keySet())
 			{
-				for(Chunk bC : chunks.get(a))
+				for(Chunk bC : chunks.get(aC))
 				{
 					if(fineCheck(aC, bC, normal))
 					{

@@ -258,14 +258,36 @@ public abstract class Structure extends PhysicalObject implements
 		chunkAt(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH, c);
 	}
 	
-	public Vector3f chunkRelativePos(Chunk c)
+	public Vector3f chunkWorldPosition(Chunk c, Vector3f out)
 	{
-		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(), c.localPosition().z());
+		return chunkRelativePos(c, out).add(position());
 	}
 	
-	public Vector3f chunkRelativePos(int x, int y, int z)
+	public Vector3f chunkWorldPosCentered(Chunk c, Vector3f out)
 	{
-		return new Vector3f(Chunk.WIDTH * (x - chunksWidth() / 2.f),
+		return chunkRelativePosCentered(c, out).add(position());
+	}
+	
+	public Vector3f chunkRelativePosCentered(Chunk c, Vector3f out)
+	{
+		return chunkRelativePosCentered(c.localPosition().x(), c.localPosition().y(), c.localPosition().z(), out);
+	}
+	
+	public Vector3f chunkRelativePosCentered(int x, int y, int z, Vector3f out)
+	{
+		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f) + Chunk.WIDTH / 2.f,
+				Chunk.HEIGHT * (x - chunksHeight() / 2.f) + Chunk.HEIGHT / 2.f,
+				Chunk.LENGTH * (x - chunksLength() / 2.f) + Chunk.LENGTH / 2.f);
+	}
+	
+	public Vector3f chunkRelativePos(Chunk c, Vector3f out)
+	{
+		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(), c.localPosition().z(), out);
+	}
+	
+	public Vector3f chunkRelativePos(int x, int y, int z, Vector3f out)
+	{
+		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f),
 				Chunk.HEIGHT * (x - chunksHeight() / 2.f),
 				Chunk.LENGTH * (x - chunksLength() / 2.f));
 	}
@@ -283,9 +305,9 @@ public abstract class Structure extends PhysicalObject implements
 					int i = flatten(x, y, z);
 					chunks[i] = new Chunk(
 							x, y, z,
-							(x - cWidth / 2.f) * Chunk.WIDTH, 
-							(y - cHeight / 2.f) * Chunk.HEIGHT, 
-							(z - cLength / 2.f) * Chunk.LENGTH,
+							(x - cWidth / 2.f) * Chunk.WIDTH + Chunk.WIDTH / 2.f, 
+							(y - cHeight / 2.f) * Chunk.HEIGHT + Chunk.HEIGHT / 2.f, 
+							(z - cLength / 2.f) * Chunk.LENGTH + Chunk.LENGTH / 2.f,
 							x * Chunk.WIDTH + 1, 
 							y * Chunk.HEIGHT + 1, 
 							z * Chunk.LENGTH + 1, this);

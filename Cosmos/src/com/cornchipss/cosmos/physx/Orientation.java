@@ -39,14 +39,16 @@ public class Orientation implements Cloneable
 		transMatrix.rotate(rotation);
 	}
 	
-	public void applyRotation(Vector3fc src, Vector3f dest)
+	public Vector3f applyRotation(Vector3fc src, Vector3f dest)
 	{
 		src.rotate(rotation, dest);
+		return dest;
 	}
 	
-	public void applyInverseRotation(Vector3fc src, Vector3f dest)
+	public Vector3f applyInverseRotation(Vector3fc src, Vector3f dest)
 	{
 		src.rotate(inverted, dest);
+		return dest;
 	}
 	
 	public void rotateRelative(Vector3fc dRot)

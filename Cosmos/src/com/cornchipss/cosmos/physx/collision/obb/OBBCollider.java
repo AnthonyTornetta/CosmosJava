@@ -28,6 +28,8 @@ public class OBBCollider implements Iterable<Vector3fc>
 	{
 		int z = -1, y = -1, x = -1;
 		
+		boolean first = true;
+		
 		OBBCollider obc;
 		Vector3f temp = new Vector3f();
 		
@@ -44,7 +46,12 @@ public class OBBCollider implements Iterable<Vector3fc>
 
 		@Override
 		public Vector3fc next()
-		{
+		{		
+			if(first)
+			{
+				first = false;
+				return new Vector3f(obc.center);
+			}
 			
 			Vector3f corner = new Vector3f(obc.center);
 			corner.add(obc.localAxis[2].mul(obc.halfwidths.z * z, temp));

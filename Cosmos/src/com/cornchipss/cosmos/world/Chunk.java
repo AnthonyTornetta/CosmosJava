@@ -329,7 +329,7 @@ public class Chunk implements IWritable
 	 */
 	public boolean hasBlock(int x, int y, int z)
 	{
-		return block(x, y, z) != null;
+		return within(x, y, z) && block(x, y, z) != null;
 	}
 	
 	/**
@@ -367,7 +367,12 @@ public class Chunk implements IWritable
 	
 	public Vector3fc relativePosition()
 	{
-		return relativePos;
+		Vector3fc structPos = structure.position();
+		
+		return structPos.add(
+				structure.body().transform().orientation().
+				applyRotation(relativePos, new Vector3f()), 
+				new Vector3f());
 	}
 
 	public Vector3ic localPosition()
@@ -380,16 +385,11 @@ public class Chunk implements IWritable
 		Vector3f temp = new Vector3f();
 		
 		Block block = block(x, y, z);
-		Vector3f at = new Vector3f(relativePosition());
+		Vector3f at = structure().chunkWorldPosition(this, new Vector3f());
 		
-		// + 0.5f to get to the center of a block in an even chunk
-		
-		at.add(structure().body().transform().orientation()
-				.right().mul(-Chunk.WIDTH / 2.f + x / 2.f + 0.5f, temp));
-		at.add(structure().body().transform().orientation()
-				.up().mul(-Chunk.HEIGHT / 2.f + y / 2.f + 0.5f, temp));
-		at.add(structure().body().transform().orientation()
-				.forward().mul(-Chunk.LENGTH / 2.f + z / 2.f + 0.5f, temp));
+		temp.set(x + 0.5f, y + 0.5f, z + 0.5f);
+		structure.body().transform().orientation().applyRotation(temp, temp);
+		at.add(temp);
 		
 		return new OBBCollider(at, 
 				structure().body().transform().orientation(), block.halfWidths());
