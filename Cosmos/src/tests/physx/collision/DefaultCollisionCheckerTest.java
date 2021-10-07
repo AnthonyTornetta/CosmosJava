@@ -1,5 +1,6 @@
 package tests.physx.collision;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -63,45 +64,91 @@ class DefaultCollisionCheckerTest
 		normal = null;
 	}
 	
+	// 0 //
+
 	@Test
 	void twoStructures()
 	{
-		// 0 //
 		
 		a.body().transform().position(new Vector3f(0, 0, 0));
-		assertTrue(dcc.colliding(a, b, normal));
-		
-		// X //		
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	// X //		
+	
+	@Test 
+	void twoStructuresX1()		
+	{
 		a.body().transform().position(new Vector3f(8.0f, 0, 0));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresX2()		
+	{
 		a.body().transform().position(new Vector3f(15.95f, 0, 0));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresX3()		
+	{
 		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, normal));
+		assertFalse(dcc.colliding(a, b, null));
+	}
+	
+	@Test
+	void testXNormal()
+	{
+		a.body().transform().position(new Vector3f(15.95f, 0, 0));
+		dcc.colliding(a, b, normal);
 		
-		// Y //
+		assertEquals(new Vector3f(1, 0, 0), normal);
+	}
+	
+	// Y //
 		
+	@Test 
+	void twoStructuresY1()		
+	{
 		a.body().transform().position(new Vector3f(0, 8.0f, 0));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresY2()		
+	{
 		a.body().transform().position(new Vector3f(0, 15.95f, 0));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresY3()		
+	{
 		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, normal));
-		
+		assertFalse(dcc.colliding(a, b, null));
+	}
+	
 		// Z //
-		
+	
+	@Test 
+	void twoStructuresZ1()		
+	{
 		a.body().transform().position(new Vector3f(0, 0, 8.0f));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresZ2()		
+	{
 		a.body().transform().position(new Vector3f(0, 0, 15.95f));
-		assertTrue(dcc.colliding(a, b, normal));
-		
+		assertTrue(dcc.colliding(a, b, null));
+	}
+	
+	@Test 
+	void twoStructuresZ3()		
+	{
 		a.body().transform().position(new Vector3f(0, 0, 16.05f));
-		assertFalse(dcc.colliding(a, b, normal));
+		assertFalse(dcc.colliding(a, b, null));
 	}
 }
