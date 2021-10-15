@@ -1,7 +1,8 @@
 package com.cornchipss.cosmos.physx.collision.obb;
 
-import org.joml.Vector3f;
 import org.joml.Vector3fc;
+
+import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 
 public interface IOBBCollisionChecker
 {
@@ -21,5 +22,5 @@ public interface IOBBCollisionChecker
 	 * @param normal The normal of the collision - remains unchanged if no collision happened
 	 * @return True if they hit - false if not
 	 */
-	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, Vector3f normal);
+	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, CollisionInfo info);
 }

@@ -4,6 +4,8 @@ import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.physx.collision.CollisionInfo;
+
 public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 {
 	@Override
@@ -17,16 +19,16 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	}
 
 	@Override
-	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, Vector3f normal)
+	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, CollisionInfo info)
 	{
-		if(normal == null)
-			normal = new Vector3f(); // It's still needed for JOML functions
+		if(info == null)
+			info = new CollisionInfo(); // It's still needed for JOML functions
 		
 		final float EPSILON = 1e-5f;
 		Vector3f v0 = new Vector3f(), v1 = new Vector3f(), v2 = new Vector3f();
 		
 		Vector3f temp = new Vector3f();
-		float bestDist = Float.MAX_VALUE;
+		info.distanceSquared = Float.MAX_VALUE;
 		boolean hit = false;
 		
 		Vector3f dx = b.localAxis()[0].mul(b.halfwidths().x(), new Vector3f());
@@ -36,7 +38,7 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		Vector3f dx2 = new Vector3f(dx).mul(2);
 		Vector3f dy2 = new Vector3f(dy).mul(2);
 		Vector3f dz2 = new Vector3f(dz).mul(2);
-
+		
 		for(Vector3fc point : a)
 		{
 			Vector3f end = new Vector3f(
@@ -73,12 +75,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[0]);
-						normal.mul(signX);
+						info.normal.set(b.localAxis()[0]);
+						info.normal.mul(signX);
 					}
 				}
 				
@@ -97,12 +100,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[0]);
-						normal.mul(signX);
+						info.normal.set(b.localAxis()[0]);
+						info.normal.mul(signX);
 					}
 				}
 			}
@@ -137,12 +141,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[1]);
-						normal.mul(sign);
+						info.normal.set(b.localAxis()[1]);
+						info.normal.mul(sign);
 					}
 				}
 				
@@ -161,12 +166,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[1]);
-						normal.mul(sign);
+						info.normal.set(b.localAxis()[1]);
+						info.normal.mul(sign);
 					}
 				}
 			}			
@@ -200,12 +206,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[2]);
-						normal.mul(sign);
+						info.normal.set(b.localAxis()[2]);
+						info.normal.mul(sign);
 					}
 				}
 				
@@ -224,12 +231,13 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				{
 					hit = true;
 					float distSqrd = temp.distanceSquared(point);
-					if(distSqrd < bestDist)
+					if(distSqrd < info.distanceSquared)
 					{
-						bestDist = distSqrd;
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
 						
-						normal.set(b.localAxis()[2]);
-						normal.mul(sign);
+						info.normal.set(b.localAxis()[2]);
+						info.normal.mul(sign);
 					}
 				}
 			}

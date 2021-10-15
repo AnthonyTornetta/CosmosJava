@@ -46,7 +46,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		}
 	}
 	
-	private void aggregateChunks(Structure sa, Structure sb, Map<Chunk, List<Chunk>> cl)
+	private void aggregateChunks(Structure sa, Structure sb, Vector3fc deltaA, Map<Chunk, List<Chunk>> cl)
 	{
 		List<Chunk> aChunks = new LinkedList<>();
 		List<Chunk> bChunks = new LinkedList<>();
@@ -61,7 +61,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				OBBCollider obbB = sb.obbForChunk(bc);
 				
-				if(obbChecker.testOBBOBB(obbA, obbB))
+				if(obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
 				{
 					List<Chunk> chunks = cl.getOrDefault(cl, new LinkedList<>());
 					chunks.add(bc);
@@ -71,8 +71,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		}
 	}
 	
-	private boolean fineCheck(Chunk a, Chunk b, Vector3f normal)
-	{
+	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA, CollisionInfo info)
+	{		
 		OBBCollider bOBB = b.structure().obbForChunk(b);
 		
 		Vector3fc pos = a.relativePosition();
@@ -94,7 +94,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsY);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB))
+				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					ys.add(y);
 				}
@@ -116,7 +116,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsX);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB))
+				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					xs.add(x);
 				}
@@ -139,7 +139,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsZ);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB))
+				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					zs.add(z);
 				}
@@ -147,6 +147,13 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				at.add(a.structure().body().transform().orientation().forward());
 			}
 		}
+		
+		CollisionInfo tempInfo = new CollisionInfo();
+		
+		if(info != null)
+			info.distanceSquared = Float.MAX_VALUE;
+		
+		boolean hit = false;
 		
 		for(int z : zs)
 		{
@@ -185,8 +192,20 @@ public class DefaultCollisionChecker implements ICollisionChecker
 							{
 								OBBCollider obbBlockB = b.obbForBlock(relative.x, relative.y, relative.z);
 								
-								if(obbChecker.testOBBOBB(obbBlockA, obbBlockB))
-									return true;
+								if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, obbBlockB, tempInfo))
+								{
+									if(info != null)
+									{
+										if(info.distanceSquared > tempInfo.distanceSquared)
+										{
+											info.set(tempInfo);
+										}
+										
+										hit = true;
+									}
+									else
+										return true;
+								}
 							}
 						}
 					}
@@ -194,11 +213,11 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 				
-		return false;
+		return hit;
 	}
 	
 	@Override
-	public boolean colliding(PhysicalObject a, PhysicalObject b, Vector3f normal)
+	public boolean colliding(PhysicalObject a, PhysicalObject b, Vector3fc deltaA, CollisionInfo info)
 	{
 		if(a instanceof Structure && b instanceof Structure)
 		{
@@ -207,13 +226,13 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
 			
-			aggregateChunks(sa, sb, chunks);
+			aggregateChunks(sa, sb, deltaA, chunks);
 			
 			for(Chunk aC : chunks.keySet())
 			{
 				for(Chunk bC : chunks.get(aC))
 				{
-					if(fineCheck(aC, bC, normal))
+					if(fineCheck(aC, bC, deltaA, info))
 					{
 						return true;
 					}

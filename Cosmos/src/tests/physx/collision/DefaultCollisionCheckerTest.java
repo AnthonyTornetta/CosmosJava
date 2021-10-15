@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class DefaultCollisionCheckerTest
@@ -37,7 +37,7 @@ class DefaultCollisionCheckerTest
 	
 	Structure a, b;
 	DefaultCollisionChecker dcc;
-	Vector3f normal;
+	CollisionInfo info;
 
 	@BeforeEach
 	void before()
@@ -55,7 +55,7 @@ class DefaultCollisionCheckerTest
 		
 		dcc = new DefaultCollisionChecker();
 		
-		normal = new Vector3f();
+		info = new CollisionInfo();
 	}
 	
 	@AfterEach
@@ -63,7 +63,7 @@ class DefaultCollisionCheckerTest
 	{
 		a = b = null;
 		dcc = null;
-		normal = null;
+		info = null;
 	}
 	
 	private static final float EPSILON = 1e-5f;
@@ -87,7 +87,7 @@ class DefaultCollisionCheckerTest
 	{
 		
 		a.body().transform().position(new Vector3f(0, 0, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	// X //		
@@ -96,53 +96,53 @@ class DefaultCollisionCheckerTest
 	void twoStructuresX2Neg()
 	{
 		a.body().transform().position(new Vector3f(-8.0f, 0, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test
 	void twoStructuresX3Neg()
 	{
 		a.body().transform().position(new Vector3f(-15.45f, 0, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresX1()		
 	{
 		a.body().transform().position(new Vector3f(8.0f, 0, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresX2()		
 	{
 		a.body().transform().position(new Vector3f(15.95f, 0, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresX3()		
 	{
 		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, null));
+		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 //	@Test
 	void testPosXNormal()
 	{
 		a.body().transform().position(new Vector3f(15.95f, -.01f, -0.01f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(1, 0, 0), normal);
+		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
 	}
 	
 //	@Test
 	void testNegXNormal()
 	{
 		a.body().transform().position(new Vector3f(-15.45f, -.01f, -0.01f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(-1, 0, 0), normal);
+		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
 	}
 	
 	// Y //
@@ -151,39 +151,39 @@ class DefaultCollisionCheckerTest
 	void twoStructuresY1()		
 	{
 		a.body().transform().position(new Vector3f(0, 8.0f, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresY2()		
 	{
 		a.body().transform().position(new Vector3f(0, 15.95f, 0));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresY3()		
 	{
 		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, null));
+		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test
 	void testPosYNormal()
 	{
 		a.body().transform().position(new Vector3f(-0.01f, 15.95f, -0.01f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(0, 1, 0), normal);
+		assertVectorEquals(new Vector3f(0, 1, 0), info.normal);
 	}
 	
 //	@Test
 	void testNegYNormal()
 	{
 		a.body().transform().position(new Vector3f(-0.01f, -15.45f, -0.01f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(0, -1, 0), normal);
+		assertVectorEquals(new Vector3f(0, -1, 0), info.normal);
 	}
 	
 	// Z //
@@ -192,38 +192,38 @@ class DefaultCollisionCheckerTest
 	void twoStructuresZ1()		
 	{
 		a.body().transform().position(new Vector3f(0, 0, 8.0f));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresZ2()		
 	{
 		a.body().transform().position(new Vector3f(0, 0, 15.95f));
-		assertTrue(dcc.colliding(a, b, null));
+		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 	@Test 
 	void twoStructuresZ3()		
 	{
 		a.body().transform().position(new Vector3f(0, 0, 16.05f));
-		assertFalse(dcc.colliding(a, b, null));
+		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
 	}
 	
 //	@Test
 	void testPosZNormal()
 	{
 		a.body().transform().position(new Vector3f(-0.01f, -0.01f, 15.95f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(0, 0, 1), normal);
+		assertVectorEquals(new Vector3f(0, 0, 1), info.normal);
 	}
 	
 //	@Test
 	void testNegZNormal()
 	{
 		a.body().transform().position(new Vector3f(-0.01f, -0.01f, -15.45f));
-		dcc.colliding(a, b, normal);
+		dcc.colliding(a, b, new Vector3f(), info);
 		
-		assertVectorEquals(new Vector3f(0, 0, -1), normal);
+		assertVectorEquals(new Vector3f(0, 0, -1), info.normal);
 	}
 }

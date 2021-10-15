@@ -5,8 +5,10 @@ import java.util.List;
 
 import org.joml.AABBf;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
 import com.cornchipss.cosmos.utils.Utils;
@@ -44,42 +46,33 @@ public class PhysicsWorld
 	
 	public void update(float delta)
 	{
-		Vector3f vel = new Vector3f();
-		Vector3f pos = new Vector3f();
-		
 		for(PhysicalObject a : bodies)
 		{
-			vel.set(a.body().velocity()).mul(delta);
-			vel.add(a.body().transform().position(), pos);
-			
+			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
+
 			for(PhysicalObject b : bodies)
 			{
 				if(!b.equals(a))
 				{
-					AABBf aA = new AABBf();
-					AABBf aB = new AABBf();
-					
-					if(a.aabb(a.position(), aA).testAABB(b.aabb(b.position(), aB))
-							||
-							a.aabb(pos, aA).testAABB(aB))
-					{
-						handlePotentialCollision(a, b, vel, pos, delta, aA, aB);
-					}
+					handlePotentialCollision(a, b, deltaA);
 				}
 			}
 			
-			a.body().transform().position(pos);
+			a.body().transform().position(
+					a.body().transform().position().add(
+							deltaA, new Vector3f()));
 		}
 	}
 	
-	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3f vel, Vector3f pos, float delta, AABBf aaBBa, AABBf aaBBb)
+	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3fc deltaA)
 	{
-		Vector3f normal = new Vector3f();
-		if(strategy.colliding(a, b, normal))
+		CollisionInfo info = new CollisionInfo();
+		
+		if(strategy.colliding(a, b, deltaA, info))
 		{
-			Utils.println(a.getClass().getSimpleName() + " hit " + b.getClass().getSimpleName() + " NORM: " + Utils.toString(normal));
+			Utils.println(a.getClass().getSimpleName() + " hit " + b.getClass().getSimpleName() + " NORM: " + Utils.toString(info.normal));
 			
-			a.body().velocity(a.body().velocity().add(a.body().velocity().mul(normal, new Vector3f(0)), new Vector3f()));
+//			a.body().velocity(a.body().velocity().add(a.body().velocity().mul(info.normal, new Vector3f()), new Vector3f()));
 			
 		}
 	}
