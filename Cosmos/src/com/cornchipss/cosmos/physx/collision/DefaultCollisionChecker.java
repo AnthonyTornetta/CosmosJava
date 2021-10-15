@@ -37,7 +37,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				for(int x = 0; x < a.chunksWidth(); x++)
 				{
 					OBBCollider obbA = a.obbForChunk(a.chunk(x, y, z));
-					if(obbChecker.testOBBOBB(obbA, obbB, null))
+					if(obbChecker.testOBBOBB(obbA, obbB))
 					{
 						chunks.add(a.chunk(x, y, z));
 					}
@@ -61,7 +61,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				OBBCollider obbB = sb.obbForChunk(bc);
 				
-				if(obbChecker.testOBBOBB(obbA, obbB, null))
+				if(obbChecker.testOBBOBB(obbA, obbB))
 				{
 					List<Chunk> chunks = cl.getOrDefault(cl, new LinkedList<>());
 					chunks.add(bc);
@@ -94,7 +94,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsY);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB, null))
+				if(obbChecker.testOBBOBB(obc, bOBB))
 				{
 					ys.add(y);
 				}
@@ -116,7 +116,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsX);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB, null))
+				if(obbChecker.testOBBOBB(obc, bOBB))
 				{
 					xs.add(x);
 				}
@@ -139,7 +139,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						a.structure().body().transform().orientation(), 
 						halfWidthsZ);
 				
-				if(obbChecker.testOBBOBB(obc, bOBB, null))
+				if(obbChecker.testOBBOBB(obc, bOBB))
 				{
 					zs.add(z);
 				}
@@ -185,7 +185,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 							{
 								OBBCollider obbBlockB = b.obbForBlock(relative.x, relative.y, relative.z);
 								
-								if(obbChecker.testOBBOBB(obbBlockA, obbBlockB, normal))
+								if(obbChecker.testOBBOBB(obbBlockA, obbBlockB))
 									return true;
 							}
 						}
@@ -193,7 +193,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				}
 			}
 		}
-		
+				
 		return false;
 	}
 	
