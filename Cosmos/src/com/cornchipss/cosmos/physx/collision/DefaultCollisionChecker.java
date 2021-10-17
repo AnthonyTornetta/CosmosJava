@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
@@ -25,7 +24,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		obbChecker = new OBBCollisionCheckerJOML();
 	}
 	
-	private void calcChunks(List<Chunk> chunks, Structure a, Structure b)
+	private void calcChunks(List<Chunk> chunks, Vector3fc deltaA, Structure a, Structure b)
 	{
 		OBBCollider obbB = new OBBCollider(b.position(), b.body().transform().orientation(), 
 				new Vector3f(b.width() / 2.f, b.height() / 2.f, b.length() / 2.f));
@@ -37,7 +36,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				for(int x = 0; x < a.chunksWidth(); x++)
 				{
 					OBBCollider obbA = a.obbForChunk(a.chunk(x, y, z));
-					if(obbChecker.testOBBOBB(obbA, obbB))
+					if(obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
 					{
 						chunks.add(a.chunk(x, y, z));
 					}
@@ -51,8 +50,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		List<Chunk> aChunks = new LinkedList<>();
 		List<Chunk> bChunks = new LinkedList<>();
 		
-		calcChunks(aChunks, sa, sb);
-		calcChunks(bChunks, sb, sa);
+		calcChunks(aChunks, deltaA, sa, sb);
+		calcChunks(bChunks, deltaA.mul(-1, new Vector3f()), sb, sa);
 		
 		for(Chunk c : aChunks)
 		{
@@ -93,7 +92,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				OBBCollider obc = new OBBCollider(at, 
 						a.structure().body().transform().orientation(), 
 						halfWidthsY);
-				
+
 				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					ys.add(y);
@@ -125,6 +124,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 		
+		Vector3fc backward = a.structure().body().transform().orientation().forward().mul(-1, new Vector3f());
+		
 		{
 			Vector3f at = new Vector3f(pos);
 			// it is add here
@@ -138,17 +139,15 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				OBBCollider obc = new OBBCollider(at, 
 						a.structure().body().transform().orientation(), 
 						halfWidthsZ);
-				
+
 				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					zs.add(z);
 				}
 				
-				at.add(a.structure().body().transform().orientation().forward());
+				at.add(backward);
 			}
 		}
-		
-		CollisionInfo tempInfo = new CollisionInfo();
 		
 		if(info != null)
 			info.distanceSquared = Float.MAX_VALUE;
@@ -161,51 +160,17 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				for(int x : xs)
 				{
-//					Block bbbb = a.block(x, y, z);
 					if(a.hasBlock(x, y, z))
 					{
 						OBBCollider obbBlockA = a.obbForBlock(x, y, z);
 						
 						for(Vector3fc pointOfInterest : obbBlockA)
 						{
-							Vector3f delta = new Vector3f();
-//							Vector3f p = a.structure().chunkWorldPosCentered(a, new Vector3f());
-							Vector3f pp = b.structure().chunkWorldPosCentered(b, new Vector3f());
-							
-							delta.x += pointOfInterest.x() - pp.x - 0.5f;
-							delta.y += pointOfInterest.y() - pp.y - 0.5f;
-							delta.z += pointOfInterest.z() - pp.z - 0.5f;
-							
-//							delta.x += Math.signum(delta.x) * .001f;
-//							delta.y += Math.signum(delta.y) * .001f;
-//							delta.z += Math.signum(delta.z) * .001f; 
-							
-							Vector3i relative = new Vector3i((int)delta.x(), (int)delta.y(), (int)delta.z());
-							
-							relative.x += Chunk.WIDTH / 2;
-							relative.y += Chunk.HEIGHT / 2;
-							relative.z += Chunk.LENGTH / 2;
-							
-//							Block bbb = b.block(relative.x, relative.y, relative.z);
-							
-							if(b.hasBlock(relative))
+							if(b.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
 							{
-								OBBCollider obbBlockB = b.obbForBlock(relative.x, relative.y, relative.z);
-								
-								if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, obbBlockB, tempInfo))
-								{
-									if(info != null)
-									{
-										if(info.distanceSquared > tempInfo.distanceSquared)
-										{
-											info.set(tempInfo);
-										}
-										
-										hit = true;
-									}
-									else
-										return true;
-								}
+								if(info == null)
+									return true;
+								hit = true;
 							}
 						}
 					}

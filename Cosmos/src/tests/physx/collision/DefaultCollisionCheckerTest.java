@@ -80,150 +80,19 @@ class DefaultCollisionCheckerTest
 			assertTrue(true); // it passed
 	}
 	
-	// 0 //
-
-	@Test
-	void twoStructures()
+//	@Test
+	void emptyStructure()
 	{
+		fill(a, null);
 		
-		a.body().transform().position(new Vector3f(0, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	// X //		
-	
-	@Test
-	void twoStructuresX2Neg()
-	{
-		a.body().transform().position(new Vector3f(-8.0f, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
+		a.body().transform().position(new Vector3f(-20, 0, 0));
+		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
 	}
 	
 	@Test
-	void twoStructuresX3Neg()
+	void structurePosX()
 	{
-		a.body().transform().position(new Vector3f(-15.45f, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresX1()		
-	{
-		a.body().transform().position(new Vector3f(8.0f, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresX2()		
-	{
-		a.body().transform().position(new Vector3f(15.95f, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresX3()		
-	{
-		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-//	@Test
-	void testPosXNormal()
-	{
-		a.body().transform().position(new Vector3f(15.95f, -.01f, -0.01f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
-	}
-	
-//	@Test
-	void testNegXNormal()
-	{
-		a.body().transform().position(new Vector3f(-15.45f, -.01f, -0.01f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
-	}
-	
-	// Y //
-	
-	@Test 
-	void twoStructuresY1()		
-	{
-		a.body().transform().position(new Vector3f(0, 8.0f, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresY2()		
-	{
-		a.body().transform().position(new Vector3f(0, 15.95f, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresY3()		
-	{
-		a.body().transform().position(new Vector3f(0, 16.05f, 0));
-		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test
-	void testPosYNormal()
-	{
-		a.body().transform().position(new Vector3f(-0.01f, 15.95f, -0.01f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(0, 1, 0), info.normal);
-	}
-	
-//	@Test
-	void testNegYNormal()
-	{
-		a.body().transform().position(new Vector3f(-0.01f, -15.45f, -0.01f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(0, -1, 0), info.normal);
-	}
-	
-	// Z //
-	
-	@Test 
-	void twoStructuresZ1()		
-	{
-		a.body().transform().position(new Vector3f(0, 0, 8.0f));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresZ2()		
-	{
-		a.body().transform().position(new Vector3f(0, 0, 15.95f));
-		assertTrue(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-	@Test 
-	void twoStructuresZ3()		
-	{
-		a.body().transform().position(new Vector3f(0, 0, 16.05f));
-		assertFalse(dcc.colliding(a, b, new Vector3f(), null));
-	}
-	
-//	@Test
-	void testPosZNormal()
-	{
-		a.body().transform().position(new Vector3f(-0.01f, -0.01f, 15.95f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(0, 0, 1), info.normal);
-	}
-	
-//	@Test
-	void testNegZNormal()
-	{
-		a.body().transform().position(new Vector3f(-0.01f, -0.01f, -15.45f));
-		dcc.colliding(a, b, new Vector3f(), info);
-		
-		assertVectorEquals(new Vector3f(0, 0, -1), info.normal);
+		a.body().transform().position(new Vector3f(-20, 0, 0));
+		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
 	}
 }

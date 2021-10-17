@@ -48,19 +48,24 @@ public class PhysicsWorld
 	{
 		for(PhysicalObject a : bodies)
 		{
-			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
-
-			for(PhysicalObject b : bodies)
+			if(a.body().velocity().x() != 0 
+					|| a.body().velocity().y() != 0 
+					|| a.body().velocity().z() != 0)
 			{
-				if(!b.equals(a))
+				Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
+	
+				for(PhysicalObject b : bodies)
 				{
-					handlePotentialCollision(a, b, deltaA);
+					if(!b.equals(a))
+					{
+						handlePotentialCollision(a, b, deltaA);
+					}
 				}
+				
+				a.body().transform().position(
+						a.body().transform().position().add(
+								deltaA, new Vector3f()));
 			}
-			
-			a.body().transform().position(
-					a.body().transform().position().add(
-							deltaA, new Vector3f()));
 		}
 	}
 	

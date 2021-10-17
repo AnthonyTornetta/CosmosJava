@@ -6,6 +6,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.Orientation;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class OBBCollider implements Iterable<Vector3fc>
 {
@@ -85,5 +86,11 @@ public class OBBCollider implements Iterable<Vector3fc>
 	public Iterator<Vector3fc> iterator()
 	{
 		return new CornerIterator(this);
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "{" + Utils.toEasyString(center) + " +/- " + Utils.toEasyString(halfwidths) + "; X: " + Utils.toEasyString(localAxis[0]) + "; Y: " + Utils.toEasyString(localAxis[1]) + "; Z: " + Utils.toEasyString(localAxis[2]) + "}";
 	}
 }

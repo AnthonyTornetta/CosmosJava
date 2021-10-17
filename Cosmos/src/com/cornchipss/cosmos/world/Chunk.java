@@ -3,7 +3,9 @@ package com.cornchipss.cosmos.world;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -14,6 +16,8 @@ import org.joml.Vector3ic;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.physx.collision.CollisionInfo;
+import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
@@ -393,5 +397,97 @@ public class Chunk implements IWritable
 		
 		return new OBBCollider(at, 
 				structure().body().transform().orientation(), block.halfWidths());
+	}
+
+	public OBBCollider wholeOBBForBlock(int x, int y, int z)
+	{
+		Vector3f temp = new Vector3f();
+		
+		Vector3f at = structure().chunkWorldPosition(this, new Vector3f());
+		
+		temp.set(x + 0.5f, y + 0.5f, z + 0.5f);
+		structure.body().transform().orientation().applyRotation(temp, temp);
+		at.add(temp);
+		
+		return new OBBCollider(at, 
+				structure().body().transform().orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
+	}
+
+	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, CollisionInfo info, IOBBCollisionChecker checker)
+	{
+		OBBCollider chunkCollider = structure.obbForChunk(this);
+		
+		CollisionInfo tempInfo = new CollisionInfo();
+		
+		// Checks if the line is within the chunk
+		if(!checker.testLineOBB(lineStart, lineDelta, chunkCollider, tempInfo))
+			return false;
+		
+		Vector3f point = tempInfo.collisionPoint;
+		
+		float totalDist = lineDelta.dot(lineDelta);
+		
+		Set<Vector3i> places = new HashSet<>();
+		places.add(structure.worldCoordsToChunkCoords(point));
+		
+		Set<Vector3i> nextPlaces = new HashSet<>();
+		
+		while(places.size() != 0)
+		{
+			boolean hit = false;
+			boolean tooFar = false;
+			
+			for(Vector3i p : places)
+			{
+				if(this.hasBlock(p) && 
+						checker.testLineOBB(lineStart, lineDelta, 
+								this.obbForBlock(p.x, p.y, p.z), info))
+				{
+					if(info == null)
+						return true;
+					
+					if(info.distanceSquared <= totalDist)
+						hit = true;
+					else
+						tooFar = true;
+				}
+				else if(checker.testLineOBB(lineStart, lineDelta, this.wholeOBBForBlock(p.x, p.y, p.z), null))
+				{
+					for(int dz = 0; dz <= 1; dz++)
+					{
+						for(int dy = 0; dy <= 1; dy++)
+						{
+							// skip 0, 0, 0
+							for(int dx = (dz == 0 && dy == 0) ? 1 : 0; dx <= 1; dx++)
+							{
+								int xx, yy, zz;
+								xx = p.x + (int)Math.signum(lineDelta.x()) * dx;
+								yy = p.y + (int)Math.signum(lineDelta.y()) * dy;
+								zz = p.z + (int)Math.signum(lineDelta.z()) * dz;
+								
+								if(within(xx, yy, zz))
+								{
+									Vector3i v = new Vector3i(xx, yy, zz);
+									if(!places.contains(v))
+									{
+										nextPlaces.add(v);
+									}
+								}
+							}
+						}
+					}
+				}
+				
+				places = nextPlaces;
+				nextPlaces = new HashSet<>();
+			}
+			
+			if(hit)
+				return true;
+			else if(tooFar)
+				return false;
+		}
+		
+		return false;
 	}
 }
