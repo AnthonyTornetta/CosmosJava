@@ -31,6 +31,8 @@ public class Chunk implements IWritable
 	
 	private boolean needsRendered;
 	
+	private boolean empty = true;
+	
 	public boolean lightmapNeedsUpdating()
 	{
 		return false;
@@ -52,6 +54,8 @@ public class Chunk implements IWritable
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
 	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT, LENGTH);
 	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS).div(2);
+
+	private static final float EPSILON = 1E-5f;
 	
 	private Block[][][] blocks;
 	
@@ -242,6 +246,8 @@ public class Chunk implements IWritable
 		
 		if(!Utils.equals(blocks[z][y][x], block))
 		{
+			empty = false;
+			
 			blocks[z][y][x] = block;
 			
 			if(block != null)
@@ -413,6 +419,8 @@ public class Chunk implements IWritable
 				structure().body().transform().orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 	}
 
+	static int itr = 0;
+	
 	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, CollisionInfo info, IOBBCollisionChecker checker)
 	{
 		OBBCollider chunkCollider = structure.obbForChunk(this);
@@ -424,6 +432,7 @@ public class Chunk implements IWritable
 			return false;
 		
 		Vector3f point = tempInfo.collisionPoint;
+		point.add(lineDelta.normalize(EPSILON, new Vector3f()));
 		
 		float totalDist = lineDelta.dot(lineDelta);
 		
@@ -477,11 +486,11 @@ public class Chunk implements IWritable
 						}
 					}
 				}
-				
-				places = nextPlaces;
-				nextPlaces = new HashSet<>();
 			}
 			
+			places = nextPlaces;
+			nextPlaces = new HashSet<>();
+
 			if(hit)
 				return true;
 			else if(tooFar)
@@ -489,5 +498,10 @@ public class Chunk implements IWritable
 		}
 		
 		return false;
+	}
+
+	public boolean empty()
+	{
+		return empty;
 	}
 }

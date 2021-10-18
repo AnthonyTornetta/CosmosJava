@@ -36,6 +36,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				for(int x = 0; x < a.chunksWidth(); x++)
 				{
 					OBBCollider obbA = a.obbForChunk(a.chunk(x, y, z));
+					
 					if(obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
 					{
 						chunks.add(a.chunk(x, y, z));
@@ -55,9 +56,16 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		
 		for(Chunk c : aChunks)
 		{
+			if(c.empty())
+				continue;
+			
 			OBBCollider obbA = sa.obbForChunk(c);
+			
 			for(Chunk bc : bChunks)
 			{
+				if(bc.empty())
+					continue;
+				
 				OBBCollider obbB = sb.obbForChunk(bc);
 				
 				if(obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))

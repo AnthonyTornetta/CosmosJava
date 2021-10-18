@@ -17,6 +17,7 @@ import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class DefaultCollisionCheckerTest
@@ -81,18 +82,46 @@ class DefaultCollisionCheckerTest
 	}
 	
 //	@Test
-	void emptyStructure()
-	{
-		fill(a, null);
-		
-		a.body().transform().position(new Vector3f(-20, 0, 0));
-		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
-	}
+//	void emptyStructure()
+//	{
+//		fill(a, null);
+//		
+//		a.body().transform().position(new Vector3f(-20, 0, 0));
+//		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
+//	}
+//	
+//	@Test
+//	void structurePosX()
+//	{
+//		a.body().transform().position(new Vector3f(-20, 0, 0));
+//		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), info));
+//		
+//		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
+//	}
+//	
+//	@Test
+//	void structureNegX()
+//	{
+//		a.body().transform().position(new Vector3f(20, 0, 0));
+//		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
+//		
+//		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
+//	}
 	
 	@Test
-	void structurePosX()
+	void structureFarAwayX()
 	{
-		a.body().transform().position(new Vector3f(-20, 0, 0));
-		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
+		a.body().transform().position(new Vector3f(200, 0, 0));
+		b.body().transform().position(new Vector3f(190, 0, 0));
+		
+		for(int i = 0; i < 100; i++)
+		{
+			long time = System.currentTimeMillis();
+			assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
+			long delta = System.currentTimeMillis() - time;
+			
+			Utils.println(delta + "ms" + " / " + 1000/60.0f);
+		}
+		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
 	}
 }
