@@ -25,6 +25,20 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		if(info == null)
 			info = new CollisionInfo(); // It's still needed for JOML functions
 		
+		if(testOBBOBB(a, b))
+		{
+			if(info != null)
+			{
+				info.collisionPoint.set(a.center());
+				info.distanceSquared = 0;
+				info.normal.set(aDeltaPos);
+				info.normal.mul(-1);
+				if(aDeltaPos.x() != 0 || aDeltaPos.y() != 0 || aDeltaPos.z() != 0)
+					info.normal.normalize();
+			}
+			return true;
+		}
+		
 		boolean hit = false;
 		
 		for(Vector3fc point : a)
@@ -36,7 +50,7 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				
 				hit = true;
 			}
-		}
+		}				
 		
 		return hit;
 	}

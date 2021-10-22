@@ -31,7 +31,8 @@ public class RigidBody
 
 	public void navigateTowards(Vector3fc vec)
 	{
-		vec.sub(transform.position(), this.velocity);
+		transform.position(vec);
+//		vec.sub(transform.position(), this.velocity);
 	}
 	
 	public void rotateTowards(Quaternionfc quat)

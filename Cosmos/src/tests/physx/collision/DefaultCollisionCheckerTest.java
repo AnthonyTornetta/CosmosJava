@@ -45,8 +45,8 @@ class DefaultCollisionCheckerTest
 	{
 		World w = new World();
 		
-		a = new Planet(w, 16, 16, 16, 1);
-		b = new Planet(w, 16, 16, 16, 2);
+		a = new Planet(w, 16*4, 16*4, 16*4, 1);
+		b = new Planet(w, 16*4, 16*4, 16*4, 2);
 		
 		fill(a, Blocks.STONE);
 		fill(b, Blocks.STONE);
@@ -82,46 +82,55 @@ class DefaultCollisionCheckerTest
 	}
 	
 //	@Test
-//	void emptyStructure()
-//	{
-//		fill(a, null);
-//		
-//		a.body().transform().position(new Vector3f(-20, 0, 0));
-//		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
-//	}
-//	
-//	@Test
-//	void structurePosX()
-//	{
-//		a.body().transform().position(new Vector3f(-20, 0, 0));
-//		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), info));
-//		
-//		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
-//	}
-//	
-//	@Test
-//	void structureNegX()
-//	{
-//		a.body().transform().position(new Vector3f(20, 0, 0));
-//		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
-//		
-//		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
-//	}
+	void emptyStructure()
+	{
+		fill(a, null);
+		
+		a.body().transform().position(new Vector3f(-20, 0, 0));
+		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
+	}
 	
-	@Test
+//	@Test
+	void structurePosX()
+	{
+		a.body().transform().position(new Vector3f(-20, 0, 0));
+		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), info));
+		
+		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
+	}
+	
+//	@Test
+	void structureNegX()
+	{
+		a.body().transform().position(new Vector3f(20, 0, 0));
+		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
+		
+		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
+	}
+	
+//	@Test
 	void structureFarAwayX()
 	{
 		a.body().transform().position(new Vector3f(200, 0, 0));
 		b.body().transform().position(new Vector3f(190, 0, 0));
 		
-		for(int i = 0; i < 100; i++)
-		{
-			long time = System.currentTimeMillis();
-			assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
-			long delta = System.currentTimeMillis() - time;
-			
-			Utils.println(delta + "ms" + " / " + 1000/60.0f);
-		}
+		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
+		
 		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
+	}
+	
+	@Test
+	void structureFarAway()
+	{	
+		float dx = 0.1f;
+		float dy = 0.1f;
+		float dz = 0.1f;
+		
+		a.body().transform().position(new Vector3f(100+a.width() / 2.f + dx, 100 + a.height() / 2.f + dy, 100 + a.length() / 2.f + dz));
+		b.body().transform().position(new Vector3f(100, 100, 100));
+		
+		assertTrue(dcc.colliding(a, b, new Vector3f(-2 * dx, -2 * dy, -2 * dz), info));
+		
+		Utils.println(info.normal);
 	}
 }

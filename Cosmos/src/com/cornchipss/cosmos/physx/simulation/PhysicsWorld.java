@@ -3,7 +3,6 @@ package com.cornchipss.cosmos.physx.simulation;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -48,23 +47,26 @@ public class PhysicsWorld
 	{
 		for(PhysicalObject a : bodies)
 		{
-			if(a.body().velocity().x() != 0 
-					|| a.body().velocity().y() != 0 
-					|| a.body().velocity().z() != 0)
 			{
 				Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
-	
-				for(PhysicalObject b : bodies)
+				
+				if(deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
 				{
-					if(!b.equals(a))
+					for(PhysicalObject b : bodies)
 					{
-						handlePotentialCollision(a, b, deltaA);
+						if(!b.equals(a))
+						{
+							handlePotentialCollision(a, b, deltaA);
+						}
 					}
 				}
 				
+				
+				a.body().velocity().mul(delta, deltaA);
+				
 				a.body().transform().position(
 						a.body().transform().position().add(
-								deltaA, new Vector3f()));
+								deltaA, deltaA));
 			}
 		}
 	}
@@ -75,10 +77,20 @@ public class PhysicsWorld
 		
 		if(strategy.colliding(a, b, deltaA, info))
 		{
-			Utils.println(a.getClass().getSimpleName() + " hit " + b.getClass().getSimpleName() + " NORM: " + Utils.toString(info.normal));
+			info.normal.set(0, 0, 1);
 			
-//			a.body().velocity(a.body().velocity().add(a.body().velocity().mul(info.normal, new Vector3f()), new Vector3f()));
+			Vector3f mulBy = new Vector3f();
+			mulBy.x = Math.signum(a.body().velocity().x()) == Math.signum(info.normal.x) ? 1 : -1;
+			mulBy.y = Math.signum(a.body().velocity().y()) == Math.signum(info.normal.y) ? 1 : -1;
+			mulBy.z = Math.signum(a.body().velocity().z()) == Math.signum(info.normal.z) ? 1 : -1;
 			
+			info.normal.x = Math.abs(info.normal.x) * mulBy.x;
+			info.normal.y = Math.abs(info.normal.y) * mulBy.y;
+			info.normal.z = Math.abs(info.normal.z) * mulBy.z;
+			
+			info.normal.mul(0.5f);
+			
+			a.body().velocity(a.body().velocity().mul(info.normal, new Vector3f()));
 		}
 	}
 

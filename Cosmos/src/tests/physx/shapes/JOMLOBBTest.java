@@ -40,6 +40,15 @@ class JOMLOBBTest
 	}
 	
 	@Test
+	void testMoving2()
+	{
+		OBBCollider a = new OBBCollider(new Vector3f(-22.5f, -21.1f, -25.1f), new Orientation(), new Vector3f(80, 80, 80));
+		OBBCollider b = new OBBCollider(new Vector3f(0.0f, -80.0f, 0.0f), new Orientation(), new Vector3f(80.0f, 40.0f, 80.0f));
+		
+		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0.1f, 0, 0), a, b, info));
+	}
+	
+//	@Test
 	void testMoving()
 	{
 		// y

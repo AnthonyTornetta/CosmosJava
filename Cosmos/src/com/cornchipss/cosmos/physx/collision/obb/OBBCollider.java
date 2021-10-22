@@ -83,6 +83,30 @@ public class OBBCollider implements Iterable<Vector3fc>
 	public Orientation orientation() { return or; }
 	
 	@Override
+	public boolean equals(Object other)
+	{
+		if(other instanceof OBBCollider)
+		{
+			OBBCollider c = (OBBCollider)other;
+			return c.center().equals(center()) && 
+					c.localAxis()[0].equals(localAxis()[0]) &&
+					c.localAxis()[1].equals(localAxis()[1]) &&
+					c.localAxis()[2].equals(localAxis()[2]) &&
+					c.halfwidths().equals(this.halfwidths());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return center().hashCode() * halfwidths().hashCode() 
+				* localAxis()[0].hashCode() * localAxis()[1].hashCode() 
+				* localAxis()[2].hashCode();
+	}
+	
+	@Override
 	public Iterator<Vector3fc> iterator()
 	{
 		return new CornerIterator(this);

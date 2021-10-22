@@ -21,6 +21,7 @@ import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
+import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
@@ -61,7 +62,7 @@ public abstract class Structure extends PhysicalObject implements
 	private float totalMass = 0;
 	
 	Map<BlockSystem, List<StructureBlock>> systems = new HashMap<>();
-
+	
 	public Structure(World world, int id)
 	{
 		super(world);
@@ -238,24 +239,26 @@ public abstract class Structure extends PhysicalObject implements
 		return x + cWidth * (y + cHeight * z);
 	}
 	
-	private void chunkAt(int x, int y, int z, Chunk c)
+	public void chunk(int x, int y, int z, Chunk c)
 	{
 		chunks[flatten(x, y, z)] = c;
 	}
 	
-	private Chunk chunkAt(int x, int y, int z)
+	public Chunk chunk(int x, int y, int z)
 	{
 		return chunks[flatten(x, y, z)];
 	}
 	
-	public Chunk chunk(int x, int y, int z)
+	@Deprecated
+	public Chunk chunk_old(int x, int y, int z)
 	{
-		return chunkAt(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH);
+		return chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH);
 	}
 	
-	public void chunk(int x, int y, int z, Chunk c)
+	@Deprecated
+	public void chunk_old(int x, int y, int z, Chunk c)
 	{
-		chunkAt(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH, c);
+		chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH, c);
 	}
 	
 	public Vector3f chunkWorldPosition(Chunk c, Vector3f out)
@@ -270,7 +273,11 @@ public abstract class Structure extends PhysicalObject implements
 	
 	public Vector3f chunkRelativePosCentered(Chunk c, Vector3f out)
 	{
-		return chunkRelativePosCentered(c.localPosition().x(), c.localPosition().y(), c.localPosition().z(), out);
+		Orientation o = body().transform().orientation();
+		
+		Vector3f temp = new Vector3f(c.relativePosition());
+		
+		return o.applyRotation(temp, temp);
 	}
 	
 	public Vector3f chunkRelativePosCentered(int x, int y, int z, Vector3f out)
@@ -305,9 +312,9 @@ public abstract class Structure extends PhysicalObject implements
 					int i = flatten(x, y, z);
 					chunks[i] = new Chunk(
 							x, y, z,
-							(x - cWidth / 2.f) * Chunk.WIDTH + Chunk.WIDTH / 2.f, 
-							(y - cHeight / 2.f) * Chunk.HEIGHT + Chunk.HEIGHT / 2.f, 
-							(z - cLength / 2.f) * Chunk.LENGTH + Chunk.LENGTH / 2.f,
+							(x - cWidth / 2) * Chunk.WIDTH + ((1 - cWidth % 2) * Chunk.WIDTH / 2.f), 
+							(y - cHeight / 2) * Chunk.HEIGHT + ((1 - cHeight % 2) * Chunk.HEIGHT / 2.f), 
+							(z - cLength / 2) * Chunk.LENGTH + ((1 - cLength % 2) * Chunk.LENGTH / 2.f),
 							x * Chunk.WIDTH + 1, 
 							y * Chunk.HEIGHT + 1, 
 							z * Chunk.LENGTH + 1, this);
@@ -393,7 +400,7 @@ public abstract class Structure extends PhysicalObject implements
 			{
 				for(int x = 0; x < chunksWidth(); x++)
 				{
-					chunkAt(x, y, z).write(writer);
+					chunk(x, y, z).write(writer);
 				}
 			}
 		}
@@ -428,7 +435,7 @@ public abstract class Structure extends PhysicalObject implements
 			{
 				for(int x = 0; x < chunksWidth(); x++)
 				{
-					chunkAt(x, y, z).read(reader);
+					chunk(x, y, z).read(reader);
 				}
 			}
 		}
@@ -484,7 +491,7 @@ public abstract class Structure extends PhysicalObject implements
 		
 		if(withinBlocks(x, y, z))
 		{
-			Chunk c = chunk(x, y, z);
+			Chunk c = chunk_old(x, y, z);
 			
 			StructureBlock structBlock = new StructureBlock(this, x, y, z);
 			
@@ -543,7 +550,7 @@ public abstract class Structure extends PhysicalObject implements
 		
 		if(withinBlocks(x, y, z))
 		{
-			Chunk c = chunk(x, y, z);
+			Chunk c = chunk_old(x, y, z);
 			
 			return c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
 		}
@@ -716,6 +723,44 @@ public abstract class Structure extends PhysicalObject implements
 
 	public OBBCollider obbForChunk(Chunk c)
 	{
-		return new OBBCollider(c.relativePosition(), body().transform().orientation(), Chunk.HALF_DIMENSIONS);
+		return new OBBCollider(chunkWorldPosCentered(c, new Vector3f()), body().transform().orientation(), Chunk.HALF_DIMENSIONS);
+	}
+
+	public OBBCollider OBB()
+	{
+		return new OBBCollider(position(), body().transform().orientation(), new Vector3f(width() / 2.f, height() / 2.f, length() / 2.f));
+	}
+	
+	private OBBCollider genOBB(Chunk a, int x, int y, int z, Vector3fc halfwidths)
+	{
+		Vector3f pos = this.chunkWorldPosCentered(a, new Vector3f());
+		
+		Vector3f delta = new Vector3f(
+				x - a.width() / 2.f + 0.5f,
+				y - a.height() / 2.f + 0.5f,
+				z - a.length() / 2.f + 0.5f);
+		
+		this.body().transform().orientation().applyRotation(delta, delta);
+		pos.add(delta);
+		
+		return new OBBCollider(pos, body().transform().orientation(), halfwidths);
+	}
+	
+	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f, 0.5f, 0.5f);
+	
+	public OBBCollider wholeOBBForBlock(Chunk a, int x, int y, int z)
+	{
+		if(a.within(x, y, z))
+			return genOBB(a, x, y, z, HALF_WIDTHS_DEFAULT);
+		
+		return null;
+	}
+
+	public OBBCollider obbForBlock(Chunk a, int x, int y, int z)
+	{
+		if(a.hasBlock(x, y, z))
+			return genOBB(a, x, y, z, a.block(x, y, z).halfWidths());
+		
+		return null;
 	}
 }
