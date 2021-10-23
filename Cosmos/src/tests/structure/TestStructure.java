@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -76,6 +77,24 @@ class TestStructure
 	}
 	
 	@Test
+	void asdf()
+	{
+		init(16, 16, 16);
+		
+		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(0, 0, 0)));
+		
+		init(16*8, 16*8, 16*8);
+		
+		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(-1.01f, -0.01f, -1)));
+		
+		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(1.01f, 0.01f, 1)));
+//		a.worldCoordsToO
+		Vector3i here = a.worldCoordsToChunkCoords(new Vector3f(1.01f, 0.01f, 1));
+		OBBCollider c = a.wholeOBBForBlock(a.chunk(1, 1, 1), here.x, here.y, here.z);
+		Utils.println(c);
+	}
+	
+	@Test
 	void blocks()
 	{
 		final int W = 16, H = 16, L = 16;
@@ -83,6 +102,10 @@ class TestStructure
 		init(W, H, L);
 		
 		OBBCollider c = a.obbForBlock(a.chunk(0, 0, 0), 0, 0, 0);
+		
+		assertEquals(
+				new OBBCollider(new Vector3f(0, 0, 0), new Orientation(), 
+						new Vector3f(8, 8, 8)), a.obbForChunk(a.chunk(0, 0, 0)));
 		
 		assertEquals(
 				new OBBCollider(new Vector3f(-7.5f, -7.5f, -7.5f), new Orientation(), 

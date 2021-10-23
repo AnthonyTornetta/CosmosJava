@@ -22,6 +22,7 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 	
@@ -55,7 +56,7 @@ public class Chunk implements IWritable
 	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT, LENGTH);
 	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS).div(2);
 
-	private static final float EPSILON = 1E-5f;
+	private static final float EPSILON = 1E-4f;
 	
 	private Block[][][] blocks;
 	
@@ -392,9 +393,102 @@ public class Chunk implements IWritable
 		return localPosition;
 	}
 	
-	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, CollisionInfo info, IOBBCollisionChecker checker)
+	private boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, Vector3ic dir,
+			CollisionInfo info, IOBBCollisionChecker checker, 
+			int x, int y, int z, Set<Vector3i> done, Vector3i temp)
 	{
-		return true;
+		if(done.contains(temp.set(x, y, z)))
+			return false;
+		
+		done.add(new Vector3i(x, y, z));
+		
+		if(!within(x, y, z))
+			return false;
+		
+		Utils.println(lineStart);
+		Utils.println(lineDelta);
+		Utils.println(structure().obbForBlock(this, x, y, z));
+		
+		OBBCollider c = structure().wholeOBBForBlock(this, x, y, z);
+		if(c == null)
+			return false;
+		
+		if(!checker.testLineOBB(lineStart, lineDelta, c, null))
+			return false;
+		
+		Utils.println(lineStart);
+		Utils.println(lineDelta);
+
+		if(hasBlock(x, y, z))
+		{
+			if(checker.testLineOBB(lineStart, lineDelta, structure().obbForBlock(this, x, y, z), info))
+			{
+				Utils.println(" -> true");
+				return true;
+			}
+		}
+		
+		boolean res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y, z, done, temp);
+		
+		if(res && info == null)
+			return true;
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z, done, temp);
+		if(res && info == null)
+			return true;
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y, z + dir.z(), done, temp);
+		if(res && info == null)
+			return true;
+		
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
+		if(res && info == null)
+			return true;
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z + dir.z(), done, temp);
+		if(res && info == null)
+			return true;
+		
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
+		if(res && info == null)
+			return true;
+		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z + dir.z(), done, temp);
+		if(res && info == null)
+			return true;
+		
+		Utils.println(" -> " + res);
+		
+		return res;
+	}
+	
+	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, 
+			CollisionInfo info, IOBBCollisionChecker checker)
+	{
+		OBBCollider chunkCollider = structure.obbForChunk(this);
+		
+		CollisionInfo tempInfo = new CollisionInfo();
+		
+		// Checks if the line is within the chunk
+		if(!checker.testLineOBB(lineStart, lineDelta, chunkCollider, tempInfo))
+		{
+			tempInfo.collisionPoint.set(lineStart);
+		}
+		
+		Set<Vector3i> done = new HashSet<>();
+		
+		Vector3i direction = Maths.signumi(lineDelta, new Vector3i());
+		
+		Vector3i here = structure.worldCoordsToChunkCoords(
+				tempInfo.collisionPoint.add(
+						EPSILON * direction.x, 
+						EPSILON * direction.y, 
+						EPSILON * direction.z));
+		
+		Vector3f rel = (structure.chunkRelativePosCentered(this, new Vector3f()));
+		Vector3f world = structure.chunkWorldPosCentered(this, new Vector3f());
+		OBBCollider c = structure.obbForBlock(this, here.x, here.y, 16-here.z);
+//		Vector3f xd = structure.chunkCoordsToWorldCoords(this, here, new Vector3f());
+		Vector3fc sdddxxd = this.relativePosition();
+		
+		return testLineIntersection(lineStart, lineDelta, direction, 
+				info, checker, here.x, here.y, here.z, done, new Vector3i());
 		
 //		OBBCollider chunkCollider = structure.obbForChunk(this);
 //		

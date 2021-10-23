@@ -13,7 +13,6 @@ import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -68,7 +67,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 	}
 	
 	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA, CollisionInfo info)
-	{		
+	{
 		OBBCollider bOBB = b.structure().obbForChunk(b);
 		
 		Vector3fc pos = a.structure().chunkWorldPosCentered(a, new Vector3f());
@@ -163,10 +162,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 						
 						if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), info)) 
 						{
-							Utils.println(b.structure().obbForChunk(b));
-							Utils.println("VS");
-							Utils.println(obbBlockA);
-							
 							for(Vector3fc pointOfInterest : obbBlockA)
 							{
 								if(b.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
@@ -187,8 +182,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 		
-		Utils.println(hit);
-				
 		return hit;
 	}
 	

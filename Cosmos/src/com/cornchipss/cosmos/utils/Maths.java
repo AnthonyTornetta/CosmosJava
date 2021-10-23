@@ -706,4 +706,16 @@ public class Maths
 	{
 		return b.sub(a, new Vector3f()).cross(c.sub(a, new Vector3f())).normalize(1);
 	}
+
+	public static Vector3fc signum(Vector3fc v, Vector3f out)
+	{
+		out.set(Math.signum(v.x()), Math.signum(v.y()), Math.signum(v.z()));
+		return out;
+	}
+
+	public static Vector3i signumi(Vector3fc v, Vector3i out)
+	{
+		out.set((int)Math.signum(v.x()), (int)Math.signum(v.y()), (int)Math.signum(v.z()));
+		return out;
+	}
 }

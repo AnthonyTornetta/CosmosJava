@@ -478,10 +478,101 @@ public abstract class Structure extends PhysicalObject implements
 	{
 		return new Vector3i(local.x() % Chunk.WIDTH, local.y() % Chunk.HEIGHT, local.z() % Chunk.LENGTH);
 	}
-
+	
+	public Vector3f chunkCoordsToWorldCoords(Chunk c, Vector3i pos, Vector3f out)
+	{
+		Vector3f posF = new Vector3f(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
+		
+		this.chunkWorldPosition(c, out);
+		
+		this.body().transform().orientation().applyRotation(posF, posF);
+		
+		out.add(posF);
+		
+		return out;
+	}
+	
 	public Vector3i worldCoordsToChunkCoords(Vector3fc v)
 	{
-		return structureCoordsToChunkCoords(worldCoordsToStructureCoords(v));
+		Vector3f temp = new Vector3f(v);
+		this.body().transform().orientation().applyInverseRotation(temp, temp);
+		temp.sub(body().transform().position());
+		
+		Vector3i ret = new Vector3i();
+		if(cWidth % 2 == 0)
+		{
+			if(temp.x >= 0)
+			{
+				ret.x = (int)temp.x % Chunk.WIDTH;
+			}
+			else
+			{
+				ret.x = (Chunk.WIDTH + (int)Math.floor(temp.x) % Chunk.WIDTH) % Chunk.WIDTH;
+			}
+		}
+		else
+		{
+			if(temp.x >= 0)
+			{
+				ret.x = (int)(temp.x + Chunk.WIDTH / 2) % Chunk.WIDTH;
+			}
+			else
+			{
+				ret.x = (Chunk.WIDTH - (int)Math.abs(Math.floor(temp.x - Chunk.WIDTH / 2)) % Chunk.WIDTH) % Chunk.WIDTH;
+			}
+		}
+		
+		
+		
+		if(cHeight % 2 == 0)
+		{
+			if(temp.y >= 0)
+			{
+				ret.y = (int)temp.y % Chunk.HEIGHT;
+			}
+			else
+			{
+				ret.y = (Chunk.HEIGHT + (int)Math.floor(temp.y) % Chunk.HEIGHT) % Chunk.HEIGHT;
+			}
+		}
+		else
+		{
+			if(temp.y >= 0)
+			{
+				ret.y = (int)(temp.y + Chunk.HEIGHT / 2) % Chunk.HEIGHT;
+			}
+			else
+			{
+				ret.y = (Chunk.HEIGHT - (int)Math.abs(Math.floor(temp.y - Chunk.HEIGHT / 2)) % Chunk.HEIGHT) % Chunk.HEIGHT;
+			}
+		}
+		
+		
+		
+		if(cLength % 2 == 0)
+		{
+			if(temp.z >= 0)
+			{
+				ret.z = (int)temp.z % Chunk.LENGTH;
+			}
+			else
+			{
+				ret.z = (Chunk.LENGTH + (int)Math.floor(temp.z) % Chunk.LENGTH) % Chunk.LENGTH;
+			}
+		}
+		else
+		{
+			if(temp.z >= 0)
+			{
+				ret.z = (int)(temp.z + Chunk.LENGTH / 2) % Chunk.LENGTH;
+			}
+			else
+			{
+				ret.z = (Chunk.LENGTH - (int)Math.abs(Math.floor(temp.z - Chunk.LENGTH / 2)) % Chunk.LENGTH) % Chunk.LENGTH;
+			}
+		}
+		
+		return ret;
 	}
 	
 	public void block(int x, int y, int z, Block b)
