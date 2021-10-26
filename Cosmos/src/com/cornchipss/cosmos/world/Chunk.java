@@ -405,25 +405,18 @@ public class Chunk implements IWritable
 		if(!within(x, y, z))
 			return false;
 		
-		Utils.println(lineStart);
-		Utils.println(lineDelta);
-		Utils.println(structure().obbForBlock(this, x, y, z));
-		
 		OBBCollider c = structure().wholeOBBForBlock(this, x, y, z);
 		if(c == null)
 			return false;
 		
 		if(!checker.testLineOBB(lineStart, lineDelta, c, null))
 			return false;
-		
-		Utils.println(lineStart);
-		Utils.println(lineDelta);
 
 		if(hasBlock(x, y, z))
 		{
-			if(checker.testLineOBB(lineStart, lineDelta, structure().obbForBlock(this, x, y, z), info))
+			OBBCollider obbc = structure().obbForBlock(this, x, y, z);
+			if(checker.testLineOBB(lineStart, lineDelta, obbc, info))
 			{
-				Utils.println(" -> true");
 				return true;
 			}
 		}
@@ -453,8 +446,6 @@ public class Chunk implements IWritable
 		if(res && info == null)
 			return true;
 		
-		Utils.println(" -> " + res);
-		
 		return res;
 	}
 	
@@ -480,12 +471,6 @@ public class Chunk implements IWritable
 						EPSILON * direction.x, 
 						EPSILON * direction.y, 
 						EPSILON * direction.z));
-		
-		Vector3f rel = (structure.chunkRelativePosCentered(this, new Vector3f()));
-		Vector3f world = structure.chunkWorldPosCentered(this, new Vector3f());
-		OBBCollider c = structure.obbForBlock(this, here.x, here.y, 16-here.z);
-//		Vector3f xd = structure.chunkCoordsToWorldCoords(this, here, new Vector3f());
-		Vector3fc sdddxxd = this.relativePosition();
 		
 		return testLineIntersection(lineStart, lineDelta, direction, 
 				info, checker, here.x, here.y, here.z, done, new Vector3i());

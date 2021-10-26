@@ -48,7 +48,7 @@ class JOMLOBBTest
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0.1f, 0, 0), a, b, info));
 	}
 	
-//	@Test
+	@Test
 	void testMoving()
 	{
 		// y

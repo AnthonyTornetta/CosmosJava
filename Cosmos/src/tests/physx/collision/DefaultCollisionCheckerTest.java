@@ -81,7 +81,7 @@ class DefaultCollisionCheckerTest
 			assertTrue(true); // it passed
 	}
 	
-//	@Test
+	@Test
 	void emptyStructure()
 	{
 		fill(a, null);
@@ -90,7 +90,7 @@ class DefaultCollisionCheckerTest
 		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
 	}
 	
-//	@Test
+	@Test
 	void structurePosX()
 	{
 		a.body().transform().position(new Vector3f(-20, 0, 0));
@@ -99,7 +99,7 @@ class DefaultCollisionCheckerTest
 		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
 	}
 	
-//	@Test
+	@Test
 	void structureNegX()
 	{
 		a.body().transform().position(new Vector3f(20, 0, 0));
@@ -108,7 +108,7 @@ class DefaultCollisionCheckerTest
 		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
 	}
 	
-//	@Test
+	@Test
 	void structureFarAwayX()
 	{
 		a.body().transform().position(new Vector3f(200, 0, 0));
@@ -131,6 +131,6 @@ class DefaultCollisionCheckerTest
 		
 		assertTrue(dcc.colliding(a, b, new Vector3f(-2 * dx, -2 * dy, -2 * dz), info));
 		
-		Utils.println(info.normal);
+		assertVectorEquals(new Vector3f(1.f, 0, 0), info.normal);
 	}
 }
