@@ -13,7 +13,6 @@ import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -188,7 +187,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			
 			if(!obbChecker.testMovingOBBOBB(deltaA, sa.OBB(), sb.OBB(), null))
 			{
-				Utils.println("NOIPE!");
 				return false;
 			}
 			

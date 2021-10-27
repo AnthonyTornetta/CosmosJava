@@ -26,7 +26,7 @@ public class ServerGame extends Game
 	{
 		instance = this;
 		
-		mainPlanet = new Planet(world(), 16,16,16, 1);
+		mainPlanet = new Planet(world(), 16*8,16*4,16*8, 1);
 		mainPlanet.init();
 		
 		Biosphere def = Biospheres.newInstance("cosmos:grass");
