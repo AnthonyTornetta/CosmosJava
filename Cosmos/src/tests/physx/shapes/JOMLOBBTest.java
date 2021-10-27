@@ -40,7 +40,7 @@ class JOMLOBBTest
 	}
 	
 	@Test
-	void testMoving2()
+	void testMoving0()
 	{
 		OBBCollider a = new OBBCollider(new Vector3f(-22.5f, -21.1f, -25.1f), new Orientation(), new Vector3f(80, 80, 80));
 		OBBCollider b = new OBBCollider(new Vector3f(0.0f, -80.0f, 0.0f), new Orientation(), new Vector3f(80.0f, 40.0f, 80.0f));
@@ -49,7 +49,16 @@ class JOMLOBBTest
 	}
 	
 	@Test
-	void testMoving()
+	void testMovingReal()
+	{
+		OBBCollider c1 = new OBBCollider(new Vector3f(4.6f, -19.9f, 3.4f), new Orientation(), new Vector3f(80, 80, 80));
+		OBBCollider c2 = new OBBCollider(new Vector3f(0.0f, -16.0f, 0.0f), new Orientation(), new Vector3f(8, 8, 8));
+		
+		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(-0.20185247f, 0.0014078844f, -0.16358137f), c1, c2, info));
+	}
+	
+	@Test
+	void testMoving1()
 	{
 		// y
 		
@@ -57,31 +66,49 @@ class JOMLOBBTest
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0, 10.0f, 0), a, b, info));
 		
 		assertVecEquals(new Vector3f(0, -1.0f, 0), info.normal);
-		
+	}
+	
+	@Test
+	void testMoving2()
+	{
 		b = new OBBCollider(new Vector3f(0, -2.0f, 0), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0, -10.0f, 0), a, b, info));
 		
 		assertVecEquals(new Vector3f(0, 1.0f, 0), info.normal);
-		
+	}	
+	
 		// x
-		
+	@Test
+	void testMoving3()
+	{	
 		b = new OBBCollider(new Vector3f(2.0f, 0, 0), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(10.0f, 0, 0), a, b, info));
 		
 		assertVecEquals(new Vector3f(-1.0f, 0, 0), info.normal);
-		
+	}
+	
+	@Test
+	void testMoving4()
+	{
 		b = new OBBCollider(new Vector3f(-2.0f, 0, 0), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(-10.0f, 0, 0), a, b, info));
-		
+
 		assertVecEquals(new Vector3f(1.0f, 0, 0), info.normal);
-		
+	}		
 		// z
-		
+	
+	@Test
+	void testMoving5()
+	{
 		b = new OBBCollider(new Vector3f(0, 0, 2.0f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0, 0, 10.0f), a, b, info));
 		
 		assertVecEquals(new Vector3f(0, 0, -1.0f), info.normal);
-		
+	}
+	
+	@Test
+	void testMoving6()
+	{
 		b = new OBBCollider(new Vector3f(0, 0, -2.0f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f));
 		assertTrue(obbChecker.testMovingOBBOBB(new Vector3f(0, 0, -10.0f), a, b, info));
 		

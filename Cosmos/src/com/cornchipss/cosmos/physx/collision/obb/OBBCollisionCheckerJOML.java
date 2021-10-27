@@ -18,9 +18,33 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				(Vector3f)b.localAxis()[2], (Vector3f)b.halfwidths()));
 	}
 
+	private boolean testMovingOBBOBB(Vector3fc aDeltaPos, Vector3fc deltaStart, OBBCollider a, OBBCollider b, CollisionInfo info, CollisionInfo actual)
+	{
+		boolean hit = false;
+		
+		for(Vector3fc pt : a)
+		{
+			Vector3f point = new Vector3f(pt);
+			point.add(deltaStart);
+			
+			if(testLineOBB(point, aDeltaPos, b, info))
+			{
+				if(info == null)
+					return true;
+				
+				info.distanceSquared = 0;
+				
+				return true;
+			}
+		}
+		
+		return hit;
+	}
+	
 	@Override
 	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, CollisionInfo info)
 	{
+		CollisionInfo actual = info;
 		if(info == null)
 			info = new CollisionInfo(); // It's still needed for JOML functions
 		
@@ -30,25 +54,42 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		{
 			if(testLineOBB(point, aDeltaPos, b, info))
 			{
-				if(info == null)
+				if(actual == null)
 					return true;
 				
 				hit = true;
 			}
-		}				
+		}
 		
 		if(!hit && testOBBOBB(a, b))
 		{
-			if(info != null)
+			// Last resort collision
+			if(actual != null)
 			{
-				info.collisionPoint.set(a.center());
-				info.distanceSquared = 0;
-				info.normal.set(aDeltaPos);
-				info.normal.mul(-1);
-				if(aDeltaPos.x() != 0 || aDeltaPos.y() != 0 || aDeltaPos.z() != 0)
-					info.normal.normalize();
+				float max = Math.max(Math.max(b.halfwidths().x(), b.halfwidths().y()), b.halfwidths().z());
+				Vector3f deltaStart = new Vector3f(aDeltaPos);
+
+				if(deltaStart.x != 0 || deltaStart.y != 0 || deltaStart.z != 0)
+				{
+					deltaStart.normalize();
+					Vector3f newDelta = new Vector3f(deltaStart);
+					deltaStart.mul(-max);
+					newDelta.mul(2*max);
+					
+					return testMovingOBBOBB(newDelta, deltaStart, a, b, info, actual);
+				}
+				else
+				{
+					// If the OBB isn't actually moving just take a guess
+					info.collisionPoint.set(a.center());
+					info.distanceSquared = 0;
+					info.normal.set(0, 0, 0);
+					
+					return true;
+				}
 			}
-			return true;
+			else
+				return true;
 		}
 		
 		return hit;

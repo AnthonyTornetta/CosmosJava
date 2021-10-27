@@ -90,7 +90,7 @@ public class PhysicsWorld
 			a.body().velocity(a.body().velocity().mul(info.normal, new Vector3f()));
 		}
 	}
-
+	
 	public boolean locked()
 	{
 		return locked;

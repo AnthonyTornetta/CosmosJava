@@ -425,26 +425,28 @@ public class Chunk implements IWritable
 		
 		if(res && info == null)
 			return true;
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z, done, temp);
+		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z, done, temp);
 		if(res && info == null)
 			return true;
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y, z + dir.z(), done, temp);
-		if(res && info == null)
-			return true;
-		
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
-		if(res && info == null)
-			return true;
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z + dir.z(), done, temp);
+		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y, z + dir.z(), done, temp);
 		if(res && info == null)
 			return true;
 		
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
-		if(res && info == null)
-			return true;
-		res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z + dir.z(), done, temp);
-		if(res && info == null)
-			return true;
+		// me thinks these are useless but me not 100% sure
+		
+//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
+//		if(res && info == null)
+//			return true;
+//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z + dir.z(), done, temp);
+//		if(res && info == null)
+//			return true;
+//		
+//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
+//		if(res && info == null)
+//			return true;
+//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z + dir.z(), done, temp);
+//		if(res && info == null)
+//			return true;
 		
 		return res;
 	}

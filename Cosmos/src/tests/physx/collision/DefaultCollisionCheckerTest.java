@@ -17,7 +17,6 @@ import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class DefaultCollisionCheckerTest
@@ -36,14 +35,29 @@ class DefaultCollisionCheckerTest
 		}
 	}
 	
-	Structure a, b;
-	DefaultCollisionChecker dcc;
-	CollisionInfo info;
-
+	private static void fill(Structure s, Block b, int xx, int yy, int zz)
+	{
+		for(int z = 0; z < zz; z++)
+		{
+			for(int y = 0; y < yy; y++)
+			{
+				for(int x = 0; x < xx; x++)
+				{
+					s.block(x, y, z, b);
+				}
+			}
+		}
+	}
+	
+	private Structure a, b;
+	private DefaultCollisionChecker dcc;
+	private CollisionInfo info;
+	private World w;
+	
 	@BeforeEach
 	void before()
 	{
-		World w = new World();
+		w = new World();
 		
 		a = new Planet(w, 16*4, 16*4, 16*4, 1);
 		b = new Planet(w, 16*4, 16*4, 16*4, 2);
@@ -65,6 +79,7 @@ class DefaultCollisionCheckerTest
 		a = b = null;
 		dcc = null;
 		info = null;
+		w = null;
 	}
 	
 	private static final float EPSILON = 1e-5f;
@@ -80,6 +95,32 @@ class DefaultCollisionCheckerTest
 		else
 			assertTrue(true); // it passed
 	}
+	
+	@Test
+	void asdasdasd()
+	{
+		b = new Planet(w, 16*4, 16*4, 16*4, 2);
+		b.addToWorld(new Transform());
+
+		fill(b, Blocks.STONE, 5, 16, 16);
+		
+		a.body().transform().position(new Vector3f(20, 0, 0));
+		assertTrue(dcc.colliding(a, b, new Vector3f(-20.5f, 0, 0), info));
+		
+		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
+	}
+	
+//	@Test
+//	void asdasdasd2()
+//	{
+//		fill(b, null);
+//		fill(b, Blocks.STONE, 5);
+//		
+//		a.body().transform().position(new Vector3f(20, 0, 0));
+//		assertTrue(dcc.colliding(a, b, new Vector3f(-20.5f, 0, 0), info));
+//		
+//		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
+//	}
 	
 	@Test
 	void emptyStructure()

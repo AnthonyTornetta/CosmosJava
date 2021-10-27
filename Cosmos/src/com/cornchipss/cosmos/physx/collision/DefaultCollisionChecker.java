@@ -146,9 +146,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 		
-		if(info != null)
-			info.distanceSquared = Float.MAX_VALUE;
-		
 		boolean hit = false;
 		
 		for(int z : zs)
@@ -161,7 +158,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 					{
 						OBBCollider obbBlockA = a.structure().obbForBlock(a, x, y, z);
 						
-						if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), info)) 
+						if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), null)) 
 						{
 							for(Vector3fc pointOfInterest : obbBlockA)
 							{
@@ -172,11 +169,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 									hit = true;
 								}
 							}
-							
-//							if(info == null)
-//								return true;
-//							
-//							hit = true;
 						}						
 					}
 				}
@@ -196,23 +188,31 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			
 			if(!obbChecker.testMovingOBBOBB(deltaA, sa.OBB(), sb.OBB(), null))
 			{
+				Utils.println("NOIPE!");
 				return false;
 			}
+			
+			boolean hit = false;
 			
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
 			
 			aggregateChunks(sa, sb, deltaA, chunks);
-
+			
 			for(Chunk aC : chunks.keySet())
 			{
 				for(Chunk bC : chunks.get(aC))
 				{
 					if(fineCheck(aC, bC, deltaA, info))
 					{
-						return true;
+						if(info == null || info.distanceSquared == 0)
+							return true;
+						
+						hit = true;
 					}
 				}
 			}
+			
+			return hit;
 		}
 		
 		return false;
