@@ -65,7 +65,7 @@ public class ThrusterSystem extends BlockSystem
 			
 			ship.body().velocity(vel);
 			
-			ship.body().transform().rotateRelative(ship.movement().deltaRotation().negate(new Vector3f()));
+			ship.body().angularVelocity(ship.movement().deltaRotation().negate(new Vector3f()));
 		}
 	}
 

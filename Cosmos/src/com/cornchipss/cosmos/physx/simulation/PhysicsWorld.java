@@ -60,12 +60,15 @@ public class PhysicsWorld
 					}
 				}
 				
-				
 				a.body().velocity().mul(delta, deltaA);
 				
 				a.body().transform().position(
 						a.body().transform().position().add(
 								deltaA, deltaA));
+				
+				Vector3f deltaR = a.body().angularVelocity().mul(delta, new Vector3f());
+				
+				a.body().transform().rotateRelative(deltaR);
 			}
 		}
 	}
@@ -86,6 +89,13 @@ public class PhysicsWorld
 			info.normal.z = Math.abs(info.normal.z) * mulBy.z;
 			
 			info.normal.mul(0.5f);
+			
+			if(info.normal.x == 0)
+				info.normal.x = 1;
+			if(info.normal.y == 0)
+				info.normal.y = 1;
+			if(info.normal.z == 0)
+				info.normal.z = 1;
 			
 			a.body().velocity(a.body().velocity().mul(info.normal, new Vector3f()));
 		}
