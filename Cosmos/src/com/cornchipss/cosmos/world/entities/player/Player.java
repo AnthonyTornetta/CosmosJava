@@ -1,6 +1,5 @@
 package com.cornchipss.cosmos.world.entities.player;
 
-import org.joml.AABBf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -13,6 +12,7 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
@@ -33,6 +33,7 @@ public abstract class Player extends PhysicalObject
 	private Movement movement;
 	
 	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
+	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
 	
 	public Player(World world, String name)
 	{
@@ -66,17 +67,9 @@ public abstract class Player extends PhysicalObject
 	}
 	
 	@Override
-	public AABBf aabb(Vector3fc position, AABBf dest)
+	public OBBCollider OBB()
 	{
-		dest.minX = position.x() - WIDTH / 2.f;
-		dest.minY = position.y() - HEIGHT / 2.f;
-		dest.minZ = position.z() - LENGTH / 2.f;
-		
-		dest.maxX = position.x() + WIDTH / 2.f;
-		dest.maxY = position.y() + HEIGHT / 2.f;
-		dest.maxZ = position.z() + LENGTH / 2.f;
-		
-		return dest;
+		return new OBBCollider(this.position(), this.body().transform().orientation(), HALF_WIDTHS);
 	}
 	
 	public Structure calculateLookingAt()

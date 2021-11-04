@@ -4,7 +4,6 @@ import java.io.IOException;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector3i;
 import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
@@ -21,9 +20,9 @@ import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
-import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -32,135 +31,133 @@ import com.cornchipss.cosmos.world.World;
 public class ClientPlayer extends Player
 {
 	private GimbalLockCamera cam;
-	
+
 	public ClientPlayer(World world, String name)
 	{
 		super(world, name);
 	}
-	
+
 	@Override
 	public void addToWorld(Transform transform)
 	{
 		super.addToWorld(transform);
-		
+
 		cam = new GimbalLockCamera(transform);
 	}
-	
+
 	private byte[] buffer = new byte[128];
-	
+
 	@Override
 	public void update(float delta)
 	{
 		movement(Movement.movement(MovementType.NONE));
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_W))
+
+		if (Input.isKeyDown(GLFW.GLFW_KEY_W))
 			movement().add(MovementType.FORWARD);
-		if(Input.isKeyDown(GLFW.GLFW_KEY_S))
+		if (Input.isKeyDown(GLFW.GLFW_KEY_S))
 			movement().add(MovementType.BACKWARD);
-		if(Input.isKeyDown(GLFW.GLFW_KEY_A))
+		if (Input.isKeyDown(GLFW.GLFW_KEY_A))
 			movement().add(MovementType.LEFT);
-		if(Input.isKeyDown(GLFW.GLFW_KEY_D))
+		if (Input.isKeyDown(GLFW.GLFW_KEY_D))
 			movement().add(MovementType.RIGHT);
-		if(Input.isKeyDown(GLFW.GLFW_KEY_E))
+		if (Input.isKeyDown(GLFW.GLFW_KEY_E))
 			movement().add(MovementType.UP);
-		if(Input.isKeyDown(GLFW.GLFW_KEY_Q))
+		if (Input.isKeyDown(GLFW.GLFW_KEY_Q))
 			movement().add(MovementType.DOWN);
-		
+
 		Vector3f dRot = new Vector3f();
-		
+
 		dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.0025f);
-		
+
 		dRot.x = (dRot.x() - Input.getMouseDeltaY() * 0.0025f);
-		
+
 		movement().addDeltaRotation(dRot);
-		
-		if(!isPilotingShip())
+
+		if (!isPilotingShip())
 		{
 			handleHotbar();
-			
+
 			handleMovement(delta);
-			
+
 			handleInteractions();
 		}
-		else if(Input.isKeyJustDown(GLFW.GLFW_KEY_R))
+		else if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 		{
-			// 	shipPiloting(null);
+			// shipPiloting(null);
 			ExitShipPacket esp = new ExitShipPacket(buffer, 0);
 			esp.init();
-			try {
+			try
+			{
 				Client.instance().nettyClient().sendTCP(esp);
-			} catch (IOException e) {
+			}
+			catch (IOException e)
+			{
 				e.printStackTrace();
 			}
 		}
-		
+
 		camera().update();
-		
+
 		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
 		cmp.init();
 		Client.instance().nettyClient().sendUDP(cmp);
 	}
-	
+
 	private void handleInteractions()
 	{
 		Structure lookingAt = calculateLookingAt();
-		
-		if(lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R) || 
-						Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || 
-						Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2) || 
-						Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
-		{
-			Vector3fc from = camera().position();
-			Vector3f dLook = Maths.mul(camera().forward(), 10.0f);
-			Vector3f to = Maths.add(from, dLook);
 
-			RayResult hits = lookingAt.shape().raycast(from, to);
-			
-			if(hits.closestHit() != null)
+		if (lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R)
+			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
+			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
+		{
+			Structure.RayRes sb = lookingAt.raycast(camera().position(), camera().forward(), 10.0f,
+				new OBBCollisionCheckerJOML());
+
+			if (sb != null)
 			{
 				Block selectedBlock = null;
-				
+
 				selectedBlock = inventory().block(0, selectedInventoryColumn());
-				
-				Vector3i pos = new Vector3i(Maths.round(hits.closestHit().x()), 
-						Maths.round(hits.closestHit().y()), 
-						Maths.round(hits.closestHit().z()));
-				
-				if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
+
+				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
 					byte[] buffer = new byte[64];
-					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, pos.x, pos.y, pos.z, null);
+					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, sb.block().structureX(),
+						sb.block().structureY(), sb.block().structureZ(), null);
 					packet.init();
 					ClientGame.instance().nettyClient().sendUDP(packet);
 				}
-				else if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
+				else if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
-					if(selectedBlock != null && selectedBlock.canAddTo(lookingAt))
+					if (selectedBlock != null && selectedBlock.canAddTo(lookingAt))
 					{
-						BlockFace face = hits.closestFace();
-						
-						int xx = Maths.floor(pos.x + 0.5f + (face.getRelativePosition().x * 2)), 
-							yy = Maths.floor(pos.y + 0.5f + (face.getRelativePosition().y * 2)), 
-							zz = Maths.floor(pos.z + 0.5f + (face.getRelativePosition().z * 2));
-						
-						if(lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
+						BlockFace face = sb.face();
+
+						int xx = Maths.floor(sb.block().structureX() + 0.5f + (face.getRelativePosition().x * 2)),
+							yy = Maths.floor(sb.block().structureY() + 0.5f + (face.getRelativePosition().y * 2)),
+							zz = Maths.floor(sb.block().structureZ() + 0.5f + (face.getRelativePosition().z * 2));
+
+						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
-							//lookingAt.block(xx, yy, zz, selectedBlock);
+							// lookingAt.block(xx, yy, zz, selectedBlock);
 							byte[] buffer = new byte[64];
-							ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, xx, yy, zz, selectedBlock);
+							ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, xx, yy, zz,
+								selectedBlock);
 							packet.init();
 							ClientGame.instance().nettyClient().sendUDP(packet);
 						}
 					}
 				}
-				else if(Input.isKeyJustDown(GLFW.GLFW_KEY_R))
+				else if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 				{
-					if(lookingAt.block(pos.x, pos.y, pos.z) instanceof IInteractable)
+					if (lookingAt.block(sb.block().structureX(), sb.block().structureY(),
+						sb.block().structureZ()) instanceof IInteractable)
 					{
-						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, 
-								new StructureBlock(lookingAt, pos.x, pos.y, pos.z));
+						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, new StructureBlock(lookingAt,
+							sb.block().structureX(), sb.block().structureY(), sb.block().structureZ()));
 						cip.init();
-						
+
 						try
 						{
 							Client.instance().nettyClient().sendTCP(cip);
@@ -174,61 +171,61 @@ public class ClientPlayer extends Player
 			}
 		}
 	}
-	
+
 	private void handleMovement(float delta)
 	{
 		Vector3f dVel = new Vector3f();
-	    
-		if(movement().forward())
+
+		if (movement().forward())
 			dVel.add(camera().forward());
-		if(movement().backward())
+		if (movement().backward())
 			dVel.sub(camera().forward());
-		if(movement().right())
+		if (movement().right())
 			dVel.add(camera().right());
-		if(movement().left())
+		if (movement().left())
 			dVel.sub(camera().right());
-		if(movement().up())
+		if (movement().up())
 			dVel.add(camera().up());
-		if(movement().down())
+		if (movement().down())
 			dVel.sub(camera().up());
-		
+
 		dVel.x = (dVel.x() * (delta * 1000));
 		dVel.z = (dVel.z() * (delta * 1000));
 		dVel.y = (dVel.y() * (delta * 1000));
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
+
+		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
 			dVel.mul(0.001f);
-		
+
 		Vector3fc dRot = movement().deltaRotation();
-		
+
 		cam.rotate(dRot);
-		
+
 		Vector3f vel = new Vector3f(body().velocity());
-		
-		if(Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+
+		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel.mul(0.75f);
-		
+
 		vel.add(dVel);
-		
+
 		vel = Maths.safeNormalize(vel, 50.0f);
-		
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
+
+		if (Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 			vel.y = (vel.y() + 5);
-		
+
 		body().velocity(vel);
 	}
-	
+
 	private void handleHotbar()
 	{
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_0))
+		if (Input.isKeyJustDown(GLFW.GLFW_KEY_0))
 		{
 			selectedInventoryColumn(9);
 		}
 		else
 		{
-			for(int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
+			for (int key = GLFW.GLFW_KEY_1; key <= GLFW.GLFW_KEY_9 + 1; key++)
 			{
-				if(Input.isKeyJustDown(key))
+				if (Input.isKeyJustDown(key))
 				{
 					selectedInventoryColumn(key - GLFW.GLFW_KEY_1);
 					break;
@@ -236,18 +233,18 @@ public class ClientPlayer extends Player
 			}
 		}
 	}
-	
+
 	public Camera camera()
 	{
 		return cam;
 	}
-	
+
 	@Override
 	public void body(RigidBody b)
 	{
 		super.body(b);
-		
-		if(cam != null)
+
+		if (cam != null)
 			cam.parent(b.transform());
 	}
 }

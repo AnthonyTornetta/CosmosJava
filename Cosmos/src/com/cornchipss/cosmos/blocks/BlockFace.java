@@ -1,6 +1,9 @@
 package com.cornchipss.cosmos.blocks;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
+
+import com.cornchipss.cosmos.utils.Utils;
 
 /**
  * The faces of each block
@@ -98,5 +101,25 @@ public enum BlockFace
 		default:
 			return new Vector3f(0, 0, 0);
 		}
+	}
+
+	public static BlockFace fromNormal(Vector3fc normal)
+	{
+		if(Utils.equals(normal.x(), 1))
+			return RIGHT;
+		if(Utils.equals(normal.x(), -1))
+			return LEFT;
+		
+		if(Utils.equals(normal.y(), 1))
+			return TOP;
+		if(Utils.equals(normal.y(), -1))
+			return BOTTOM;
+		
+		if(Utils.equals(normal.z(), 1))
+			return FRONT;
+		if(Utils.equals(normal.z(), -1))
+			return BACK;
+		
+		return null;
 	}
 }

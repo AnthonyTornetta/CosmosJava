@@ -1,8 +1,8 @@
 package com.cornchipss.cosmos.physx;
 
-import org.joml.AABBf;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
 import com.cornchipss.cosmos.world.World;
 
@@ -11,9 +11,9 @@ public abstract class PhysicalObject
 	private RigidBody body;
 	private World world;
 	
-	public abstract AABBf aabb(Vector3fc originCenter, AABBf dest);
-	
 	public abstract PhysicsShape shape();
+	
+	public abstract OBBCollider OBB();
 	
 	public PhysicalObject(World world)
 	{

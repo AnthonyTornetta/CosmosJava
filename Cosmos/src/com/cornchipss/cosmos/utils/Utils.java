@@ -18,6 +18,8 @@ public class Utils
 	 */
 	private static FloatBuffer matrixBuffer = BufferUtils.createFloatBuffer(16);
 	
+	public static final float EPSILON = 1E-5f;
+	
 	/**
 	 * Prints an object w/ the class & line number next to it and a newline
 	 * @param obj The object to print
@@ -270,6 +272,17 @@ public class Utils
 			return true;
 		   
 		return a.equals(b);
+	}
+	
+	/**
+	 * Checks if two objects are equal & is null safe
+	 * @param a Object A
+	 * @param b Object B
+	 * @return Checks if two objects are equal
+	 */
+	public static boolean equals(float a, float b)
+	{
+		return Math.abs(a - b) <= EPSILON;
 	}
 	
 	public static String toEasyString(Vector3fc v)

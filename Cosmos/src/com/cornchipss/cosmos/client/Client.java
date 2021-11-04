@@ -18,111 +18,111 @@ import com.cornchipss.cosmos.utils.io.Input;
 public class Client implements Runnable
 {
 	private Window window;
-	
+
 	private static Client instance;
-	
+
 	public Client()
 	{
 		NettySide.initNettySide(NettySide.CLIENT);
-		
-		if(instance != null)
+
+		if (instance != null)
 			throw new IllegalStateException("Cannot have more than 1 running clients!");
 		instance = this;
 	}
-	
+
 	private volatile boolean running = true;
 	private State state;
 	private CosmosNettyClient client;
-	
+
 	private Thread nettyThread;
-	
+
 	public boolean connected()
 	{
 		return client != null;
 	}
-	
+
 	public void connectTo(String ip, int port, String name) throws IOException
 	{
-		if(connected())
+		if (connected())
 			throw new IllegalStateException("Already connected");
-		
+
 		client = new CosmosNettyClient();
 		try
 		{
 			client.createConnection(ip, port, name);
 		}
-		catch(IOException ex)
+		catch (IOException ex)
 		{
 			client = null;
 			throw ex;
 		}
-		
+
 		nettyThread = new Thread(client);
 		nettyThread.start();
 	}
-	
+
 	public void disconnect() throws IOException, InterruptedException
 	{
-		if(!connected())
+		if (!connected())
 			throw new IllegalStateException("Not connected");
-		
+
 		client.disconnect();
 		nettyThread.join();
 		nettyThread = null;
 	}
-	
+
 	@Override
 	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
-		
+
 		window = new Window(1024, 720, "Cosmos");
-		
+
 		Initializer loader = new Initializer();
 		loader.init();
-		
+
 		PacketTypes.registerAll();
-		
+
 		Input.setWindow(window);
 		Input.update();
-		
+
 		Fonts.init();
-		
+
 		state(new MainMenuState());
-		
+
 		GameLoop loop = new GameLoop((float delta) ->
 		{
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
+			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
 				Input.toggleCursor();
-			
-			if(Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
+
+			if (Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
 				running(false);
-			
+
 			state.update(delta);
-			
+
 			window.clear(0, 0, 0, 1);
-			
+
 			state.render(delta);
-			
+
 			Input.update();
 
 			window.update();
-			
+
 			state.postUpdate();
-			
+
 			return running();
 		}, 1000 / 70);
-		
+
 		loop.run();
-		
+
 		window.destroy();
-		
+
 		Logger.LOGGER.info("Window Destroyed");
-		
+
 		try
 		{
 			Logger.LOGGER.info("Netty thread joined");
-			if(nettyThread != null)
+			if (nettyThread != null)
 				nettyThread.join();
 			Logger.LOGGER.info("Netty thread terminated gracefully");
 		}
@@ -130,7 +130,7 @@ public class Client implements Runnable
 		{
 			e.printStackTrace();
 		}
-		
+
 		Logger.LOGGER.info("Successfully closed.");
 	}
 
@@ -143,21 +143,21 @@ public class Client implements Runnable
 	{
 		running = b;
 	}
-	
+
 	public boolean running()
 	{
 		return !window.shouldClose() && running;
 	}
-	
+
 	public void state(State state)
 	{
-		if(this.state != null)
+		if (this.state != null)
 			this.state.remove();
-		
+
 		this.state = state;
 		state.init(window);
 	}
-	
+
 	public State state()
 	{
 		return state;

@@ -42,8 +42,8 @@ public class StructureShape implements PhysicsShape
 		List<Vector3f> hits = new LinkedList<>();
 		List<BlockFace> faces = new LinkedList<>();
 		
-		Vector3i coordsNeg = s.worldCoordsToStructureCoords(from);
-		Vector3i coordsPos = s.worldCoordsToStructureCoords(to);
+		Vector3i coordsNeg = s.worldCoordsToBlockCoords(from);
+		Vector3i coordsPos = s.worldCoordsToBlockCoords(to);
 		
 		if(coordsNeg.x > coordsPos.x)
 		{
@@ -177,7 +177,7 @@ public class StructureShape implements PhysicsShape
 		
 		while(dist < totalDist)
 		{
-			localCoords = s.worldCoordsToStructureCoords(pos);
+			localCoords = s.worldCoordsToBlockCoords(pos);
 			if(check(pos, lineEndMod, localCoords, orientation, res, normal))
 				return true;
 			
@@ -186,7 +186,7 @@ public class StructureShape implements PhysicsShape
 			dist++;
 		}
 		
-		localCoords = s.worldCoordsToStructureCoords(lineEndMod);
+		localCoords = s.worldCoordsToBlockCoords(lineEndMod);
 		if(check(lineStartMod, lineEndMod, localCoords, orientation, res, normal))
 			return true;
 		
