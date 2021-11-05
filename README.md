@@ -25,6 +25,8 @@ A multiplayer block-based space exploration game
 - Ship collision when just rotating & not moving
 - Health for blocks on structure
 
+![Screenshot of Title Screen](https://raw.githubusercontent.com/AnthonyTornetta/Cosmos/master/Cosmos/assets/images/screenshot_5.png)
+
 ![Screenshot of Game](https://raw.githubusercontent.com/AnthonyTornetta/Cosmos/master/Cosmos/assets/images/screenshot_2.png)
 ![Screenshot of Game](https://raw.githubusercontent.com/AnthonyTornetta/Cosmos/master/Cosmos/assets/images/screenshot_3.png)
 ![Screenshot of Game](https://raw.githubusercontent.com/AnthonyTornetta/Cosmos/master/Cosmos/assets/images/screenshot_4.png)
