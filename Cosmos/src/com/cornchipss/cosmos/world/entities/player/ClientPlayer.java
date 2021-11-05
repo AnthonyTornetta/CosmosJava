@@ -8,7 +8,6 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
-import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
@@ -118,9 +117,7 @@ public class ClientPlayer extends Player
 				Block selectedBlock = null;
 
 				selectedBlock = inventory().block(0, selectedInventoryColumn());
-			}
-		}
-/*
+
 				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
 					byte[] buffer = new byte[64];
@@ -135,9 +132,9 @@ public class ClientPlayer extends Player
 					{
 						BlockFace face = sb.face();
 
-						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x * 2)),
-							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y * 2)),
-							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z * 2));
+						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x)),
+							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y)),
+							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z));
 
 						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
@@ -152,7 +149,7 @@ public class ClientPlayer extends Player
 				}
 				else if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 				{
-					if (sb.block() instanceof IInteractable)
+					if (sb.block().block() instanceof IInteractable)
 					{
 						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, new StructureBlock(lookingAt,
 							sb.block().structureX(), sb.block().structureY(), sb.block().structureZ()));
@@ -171,7 +168,6 @@ public class ClientPlayer extends Player
 			}
 			
 		}
-		*/
 	}
 
 	private void handleMovement(float delta)

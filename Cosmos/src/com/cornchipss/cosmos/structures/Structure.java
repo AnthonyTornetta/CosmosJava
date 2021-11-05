@@ -171,11 +171,13 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		int signY = (int)Math.signum(delta.y());
 		int signZ = (int)Math.signum(delta.z());
 		
-		for (int xi = -10; xi <= xx + 10; xi++)
+		// TODO: make this more efficient
+		
+		for (int xi = -xx - 1; xi <= xx + 10; xi++)
 		{
-			for (int yi = -10; yi <= yy + 10; yi++)
+			for (int yi = -yy - 1; yi <= yy + 10; yi++)
 			{
-				for (int zi = -10; zi <= zz + 10; zi++)
+				for (int zi = -zz - 1; zi <= zz + 10; zi++)
 				{					
 					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
 						start.z() + zi * signZ);
@@ -202,58 +204,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 		}
 		
-		Utils.println(rr);
-
 		return rr;
-
-//		Set<Vector3i> pts = new HashSet<>();
-//		Set<Vector3i> newPts = new HashSet<>();
-//
-//		pts.add(worldCoordsToBlockCoords(start));
-//
-//		Vector3i normSign = new Vector3i((int) Math.signum(delta.x()), (int) Math.signum(delta.y()),
-//			(int) Math.signum(delta.z()));
-//
-//		CollisionInfo info = new CollisionInfo();
-//
-//		while (pts.size() != 0)
-//		{
-//			boolean hit = false;
-//
-//			for (Vector3i pt : pts)
-//			{
-//				OBBCollider obb = wholeOBBForBlock(pt.x, pt.y, pt.z);
-//
-//				if(obb.center().dot(start) >= (totalDist - 0.5f) * (totalDist - 0.5f))
-//					continue;
-//				
-//				if (hasBlock(pt.x, pt.y, pt.z) && obc.testLineOBB(start, delta, obb, info))
-//				{
-//					hit = true;
-//					
-//					if (info.distanceSquared <= totalDist * totalDist)
-//						return new RayRes(new StructureBlock(this, pt.x, pt.y, pt.z), info.distanceSquared,
-//							BlockFace.fromNormal(info.normal));
-//				}
-//				
-//				if (withinBlocks(normSign.x() + pt.x, pt.y, pt.z))
-//					newPts.add(new Vector3i(normSign.x() + pt.x, pt.y, pt.z));
-//				if (withinBlocks(pt.x, normSign.y() + pt.y, pt.z))
-//					newPts.add(new Vector3i(pt.x, pt.y + normSign.y(), pt.z));
-//				if (withinBlocks(pt.x, pt.y, normSign.z() + pt.z))
-//					newPts.add(new Vector3i(pt.x, pt.y, pt.z + normSign.z()));
-//			}
-//
-//			if (hit)
-//			{
-//				return null; // none of the blocks were in range
-//			}
-//			else
-//			{
-//				pts = new HashSet<>(newPts);
-//				newPts.clear();
-//			}
-//		}
 	}
 
 	private OBBCollider wholeOBBForBlock(int x, int y, int z)
