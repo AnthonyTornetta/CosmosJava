@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
@@ -117,7 +118,9 @@ public class ClientPlayer extends Player
 				Block selectedBlock = null;
 
 				selectedBlock = inventory().block(0, selectedInventoryColumn());
-
+			}
+		}
+/*
 				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
 					byte[] buffer = new byte[64];
@@ -166,7 +169,9 @@ public class ClientPlayer extends Player
 					}
 				}
 			}
+			
 		}
+		*/
 	}
 
 	private void handleMovement(float delta)

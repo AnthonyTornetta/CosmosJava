@@ -32,6 +32,7 @@ import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
@@ -125,6 +126,12 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		{
 			return distance;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return block.block() + " " + face + " " + Utils.toEasyString(distance) + "m";
+		}
 	}
 
 	public RayRes raycast(Vector3fc start, Vector3fc direction, float length, IOBBCollisionChecker obc)
@@ -150,26 +157,55 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				return null; // the line does not intersect the structure
 		}
 
-		final float totalDist = Maths.sqrt(delta.dot(delta));
+		final float totalDistSquared = delta.dot(delta);
 
-		for(float xi = 0; xi <= Math.abs(delta.x()) + 1; xi ++)
+		CollisionInfo info = new CollisionInfo();
+		info.distanceSquared = totalDistSquared;
+		RayRes rr = null;
+
+		int xx = (int)Math.abs(delta.z());
+		int yy = (int)Math.abs(delta.y());
+		int zz = (int)Math.abs(delta.z());
+		
+		int signX = (int)Math.signum(delta.x());
+		int signY = (int)Math.signum(delta.y());
+		int signZ = (int)Math.signum(delta.z());
+		
+		for (int xi = -10; xi <= xx + 10; xi++)
 		{
-			for(float yi = 0; yi <= Math.abs(delta.y()) + 1; yi ++)
+			for (int yi = -10; yi <= yy + 10; yi++)
 			{
-				for(float zi = 0; zi <= Math.abs(delta.z()) + 1; zi ++)
-				{
-					Vector3f point = new Vector3f(start.x() + delta.x() * xi,
-						start.y() + delta.y() * yi,
-						start.z() + delta.z() * zi);
+				for (int zi = -10; zi <= zz + 10; zi++)
+				{					
+					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
+						start.z() + zi * signZ);
+
+					Vector3i blockCoords = worldCoordsToBlockCoords(point);
 					
-					Vector3i blockpos = worldCoordsToBlockCoords(point);
-					
-					OBBCollider obc = wholeOBBForBlock(blockpos.x, blockpos.y, blockpos.z);
-					
+					if(hasBlock(blockCoords.x, blockCoords.y, blockCoords.z) && withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
+					{
+						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x, blockCoords.y, blockCoords.z);
+						
+						CollisionInfo temp = new CollisionInfo();
+						
+						if (obc.testLineOBB(start, delta, obbBlock, temp))
+						{
+							if(temp.distanceSquared < info.distanceSquared)
+							{
+								info.set(temp);
+								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
+									Maths.sqrt(info.distanceSquared), BlockFace.fromNormal(info.normal));
+							}
+						}
+					}
 				}
 			}
 		}
 		
+		Utils.println(rr);
+
+		return rr;
+
 //		Set<Vector3i> pts = new HashSet<>();
 //		Set<Vector3i> newPts = new HashSet<>();
 //
@@ -218,8 +254,6 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 //				newPts.clear();
 //			}
 //		}
-		
-		return null;
 	}
 
 	private OBBCollider wholeOBBForBlock(int x, int y, int z)
@@ -227,7 +261,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		return new OBBCollider(localCoordsToWorldCoords(x, y, z), body().transform().orientation(),
 			HALF_WIDTHS_DEFAULT);
 	}
-	
+
 	public void energy(float f)
 	{
 		energy = f;
