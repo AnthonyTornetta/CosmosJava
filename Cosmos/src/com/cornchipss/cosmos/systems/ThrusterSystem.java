@@ -43,11 +43,14 @@ public class ThrusterSystem extends BlockSystem
 				dVel.sub(ship.body().transform().up());
 
 			if (dVel.x != 0 || dVel.y != 0 || dVel.z != 0 || ship.movement().deltaRotation().x() != 0
-				|| ship.movement().deltaRotation().y() != 0 || ship.movement().deltaRotation().z() != 0)
+				|| ship.movement().deltaRotation().y() != 0 || ship.movement().deltaRotation().z() != 0
+				|| ship.movement().stop() && (ship.body().velocity().dot(ship.body().velocity()) != 0))
 			{
 				if (!ship.useEnergy(energyCost))
 					return;
 			}
+			else
+				return; // Nothing is happening
 
 			float accel = thrustForce / ship.mass();
 
@@ -56,6 +59,17 @@ public class ThrusterSystem extends BlockSystem
 			dVel.y = (dVel.y() * (accel));
 
 			Vector3f vel = new Vector3f(ship.body().velocity());
+
+			if (ship.movement().stop())
+			{
+				Vector3f r = new Vector3f(0.1f * ship.body().velocity().x(), 0.1f * ship.body().velocity().y(),
+					0.1f * ship.body().velocity().z());
+
+				if (r.dot(r) != 0)
+					r.normalize(accel);
+
+				vel.sub(r);
+			}
 
 			vel.add(dVel);
 

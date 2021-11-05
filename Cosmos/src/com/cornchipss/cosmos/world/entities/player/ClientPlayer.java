@@ -63,7 +63,9 @@ public class ClientPlayer extends Player
 			movement().add(MovementType.UP);
 		if (Input.isKeyDown(GLFW.GLFW_KEY_Q))
 			movement().add(MovementType.DOWN);
-
+		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+			movement().add(MovementType.STOP);
+		
 		Vector3f dRot = new Vector3f();
 
 		dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.0025f);
@@ -104,12 +106,12 @@ public class ClientPlayer extends Player
 
 	private void handleInteractions()
 	{
-		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R)
-			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
+		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1)
+			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
 			Structure.RayRes sb = calculateLookingAt();
-			
+
 			if (sb != null)
 			{
 				Structure lookingAt = sb.block().structure();
@@ -166,7 +168,7 @@ public class ClientPlayer extends Player
 					}
 				}
 			}
-			
+
 		}
 	}
 

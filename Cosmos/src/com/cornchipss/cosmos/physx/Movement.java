@@ -13,7 +13,8 @@ public class Movement
 		LEFT(0b100),
 		RIGHT(0b1000),
 		UP(0b10000),
-		DOWN(0b100000);
+		DOWN(0b100000),
+		STOP(0b1000000);
 		
 		private final int code;
 		
@@ -96,6 +97,11 @@ public class Movement
 	public boolean down()
 	{
 		return (code & MovementType.DOWN.code) != 0;
+	}
+	
+	public boolean stop()
+	{
+		return (code & MovementType.STOP.code) != 0;
 	}
 	
 	public Vector3f movementDirection(Vector3f v)
