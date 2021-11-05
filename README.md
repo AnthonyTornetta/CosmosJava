@@ -23,3 +23,5 @@ A multiplayer block-based space exploration game
 - Better ship rotation
 - Ship collision when just rotating & not moving
 - Health for blocks on structure
+
+![Screenshot of Game](https://raw.githubusercontent.com/AnthonyTornetta/Cosmos/master/Cosmos/assets/images/screenshot_2.png)
