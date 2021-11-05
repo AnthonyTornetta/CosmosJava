@@ -6,7 +6,7 @@ public class StructureBlock
 {
 	private Structure structure;
 	private int x, y, z;
-	
+
 	public StructureBlock(Structure s, int x, int y, int z)
 	{
 		this.structure = s;
@@ -39,20 +39,20 @@ public class StructureBlock
 	{
 		return structure.block(x, y, z);
 	}
-	
+
 	public void changeBlock(Block to)
 	{
 		structure.block(x, y, z, to);
 	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{
-		if(!(o instanceof StructureBlock))
+		if (!(o instanceof StructureBlock))
 			return false;
-		
-		StructureBlock otr = (StructureBlock)o;
-		
+
+		StructureBlock otr = (StructureBlock) o;
+
 		return x == otr.x && y == otr.y && z == otr.z && structure.equals(otr.structure);
 	}
 }

@@ -21,7 +21,8 @@ public class EnergyGenerationSystem extends BlockSystem
 	@Override
 	public void update(Structure s, List<StructureBlock> blocks, float delta)
 	{
-		if(blocks.size() > 0)
-			s.addEnergy(((IEnergyProducerBlock)blocks.get(0).block()).energyGeneratedPerSecond() * blocks.size() * delta);
+		if (blocks.size() > 0)
+			s.addEnergy(
+				((IEnergyProducerBlock) blocks.get(0).block()).energyGeneratedPerSecond() * blocks.size() * delta);
 	}
 }

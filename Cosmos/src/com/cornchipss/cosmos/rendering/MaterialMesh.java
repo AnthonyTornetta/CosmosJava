@@ -9,13 +9,20 @@ public class MaterialMesh
 {
 	private Material mat;
 	private Mesh mesh;
-	
+
 	public MaterialMesh(Material mat, Mesh mesh)
 	{
 		this.mat = mat;
 		this.mesh = mesh;
 	}
-	
-	public Material material() { return mat; }
-	public Mesh mesh() { return mesh; }
+
+	public Material material()
+	{
+		return mat;
+	}
+
+	public Mesh mesh()
+	{
+		return mesh;
+	}
 }

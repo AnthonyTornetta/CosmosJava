@@ -16,77 +16,81 @@ import com.cornchipss.cosmos.utils.Logger;
 public class Server implements Runnable
 {
 	private static CosmosNettyServer server;
-	
-	public static CosmosNettyServer nettyServer() { return server; }
-	
+
+	public static CosmosNettyServer nettyServer()
+	{
+		return server;
+	}
+
 	public Server()
 	{
 		NettySide.initNettySide(NettySide.SERVER);
 	}
-	
+
 	@Override
 	public void run()
 	{
 		Logger.LOGGER.setLevel(Logger.LogLevel.DEBUG);
-		
+
 		Initializer loader = new ServerInitializer();
 		loader.init();
-		
+
 		ServerGame game = new ServerGame();
-		
+
 		DefaultCommandHandler defaultCmd = new DefaultCommandHandler();
-		
+
 		defaultCmd.addCommand(new StopCommand());
 		defaultCmd.addCommand(new PingCommand());
 		defaultCmd.addCommand(new SayCommand());
 		defaultCmd.addCommand(new SaveCommand());
-		
+
 		PacketTypes.registerAll();
 		server = new CosmosNettyServer(game, defaultCmd);
-		
+
 		Thread serverThread = new Thread(server);
 		serverThread.start();
-		
+
 		ServerConsole cmd = new ServerConsole();
-		
+
 		byte[] playerBuffer = new byte[128];
-		
+
 		GameLoop loop = new GameLoop((float delta) ->
 		{
 			server.game().update(delta);
-			
-			for(ServerPlayer p : server.players().players())
+
+			for (ServerPlayer p : server.players().players())
 			{
 				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
 				packet.init();
-				
+
 				server.sendToAllExceptUDP(packet, p);
 			}
-			
+
 			return server.running();
-		}, 1000/50); // 20 tps
-		
+		}, 1000 / 50); // 20 tps
+
 		Thread gameThread = new Thread(loop);
-		
+
 		gameThread.start();
-		
-		while(server.running())
+
+		while (server.running())
 		{
 			cmd.readCommand(server);
 		}
-		
+
 		Logger.LOGGER.info("Terminating server...");
-		
+
 		try
 		{
 			gameThread.join();
-			// I cannot join() the udp thread because it forever waits for a UDP connection that will never happen
+			// I cannot join() the udp thread because it forever waits for a UDP connection
+			// that will never happen
 		}
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
 		}
-		
+
 		Logger.LOGGER.info("Server terminated.");
 		System.exit(0);
 	}

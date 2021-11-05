@@ -11,7 +11,7 @@ import com.cornchipss.cosmos.rendering.Mesh;
 public abstract class GUIElementHolder extends GUIElement implements IGUIContainer, IHasGUIAddEvent
 {
 	private List<GUIElement> children = new LinkedList<>();
-	
+
 	public GUIElementHolder(MeasurementPair position, MeasurementPair dimensions)
 	{
 		super(position, dimensions);
@@ -19,19 +19,19 @@ public abstract class GUIElementHolder extends GUIElement implements IGUIContain
 
 	@Override
 	public abstract void onAdd(GUI gui);
-	
+
 	@Override
 	public boolean canBeDrawn()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public Mesh guiMesh()
 	{
 		return null;
 	}
-	
+
 	@Override
 	public List<GUIElement> children()
 	{
@@ -49,7 +49,7 @@ public abstract class GUIElementHolder extends GUIElement implements IGUIContain
 	{
 		children.remove(elem);
 	}
-	
+
 	public Material material()
 	{
 		return Materials.GUI_PAUSE_MENU;

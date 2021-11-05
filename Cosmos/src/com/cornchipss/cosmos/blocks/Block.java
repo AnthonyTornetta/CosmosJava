@@ -10,28 +10,44 @@ import com.cornchipss.cosmos.models.IHasModel;
 import com.cornchipss.cosmos.structures.Structure;
 
 /**
- * <p>A block in the world</p>
- * <p>Only one instance of each block should ever be present</p>
- * <p>Each block of the same type in the world points to that instance</p>
- * <p>Use {@link IHasData} to differentiate between different blocks</p>
+ * <p>
+ * A block in the world
+ * </p>
+ * <p>
+ * Only one instance of each block should ever be present
+ * </p>
+ * <p>
+ * Each block of the same type in the world points to that instance
+ * </p>
+ * <p>
+ * Use {@link IHasData} to differentiate between different blocks
+ * </p>
  */
 public class Block implements IHasModel
 {
 	private CubeModel model;
-	
+
 	private short id;
-	
+
 	private String name;
-	
+
 	private int mass;
-	
+
 	/**
-	 * <p>A block in the world</p>
-	 * <p>Only one instance of each block should ever be present</p>
-	 * <p>Each block of the same type in the world points to that instance</p>
-	 * <p>Use {@link BlockData} to differentiate between different blocks</p>
+	 * <p>
+	 * A block in the world
+	 * </p>
+	 * <p>
+	 * Only one instance of each block should ever be present
+	 * </p>
+	 * <p>
+	 * Each block of the same type in the world points to that instance
+	 * </p>
+	 * <p>
+	 * Use {@link BlockData} to differentiate between different blocks
+	 * </p>
 	 * 
-	 * @param m The model the block has
+	 * @param m    The model the block has
 	 * @param name The name used to refer to the block in the registry
 	 */
 	public Block(CubeModel m, String name, int mass)
@@ -39,34 +55,35 @@ public class Block implements IHasModel
 		this.model = m;
 		this.name = name;
 		this.mass = mass;
-		
+
 		id = -1;
 	}
-	
+
 	@Override
 	public CubeModel model()
 	{
 		return model;
 	}
-	
+
 	public short numericId()
 	{
-		if(id == -1)
+		if (id == -1)
 			throw new IllegalStateException("Id of a block was asked for before the block was initialized");
-		
+
 		return id;
 	}
-	
+
 	public void blockId(short s)
 	{
-		if(id != -1)
+		if (id != -1)
 			throw new IllegalStateException("Id of a block cannot be set more than once!!!");
-		
+
 		id = s;
 	}
-	
+
 	/**
 	 * Determines whether this block can be added to a given structure
+	 * 
 	 * @param s The structure to check
 	 * @return True if it can be added, false if not
 	 */
@@ -74,23 +91,23 @@ public class Block implements IHasModel
 	{
 		return true;
 	}
-	
+
 	public int mass()
 	{
 		return mass;
 	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{
-		if(o instanceof Block)
+		if (o instanceof Block)
 		{
-			return ((Block)o).numericId() == numericId();
+			return ((Block) o).numericId() == numericId();
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -101,7 +118,7 @@ public class Block implements IHasModel
 	{
 		return name;
 	}
-	
+
 	@Override
 	public String toString()
 	{
@@ -112,7 +129,7 @@ public class Block implements IHasModel
 	 * Halfwidths for OBB collision detection
 	 */
 	private Vector3fc halfwidths = new Vector3f(0.5f, 0.5f, 0.5f);
-	
+
 	/**
 	 * Halfwidths for OBB collision detection
 	 */

@@ -126,7 +126,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		{
 			return distance;
 		}
-		
+
 		@Override
 		public String toString()
 		{
@@ -163,36 +163,37 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		info.distanceSquared = totalDistSquared;
 		RayRes rr = null;
 
-		int xx = (int)Math.abs(delta.z());
-		int yy = (int)Math.abs(delta.y());
-		int zz = (int)Math.abs(delta.z());
-		
-		int signX = (int)Math.signum(delta.x());
-		int signY = (int)Math.signum(delta.y());
-		int signZ = (int)Math.signum(delta.z());
-		
+		int xx = (int) Math.abs(delta.z());
+		int yy = (int) Math.abs(delta.y());
+		int zz = (int) Math.abs(delta.z());
+
+		int signX = (int) Math.signum(delta.x());
+		int signY = (int) Math.signum(delta.y());
+		int signZ = (int) Math.signum(delta.z());
+
 		// TODO: make this more efficient
-		
+
 		for (int xi = -xx - 1; xi <= xx + 10; xi++)
 		{
 			for (int yi = -yy - 1; yi <= yy + 10; yi++)
 			{
 				for (int zi = -zz - 1; zi <= zz + 10; zi++)
-				{					
+				{
 					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
 						start.z() + zi * signZ);
 
 					Vector3i blockCoords = worldCoordsToBlockCoords(point);
-					
-					if(hasBlock(blockCoords.x, blockCoords.y, blockCoords.z) && withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
+
+					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
+						&& withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
 					{
 						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x, blockCoords.y, blockCoords.z);
-						
+
 						CollisionInfo temp = new CollisionInfo();
-						
+
 						if (obc.testLineOBB(start, delta, obbBlock, temp))
 						{
-							if(temp.distanceSquared < info.distanceSquared)
+							if (temp.distanceSquared < info.distanceSquared)
 							{
 								info.set(temp);
 								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
@@ -203,7 +204,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				}
 			}
 		}
-		
+
 		return rr;
 	}
 

@@ -20,9 +20,9 @@ public class PacketTypes
 {
 	private static Map<Byte, Packet> packetTypes = new HashMap<>();
 	private static Map<Class<? extends Packet>, Byte> markers = new HashMap<>();
-	
+
 	private static byte marker = 1;
-	
+
 	public static void addPacketType(Packet p)
 	{
 //		if(packetTypes.containsKey(p.marker()))
@@ -31,20 +31,20 @@ public class PacketTypes
 		markers.put(p.getClass(), marker);
 		marker++;
 	}
-	
+
 	public static Packet packet(byte marker)
 	{
 		return packetTypes.get(marker);
 	}
-	
+
 	public static byte marker(Class<? extends Packet> packetClass)
 	{
-		if(!markers.containsKey(packetClass))
+		if (!markers.containsKey(packetClass))
 			throw new IllegalArgumentException("PacketClass " + packetClass.getName() + " not registered!");
-		
+
 		return markers.get(packetClass);
 	}
-	
+
 	public static void registerAll()
 	{
 		addPacketType(new JoinPacket());

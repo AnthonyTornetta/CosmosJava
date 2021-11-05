@@ -14,16 +14,16 @@ public class GUIRectangle extends GUITexture
 	{
 		super(position, dimensions, 0, 0, generateMaterial(color));
 	}
-	
+
 	private static Material generateMaterial(Color c)
 	{
 		BufferedImage bi = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		bi.setRGB(0, 0, c.getRGB());
-		
+
 		Texture texture = Texture.loadTexture(bi);
 		Material mat = new RawImageMaterial(texture);
 		mat.init();
-		
+
 		return mat;
 	}
 }

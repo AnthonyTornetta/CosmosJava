@@ -17,66 +17,73 @@ public class ServerConnection
 	private int port;
 	private DatagramSocket socket;
 	private TCPServerConnection tcpServerConnection;
-	
+
 	public ServerConnection(InetAddress addr, int port, TCPServerConnection tcp)
 	{
 		this.addr = addr;
 		this.port = port;
 		this.tcpServerConnection = tcp;
 	}
-	
+
 	public ServerConnection(InetAddress addr, int port)
 	{
 		this.addr = addr;
 		this.port = port;
 	}
-	
+
 	public void initTCP(TCPServerConnection tcpServer)
 	{
 		this.tcpServerConnection = tcpServer;
 	}
-	
+
 	public ServerConnection(TCPServerConnection tcpServer)
 	{
 		this.tcpServerConnection = tcpServer;
 	}
-	
+
 	public void initUDP(InetAddress addr, int port)
 	{
 		this.addr = addr;
 		this.port = port;
 	}
-	
+
 	public void initUDPSocket() throws SocketException
 	{
 		socket = new DatagramSocket();
 	}
-	
-	public InetAddress address() { return addr; }
-	public int port() { return port; }
-	
+
+	public InetAddress address()
+	{
+		return addr;
+	}
+
+	public int port()
+	{
+		return port;
+	}
+
 	@Override
 	public int hashCode()
 	{
-		if(hasTCP())
+		if (hasTCP())
 			return tcpServerConnection.hashCode();
 		else
 			return addr.hashCode() + port;
 	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{
-		if(o instanceof ServerConnection)
+		if (o instanceof ServerConnection)
 		{
-			if(hasTCP())
-				return Utils.equals(tcpServerConnection, ((ServerConnection)o).tcpServerConnection);
+			if (hasTCP())
+				return Utils.equals(tcpServerConnection, ((ServerConnection) o).tcpServerConnection);
 			else
-				return Utils.equals(addr, ((ServerConnection)o).addr) && port == ((ServerConnection)o).port;
+				return Utils.equals(addr, ((ServerConnection) o).addr) && port == ((ServerConnection) o).port;
 		}
 		return false;
 	}
-	
+
 //
 //	public void send(byte[] buffer, int length, int offset) throws IOException
 //	{
@@ -98,11 +105,10 @@ public class ServerConnection
 	{
 		tcpServerConnection.sendData(buffer, 0, length);
 	}
-	
+
 	public void sendUDP(byte[] buffer, int length, CosmosNettyClient client)
 	{
-		DatagramPacket response = new DatagramPacket(buffer, 0, length, 
-				address(), port());
+		DatagramPacket response = new DatagramPacket(buffer, 0, length, address(), port());
 		try
 		{
 			socket.send(response);
@@ -112,9 +118,16 @@ public class ServerConnection
 			throw new RuntimeException(ex);
 		}
 	}
-	
-	public boolean hasTCP() { return tcpServerConnection != null; }
-	public boolean hasUDP() { return addr != null; }
+
+	public boolean hasTCP()
+	{
+		return tcpServerConnection != null;
+	}
+
+	public boolean hasUDP()
+	{
+		return addr != null;
+	}
 
 	public TCPServerConnection tcpConnection()
 	{

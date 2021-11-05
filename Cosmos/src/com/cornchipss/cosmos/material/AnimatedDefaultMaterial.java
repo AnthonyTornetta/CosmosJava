@@ -6,7 +6,7 @@ import org.lwjgl.glfw.GLFW;
 public class AnimatedDefaultMaterial extends Material
 {
 	private int projLoc, camLoc, transLoc, stateLoc, ambientLoc;
-	
+
 	public AnimatedDefaultMaterial()
 	{
 		super("assets/shaders/chunk-animated", "assets/images/atlas/main-animated");
@@ -19,7 +19,7 @@ public class AnimatedDefaultMaterial extends Material
 		shader().setUniformMatrix(camLoc, camera);
 		shader().setUniformMatrix(transLoc, transform);
 		shader().setUniformF(ambientLoc, inGUI ? 1 : 0.2f);
-		shader().setUniformI(stateLoc, (int)(GLFW.glfwGetTime() * 1000));
+		shader().setUniformI(stateLoc, (int) (GLFW.glfwGetTime() * 1000));
 	}
 
 	@Override

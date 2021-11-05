@@ -6,7 +6,7 @@ import org.lwjgl.glfw.GLFW;
 public class DefaultMaterial extends Material
 {
 	private int projLoc, camLoc, transLoc, ambientLoc, timeLoc;
-	
+
 	public DefaultMaterial()
 	{
 		super("assets/shaders/chunk", "assets/images/atlas/main");
@@ -19,7 +19,7 @@ public class DefaultMaterial extends Material
 		shader().setUniformMatrix(camLoc, camera);
 		shader().setUniformMatrix(transLoc, transform);
 		shader().setUniformF(ambientLoc, inGUI ? 1 : 0.2f);
-		shader().setUniformF(timeLoc, (float)GLFW.glfwGetTime());
+		shader().setUniformF(timeLoc, (float) GLFW.glfwGetTime());
 	}
 
 	@Override

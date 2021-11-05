@@ -43,240 +43,236 @@ public class ClientGame extends Game
 	private GUI gui;
 	private GUIText fpsText;
 	private CosmosNettyClient nettyClient;
-	public CosmosNettyClient nettyClient() { return nettyClient; }
-	
+
+	public CosmosNettyClient nettyClient()
+	{
+		return nettyClient;
+	}
+
 	private HotbarGUI hotbarGUI;
-	
+
 	private volatile boolean running = true;
-	
+
 	private boolean drawGUI = true;
-	
+
 	private static ClientGame instance;
-	public static ClientGame instance() { return instance; }
-	
+
+	public static ClientGame instance()
+	{
+		return instance;
+	}
+
 	private Mesh playerMesh;
 	private Material playerMaterial;
-	
+
 	private PauseMenuGUI pauseMenu;
-	
+
 	private ShipGUI shipGUI;
-	
+
 	private void initPauseMenu()
 	{
 		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
-		
+
 		gui.addElement(pauseMenu);
 	}
-	
+
 	private void initGraphics()
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
-		
+
 		initPauseMenu();
-		
+
 		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(hotbarGUI);
-		
+
 		shipGUI = new ShipGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(shipGUI);
 
 		GUITexture crosshair = new GUITexture(
-				new MeasurementPair(
-						MeasurementParser.parse("50% - 16"),
-						MeasurementParser.parse("50% - 16")),
-				new MeasurementPair(
-						new PixelMeasurement(32),
-						new PixelMeasurement(32)), 
-				0, 0);
-		
+			new MeasurementPair(MeasurementParser.parse("50% - 16"), MeasurementParser.parse("50% - 16")),
+			new MeasurementPair(new PixelMeasurement(32), new PixelMeasurement(32)), 0, 0);
+
 		gui.addElement(crosshair);
-		
+
 		OpenGLFont font = Fonts.ARIAL_28;
-		
-		
-		fpsText = new GUIText("-- --ms", font, 
-				new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
+
+		fpsText = new GUIText("-- --ms", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
-		
+
 		playerMaterial = new RawImageMaterial("assets/images/atlas/player");
 		playerMaterial.init();
-		
+
 		playerMesh = new PlayerModel(playerMaterial).createMesh(0, 0, 0, 1);
 	}
-	
+
 	public ClientGame(CosmosNettyClient nettyClient)
 	{
-		if(instance != null)
+		if (instance != null)
 			throw new IllegalStateException("A game is already running.");
-		
+
 		instance = this;
-		
+
 		this.nettyClient = nettyClient;
 
 		projectionMatrix = new Matrix4f();
-		projectionMatrix.perspective((float)Math.toRadians(90), 
-				Window.instance().getWidth()/(float)Window.instance().getHeight(),
-				0.1f, 1000);
+		projectionMatrix.perspective((float) Math.toRadians(90),
+			Window.instance().getWidth() / (float) Window.instance().getHeight(), 0.1f, 1000);
 	}
-	
+
 	public void onResize(int w, int h)
 	{
 		projectionMatrix.identity();
-		projectionMatrix.perspective((float)Math.toRadians(90), 
-				w/(float)h,
-				0.1f, 1000);
-		
+		projectionMatrix.perspective((float) Math.toRadians(90), w / (float) h, 0.1f, 1000);
+
 		gui.onResize(w, h);
 		pauseMenu.onResize(w, h);
 	}
-	
+
 	public void render(float delta)
 	{
-		if(player() == null)
+		if (player() == null)
 			return;
-		if(gui == null)
+		if (gui == null)
 			initGraphics();
 
 		GL11.glEnable(GL13.GL_TEXTURE0);
-		
+
 		GL30.glEnable(GL30.GL_DEPTH_TEST);
 		GL30.glDepthFunc(GL30.GL_LESS);
-		
-		//GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
-		
+
+		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
+
 		world().lock();
-		for(Structure s : world().structures())
-		{			
+		for (Structure s : world().structures())
+		{
 //			if(!s.hasBeenRendered())
 //			{
 //				s.calculateLights();
 //				s.render();
 //			}
-			
+
 			drawStructure(s, projectionMatrix, player);
 		}
 		world().unlock();
-		
-		for(Player p : nettyClient.players().players())
+
+		for (Player p : nettyClient.players().players())
 		{
-			if(!p.equals(player))
+			if (!p.equals(player))
 			{
 				playerMaterial.use();
-				
-				Matrix4fc camera = player.shipPiloting() == null ? 
-						player.camera().viewMatrix() : 
-							player.shipPiloting().body().transform().invertedMatrix();
-						
-				playerMaterial.initUniforms(projectionMatrix, camera, 
-						p.body().transform().matrix(), false);
-				
+
+				Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
+					: player.shipPiloting().body().transform().invertedMatrix();
+
+				playerMaterial.initUniforms(projectionMatrix, camera, p.body().transform().matrix(), false);
+
 				playerMesh.prepare();
 				playerMesh.draw();
 				playerMesh.finish();
-				
+
 				playerMaterial.stop();
 			}
 		}
-		
+
 		gui.update(delta);
-		
-		if(drawGUI)
+
+		if (drawGUI)
 			gui.draw();
 	}
-	
+
 	@Override
 	public void postUpdate()
 	{
-		if(nettyClient.ready())
+		if (nettyClient.ready())
 		{
-			for(Structure s : world().structures())
+			for (Structure s : world().structures())
 				updateStructureGraphics(s);
 		}
 	}
-	
+
 	private void togglePause()
 	{
 		pauseMenu.active(!pauseMenu.active());
-		
+
 		Input.hideCursor(!pauseMenu.active());
 	}
-	
+
 	@Override
 	public void update(float delta)
 	{
-		if(shipGUI != null)
+		if (shipGUI != null)
 		{
-			if(!Utils.equals(player.shipPiloting(), shipGUI.ship()))
+			if (!Utils.equals(player.shipPiloting(), shipGUI.ship()))
 			{
 				shipGUI.ship(player.shipPiloting());
 			}
 		}
-		
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_P))
+
+		if (Input.isKeyJustDown(GLFW.GLFW_KEY_P))
 		{
 			togglePause();
 		}
-		
-		if((pauseMenu == null || !pauseMenu.active()) && nettyClient.ready())
+
+		if ((pauseMenu == null || !pauseMenu.active()) && nettyClient.ready())
 		{
 			super.update(delta);
-			
-			if(player() == null)
+
+			if (player() == null)
 				return;
-			if(gui == null)
+			if (gui == null)
 				initGraphics();
-			
-			if(Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
+
+			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
 				drawGUI = !drawGUI;
-			
-			fpsText.text(DebugMonitor.get("ups") + " " + (int)((Float)DebugMonitor.get("ups-variance")*1000) + "ms");
-			
+
+			fpsText
+				.text(DebugMonitor.get("ups") + " " + (int) ((Float) DebugMonitor.get("ups-variance") * 1000) + "ms");
+
 			int prevRow = player.selectedInventoryColumn();
-			
+
 			player.update(delta);
-			
+
 			int row = player.selectedInventoryColumn();
-			
-			if(prevRow != row)
+
+			if (prevRow != row)
 			{
 				hotbarGUI.select(row);
 			}
 		}
 	}
-	
+
 	private static void updateStructureGraphics(Structure s)
 	{
-		if(s.lightMap().needsUpdating())
+		if (s.lightMap().needsUpdating())
 			s.calculateLights();
-		
-		for(Chunk c : s.chunks())
-			if(c.needsRendered())
+
+		for (Chunk c : s.chunks())
+			if (c.needsRendered())
 				c.render();
 	}
 
 	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, ClientPlayer p)
 	{
-		for(Chunk chunk : s.chunks())
+		for (Chunk chunk : s.chunks())
 		{
 			Matrix4f transform = new Matrix4f();
 			Matrix4fc trans = s.openGLMatrix();
 			trans.mul(chunk.transformMatrix(), transform);
-			
-			for(MaterialMesh m : chunk.model().materialMeshes())
+
+			for (MaterialMesh m : chunk.model().materialMeshes())
 			{
 				m.material().use();
-				
-				Matrix4fc camera = p.shipPiloting() == null ? 
-						p.camera().viewMatrix() : 
-							p.shipPiloting().body().transform().invertedMatrix();
-				
+
+				Matrix4fc camera = p.shipPiloting() == null ? p.camera().viewMatrix()
+					: p.shipPiloting().body().transform().invertedMatrix();
+
 				m.material().initUniforms(projectionMatrix, camera, transform, false);
-				
+
 				m.mesh().prepare();
 				m.mesh().draw();
 				m.mesh().finish();
-				
+
 				m.material().stop();
 			}
 		}
@@ -286,7 +282,7 @@ public class ClientGame extends Game
 	{
 		return player;
 	}
-	
+
 	public void player(ClientPlayer p)
 	{
 		this.player = p;
@@ -297,7 +293,7 @@ public class ClientGame extends Game
 	{
 		running = r;
 	}
-	
+
 	public boolean running()
 	{
 		return Client.instance().running() && running;

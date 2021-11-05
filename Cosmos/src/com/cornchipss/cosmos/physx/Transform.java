@@ -8,12 +8,12 @@ import org.joml.Vector3fc;
 public class Transform
 {
 	private Vector3f position;
-	
+
 	private Matrix4f transMatrix;
 	private Matrix4f invertedMatirx;
-	
+
 	private Orientation orientation;
-	
+
 	public Transform()
 	{
 		this(0, 0, 0);
@@ -23,21 +23,21 @@ public class Transform
 	{
 		position = new Vector3f(x, y, z);
 		orientation = new Orientation();
-		
+
 		transMatrix = new Matrix4f();
 		invertedMatirx = new Matrix4f();
-		
+
 		updateMatrix();
 	}
-	
+
 	private void updateMatrix()
 	{
 		transMatrix.identity();
-		
+
 		transMatrix.translate(position);
-		
+
 		orientation.applyRotation(transMatrix);
-		
+
 		transMatrix.invert(invertedMatirx);
 	}
 
@@ -45,34 +45,34 @@ public class Transform
 	{
 		rotateRelative(dRot, right(), up(), forward());
 	}
-	
+
 	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
 	{
 		orientation.rotateRelative(dRot, right, up, forward);
 		updateMatrix();
 	}
-	
+
 	public Transform(Vector3fc pos)
 	{
 		this(pos.x(), pos.y(), pos.z());
 	}
-	
+
 	public void position(Vector3fc p)
 	{
 		position.set(p);
 		updateMatrix();
 	}
-	
+
 	public Vector3fc position()
 	{
 		return position;
 	}
-	
+
 	public Orientation orientation()
 	{
 		return orientation;
 	}
-	
+
 	public void orientation(Orientation o)
 	{
 		this.orientation = o.clone();

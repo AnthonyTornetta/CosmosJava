@@ -12,22 +12,22 @@ import com.cornchipss.cosmos.utils.Logger;
 public class World extends PhysicsWorld
 {
 	private List<Structure> structures;
-	
+
 	private List<Structure> structuresToAdd;
-	
+
 	public World()
 	{
 		structures = new LinkedList<>();
-		
+
 		structuresToAdd = new LinkedList<>();
 	}
-	
+
 	@Override
 	public void update(float delta)
 	{
 		super.update(delta);
-		
-		for(Structure s : structures)
+
+		for (Structure s : structures)
 			s.update(delta);
 	}
 
@@ -35,11 +35,13 @@ public class World extends PhysicsWorld
 	{
 		return structures;
 	}
-	
+
 	/**
 	 * TODO: this
+	 * 
 	 * @param location The location to select nearby players for
-	 * @return The structures that are near that location (not yet implemented - just returns them all)
+	 * @return The structures that are near that location (not yet implemented -
+	 *         just returns them all)
 	 */
 	public List<Structure> structuresNear(Vector3fc location)
 	{
@@ -48,9 +50,9 @@ public class World extends PhysicsWorld
 
 	public void addStructure(Structure s)
 	{
-		if(!locked())
+		if (!locked())
 		{
-			if(!structures.contains(s))
+			if (!structures.contains(s))
 				structures.add(s);
 			else
 				Logger.LOGGER.error("Duplicate structure attempted to be added");
@@ -61,18 +63,18 @@ public class World extends PhysicsWorld
 
 	public Structure structureFromID(int id)
 	{
-		for(Structure s : structures)
-			if(s.id() == id)
+		for (Structure s : structures)
+			if (s.id() == id)
 				return s;
 		return null;
 	}
-	
+
 	@Override
 	public void unlock()
 	{
 		super.unlock();
-		
-		while(structuresToAdd.size() != 0)
+
+		while (structuresToAdd.size() != 0)
 			addStructure(structuresToAdd.remove(0));
 	}
 }

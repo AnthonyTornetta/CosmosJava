@@ -22,28 +22,32 @@ import com.cornchipss.cosmos.world.World;
 public abstract class Player extends PhysicalObject
 {
 	private Ship pilotingShip;
-	
+
 	private Inventory inventory;
 	private int selectedInventoryCol;
-	
+
 	private String name;
-	public String name() { return name; }
-	
+
+	public String name()
+	{
+		return name;
+	}
+
 	private Movement movement;
-	
+
 	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
 	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
-	
+
 	private OBBCollisionCheckerJOML jomlChecker;
-	
+
 	public Player(World world, String name)
 	{
 		super(world);
-		
+
 		this.name = name;
-		
+
 		inventory = new Inventory(4, 10);
-		
+
 		inventory.block(0, 0, Blocks.GRASS);
 		inventory.block(0, 1, Blocks.DIRT);
 		inventory.block(0, 2, Blocks.STONE);
@@ -54,12 +58,12 @@ public abstract class Player extends PhysicalObject
 		inventory.block(0, 7, Blocks.ENERGY_STORAGE);
 		inventory.block(0, 8, Blocks.LOG);
 		inventory.block(0, 9, Blocks.LEAF);
-		
+
 		movement = Movement.movement(MovementType.NONE);
-		
+
 		jomlChecker = new OBBCollisionCheckerJOML();
 	}
-	
+
 	public abstract void update(float delta);
 
 	@Override
@@ -68,40 +72,41 @@ public abstract class Player extends PhysicalObject
 		body(new RigidBody(transform));
 		world().addPhysicalObject(this);
 	}
-	
+
 	@Override
 	public OBBCollider OBB()
 	{
 		return new OBBCollider(this.position(), this.body().transform().orientation(), HALF_WIDTHS);
 	}
-	
+
 	public Structure.RayRes calculateLookingAt()
 	{
 		Structure.RayRes closestHit = null;
 		float closestDist = -1;
-		
-		for(Structure s : world().structuresNear(body().transform().position()))
+
+		for (Structure s : world().structuresNear(body().transform().position()))
 		{
-			Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()), jomlChecker);
-			if(hit != null)
+			Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()),
+				jomlChecker);
+			if (hit != null)
 			{
 				float distSqrd = hit.distance();
-				
-				if(closestHit == null)
+
+				if (closestHit == null)
 				{
 					closestHit = hit;
 					closestDist = distSqrd;
 				}
-				else if(closestDist > distSqrd)
+				else if (closestDist > distSqrd)
 				{
 					closestHit = hit;
 					closestDist = distSqrd;
 				}
 			}
 		}
-		
+
 		Utils.println(closestHit);
-		
+
 		return closestHit;
 	}
 
@@ -109,68 +114,75 @@ public abstract class Player extends PhysicalObject
 	{
 		return pilotingShip != null;
 	}
-	
+
 	public void shipPiloting(Ship s)
 	{
-		if(Utils.equals(pilotingShip, s))
+		if (Utils.equals(pilotingShip, s))
 			return;
-		
+
 		Ship temp = pilotingShip;
 		pilotingShip = null;
-		
-		if(temp != null)
+
+		if (temp != null)
 			temp.setPilot(null);
-		
-		if(s != null)
+
+		if (s != null)
 		{
 			pilotingShip = s;
 			pilotingShip.setPilot(this);
 		}
 	}
-	
+
 	public Ship shipPiloting()
 	{
 		return pilotingShip;
 	}
-	
+
 	public abstract Camera camera();
-	
+
 	public void selectedInventoryColumn(int c)
 	{
 		selectedInventoryCol = c;
 	}
-	
+
 	public int selectedInventoryColumn()
 	{
 		return selectedInventoryCol;
 	}
-	
+
 	@Override
 	public boolean equals(Object other)
 	{
-		if(other instanceof Player)
+		if (other instanceof Player)
 		{
-			Player o = (Player)other;
+			Player o = (Player) other;
 			return name().equals(o.name());
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return name.hashCode();
 	}
-	
-	public Inventory inventory() { return inventory; }
-	public void inventory(Inventory i) { inventory = i; }
+
+	public Inventory inventory()
+	{
+		return inventory;
+	}
+
+	public void inventory(Inventory i)
+	{
+		inventory = i;
+	}
 
 	public void movement(Movement movement)
 	{
 		this.movement = movement;
 	}
-	
+
 	public Movement movement()
 	{
 		return movement;

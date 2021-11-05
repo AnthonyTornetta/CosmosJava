@@ -14,27 +14,31 @@ public abstract class Camera
 	 * The matrix passed into the shader
 	 */
 	public abstract Matrix4fc viewMatrix();
-	
+
 	/**
 	 * The forward direction in respect to the camera
+	 * 
 	 * @return The forward direction in respect to the camera
 	 */
 	public abstract Vector3fc forward();
-	
+
 	/**
 	 * The right direction in respect to the camera
+	 * 
 	 * @return The right direction in respect to the camera
 	 */
 	public abstract Vector3fc right();
-	
+
 	/**
 	 * The upward direction in respect to the camera
+	 * 
 	 * @return The upward direction in respect to the camera
 	 */
 	public abstract Vector3fc up();
 
 	/**
 	 * The camera's position
+	 * 
 	 * @return The camera's position
 	 */
 	public abstract Vector3fc position();
@@ -43,7 +47,7 @@ public abstract class Camera
 	 * Sets the camera's rotation to zero
 	 */
 	public abstract void zeroRotation();
-	
+
 	/**
 	 * Updates all the values
 	 */
@@ -51,18 +55,21 @@ public abstract class Camera
 
 	/**
 	 * Rotates the camera
+	 * 
 	 * @param dRot The amount to rotate each axis by in radians
 	 */
 	public abstract void rotate(Vector3fc dRot);
 
 	/**
 	 * Sets the camera's parent
+	 * 
 	 * @param parent The parent
 	 */
 	public abstract void parent(Transform parent);
-	
+
 	/**
 	 * The camera's parent
+	 * 
 	 * @return The camera's parent
 	 */
 	public abstract Transform parent();

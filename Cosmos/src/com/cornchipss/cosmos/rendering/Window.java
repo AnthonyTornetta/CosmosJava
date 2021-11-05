@@ -29,33 +29,33 @@ public class Window
 {
 	private static long window;
 	private int width, height;
-	
+
 	private boolean wasWindowResized = false;
-	
+
 	private static Window instance;
-	
+
 	public boolean wasWindowResized()
 	{
 		boolean ret = wasWindowResized;
 		wasWindowResized = false;
 		return ret;
 	}
-	
+
 	public Window(int w, int h, String title)
 	{
 		instance = this;
-		
+
 		this.width = w;
 		this.height = h;
-		
+
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
-		
+
 		// Initialize GLFW. Most GLFW functions will not work before doing this.
 		if (!glfwInit())
 			throw new IllegalStateException("Unable to initialize GLFW");
-		
+
 		// Configure GLFW
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // the window will stay hidden after creation
@@ -63,19 +63,19 @@ public class Window
 
 		// Create the window
 		window = glfwCreateWindow(w, h, title, NULL, NULL);
-		if ( window == NULL )
+		if (window == NULL)
 			throw new RuntimeException("Failed to create the GLFW window");
-		
+
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
-		
+
 		GLFW.glfwSetWindowSizeCallback(window, new GLFWWindowSizeCallbackI()
 		{
 			@Override
 			public void invoke(long window, int width, int height)
 			{
 				wasWindowResized = true;
-				
+
 //				if(width / (float)height > ogAspectRatio)
 //				{
 //					float desiredHeight = (width / ogAspectRatio);
@@ -86,47 +86,47 @@ public class Window
 //					float desiredWidth = (height * ogAspectRatio);
 //					viewportOffX = -Math.round((desiredWidth - width) / 2) / 2;
 //				}
-				
+
 //				GL20.glViewport(viewportOffX, viewportOffY, width - viewportOffX, height - viewportOffY);
-				
+
 //				Utils.println(width + ", " + height);
 //				Utils.println(getWidth() + ", " + getHeight());
-				
+
 				instance().width = width;
 				instance().height = height;
-				
+
 				GL20.glViewport(0, 0, width, height);
 			}
 		});
-		
+
 		// Make the window visible
 		glfwShowWindow(window);
-		
+
 		GL.createCapabilities();
 	}
-	
+
 	private int viewportOffX, viewportOffY;
-	
+
 	public int viewportOffsetY()
 	{
 		return viewportOffY;
 	}
-	
+
 	public int viewportOffsetX()
 	{
 		return viewportOffX;
 	}
-	
+
 	public int viewportWidth()
 	{
 		return getWidth() - viewportOffsetX();
 	}
-	
+
 	public int viewportHeight()
 	{
 		return getHeight() - viewportOffsetY();
 	}
-	
+
 	public void update()
 	{
 		glfwPollEvents();
@@ -137,7 +137,7 @@ public class Window
 	{
 		return glfwWindowShouldClose(window);
 	}
-	
+
 	public void destroy()
 	{
 		// Free the window callbacks and destroy the window
@@ -155,11 +155,21 @@ public class Window
 		GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 		GL11.glClearColor(r, g, b, a);
 	}
-	
-	public long getId() { return window; }
-	
-	public int getWidth() { return width; }
-	public int getHeight() { return height; }
+
+	public long getId()
+	{
+		return window;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+
+	public int getHeight()
+	{
+		return height;
+	}
 
 	public static Window instance()
 	{

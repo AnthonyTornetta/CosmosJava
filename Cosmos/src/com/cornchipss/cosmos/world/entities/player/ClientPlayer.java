@@ -65,7 +65,7 @@ public class ClientPlayer extends Player
 			movement().add(MovementType.DOWN);
 		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			movement().add(MovementType.STOP);
-		
+
 		Vector3f dRot = new Vector3f();
 
 		dRot.y = (dRot.y() - Input.getMouseDeltaX() * 0.0025f);

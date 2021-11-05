@@ -11,14 +11,14 @@ public class Initializer
 	public void init()
 	{
 		Logger.LOGGER.info("Initializing...");
-		
+
 		Blocks.init();
-		
+
 		Biospheres.registerBiosphere(GrassBiosphere.class, "cosmos:grass");
 		Biospheres.registerBiosphere(DesertBiosphere.class, "cosmos:desert");
 
 		Materials.initMaterials();
-		
+
 		Logger.LOGGER.info("Initialization Complete");
 	}
 }

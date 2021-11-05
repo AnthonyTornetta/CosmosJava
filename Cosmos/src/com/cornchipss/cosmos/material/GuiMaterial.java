@@ -5,12 +5,12 @@ import org.joml.Matrix4fc;
 public class GuiMaterial extends Material
 {
 	private int guiProjLoc, guiTransLoc;
-	
+
 	public GuiMaterial()
 	{
 		super("assets/shaders/gui", "assets/images/atlas/gui");
 	}
-	
+
 	public GuiMaterial(String atlas)
 	{
 		super("assets/shaders/gui", atlas);

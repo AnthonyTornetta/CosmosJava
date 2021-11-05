@@ -9,23 +9,23 @@ import com.cornchipss.cosmos.world.entities.player.Player;
 public class ServerPlayer extends Player
 {
 	private ClientConnection serverClient;
-	
+
 	private Camera camera;
-	
+
 	public ServerPlayer(World world, ClientConnection serverClient, String name)
 	{
 		super(world, name);
-		
+
 //		movement = Movement.movement(MovementType.NONE);
-		
+
 		this.serverClient = serverClient;
 	}
-	
+
 	@Override
 	public void addToWorld(Transform transform)
 	{
 		super.addToWorld(transform);
-		
+
 		camera = new GimbalLockCamera(transform);
 	}
 
@@ -45,6 +45,9 @@ public class ServerPlayer extends Player
 	{
 		return camera;
 	}
-	
-	public ClientConnection client() { return serverClient; }
+
+	public ClientConnection client()
+	{
+		return serverClient;
+	}
 }

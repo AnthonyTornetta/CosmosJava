@@ -16,167 +16,167 @@ import com.cornchipss.cosmos.utils.Logger;
 public class CosmosNettyServer implements Runnable
 {
 	private volatile boolean running;
-	
+
 	private final ServerGame game;
-	
+
 	private CommandHandler cmdHandler;
-	
+
 	private ServerPlayerList players = new ServerPlayerList();
-	
-	private Thread udpThread;//, tcpThread;
-	
+
+	private Thread udpThread;// , tcpThread;
+
 	private DatagramSocket udpSocket;
 	private ServerSocket tcpSocket;
-	
+
 	public CosmosNettyServer(ServerGame game, CommandHandler cmdHandler)
 	{
 		running = true;
 		this.game = game;
-		
+
 		this.cmdHandler = cmdHandler;
 	}
-	
+
 	public void sendToAllUDP(Packet packet)
 	{
-		for(ServerPlayer p : players.players())
+		for (ServerPlayer p : players.players())
 		{
 			try
 			{
 				p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
 			}
-			catch(IOException ex)
+			catch (IOException ex)
 			{
-				
+
 			}
 		}
 	}
-	
+
 	public void sendToAllTCP(Packet packet)
 	{
-		for(ServerPlayer p : players.players())
+		for (ServerPlayer p : players.players())
 		{
 			try
 			{
 				p.client().sendTCP(packet.buffer(), packet.bufferLength());
 			}
-			catch(IOException ex)
+			catch (IOException ex)
 			{
-				
+
 			}
 		}
 	}
-	
+
 	public void sendToAllExceptUDP(Packet packet, ServerPlayer exception)
 	{
-		for(ServerPlayer p : players.players())
+		for (ServerPlayer p : players.players())
 		{
-			if(!p.equals(exception))
+			if (!p.equals(exception))
 			{
 				try
 				{
 					p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
 				}
-				catch(IOException ex)
+				catch (IOException ex)
 				{
-					
+
 				}
 			}
 		}
 	}
-	
+
 	public void sendToAllExceptTCP(Packet packet, ServerPlayer exception)
 	{
-		for(ServerPlayer p : players.players())
+		for (ServerPlayer p : players.players())
 		{
-			if(!p.equals(exception))
+			if (!p.equals(exception))
 			{
 				try
 				{
 					p.client().sendTCP(packet.buffer(), packet.bufferLength());
 				}
-				catch(IOException ex)
+				catch (IOException ex)
 				{
-					
+
 				}
 			}
 		}
 	}
-	
+
 	private synchronized void processUDP(DatagramPacket packet, DatagramSocket serverSocket) throws IOException
 	{
 		ServerPlayer player = players.player(packet.getAddress(), packet.getPort());
-		
+
 		byte[] buffer = packet.getData();
-		
+
 		byte marker = Packet.findMarker(buffer, packet.getOffset(), packet.getLength());
-		
+
 		Packet p = PacketTypes.packet(marker);
-		
-		if(p == null)
+
+		if (p == null)
 		{
 			Logger.LOGGER.error("INVALID PACKET TYPE - " + marker);
 			buffer[0] = -1; // we can reuse the same buffer
 			player.client().sendUDP(buffer, 1, this);
 			return;
 		}
-		
+
 		ClientConnection connection = null;
-		
-		if(player == null && p instanceof JoinPacket)
+
+		if (player == null && p instanceof JoinPacket)
 		{
 			connection = new ClientConnection(packet.getAddress(), packet.getPort(), null);
 		}
-		else if(player != null)
+		else if (player != null)
 			connection = player.client();
 		else
 			return;
-		
+
 		int off = Packet.additionalOffset(buffer, packet.getOffset(), packet.getLength());
-		
+
 		p.onReceiveServer(buffer, packet.getLength() - off, packet.getOffset() + off, connection, this);
 	}
-	
+
 	@Override
 	public void run()
 	{
 		final CosmosNettyServer serverInstance = this;
-		
+
 		try
 		{
 			udpSocket = new DatagramSocket(1337);
 			tcpSocket = new ServerSocket(1337);
 		}
-		catch(IOException ex)
+		catch (IOException ex)
 		{
 			System.err.println("Unable to setup server - throwing error.");
 			throw new RuntimeException(ex);
 		}
-		
+
 		udpThread = new Thread(() ->
 		{
-			byte[] buffer = new byte[1024];  // 1kb max data
-			
+			byte[] buffer = new byte[1024]; // 1kb max data
+
 			Logger.LOGGER.info("UDP server listening...");
-			
-			while(running)
+
+			while (running)
 			{
 				try
 				{
 					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 					udpSocket.receive(packet);
-					
+
 					processUDP(packet, udpSocket);
 				}
 				catch (IOException e)
 				{
 					throw new RuntimeException(e);
 				}
-			}			
-			
+			}
+
 			udpSocket.close();
 		});
 		udpThread.start();
-		
+
 //		tcpThread = new Thread(() ->
 //		{
 ////			byte[] buffer = new byte[1024*1000];  // 1000kb max data
@@ -198,17 +198,17 @@ public class CosmosNettyServer implements Runnable
 //				}
 //			}		
 //		});
-		
-		while(running)
+
+		while (running)
 		{
 			try
 			{
 				Socket clientSocket = tcpSocket.accept();
-				
+
 				TCPClientConnection connection = new TCPClientConnection(clientSocket, serverInstance);
-				
+
 				Thread connectionThread = new Thread(connection);
-				
+
 				connectionThread.start();
 			}
 			catch (IOException e)
@@ -216,7 +216,7 @@ public class CosmosNettyServer implements Runnable
 				throw new RuntimeException(e);
 			}
 		}
-		
+
 		try
 		{
 			udpThread.join();
@@ -227,16 +227,39 @@ public class CosmosNettyServer implements Runnable
 			e.printStackTrace();
 		}
 	}
-	
-	public boolean running() { return running; }
-	public void running(boolean r) { running = r; }
-	
-	public CommandHandler commandHandler() { return cmdHandler; }
-	public void commandHandler(CommandHandler h) { this.cmdHandler = h; }
-	
-	public ServerGame game() { return game; }
 
-	public ServerPlayerList players() { return players; }
+	public boolean running()
+	{
+		return running;
+	}
 
-	public DatagramSocket socket() { return udpSocket; }
+	public void running(boolean r)
+	{
+		running = r;
+	}
+
+	public CommandHandler commandHandler()
+	{
+		return cmdHandler;
+	}
+
+	public void commandHandler(CommandHandler h)
+	{
+		this.cmdHandler = h;
+	}
+
+	public ServerGame game()
+	{
+		return game;
+	}
+
+	public ServerPlayerList players()
+	{
+		return players;
+	}
+
+	public DatagramSocket socket()
+	{
+		return udpSocket;
+	}
 }

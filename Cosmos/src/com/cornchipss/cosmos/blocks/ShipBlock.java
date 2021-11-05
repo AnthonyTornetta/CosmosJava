@@ -11,19 +11,27 @@ import com.cornchipss.cosmos.structures.Structure;
 public class ShipBlock extends Block
 {
 	/**
-	 * <p>A block in the world that can only be placed on a {@link Ship}</p>
-	 * <p>Only one instance of each block should ever be present</p>
-	 * <p>Each block of the same type in the world points to that instance</p>
-	 * <p>Use {@link BlockData} to differentiate between different blocks</p>
+	 * <p>
+	 * A block in the world that can only be placed on a {@link Ship}
+	 * </p>
+	 * <p>
+	 * Only one instance of each block should ever be present
+	 * </p>
+	 * <p>
+	 * Each block of the same type in the world points to that instance
+	 * </p>
+	 * <p>
+	 * Use {@link BlockData} to differentiate between different blocks
+	 * </p>
 	 * 
-	 * @param m The model the block has
+	 * @param m    The model the block has
 	 * @param name The name used to refer to the block in the registry
 	 */
 	public ShipBlock(CubeModel m, String name, int mass)
 	{
 		super(m, name, mass);
 	}
-	
+
 	@Override
 	public boolean canAddTo(Structure s)
 	{

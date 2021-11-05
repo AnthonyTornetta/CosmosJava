@@ -14,23 +14,23 @@ public class DesertBiosphere extends Biosphere
 	@Override
 	protected void generateTerrain(Structure s)
 	{
-		for(int z = 0; z < s.length(); z++)
+		for (int z = 0; z < s.length(); z++)
 		{
-			for(int x = 0; x < s.width(); x++)
+			for (int x = 0; x < s.width(); x++)
 			{
 				float n = 30 * SimplexNoise.noise(x * 0.01f, z * 0.01f);
-				
+
 				int h = Maths.round(s.height() - 30 + n);
-				
-				for(int y = 0; y < h; y++)
+
+				for (int y = 0; y < h; y++)
 				{
-					if(h - y < 5)
+					if (h - y < 5)
 						s.block(x, y, z, Blocks.SAND);
 					else
 						s.block(x, y, z, Blocks.SAND_STONE);
 				}
-				
-				if((x+8) % 8 == 0 && (z+8) % 8 == 0)
+
+				if ((x + 8) % 8 == 0 && (z + 8) % 8 == 0)
 				{
 					s.block(x, h, z, Blocks.LOG);
 					s.block(x, h + 1, z, Blocks.LIGHT);
@@ -42,26 +42,27 @@ public class DesertBiosphere extends Biosphere
 	@Override
 	protected void populate(Structure s)
 	{
-		for(int z = 0; z < s.length(); z++)
+		for (int z = 0; z < s.length(); z++)
 		{
-			for(int x = 0; x < s.width(); x++)
+			for (int x = 0; x < s.width(); x++)
 			{
 				int y = s.higehstYAt(x, z);
-				
-				if(y != -1)
+
+				if (y != -1)
 				{
-					if(Math.random() < 0.01f)
+					if (Math.random() < 0.01f)
 					{
-						if(s.block(x, y, z).equals(Blocks.SAND))
+						if (s.block(x, y, z).equals(Blocks.SAND))
 							generateCactus(x, y + 1, z, s);
 					}
 				}
 			}
 		}
 	}
-	
+
 	/**
 	 * Makes a happy cactus
+	 * 
 	 * @param x x
 	 * @param y y
 	 * @param z z
@@ -69,8 +70,8 @@ public class DesertBiosphere extends Biosphere
 	 */
 	private void generateCactus(int x, int y, int z, Structure s)
 	{
-		int h = (int)(Math.random() * 4) - 1;
-		for(int dy = 0; dy <= h; dy++)
+		int h = (int) (Math.random() * 4) - 1;
+		for (int dy = 0; dy <= h; dy++)
 			s.block(x, y + dy, z, Blocks.CACTUS);
 	}
 }

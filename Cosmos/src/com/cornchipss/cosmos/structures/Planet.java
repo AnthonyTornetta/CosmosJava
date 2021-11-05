@@ -8,7 +8,7 @@ public class Planet extends Structure
 	{
 		super(world, width, height, length, id);
 	}
-	
+
 	public Planet(World world, int id)
 	{
 		super(world, id);

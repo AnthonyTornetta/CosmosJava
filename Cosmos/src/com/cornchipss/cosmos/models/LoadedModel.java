@@ -10,84 +10,83 @@ public class LoadedModel implements Model
 {
 	private float[] verts, uvs;
 	private int[] indices;
-	
+
 	private float[] tempVerts;
-	
+
 	private Map<String, Vector2i> subcomponents;
-	
-	public LoadedModel(float[] verts, float[] uvs, int[] indices, 
-			Map<String, Vector2i> components)
+
+	public LoadedModel(float[] verts, float[] uvs, int[] indices, Map<String, Vector2i> components)
 	{
 		this.verts = verts;
 		this.uvs = uvs;
 		this.indices = indices;
 		tempVerts = new float[verts.length];
-		
+
 		subcomponents = components;
 	}
-	
+
 	public float[] vertices()
 	{
 		return verts;
 	}
-	
+
 	public float[] uvs()
 	{
 		return uvs;
 	}
-	
+
 	public int[] indices()
 	{
 		return indices;
 	}
-	
+
 	@Override
 	public Mesh createMesh(float offX, float offY, float offZ, float scale)
 	{
-		if(offX == 0 && offY == 0 && offZ == 0 && scale == 1)
+		if (offX == 0 && offY == 0 && offZ == 0 && scale == 1)
 			return Mesh.createMesh(verts, indices, uvs);
 		else
 		{
-			for(int i = 0; i < verts.length; i += 3)
+			for (int i = 0; i < verts.length; i += 3)
 			{
 				tempVerts[i] = offX + scale * verts[i];
-				tempVerts[i+1] = offY + scale * verts[i+1];
-				tempVerts[i+2] = offZ + scale * verts[i+2];
+				tempVerts[i + 1] = offY + scale * verts[i + 1];
+				tempVerts[i + 2] = offZ + scale * verts[i + 2];
 			}
-			
+
 			return Mesh.createMesh(tempVerts, indices, uvs);
 		}
 	}
 
 	public String groupContaining(int index)
 	{
-		for(String s : subcomponents.keySet())
+		for (String s : subcomponents.keySet())
 		{
 			Vector2i range = subcomponents.get(s);
-			if(range.x <= index && range.y >= index)
+			if (range.x <= index && range.y >= index)
 			{
 				return s;
 			}
 		}
-		
+
 		return null;
 	}
 
 	public int[] indicesForGroup(String group)
 	{
-		if(!subcomponents.containsKey(group))
+		if (!subcomponents.containsKey(group))
 			return null;
-		
+
 		int rangeLow = subcomponents.get(group).x;
 		int rangeHigh = subcomponents.get(group).y;
-		
+
 		int[] ret = new int[rangeHigh - rangeLow + 1];
-		
-		for(int i = rangeLow; i <= rangeHigh; i++)
+
+		for (int i = rangeLow; i <= rangeHigh; i++)
 		{
 			ret[i - rangeLow] = indices[i];
 		}
-		
+
 		return ret;
 	}
 }

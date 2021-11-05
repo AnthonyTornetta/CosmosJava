@@ -13,11 +13,11 @@ public class EnergyStorageSystem extends BlockSystem
 	{
 		try
 		{
-			IEnergyStorageBlock holder = (IEnergyStorageBlock)added.block();
-			
+			IEnergyStorageBlock holder = (IEnergyStorageBlock) added.block();
+
 			added.structure().increasePowerCapacity(holder.energyCapacity());
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
@@ -28,11 +28,11 @@ public class EnergyStorageSystem extends BlockSystem
 	{
 		try
 		{
-			IEnergyStorageBlock holder = (IEnergyStorageBlock)removed.block();
-			
+			IEnergyStorageBlock holder = (IEnergyStorageBlock) removed.block();
+
 			removed.structure().decreasePowerCapacity(holder.energyCapacity());
 		}
-		catch(Exception ex)
+		catch (Exception ex)
 		{
 			ex.printStackTrace();
 		}
@@ -41,6 +41,6 @@ public class EnergyStorageSystem extends BlockSystem
 	@Override
 	public void update(Structure s, List<StructureBlock> blocks, float delta)
 	{
-		
+
 	}
 }

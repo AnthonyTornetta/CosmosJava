@@ -18,41 +18,41 @@ import com.cornchipss.cosmos.world.Chunk;
 public class DefaultCollisionChecker implements ICollisionChecker
 {
 	private IOBBCollisionChecker obbChecker;
-	
+
 	public DefaultCollisionChecker()
 	{
 		obbChecker = new OBBCollisionCheckerJOML();
 	}
-	
+
 	private void aggregateChunks(Structure a, Structure b, Vector3fc deltaA, Map<Chunk, List<Chunk>> map)
 	{
-		for(int z = 0; z < a.chunksLength(); z++)
+		for (int z = 0; z < a.chunksLength(); z++)
 		{
-			for(int y = 0; y < a.chunksHeight(); y++)
+			for (int y = 0; y < a.chunksHeight(); y++)
 			{
-				for(int x = 0; x < a.chunksWidth(); x++)
+				for (int x = 0; x < a.chunksWidth(); x++)
 				{
 					Chunk aChunk = a.chunk(x, y, z);
-					
-					if(aChunk.empty())
+
+					if (aChunk.empty())
 						continue;
-					
+
 					OBBCollider obbA = a.obbForChunk(aChunk);
-					
-					for(int zz = 0; zz < b.chunksLength(); zz++)
+
+					for (int zz = 0; zz < b.chunksLength(); zz++)
 					{
-						for(int yy = 0; yy < b.chunksHeight(); yy++)
+						for (int yy = 0; yy < b.chunksHeight(); yy++)
 						{
-							for(int xx = 0; xx < b.chunksWidth(); xx++)
+							for (int xx = 0; xx < b.chunksWidth(); xx++)
 							{
 								Chunk bChunk = b.chunk(xx, yy, zz);
-								
-								if(bChunk.empty())
+
+								if (bChunk.empty())
 									continue;
-								
+
 								OBBCollider obbB = b.obbForChunk(bChunk);
-								
-								if(obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
+
+								if (obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
 								{
 									List<Chunk> here = map.getOrDefault(aChunk, new LinkedList<>());
 									here.add(bChunk);
@@ -65,154 +65,148 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 	}
-	
+
 	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA, CollisionInfo info)
 	{
 		OBBCollider bOBB = b.structure().obbForChunk(b);
-		
+
 		Vector3fc pos = a.structure().chunkWorldPosCentered(a, new Vector3f());
-		
+
 		List<Integer> xs = new LinkedList<>();
-		List<Integer> ys = new LinkedList<>();		
+		List<Integer> ys = new LinkedList<>();
 		List<Integer> zs = new LinkedList<>();
 
 		{
 			Vector3f at = new Vector3f(pos);
 			at.sub(a.structure().body().transform().orientation().up().mul(Chunk.HEIGHT / 2.f, new Vector3f()));
-			
+
 			// Start Y
 			Vector3f halfWidthsY = new Vector3f(Chunk.WIDTH / 2.f, 0.5f, Chunk.LENGTH / 2.f);
-			
-			for(int y = 0; y < a.height(); y++)
-			{
-				OBBCollider obc = new OBBCollider(at, 
-						a.structure().body().transform().orientation(), 
-						halfWidthsY);
 
-				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
+			for (int y = 0; y < a.height(); y++)
+			{
+				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsY);
+
+				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					ys.add(y);
 				}
-				
+
 				at.add(a.structure().body().transform().orientation().up());
 			}
 		}
-		
+
 		{
 			Vector3f at = new Vector3f(pos);
 			at.sub(a.structure().body().transform().orientation().right().mul(Chunk.WIDTH / 2.f, new Vector3f()));
-			
+
 			// Start X
 			Vector3f halfWidthsX = new Vector3f(0.5f, Chunk.HEIGHT / 2.f, Chunk.LENGTH / 2.f);
-			
-			for(int x = 0; x < a.width(); x++)
+
+			for (int x = 0; x < a.width(); x++)
 			{
-				OBBCollider obc = new OBBCollider(at, 
-						a.structure().body().transform().orientation(), 
-						halfWidthsX);
-				
-				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
+				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsX);
+
+				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					xs.add(x);
 				}
-				
+
 				at.add(a.structure().body().transform().orientation().right());
 			}
 		}
-		
+
 		Vector3fc backward = a.structure().body().transform().orientation().forward().mul(-1, new Vector3f());
-		
+
 		{
 			Vector3f at = new Vector3f(pos);
 			// it is add here
 			at.add(a.structure().body().transform().orientation().forward().mul(Chunk.LENGTH / 2.f, new Vector3f()));
-			
+
 			// Start Z
 			Vector3f halfWidthsZ = new Vector3f(Chunk.WIDTH / 2.f, Chunk.HEIGHT / 2.f, 0.5f);
-			
-			for(int z = 0; z < a.length(); z++)
-			{
-				OBBCollider obc = new OBBCollider(at, 
-						a.structure().body().transform().orientation(), 
-						halfWidthsZ);
 
-				if(obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
+			for (int z = 0; z < a.length(); z++)
+			{
+				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsZ);
+
+				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
 					zs.add(z);
 				}
-				
+
 				at.add(backward);
 			}
 		}
-		
+
 		boolean hit = false;
-		
-		for(int z : zs)
+
+		for (int z : zs)
 		{
-			for(int y : ys)
+			for (int y : ys)
 			{
-				for(int x : xs)
+				for (int x : xs)
 				{
-					if(a.hasBlock(x, y, z))
+					if (a.hasBlock(x, y, z))
 					{
 						OBBCollider obbBlockA = a.structure().obbForBlock(a, x, y, z);
-						
-						if(obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), null)) 
+
+						if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), null))
 						{
-							for(Vector3fc pointOfInterest : obbBlockA)
+							for (Vector3fc pointOfInterest : obbBlockA)
 							{
-								if(b.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
+								if (b.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
 								{
-									if(info == null || info.distanceSquared == 0)
+									if (info == null || info.distanceSquared == 0)
 										return true;
 									hit = true;
 								}
 							}
-						}						
+						}
 					}
 				}
 			}
 		}
-		
+
 		return hit;
 	}
-	
+
 	@Override
 	public boolean colliding(PhysicalObject a, PhysicalObject b, Vector3fc deltaA, CollisionInfo info)
-	{		
-		if(a instanceof Structure && b instanceof Structure)
+	{
+		if (a instanceof Structure && b instanceof Structure)
 		{
-			Structure sa = (Structure)a;
-			Structure sb = (Structure)b;
-			
-			if(!obbChecker.testMovingOBBOBB(deltaA, sa.OBB(), sb.OBB(), null))
+			Structure sa = (Structure) a;
+			Structure sb = (Structure) b;
+
+			if (!obbChecker.testMovingOBBOBB(deltaA, sa.OBB(), sb.OBB(), null))
 			{
 				return false;
 			}
-			
+
 			boolean hit = false;
-			
+
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
-			
+
 			aggregateChunks(sa, sb, deltaA, chunks);
-			
-			for(Chunk aC : chunks.keySet())
+
+			for (Chunk aC : chunks.keySet())
 			{
-				for(Chunk bC : chunks.get(aC))
+				for (Chunk bC : chunks.get(aC))
 				{
-					if(fineCheck(aC, bC, deltaA, info))
+					if (fineCheck(aC, bC, deltaA, info))
 					{
-						if(info == null || info.distanceSquared == 0)
+						if (info == null || info.distanceSquared == 0)
 							return true;
-						
+
 						hit = true;
 					}
 				}
 			}
-			
+
 			return hit;
 		}
-		
+
 		return false;
 	}
 }
