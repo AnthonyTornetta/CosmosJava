@@ -19,4 +19,16 @@ public class PingCommand implements Command
 		System.out.println("Pong");
 		return true;
 	}
+
+	@Override
+	public String argumentsHelp()
+	{
+		return "";
+	}
+
+	@Override
+	public String description()
+	{
+		return "Says \"Pong\"";
+	}
 }

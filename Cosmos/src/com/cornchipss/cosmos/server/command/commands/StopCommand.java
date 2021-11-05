@@ -19,4 +19,16 @@ public class StopCommand implements Command
 		server.running(false);
 		return false;
 	}
+
+	@Override
+	public String argumentsHelp()
+	{
+		return "";
+	}
+
+	@Override
+	public String description()
+	{
+		return "Stops the server gracefully";
+	}
 }

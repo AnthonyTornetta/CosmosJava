@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Blocks;
-import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
 import com.cornchipss.cosmos.physx.Movement;

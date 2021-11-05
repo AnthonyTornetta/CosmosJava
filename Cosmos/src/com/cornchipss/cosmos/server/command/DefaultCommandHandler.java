@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.server.command;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +34,26 @@ public class DefaultCommandHandler implements CommandHandler
 				arguments.add(split[i]);
 		}
 		
-		Command cmdObj = commands.get(cmdName);
+		Command cmdObj = command(cmdName);
 		
 		if(cmdObj == null)
+		{
+			System.out.println("Unknown command - type help for a list of commands.");
 			return true;
+		}
 		else
 			return cmdObj.call(server, arguments, command);
+	}
+
+	@Override
+	public Iterator<Command> iterator()
+	{
+		return commands.values().iterator();
+	}
+
+	@Override
+	public Command command(String name)
+	{
+		return commands.get(name);
 	}
 }
