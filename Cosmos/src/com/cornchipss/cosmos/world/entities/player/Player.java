@@ -4,19 +4,18 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.RayResult;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
-import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
@@ -34,6 +33,8 @@ public abstract class Player extends PhysicalObject
 	
 	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
 	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
+	
+	private OBBCollisionCheckerJOML jomlChecker;
 	
 	public Player(World world, String name)
 	{
@@ -55,6 +56,8 @@ public abstract class Player extends PhysicalObject
 		inventory.block(0, 9, Blocks.LEAF);
 		
 		movement = Movement.movement(MovementType.NONE);
+		
+		jomlChecker = new OBBCollisionCheckerJOML();
 	}
 	
 	public abstract void update(float delta);
@@ -72,34 +75,32 @@ public abstract class Player extends PhysicalObject
 		return new OBBCollider(this.position(), this.body().transform().orientation(), HALF_WIDTHS);
 	}
 	
-	public Structure calculateLookingAt()
+	public Structure.RayRes calculateLookingAt()
 	{
-		Vector3fc from = camera().position();
-		Vector3f dLook = Maths.mul(camera().forward(), 50.0f);
-		Vector3f to = Maths.add(from, dLook);
-		
-		Structure closestHit = null;
-		float closestDistSqrd = -1;
+		Structure.RayRes closestHit = null;
+		float closestDist = -1;
 		
 		for(Structure s : world().structuresNear(body().transform().position()))
 		{
-			RayResult hits = s.shape().raycast(from, to);
-			if(hits.closestHit() != null)
+			Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()), jomlChecker);
+			if(hit != null)
 			{
-				float distSqrd = Maths.distSqrd(from, hits.closestHitWorldCoords());
+				float distSqrd = hit.distance();
 				
 				if(closestHit == null)
 				{
-					closestHit = s;
-					closestDistSqrd = distSqrd;
+					closestHit = hit;
+					closestDist = distSqrd;
 				}
-				else if(closestDistSqrd > distSqrd)
+				else if(closestDist > distSqrd)
 				{
-					closestHit = s;
-					closestDistSqrd = distSqrd;
+					closestHit = hit;
+					closestDist = distSqrd;
 				}
 			}
 		}
+		
+		Utils.println(closestHit);
 		
 		return closestHit;
 	}
@@ -173,11 +174,5 @@ public abstract class Player extends PhysicalObject
 	public Movement movement()
 	{
 		return movement;
-	}
-
-	@Override
-	public PhysicsShape shape()
-	{
-		return null;
 	}
 }

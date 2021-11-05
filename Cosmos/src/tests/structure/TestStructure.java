@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
-import org.joml.Vector3i;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,6 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 class TestStructure
@@ -74,24 +72,6 @@ class TestStructure
 		}
 		else
 			assertTrue(true); // it passed
-	}
-	
-	@Test
-	void asdf()
-	{
-		init(16, 16, 16);
-		
-		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(0, 0, 0)));
-		
-		init(16*8, 16*8, 16*8);
-		
-		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(-1.01f, -0.01f, -1)));
-		
-		Utils.println(a.worldCoordsToChunkCoords(new Vector3f(1.01f, 0.01f, 1)));
-//		a.worldCoordsToO
-		Vector3i here = a.worldCoordsToChunkCoords(new Vector3f(1.01f, 0.01f, 1));
-		OBBCollider c = a.wholeOBBForBlock(a.chunk(1, 1, 1), here.x, here.y, here.z);
-		Utils.println(c);
 	}
 	
 	@Test
@@ -168,9 +148,6 @@ class TestStructure
 		a.body().transform().position(new Vector3f());
 		a.body().transform().orientation().rotateRelative(new Vector3f(0, Maths.PI, 0));
 		a.body().transform().position(pos);
-		
-		Utils.println(a.chunkRelativePosCentered(a.chunk(2, 2, 2), new Vector3f()));
-		Utils.println(a.chunkWorldPosCentered(a.chunk(2, 2, 2), new Vector3f()));
 		
 		assertVectorEquals(new Vector3f(100 - 16, 150 + 16, 200 - 16), a.chunkWorldPosCentered(a.chunk(2, 2, 2), new Vector3f()));
 	}

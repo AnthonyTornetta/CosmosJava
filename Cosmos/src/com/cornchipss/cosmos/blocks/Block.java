@@ -7,8 +7,6 @@ import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.blocks.modifiers.IHasData;
 import com.cornchipss.cosmos.models.CubeModel;
 import com.cornchipss.cosmos.models.IHasModel;
-import com.cornchipss.cosmos.physx.shapes.CubeShape;
-import com.cornchipss.cosmos.physx.shapes.PhysicsShape;
 import com.cornchipss.cosmos.structures.Structure;
 
 /**
@@ -24,8 +22,6 @@ public class Block implements IHasModel
 	private short id;
 	
 	private String name;
-	
-	private static final CubeShape defaultShape = new CubeShape();
 	
 	private int mass;
 	
@@ -67,11 +63,6 @@ public class Block implements IHasModel
 			throw new IllegalStateException("Id of a block cannot be set more than once!!!");
 		
 		id = s;
-	}
-	
-	public PhysicsShape shape()
-	{
-		return defaultShape;
 	}
 	
 	/**

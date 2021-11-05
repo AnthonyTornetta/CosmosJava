@@ -22,7 +22,6 @@ import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -105,17 +104,16 @@ public class ClientPlayer extends Player
 
 	private void handleInteractions()
 	{
-		Structure lookingAt = calculateLookingAt();
-
-		if (lookingAt != null && (Input.isKeyJustDown(GLFW.GLFW_KEY_R)
+		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
-			Structure.RayRes sb = lookingAt.raycast(camera().position(), camera().forward(), 10.0f,
-				new OBBCollisionCheckerJOML());
-
+			Structure.RayRes sb = calculateLookingAt();
+			
 			if (sb != null)
 			{
+				Structure lookingAt = sb.block().structure();
+
 				Block selectedBlock = null;
 
 				selectedBlock = inventory().block(0, selectedInventoryColumn());
@@ -134,9 +132,9 @@ public class ClientPlayer extends Player
 					{
 						BlockFace face = sb.face();
 
-						int xx = Maths.floor(sb.block().structureX() + 0.5f + (face.getRelativePosition().x * 2)),
-							yy = Maths.floor(sb.block().structureY() + 0.5f + (face.getRelativePosition().y * 2)),
-							zz = Maths.floor(sb.block().structureZ() + 0.5f + (face.getRelativePosition().z * 2));
+						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x * 2)),
+							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y * 2)),
+							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z * 2));
 
 						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
@@ -151,8 +149,7 @@ public class ClientPlayer extends Player
 				}
 				else if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 				{
-					if (lookingAt.block(sb.block().structureX(), sb.block().structureY(),
-						sb.block().structureZ()) instanceof IInteractable)
+					if (sb.block() instanceof IInteractable)
 					{
 						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, new StructureBlock(lookingAt,
 							sb.block().structureX(), sb.block().structureY(), sb.block().structureZ()));

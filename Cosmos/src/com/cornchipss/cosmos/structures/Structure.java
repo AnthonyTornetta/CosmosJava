@@ -4,11 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -30,7 +28,6 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
-import com.cornchipss.cosmos.physx.shapes.StructureShape;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
@@ -51,14 +48,6 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	private boolean rendered = false;
 
 	private LightMap lightMap;
-
-	private StructureShape shape;
-
-	@Override
-	public StructureShape shape()
-	{
-		return shape;
-	}
 
 	private int id;
 
@@ -96,8 +85,6 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		lightMap = new LightMap(width + 2, height + 2, length + 2);
 
 		chunks = new Chunk[cLength * cHeight * cWidth];
-
-		shape = new StructureShape(this);
 	}
 
 	/**
@@ -165,54 +152,72 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 		final float totalDist = Maths.sqrt(delta.dot(delta));
 
-		Set<Vector3i> pts = new HashSet<>();
-		Set<Vector3i> newPts = new HashSet<>();
-
-		pts.add(worldCoordsToBlockCoords(start));
-
-		Vector3i normSign = new Vector3i((int) Math.signum(delta.x()), (int) Math.signum(delta.y()),
-			(int) Math.signum(delta.z()));
-
-		CollisionInfo info = new CollisionInfo();
-
-		while (pts.size() != 0)
+		for(float xi = 0; xi <= Math.abs(delta.x()) + 1; xi ++)
 		{
-			boolean hit = false;
-
-			for (Vector3i pt : pts)
+			for(float yi = 0; yi <= Math.abs(delta.y()) + 1; yi ++)
 			{
-				OBBCollider obb = wholeOBBForBlock(pt.x, pt.y, pt.z);
-
-				if(obb.center().dot(start) >= (totalDist - 0.5f) * (totalDist - 0.5f))
-					continue;
-				
-				if (hasBlock(pt.x, pt.y, pt.z) && obc.testLineOBB(start, delta, obb, info))
+				for(float zi = 0; zi <= Math.abs(delta.z()) + 1; zi ++)
 				{
-					hit = true;
+					Vector3f point = new Vector3f(start.x() + delta.x() * xi,
+						start.y() + delta.y() * yi,
+						start.z() + delta.z() * zi);
 					
-					if (info.distanceSquared <= totalDist * totalDist)
-						return new RayRes(new StructureBlock(this, pt.x, pt.y, pt.z), info.distanceSquared,
-							BlockFace.fromNormal(info.normal));
+					Vector3i blockpos = worldCoordsToBlockCoords(point);
+					
+					OBBCollider obc = wholeOBBForBlock(blockpos.x, blockpos.y, blockpos.z);
+					
 				}
-				
-				if (withinBlocks(normSign.x() + pt.x, pt.y, pt.z))
-					newPts.add(new Vector3i(normSign.x() + pt.x, pt.y, pt.z));
-				if (withinBlocks(pt.x, normSign.y() + pt.y, pt.z))
-					newPts.add(new Vector3i(pt.x, pt.y + normSign.y(), pt.z));
-				if (withinBlocks(pt.x, pt.y, normSign.z() + pt.z))
-					newPts.add(new Vector3i(pt.x, pt.y, pt.z + normSign.z()));
-			}
-
-			if (hit)
-			{
-				return null; // none of the blocks were in range
-			}
-			else
-			{
-				pts = new HashSet<>(newPts);
-				newPts.clear();
 			}
 		}
+		
+//		Set<Vector3i> pts = new HashSet<>();
+//		Set<Vector3i> newPts = new HashSet<>();
+//
+//		pts.add(worldCoordsToBlockCoords(start));
+//
+//		Vector3i normSign = new Vector3i((int) Math.signum(delta.x()), (int) Math.signum(delta.y()),
+//			(int) Math.signum(delta.z()));
+//
+//		CollisionInfo info = new CollisionInfo();
+//
+//		while (pts.size() != 0)
+//		{
+//			boolean hit = false;
+//
+//			for (Vector3i pt : pts)
+//			{
+//				OBBCollider obb = wholeOBBForBlock(pt.x, pt.y, pt.z);
+//
+//				if(obb.center().dot(start) >= (totalDist - 0.5f) * (totalDist - 0.5f))
+//					continue;
+//				
+//				if (hasBlock(pt.x, pt.y, pt.z) && obc.testLineOBB(start, delta, obb, info))
+//				{
+//					hit = true;
+//					
+//					if (info.distanceSquared <= totalDist * totalDist)
+//						return new RayRes(new StructureBlock(this, pt.x, pt.y, pt.z), info.distanceSquared,
+//							BlockFace.fromNormal(info.normal));
+//				}
+//				
+//				if (withinBlocks(normSign.x() + pt.x, pt.y, pt.z))
+//					newPts.add(new Vector3i(normSign.x() + pt.x, pt.y, pt.z));
+//				if (withinBlocks(pt.x, normSign.y() + pt.y, pt.z))
+//					newPts.add(new Vector3i(pt.x, pt.y + normSign.y(), pt.z));
+//				if (withinBlocks(pt.x, pt.y, normSign.z() + pt.z))
+//					newPts.add(new Vector3i(pt.x, pt.y, pt.z + normSign.z()));
+//			}
+//
+//			if (hit)
+//			{
+//				return null; // none of the blocks were in range
+//			}
+//			else
+//			{
+//				pts = new HashSet<>(newPts);
+//				newPts.clear();
+//			}
+//		}
 		
 		return null;
 	}
@@ -519,8 +524,6 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		lightMap = new LightMap(width + 2, height + 2, length + 2);
 
 		chunks = new Chunk[cLength * cHeight * cWidth];
-
-		shape = new StructureShape(this);
 
 		init();
 
