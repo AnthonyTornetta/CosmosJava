@@ -4,11 +4,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -35,6 +33,7 @@ import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
@@ -138,6 +137,12 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		{
 			return distance;
 		}
+		
+		@Override
+		public String toString()
+		{
+			return block.block() + " " + face + " " + Utils.toEasyString(distance) + "m";
+		}
 	}
 
 	public RayRes raycast(Vector3fc start, Vector3fc direction, float length, IOBBCollisionChecker obc)
@@ -163,58 +168,103 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				return null; // the line does not intersect the structure
 		}
 
-		final float totalDist = Maths.sqrt(delta.dot(delta));
-
-		Set<Vector3i> pts = new HashSet<>();
-		Set<Vector3i> newPts = new HashSet<>();
-
-		pts.add(worldCoordsToBlockCoords(start));
-
-		Vector3i normSign = new Vector3i((int) Math.signum(delta.x()), (int) Math.signum(delta.y()),
-			(int) Math.signum(delta.z()));
+		final float totalDistSquared = delta.dot(delta);
 
 		CollisionInfo info = new CollisionInfo();
+		info.distanceSquared = totalDistSquared;
+		RayRes rr = null;
 
-		while (pts.size() != 0)
+		int xx = (int)Math.abs(delta.z());
+		int yy = (int)Math.abs(delta.y());
+		int zz = (int)Math.abs(delta.z());
+		
+		int signX = (int)Math.signum(delta.x());
+		int signY = (int)Math.signum(delta.y());
+		int signZ = (int)Math.signum(delta.z());
+		
+		for (int xi = -10; xi <= xx + 10; xi++)
 		{
-			boolean hit = false;
-
-			for (Vector3i pt : pts)
+			for (int yi = -10; yi <= yy + 10; yi++)
 			{
-				OBBCollider obb = wholeOBBForBlock(pt.x, pt.y, pt.z);
+				for (int zi = -10; zi <= zz + 10; zi++)
+				{					
+					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
+						start.z() + zi * signZ);
 
-				if(obb.center().dot(start) >= (totalDist - 0.5f) * (totalDist - 0.5f))
-					continue;
-				
-				if (hasBlock(pt.x, pt.y, pt.z) && obc.testLineOBB(start, delta, obb, info))
-				{
-					hit = true;
+					Vector3i blockCoords = worldCoordsToBlockCoords(point);
 					
-					if (info.distanceSquared <= totalDist * totalDist)
-						return new RayRes(new StructureBlock(this, pt.x, pt.y, pt.z), info.distanceSquared,
-							BlockFace.fromNormal(info.normal));
+					if(hasBlock(blockCoords.x, blockCoords.y, blockCoords.z) && withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
+					{
+						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x, blockCoords.y, blockCoords.z);
+						
+						CollisionInfo temp = new CollisionInfo();
+						
+						if (obc.testLineOBB(start, delta, obbBlock, temp))
+						{
+							if(temp.distanceSquared < info.distanceSquared)
+							{
+								info.set(temp);
+								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
+									Maths.sqrt(info.distanceSquared), BlockFace.fromNormal(info.normal));
+							}
+						}
+					}
 				}
-				
-				if (withinBlocks(normSign.x() + pt.x, pt.y, pt.z))
-					newPts.add(new Vector3i(normSign.x() + pt.x, pt.y, pt.z));
-				if (withinBlocks(pt.x, normSign.y() + pt.y, pt.z))
-					newPts.add(new Vector3i(pt.x, pt.y + normSign.y(), pt.z));
-				if (withinBlocks(pt.x, pt.y, normSign.z() + pt.z))
-					newPts.add(new Vector3i(pt.x, pt.y, pt.z + normSign.z()));
-			}
-
-			if (hit)
-			{
-				return null; // none of the blocks were in range
-			}
-			else
-			{
-				pts = new HashSet<>(newPts);
-				newPts.clear();
 			}
 		}
 		
-		return null;
+		Utils.println(rr);
+
+		return rr;
+
+//		Set<Vector3i> pts = new HashSet<>();
+//		Set<Vector3i> newPts = new HashSet<>();
+//
+//		pts.add(worldCoordsToBlockCoords(start));
+//
+//		Vector3i normSign = new Vector3i((int) Math.signum(delta.x()), (int) Math.signum(delta.y()),
+//			(int) Math.signum(delta.z()));
+//
+//		CollisionInfo info = new CollisionInfo();
+//
+//		while (pts.size() != 0)
+//		{
+//			boolean hit = false;
+//
+//			for (Vector3i pt : pts)
+//			{
+//				OBBCollider obb = wholeOBBForBlock(pt.x, pt.y, pt.z);
+//
+//				if(obb.center().dot(start) >= (totalDist - 0.5f) * (totalDist - 0.5f))
+//					continue;
+//				
+//				if (hasBlock(pt.x, pt.y, pt.z) && obc.testLineOBB(start, delta, obb, info))
+//				{
+//					hit = true;
+//					
+//					if (info.distanceSquared <= totalDist * totalDist)
+//						return new RayRes(new StructureBlock(this, pt.x, pt.y, pt.z), info.distanceSquared,
+//							BlockFace.fromNormal(info.normal));
+//				}
+//				
+//				if (withinBlocks(normSign.x() + pt.x, pt.y, pt.z))
+//					newPts.add(new Vector3i(normSign.x() + pt.x, pt.y, pt.z));
+//				if (withinBlocks(pt.x, normSign.y() + pt.y, pt.z))
+//					newPts.add(new Vector3i(pt.x, pt.y + normSign.y(), pt.z));
+//				if (withinBlocks(pt.x, pt.y, normSign.z() + pt.z))
+//					newPts.add(new Vector3i(pt.x, pt.y, pt.z + normSign.z()));
+//			}
+//
+//			if (hit)
+//			{
+//				return null; // none of the blocks were in range
+//			}
+//			else
+//			{
+//				pts = new HashSet<>(newPts);
+//				newPts.clear();
+//			}
+//		}
 	}
 
 	private OBBCollider wholeOBBForBlock(int x, int y, int z)
@@ -222,7 +272,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		return new OBBCollider(localCoordsToWorldCoords(x, y, z), body().transform().orientation(),
 			HALF_WIDTHS_DEFAULT);
 	}
-	
+
 	public void energy(float f)
 	{
 		energy = f;
