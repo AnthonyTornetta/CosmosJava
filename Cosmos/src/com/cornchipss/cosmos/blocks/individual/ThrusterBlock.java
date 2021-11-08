@@ -1,16 +1,15 @@
 package com.cornchipss.cosmos.blocks.individual;
 
 import com.cornchipss.cosmos.blocks.ShipBlock;
-import com.cornchipss.cosmos.blocks.modifiers.BlockSystems;
 import com.cornchipss.cosmos.blocks.modifiers.IThrustProducer;
 import com.cornchipss.cosmos.models.blocks.ThrusterModel;
-import com.cornchipss.cosmos.systems.BlockSystem;
+import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class ThrusterBlock extends ShipBlock implements IThrustProducer
 {
-	private static final BlockSystem[] properties = new BlockSystem[]
+	private static final String[] properties = new String[]
 			{
-					BlockSystems.THRUSTER
+					BlockSystemIDs.THRUSTER_ID
 			};
 	
 	public ThrusterBlock()
@@ -31,7 +30,7 @@ public class ThrusterBlock extends ShipBlock implements IThrustProducer
 	}
 
 	@Override
-	public BlockSystem[] systems()
+	public String[] systemIds()
 	{
 		return properties;
 	}

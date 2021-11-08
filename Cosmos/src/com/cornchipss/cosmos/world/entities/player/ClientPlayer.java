@@ -24,6 +24,7 @@ import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
 
@@ -133,7 +134,7 @@ public class ClientPlayer extends Player
 					if (selectedBlock != null && selectedBlock.canAddTo(lookingAt))
 					{
 						BlockFace face = sb.face();
-
+						
 						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x)),
 							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y)),
 							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z));

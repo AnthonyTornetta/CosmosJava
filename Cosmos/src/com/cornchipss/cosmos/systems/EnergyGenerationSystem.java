@@ -1,28 +1,39 @@
 package com.cornchipss.cosmos.systems;
 
-import java.util.List;
-
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IEnergyProducerBlock;
 import com.cornchipss.cosmos.structures.Structure;
 
 public class EnergyGenerationSystem extends BlockSystem
 {
-	@Override
-	public void addBlock(StructureBlock added, List<StructureBlock> otherBlocks)
+	private float energyGeneratedPerSec = 0;
+
+	public EnergyGenerationSystem(Structure s)
 	{
+		super(s);
+	}
+	
+	@Override
+	public void addBlock(StructureBlock added)
+	{
+		energyGeneratedPerSec += ((IEnergyProducerBlock)added.block()).energyGeneratedPerSecond();
 	}
 
 	@Override
-	public void removeBlock(StructureBlock removed, List<StructureBlock> otherBlocks)
+	public void removeBlock(StructureBlock removed)
 	{
+		energyGeneratedPerSec -= ((IEnergyProducerBlock)removed.block()).energyGeneratedPerSecond();
 	}
 
 	@Override
-	public void update(Structure s, List<StructureBlock> blocks, float delta)
+	public void update(float delta)
 	{
-		if (blocks.size() > 0)
-			s.addEnergy(
-				((IEnergyProducerBlock) blocks.get(0).block()).energyGeneratedPerSecond() * blocks.size() * delta);
+		structure().addEnergy(energyGeneratedPerSec * delta);
+	}
+	
+	@Override
+	public String id()
+	{
+		return BlockSystemIDs.POWER_GENERATOR_ID;
 	}
 }

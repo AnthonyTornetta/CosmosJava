@@ -3,9 +3,6 @@ package com.cornchipss.cosmos.structures;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.joml.Matrix4f;
@@ -19,7 +16,6 @@ import org.joml.Vector4f;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.StructureBlock;
-import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -29,7 +25,7 @@ import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
-import com.cornchipss.cosmos.systems.BlockSystem;
+import com.cornchipss.cosmos.systems.BlockSystemManager;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
@@ -55,22 +51,22 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	private float energy;
 	private float maxEnergy;
 
+	private BlockSystemManager blockSystemManager;
+	
 	private float totalMass = 0;
-
-	Map<BlockSystem, List<StructureBlock>> systems = new HashMap<>();
 
 	public Structure(World world, int id)
 	{
 		super(world);
 
 		this.id = id;
+		
+		blockSystemManager = new BlockSystemManager();
 	}
 
 	public Structure(World world, int width, int height, int length, int id)
 	{
-		super(world);
-
-		this.id = id;
+		this(world, id);
 
 		if (width <= 0 || height <= 0 || length <= 0)
 			throw new IllegalArgumentException("A Structure's width/height/length cannot be <= 0");
@@ -93,10 +89,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	 */
 	public void update(float delta)
 	{
-		for (BlockSystem sys : systems.keySet())
-		{
-			sys.update(this, systems.get(sys), delta);
-		}
+		blockSystemManager.update(delta);
 	}
 
 	public static final class RayRes
@@ -535,11 +528,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 						Block b = block(x, y, z);
 
 						totalMass += b.mass();
-
-						if (b instanceof ISystemBlock)
-						{
-							handleSystemBlock((ISystemBlock) b, new StructureBlock(this, x, y, z));
-						}
+						
+						blockSystemManager.addBlock(new StructureBlock(this, x, y, z));
 					}
 				}
 			}
@@ -668,8 +658,6 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		{
 			Chunk c = chunk_old(x, y, z);
 
-			StructureBlock structBlock = new StructureBlock(this, x, y, z);
-
 			Block old = c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
 
 			if (old != null)
@@ -681,42 +669,18 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			{
 				totalMass += b.mass();
 			}
-
-			if (old instanceof ISystemBlock)
-			{
-				BlockSystem[] systems = ((ISystemBlock) old).systems();
-
-				for (BlockSystem sys : systems)
-				{
-					sys.removeBlock(structBlock, this.systems.get(sys));
-					this.systems.get(sys).remove(structBlock);
-				}
-			}
+			
+			StructureBlock sb = new StructureBlock(this, x, y, z);
+			
+			blockSystemManager.removeBlock(sb);
 
 			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
 
-			if (b instanceof ISystemBlock)
-			{
-				handleSystemBlock((ISystemBlock) b, structBlock);
-			}
+			blockSystemManager.addBlock(sb);
 		}
 		else
 			throw new IndexOutOfBoundsException(
 				x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
-	}
-
-	private void handleSystemBlock(ISystemBlock b, StructureBlock block)
-	{
-		BlockSystem[] syses = b.systems();
-
-		for (BlockSystem sys : syses)
-		{
-			if (!systems.containsKey(sys))
-				systems.put(sys, new LinkedList<>());
-
-			sys.addBlock(block, this.systems.get(sys));
-			this.systems.get(sys).add(block);
-		}
 	}
 
 	public Block block(int x, int y, int z)

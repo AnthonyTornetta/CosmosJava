@@ -1,16 +1,15 @@
 package com.cornchipss.cosmos.blocks.individual;
 
 import com.cornchipss.cosmos.blocks.Block;
-import com.cornchipss.cosmos.blocks.modifiers.BlockSystems;
 import com.cornchipss.cosmos.blocks.modifiers.IEnergyStorageBlock;
 import com.cornchipss.cosmos.models.blocks.EnergyStorageModel;
-import com.cornchipss.cosmos.systems.BlockSystem;
+import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class EnergyStorageBlock extends Block implements IEnergyStorageBlock
 {
-	private static final BlockSystem[] systems = new BlockSystem[]
+	private static final String[] systems = new String[]
 			{
-					BlockSystems.POWER_STORAGE
+					BlockSystemIDs.POWER_STORAGE_ID
 			};
 	
 	public EnergyStorageBlock()
@@ -19,7 +18,7 @@ public class EnergyStorageBlock extends Block implements IEnergyStorageBlock
 	}
 
 	@Override
-	public BlockSystem[] systems()
+	public String[] systemIds()
 	{
 		return systems;
 	}

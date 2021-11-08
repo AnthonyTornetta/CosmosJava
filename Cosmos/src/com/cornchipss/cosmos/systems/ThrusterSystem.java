@@ -1,7 +1,5 @@
 package com.cornchipss.cosmos.systems;
 
-import java.util.List;
-
 import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
@@ -13,19 +11,27 @@ import com.cornchipss.cosmos.utils.Maths;
 
 public class ThrusterSystem extends BlockSystem
 {
-	@Override
-	public void update(Structure s, List<StructureBlock> blocks, float delta)
+	public ThrusterSystem(Structure s)
 	{
-		if (NettySide.side() == NettySide.CLIENT || blocks.size() == 0)
+		super(s);
+	}
+	
+	private float thrustPerSecond = 0;
+	private float powerPerSecond = 0;;
+
+	@Override
+	public void update(float delta)
+	{
+		if (NettySide.side() == NettySide.CLIENT)
 			return;
 
-		if (s instanceof Ship)
+		if (structure() instanceof Ship)
 		{
-			Ship ship = (Ship) s;
+			Ship ship = (Ship) structure();
 
-			float energyCost = calculateEnergyUsedPerSecond(blocks) * delta;
+			float energyCost = powerPerSecond * delta;
 
-			float thrustForce = calculateThrustForcePerSecond(blocks) * delta;
+			float thrustForce = thrustPerSecond * delta;
 
 			Vector3f dVel = new Vector3f();
 
@@ -82,30 +88,24 @@ public class ThrusterSystem extends BlockSystem
 	}
 
 	@Override
-	public void addBlock(StructureBlock added, List<StructureBlock> otherBlocks)
+	public void addBlock(StructureBlock added)
 	{
-
+		IThrustProducer p = (IThrustProducer)added.block();
+		thrustPerSecond += p.thrustGeneratedPerSecond();
+		powerPerSecond += p.powerUsedPerSecond();
 	}
 
 	@Override
-	public void removeBlock(StructureBlock removed, List<StructureBlock> otherBlocks)
+	public void removeBlock(StructureBlock removed)
 	{
-
+		IThrustProducer p = (IThrustProducer)removed.block();
+		thrustPerSecond -= p.thrustGeneratedPerSecond();
+		powerPerSecond -= p.powerUsedPerSecond();
 	}
 
-	private float calculateThrustForcePerSecond(List<StructureBlock> thrusterBlocks)
+	@Override
+	public String id()
 	{
-		if (thrusterBlocks.size() == 0)
-			return 0;
-
-		return thrusterBlocks.size() * ((IThrustProducer) thrusterBlocks.get(0).block()).thrustGeneratedPerSecond();
-	}
-
-	private float calculateEnergyUsedPerSecond(List<StructureBlock> thrusterBlocks)
-	{
-		if (thrusterBlocks.size() == 0)
-			return 0;
-
-		return thrusterBlocks.size() * ((IThrustProducer) thrusterBlocks.get(0).block()).powerUsedPerSecond();
+		return BlockSystemIDs.THRUSTER_ID;
 	}
 }
