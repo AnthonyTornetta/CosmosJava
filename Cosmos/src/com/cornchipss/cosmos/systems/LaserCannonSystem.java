@@ -7,7 +7,6 @@ import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class LaserCannonSystem extends BlockSystem
 {
@@ -25,27 +24,7 @@ public class LaserCannonSystem extends BlockSystem
 
 		nodes = new LinkedList<>();
 	}
-
-	private void update(Node node)
-	{
-		for (Node n : nodes)
-		{
-			if (!n.equals(node))
-			{
-				if (node.start.x == n.start.x && node.start.y == n.start.y)
-				{
-					if (node.start.z - node.count == n.start.z)
-					{
-						node.count += n.count;
-						nodes.remove(n);
-
-						return;
-					}
-				}
-			}
-		}
-	}
-
+	
 	@Override
 	public void addBlock(StructureBlock added)
 	{
@@ -165,7 +144,7 @@ public class LaserCannonSystem extends BlockSystem
 	@Override
 	public void update(float delta)
 	{
-		Utils.println(nodes.size());
+		
 	}
 
 	@Override

@@ -36,7 +36,7 @@ public class ServerGame extends Game
 		ship.init();
 
 		try (DataInputStream shipStr = new DataInputStream(
-			new FileInputStream(new File("assets/structures/ships/test.struct"))))
+			new FileInputStream(new File("assets/structures/ships/gunship.struct"))))
 		{
 			ship.read(shipStr);
 		}

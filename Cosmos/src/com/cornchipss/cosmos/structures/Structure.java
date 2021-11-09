@@ -186,7 +186,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 						if (obc.testLineOBB(start, delta, obbBlock, temp))
 						{
-							if (temp.distanceSquared < info.distanceSquared)
+							if (temp.distanceSquared < info.distanceSquared && temp.normal.dot(temp.normal) != 0)
 							{
 								info.set(temp);
 								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),

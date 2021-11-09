@@ -10,6 +10,7 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
+import com.cornchipss.cosmos.world.entities.Laser;
 
 public class PhysicsWorld
 {
@@ -23,6 +24,7 @@ public class PhysicsWorld
 	private boolean locked = false;
 
 	private List<PhysicalObject> bodiesToAdd;
+	private List<PhysicalObject> bodiesToRemove;
 
 	private ICollisionChecker strategy;
 
@@ -30,6 +32,7 @@ public class PhysicsWorld
 	{
 		bodies = new LinkedList<>();
 		bodiesToAdd = new LinkedList<>();
+		bodiesToRemove = new LinkedList<>();
 
 		strategy = new DefaultCollisionChecker();
 	}
@@ -40,6 +43,14 @@ public class PhysicsWorld
 			bodies.add(bdy);
 		else
 			bodiesToAdd.add(bdy);
+	}
+
+	public void removePhysicalObject(PhysicalObject obj)
+	{
+		if(!locked)
+			bodies.remove(obj);
+		else
+			bodiesToRemove.add(obj);
 	}
 
 	public void update(float delta)
@@ -108,12 +119,24 @@ public class PhysicsWorld
 	{
 		locked = true;
 	}
-
+	
 	public void unlock()
 	{
 		locked = false;
 
 		while (bodiesToAdd.size() != 0)
-			addPhysicalObject(bodiesToAdd.remove(0));
+		{
+			if(!bodiesToRemove.remove(bodiesToAdd.get(0)))
+			{
+				addPhysicalObject(bodiesToAdd.remove(0));
+			}
+			else
+			{
+				bodiesToAdd.remove(0);
+			}
+		}
+		
+		while (bodiesToRemove.size() != 0)
+			removePhysicalObject(bodiesToRemove.remove(0));
 	}
 }
