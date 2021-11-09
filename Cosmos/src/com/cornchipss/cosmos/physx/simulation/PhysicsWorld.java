@@ -10,7 +10,6 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
-import com.cornchipss.cosmos.world.entities.Laser;
 
 public class PhysicsWorld
 {

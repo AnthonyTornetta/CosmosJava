@@ -192,22 +192,21 @@ public class ClientPlayer extends Player
 		dVel.x = (dVel.x() * (delta * 1000));
 		dVel.z = (dVel.z() * (delta * 1000));
 		dVel.y = (dVel.y() * (delta * 1000));
-
-		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_CONTROL))
-			dVel.mul(0.001f);
-
+		
 		Vector3fc dRot = movement().deltaRotation();
 
 		cam.rotate(dRot);
 
 		Vector3f vel = new Vector3f(body().velocity());
 
-		if (Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
-			vel.mul(0.75f);
-
+		vel.mul(0.1f);
+		
 		vel.add(dVel);
 
-		vel = Maths.safeNormalize(vel, 50.0f);
+		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+			vel = Maths.safeNormalize(vel, 2.5f);
+		else
+			vel = Maths.safeNormalize(vel, 50.0f);
 
 		if (Input.isKeyJustDown(GLFW.GLFW_KEY_SPACE))
 			vel.y = (vel.y() + 5);

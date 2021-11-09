@@ -189,8 +189,11 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 							if (temp.distanceSquared < info.distanceSquared && temp.normal.dot(temp.normal) != 0)
 							{
 								info.set(temp);
+								BlockFace face = BlockFace.fromNormal(
+									body().transform().orientation().applyInverseRotation(info.normal, new Vector3f()));
+								
 								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
-									Maths.sqrt(info.distanceSquared), BlockFace.fromNormal(info.normal));
+									Maths.sqrt(info.distanceSquared), face);
 							}
 						}
 					}
