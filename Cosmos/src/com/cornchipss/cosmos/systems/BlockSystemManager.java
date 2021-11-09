@@ -6,6 +6,7 @@ import java.util.Map;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.BlockSystemFactories;
 import com.cornchipss.cosmos.blocks.modifiers.ISystemBlock;
+import com.cornchipss.cosmos.netty.action.PlayerAction;
 
 public class BlockSystemManager
 {
@@ -46,6 +47,17 @@ public class BlockSystemManager
 		for(BlockSystem s : systems.values())
 		{
 			s.update(delta);
+		}
+	}
+
+	public void sendAction(PlayerAction action)
+	{
+		for(BlockSystem s : systems.values())
+		{
+			if(s instanceof IPlayerActionReceiver)
+			{
+				((IPlayerActionReceiver)s).receiveAction(action);
+			}
 		}
 	}
 }

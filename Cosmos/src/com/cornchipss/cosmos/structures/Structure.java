@@ -52,7 +52,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	private float maxEnergy;
 
 	private BlockSystemManager blockSystemManager;
-	
+
 	private float totalMass = 0;
 
 	public Structure(World world, int id)
@@ -60,7 +60,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		super(world);
 
 		this.id = id;
-		
+
 		blockSystemManager = new BlockSystemManager();
 	}
 
@@ -134,7 +134,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	public RayRes raycast(Vector3fc start, Vector3fc delta, IOBBCollisionChecker obc)
 	{
-		Vector3i sc = worldCoordsToBlockCoords(start);
+		Vector3i sc = worldCoordsToBlockCoords(start, new Vector3i());
 		if (!withinBlocks(sc.x, sc.y, sc.z))
 		{
 			CollisionInfo info = new CollisionInfo();
@@ -144,7 +144,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				delta = delta.sub(dd, new Vector3f());
 				start = info.collisionPoint;
 
-				sc = worldCoordsToBlockCoords(start);
+				sc = worldCoordsToBlockCoords(start, new Vector3i());
 			}
 			else
 				return null; // the line does not intersect the structure
@@ -175,7 +175,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
 						start.z() + zi * signZ);
 
-					Vector3i blockCoords = worldCoordsToBlockCoords(point);
+					Vector3i blockCoords = worldCoordsToBlockCoords(point, new Vector3i());
 
 					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
 						&& withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
@@ -191,7 +191,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 								info.set(temp);
 								BlockFace face = BlockFace.fromNormal(
 									body().transform().orientation().applyInverseRotation(info.normal, new Vector3f()));
-								
+
 								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
 									Maths.sqrt(info.distanceSquared), face);
 							}
@@ -206,7 +206,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	private OBBCollider wholeOBBForBlock(int x, int y, int z)
 	{
-		return new OBBCollider(localCoordsToWorldCoords(x, y, z), body().transform().orientation(),
+		return new OBBCollider(blockCoordsToWorldCoords(x, y, z, new Vector3f()), body().transform().orientation(),
 			HALF_WIDTHS_DEFAULT);
 	}
 
@@ -346,15 +346,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	}
 
 	@Deprecated
-	public Chunk chunk_old(int x, int y, int z)
+	private Chunk chunk_old(int x, int y, int z)
 	{
 		return chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH);
-	}
-
-	@Deprecated
-	public void chunk_old(int x, int y, int z, Chunk c)
-	{
-		chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH, c);
 	}
 
 	public Vector3f chunkWorldPosition(Chunk c, Vector3f out)
@@ -531,7 +525,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 						Block b = block(x, y, z);
 
 						totalMass += b.mass();
-						
+
 						blockSystemManager.addBlock(new StructureBlock(this, x, y, z));
 					}
 				}
@@ -672,9 +666,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			{
 				totalMass += b.mass();
 			}
-			
+
 			StructureBlock sb = new StructureBlock(this, x, y, z);
-			
+
 			blockSystemManager.removeBlock(sb);
 
 			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
@@ -745,26 +739,21 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		block(x, y, z, null);
 	}
 
-	public Vector3i worldCoordsToBlockCoords(Vector3fc v)
+	public Vector3i worldCoordsToBlockCoords(Vector3fc v, Vector3i out)
 	{
-		return worldCoordsToStructureCoords(v.x(), v.y(), v.z());
+		return worldCoordsToStructureCoords(v.x(), v.y(), v.z(), out);
 	}
 
-	public Vector3i worldCoordsToStructureCoords(Vector3ic v)
-	{
-		return worldCoordsToStructureCoords(v.x(), v.y(), v.z());
-	}
-
-	public Vector3i worldCoordsToStructureCoords(float x, float y, float z)
+	public Vector3i worldCoordsToStructureCoords(float x, float y, float z, Vector3i out)
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 
 		body().transform().invertedMatrix().transform(c);
 
-		return new Vector3i((int) c.x + width() / 2, (int) c.y + height() / 2, (int) c.z + length() / 2);
+		return out.set((int) c.x + width() / 2, (int) c.y + height() / 2, (int) c.z + length() / 2);
 	}
 
-	public Vector3f localCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
+	public Vector3f blockCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
 	{
 		Vector4f c = new Vector4f(x - width() / 2, y - height() / 2, z - length() / 2, 1);
 
@@ -775,24 +764,14 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		return storage;
 	}
 
-	public Vector3f localCoordsToWorldCoords(float x, float y, float z)
+	public Vector3f blockCoordsToWorldCoords(Vector3fc v, Vector3f storage)
 	{
-		return localCoordsToWorldCoords(x, y, z, new Vector3f());
+		return blockCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
 	}
 
-	public Vector3f localCoordsToWorldCoords(Vector3fc v, Vector3f storage)
+	public Vector3f blockCoordsToWorldCoords(Vector3ic v, Vector3f storage)
 	{
-		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
-	}
-
-	public Vector3f localCoordsToWorldCoords(Vector3ic v, Vector3f storage)
-	{
-		return localCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
-	}
-
-	public Vector3f localCoordsToWorldCoords(Vector3fc v)
-	{
-		return localCoordsToWorldCoords(v.x(), v.y(), v.z());
+		return blockCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
 	}
 
 	public int higehstYAt(int x, int z)
@@ -917,5 +896,10 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			return genOBB(a, x, y, z, a.block(x, y, z).halfWidths());
 
 		return null;
+	}
+
+	protected BlockSystemManager blockSystemManager()
+	{
+		return blockSystemManager;
 	}
 }

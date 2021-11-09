@@ -3,12 +3,16 @@ package com.cornchipss.cosmos.systems;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
+import com.cornchipss.cosmos.netty.action.PlayerAction;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.world.entities.Laser;
 
-public class LaserCannonSystem extends BlockSystem
+public class LaserCannonSystem extends BlockSystem implements IPlayerActionReceiver
 {
 	private static class Node
 	{
@@ -151,5 +155,25 @@ public class LaserCannonSystem extends BlockSystem
 	public String id()
 	{
 		return BlockSystemIDs.LASER_CANNON_ID;
+	}
+
+	@Override
+	public void receiveAction(PlayerAction action)
+	{
+		if(action.isFiring())
+		{
+			for(Node n : nodes)
+			{
+				Vector3i pos = new Vector3i(n.start.x, n.start.y, n.start.z - n.count);
+				Vector3f coords = structure().blockCoordsToWorldCoords(pos, new Vector3f());
+				
+				Laser laser = new Laser(structure().world(), 20, structure());
+				
+				Transform t = new Transform(coords);
+				t.orientation(structure().body().transform().orientation());
+				
+				laser.addToWorld(t);
+			}
+		}
 	}
 }

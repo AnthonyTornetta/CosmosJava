@@ -4,5 +4,10 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 
 public interface IHasCollisionEvent
 {
-	public void onCollide(PhysicalObject obj);
+	/**
+	 * If this is false, cancel the collision
+	 * @param obj
+	 * @return
+	 */
+	public boolean onCollide(PhysicalObject obj);
 }

@@ -10,6 +10,7 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
+import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 
 public class PhysicsWorld
 {
@@ -87,6 +88,11 @@ public class PhysicsWorld
 
 		if (strategy.colliding(a, b, deltaA, info))
 		{
+			if(a instanceof IHasCollisionEvent)
+			{
+				if(!((IHasCollisionEvent)a).onCollide(b))
+					return;
+			}
 			Vector3f mulBy = new Vector3f();
 			mulBy.x = Math.signum(a.body().velocity().x()) == Math.signum(info.normal.x) ? 1 : -1;
 			mulBy.y = Math.signum(a.body().velocity().y()) == Math.signum(info.normal.y) ? 1 : -1;

@@ -13,6 +13,7 @@ import com.cornchipss.cosmos.netty.packets.JoinFinishPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
+import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.netty.packets.ShipMovementPacket;
 
@@ -25,8 +26,6 @@ public class PacketTypes
 
 	public static void addPacketType(Packet p)
 	{
-//		if(packetTypes.containsKey(p.marker()))
-//			throw new IllegalArgumentException("Packet of marker " + p.marker() + " has already been registered!");
 		packetTypes.put(marker, p);
 		markers.put(p.getClass(), marker);
 		marker++;
@@ -58,5 +57,6 @@ public class PacketTypes
 		addPacketType(new ShipMovementPacket());
 		addPacketType(new ClientInteractPacket());
 		addPacketType(new ExitShipPacket());
+		addPacketType(new PlayerActionPacket());
 	}
 }

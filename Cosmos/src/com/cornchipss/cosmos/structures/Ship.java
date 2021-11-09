@@ -4,6 +4,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Block;
+import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.utils.Maths;
@@ -56,8 +57,9 @@ public class Ship extends Structure
 		}
 		else
 		{
+			Vector3f where = new Vector3f(width() / 2, height() / 2, length() / 2);
 			pilot.body().velocity(Maths.zero());
-			pilot.body().transform().position(localCoordsToWorldCoords(width() / 2, height() / 2, length() / 2));
+			pilot.body().transform().position(blockCoordsToWorldCoords(where, where));
 
 			pilot.body().transform().orientation(body().transform().orientation());
 			movement = pilot.movement();
@@ -92,5 +94,10 @@ public class Ship extends Structure
 	public Movement movement()
 	{
 		return movement;
+	}
+
+	public void sendAction(PlayerAction action)
+	{
+		blockSystemManager().sendAction(action);
 	}
 }

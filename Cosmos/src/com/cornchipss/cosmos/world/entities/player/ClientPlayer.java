@@ -14,10 +14,12 @@ import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.client.Client;
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
 import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
 import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
@@ -82,18 +84,36 @@ public class ClientPlayer extends Player
 
 			handleInteractions();
 		}
-		else if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
+		else 
 		{
-			// shipPiloting(null);
-			ExitShipPacket esp = new ExitShipPacket(buffer, 0);
-			esp.init();
-			try
+			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
-				Client.instance().nettyClient().sendTCP(esp);
+				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
+				PlayerActionPacket p = new PlayerActionPacket(buffer, 0, action);
+				p.init();
+				try
+				{
+					Client.instance().nettyClient().sendTCP(p);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
-			catch (IOException e)
+			
+			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 			{
-				e.printStackTrace();
+				// shipPiloting(null);
+				ExitShipPacket esp = new ExitShipPacket(buffer, 0);
+				esp.init();
+				try
+				{
+					Client.instance().nettyClient().sendTCP(esp);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -126,7 +146,11 @@ public class ClientPlayer extends Player
 					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, sb.block().structureX(),
 						sb.block().structureY(), sb.block().structureZ(), null);
 					packet.init();
-					ClientGame.instance().nettyClient().sendUDP(packet);
+					try
+					{
+						ClientGame.instance().nettyClient().sendTCP(packet);
+					}
+					catch(IOException ex) {}
 				}
 				else if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{

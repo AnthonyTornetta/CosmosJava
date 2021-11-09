@@ -7,6 +7,7 @@ import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
+import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
@@ -15,11 +16,14 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent
 	private Vector3f halfwidths = new Vector3f(0.1f, 0.1f, 0.4f);
 
 	private float speed;
+	
+	private Structure sender;
 
-	public Laser(World world, float speed)
+	public Laser(World world, float speed, Structure sender)
 	{
 		super(world);
 		this.speed = speed;
+		this.sender = sender;
 	}
 
 	@Override
@@ -38,9 +42,14 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent
 	}
 
 	@Override
-	public void onCollide(PhysicalObject obj)
+	public boolean onCollide(PhysicalObject obj)
 	{
+		if(obj.equals(sender))
+			return false;
+		
 		Utils.println("BYE!");
 		this.world().removePhysicalObject(this);
+		
+		return true;
 	}
 }
