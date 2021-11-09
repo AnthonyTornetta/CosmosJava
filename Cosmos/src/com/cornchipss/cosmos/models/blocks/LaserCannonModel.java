@@ -10,9 +10,14 @@ public class LaserCannonModel extends CubeModel
 	{
 		switch(side)
 		{
-		case FRONT:
+		case BACK:
 			return 6 * material().uLength();
-		default:
+		case FRONT:
+			return 8 * material().uLength();
+		case TOP:
+		case BOTTOM:
+			return 7 * material().uLength();
+		default: // left right
 			return 5 * material().uLength();
 		}
 	}

@@ -55,7 +55,7 @@ public abstract class Player extends PhysicalObject
 		inventory.block(0, 5, Blocks.THRUSTER);
 		inventory.block(0, 6, Blocks.REACTOR);
 		inventory.block(0, 7, Blocks.ENERGY_STORAGE);
-		inventory.block(0, 8, Blocks.LOG);
+		inventory.block(0, 8, Blocks.LASER_CANNON);
 		inventory.block(0, 9, Blocks.LEAF);
 
 		movement = Movement.movement(MovementType.NONE);
