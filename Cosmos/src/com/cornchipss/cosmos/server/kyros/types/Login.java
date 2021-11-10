@@ -4,6 +4,8 @@ public class Login
 {
 	private String name;
 
+	public Login() {}
+	
 	public Login(String name)
 	{
 		this.name = name;

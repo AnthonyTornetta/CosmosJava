@@ -19,6 +19,7 @@ import com.cornchipss.cosmos.utils.Utils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.FrameworkMessage.KeepAlive;
 import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 
 public class CosmosNettyClient implements Runnable
@@ -41,7 +42,6 @@ public class CosmosNettyClient implements Runnable
 		players = new ClientPlayerList();
 		
 		client = new Client();
-		Network.register(client);
 	}
 
 	public void createConnection(String ip, int port, String name) throws IOException
@@ -49,23 +49,42 @@ public class CosmosNettyClient implements Runnable
 		this.name = name;
 		
 		client.start();
-		client.connect(5000, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
+		
+		Network.register(client);
 		
 		client.addListener(new ThreadedListener(new Listener() 
 		{
 			public void received (Connection connection, Object object) {
+				Utils.println("[client] got something!");
+				
 				Utils.println(object);
 			}
 
 			public void disconnected (Connection connection) {
 				Utils.println("BYE :(");
+				running = false;
 			}
 		}));
 		
+		client.connect(5000, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
 		
-		while(client.isConnected())
+		try
 		{
-			client.sendTCP(new Login("HI"));
+			Thread.sleep(1000);
+		}
+		catch (InterruptedException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		while(client.isConnected() && running)
+		{
+			if(Math.random() < 0.05f)
+			{
+				Utils.println("SENT");
+				client.sendUDP(new Login(name));
+			}
 			
 			try
 			{
@@ -76,6 +95,8 @@ public class CosmosNettyClient implements Runnable
 				e.printStackTrace();
 			}
 		}
+		
+		client.close();
 		
 		TCPServerConnection tcpConnection = new TCPServerConnection(this, ip, port);
 

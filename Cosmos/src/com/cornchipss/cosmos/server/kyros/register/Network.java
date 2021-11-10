@@ -7,7 +7,7 @@ import com.esotericsoftware.kryonet.EndPoint;
 
 public class Network
 {
-	public static final int TCP_PORT = 54455, UDP_PORT = 54456;
+	public static final int TCP_PORT = 54455, UDP_PORT = TCP_PORT;
 	
 	public static void register(EndPoint endPoint)
 	{

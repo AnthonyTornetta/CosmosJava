@@ -1,6 +1,8 @@
 package com.cornchipss.cosmos.server;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.packets.Packet;
@@ -9,6 +11,7 @@ import com.cornchipss.cosmos.server.kyros.FancyServer;
 import com.cornchipss.cosmos.server.kyros.register.Network;
 import com.cornchipss.cosmos.server.kyros.types.Login;
 import com.cornchipss.cosmos.server.kyros.types.StatusResponse;
+import com.cornchipss.cosmos.utils.Utils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -28,7 +31,6 @@ public class CosmosNettyServer implements Runnable
 	public CosmosNettyServer(ServerGame game, CommandHandler cmdHandler)
 	{
 		server = new FancyServer();
-		Network.register(server);
 		
 		running = true;
 		this.game = game;
@@ -102,10 +104,40 @@ public class CosmosNettyServer implements Runnable
 		}
 	}
 	
+	private Set<String> names = new HashSet<>();
+	
 	@Override
 	public void run()
 	{
 		server.start();
+		
+		Network.register(server);
+
+		server.addListener(new Listener() {
+			public void received (Connection c, Object object) {
+				Utils.println("Got Something!");
+				
+				if(object instanceof Login)
+				{
+					Login l = (Login)object;
+					Utils.println(l.name() + " trying to connect.");
+					if(!names.contains(l.name()))
+					{
+						c.sendTCP(new StatusResponse(200, "Added!"));
+						names.add(l.name());
+					}
+					else
+					{
+						c.sendTCP(new StatusResponse(400, "Already Logged In!"));
+					}
+				}
+			}
+
+			public void disconnected (Connection c) {
+				Connection connection = (Connection)c;
+			}
+		});
+		
 		try
 		{
 			server.bind(Network.TCP_PORT, Network.UDP_PORT);
@@ -115,26 +147,6 @@ public class CosmosNettyServer implements Runnable
 			throw new RuntimeException(e);
 		}
 
-		server.addListener(new Listener()
-		{
-			public void received(Connection connection, Object object)
-			{
-				if (object instanceof Login)
-				{
-					Login obj = ((Login)object);
-					System.out.println(obj.name());
-					
-					if(Math.random() < 0.05f)
-					{
-						connection.close();
-						return;
-					}
-					
-					StatusResponse response = new StatusResponse(200);
-					connection.sendTCP(response);
-				}
-			}
-		});
 	}
 
 	public boolean running()
