@@ -8,7 +8,6 @@ import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.ServerPlayer;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerActionPacket extends Packet
@@ -67,7 +66,6 @@ public class PlayerActionPacket extends Packet
 		{
 			p.shipPiloting().sendAction(action);
 		}
-
 		
 		PlayerActionPacket response = new PlayerActionPacket(nextBuffer, 0, action, p);
 		

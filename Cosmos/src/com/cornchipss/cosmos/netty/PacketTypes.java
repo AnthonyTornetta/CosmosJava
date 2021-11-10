@@ -7,6 +7,7 @@ import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
 import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
 import com.cornchipss.cosmos.netty.packets.DebugPacket;
 import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
+import com.cornchipss.cosmos.netty.packets.EntityPacket;
 import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.FullStructurePacket;
 import com.cornchipss.cosmos.netty.packets.JoinFinishPacket;
@@ -58,5 +59,6 @@ public class PacketTypes
 		addPacketType(new ClientInteractPacket());
 		addPacketType(new ExitShipPacket());
 		addPacketType(new PlayerActionPacket());
+		addPacketType(new EntityPacket());
 	}
 }
