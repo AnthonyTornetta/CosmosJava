@@ -2,12 +2,12 @@ package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.Server;
+import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
@@ -61,13 +61,13 @@ public class ClientInteractPacket extends Packet
 		if(block.block() instanceof IInteractable)
 		{
 			((IInteractable)block.block()).
-					onInteract(block, Server.nettyServer().players().player(client));
+					onInteract(block, CosmosServer.nettyServer().players().player(client));
 			
 			ClientInteractPacket cpt = new ClientInteractPacket(new byte[1024], 0, block);
 			cpt.init();
-			cpt.writeString(Server.nettyServer().players().player(client).name());
+			cpt.writeString(CosmosServer.nettyServer().players().player(client).name());
 			
-			Server.nettyServer().sendToAllTCP(cpt);
+			CosmosServer.nettyServer().sendToAllTCP(cpt);
 		}
 	}
 	
@@ -86,7 +86,7 @@ public class ClientInteractPacket extends Packet
 
 		StructureBlock block = new StructureBlock(s, x, y, z);
 		
-		Player player = Client.instance().nettyClient().players().player(name);
+		Player player = CosmosClient.instance().nettyClient().players().player(name);
 		
 		((IInteractable)s.block(x, y, z))
 			.onInteract(block, player);

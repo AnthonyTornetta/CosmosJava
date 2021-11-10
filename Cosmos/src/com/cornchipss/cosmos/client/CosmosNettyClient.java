@@ -12,7 +12,14 @@ import com.cornchipss.cosmos.netty.packets.DisconnectedPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
+import com.cornchipss.cosmos.server.kyros.register.Network;
+import com.cornchipss.cosmos.server.kyros.types.Login;
 import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.utils.Utils;
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Listener.ThreadedListener;
 
 public class CosmosNettyClient implements Runnable
 {
@@ -26,16 +33,50 @@ public class CosmosNettyClient implements Runnable
 	private String name;
 
 	private ClientGame game;
+	
+	private Client client;
 
 	public CosmosNettyClient()
 	{
 		players = new ClientPlayerList();
+		
+		client = new Client();
+		Network.register(client);
 	}
 
 	public void createConnection(String ip, int port, String name) throws IOException
 	{
 		this.name = name;
+		
+		client.start();
+		client.connect(5000, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
+		
+		client.addListener(new ThreadedListener(new Listener() 
+		{
+			public void received (Connection connection, Object object) {
+				Utils.println(object);
+			}
 
+			public void disconnected (Connection connection) {
+				Utils.println("BYE :(");
+			}
+		}));
+		
+		
+		while(client.isConnected())
+		{
+			client.sendTCP(new Login("HI"));
+			
+			try
+			{
+				Thread.sleep(100);
+			}
+			catch (InterruptedException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		
 		TCPServerConnection tcpConnection = new TCPServerConnection(this, ip, port);
 
 		server = new ServerConnection(InetAddress.getByName(ip), port, tcpConnection);
@@ -80,7 +121,7 @@ public class CosmosNettyClient implements Runnable
 			sendUDP(joinP);
 
 			// udp stuff
-			while (running && Client.instance().running())
+			while (running && CosmosClient.instance().running())
 			{
 				try
 				{

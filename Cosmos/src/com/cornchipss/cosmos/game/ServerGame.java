@@ -10,7 +10,7 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.netty.packets.ShipMovementPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
-import com.cornchipss.cosmos.server.Server;
+import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
@@ -66,7 +66,7 @@ public class ServerGame extends Game
 				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship);
 				smp.init();
 
-				Server.nettyServer().sendToAllUDP(smp);
+				CosmosServer.nettyServer().sendToAllUDP(smp);
 			}
 		}
 	}

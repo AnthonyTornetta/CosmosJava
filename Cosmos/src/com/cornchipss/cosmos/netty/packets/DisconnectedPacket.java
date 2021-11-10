@@ -1,6 +1,6 @@
 package com.cornchipss.cosmos.netty.packets;
 
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.netty.NettySide;
@@ -61,18 +61,18 @@ public class DisconnectedPacket extends Packet
 		String reason = p.readString();
 		Logger.LOGGER.info(name + " disconnected - " + reason);
 		
-		Player removedPlayer = Client.instance().nettyClient().players().player(name);
+		Player removedPlayer = CosmosClient.instance().nettyClient().players().player(name);
 		
-		if(Client.instance().nettyClient().game().player().equals(removedPlayer))
+		if(CosmosClient.instance().nettyClient().game().player().equals(removedPlayer))
 		{
 			if(server.socket() != null)
 				server.socket().close();
 			
-			Client.instance().quit();
+			CosmosClient.instance().quit();
 		}
 		else
 		{
-			Client.instance().nettyClient().players().removePlayer(removedPlayer);
+			CosmosClient.instance().nettyClient().players().removePlayer(removedPlayer);
 		}
 	}
 }

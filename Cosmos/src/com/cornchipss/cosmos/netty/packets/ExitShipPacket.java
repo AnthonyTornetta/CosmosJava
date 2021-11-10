@@ -4,7 +4,7 @@ import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.ServerConnection;
 import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.Server;
+import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 
@@ -55,7 +55,7 @@ public class ExitShipPacket extends Packet
 			
 			ExitShipPacket send = new ExitShipPacket(new byte[32], 0, s);
 			send.init();
-			Server.nettyServer().sendToAllTCP(send);
+			CosmosServer.nettyServer().sendToAllTCP(send);
 		}
 	}
 

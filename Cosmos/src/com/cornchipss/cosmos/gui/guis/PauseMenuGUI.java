@@ -1,6 +1,6 @@
 package com.cornchipss.cosmos.gui.guis;
 
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUIElementHolder;
 import com.cornchipss.cosmos.gui.interactable.GUIButtonText;
@@ -32,7 +32,7 @@ public class PauseMenuGUI extends GUIElementHolder
 					new PixelMeasurement(60)), 	
 			() ->
 			{
-				Client.instance().quit();
+				CosmosClient.instance().quit();
 			});
 	
 		GUIButtonText resumeBtn = new GUIButtonText("RESUME",

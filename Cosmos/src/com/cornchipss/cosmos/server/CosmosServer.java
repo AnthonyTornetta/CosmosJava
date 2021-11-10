@@ -13,8 +13,11 @@ import com.cornchipss.cosmos.server.command.commands.SayCommand;
 import com.cornchipss.cosmos.server.command.commands.StopCommand;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
 
-public class Server implements Runnable
+public class CosmosServer implements Runnable
 {
 	private static CosmosNettyServer server;
 
@@ -23,7 +26,7 @@ public class Server implements Runnable
 		return server;
 	}
 
-	public Server()
+	public CosmosServer()
 	{
 		NettySide.initNettySide(NettySide.SERVER);
 	}

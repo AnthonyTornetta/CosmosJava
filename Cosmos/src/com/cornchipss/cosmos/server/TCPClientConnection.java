@@ -146,7 +146,7 @@ public class TCPClientConnection implements Runnable
 		DisconnectedPacket packet = new DisconnectedPacket(buf, 0, name, "Disconnected by User");
 		packet.init();
 
-		for (ServerPlayer pl : Server.nettyServer().players().players())
+		for (ServerPlayer pl : CosmosServer.nettyServer().players().players())
 		{
 			try
 			{

@@ -1,17 +1,17 @@
 package com.cornchipss.cosmos.server;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 import com.cornchipss.cosmos.game.ServerGame;
-import com.cornchipss.cosmos.netty.PacketTypes;
-import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.server.command.CommandHandler;
-import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.server.kyros.FancyServer;
+import com.cornchipss.cosmos.server.kyros.register.Network;
+import com.cornchipss.cosmos.server.kyros.types.Login;
+import com.cornchipss.cosmos.server.kyros.types.StatusResponse;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
 
 public class CosmosNettyServer implements Runnable
 {
@@ -23,13 +23,13 @@ public class CosmosNettyServer implements Runnable
 
 	private ServerPlayerList players = new ServerPlayerList();
 
-	private Thread udpThread;// , tcpThread;
-
-	private DatagramSocket udpSocket;
-	private ServerSocket tcpSocket;
+	private Server server;
 
 	public CosmosNettyServer(ServerGame game, CommandHandler cmdHandler)
 	{
+		server = new FancyServer();
+		Network.register(server);
+		
 		running = true;
 		this.game = game;
 
@@ -101,131 +101,40 @@ public class CosmosNettyServer implements Runnable
 			}
 		}
 	}
-
-	private synchronized void processUDP(DatagramPacket packet, DatagramSocket serverSocket) throws IOException
-	{
-		ServerPlayer player = players.player(packet.getAddress(), packet.getPort());
-
-		byte[] buffer = packet.getData();
-
-		byte marker = Packet.findMarker(buffer, packet.getOffset(), packet.getLength());
-
-		Packet p = PacketTypes.packet(marker);
-
-		if (p == null)
-		{
-			Logger.LOGGER.error("INVALID PACKET TYPE - " + marker);
-			buffer[0] = -1; // we can reuse the same buffer
-			player.client().sendUDP(buffer, 1, this);
-			return;
-		}
-
-		ClientConnection connection = null;
-
-		if (player == null && p instanceof JoinPacket)
-		{
-			connection = new ClientConnection(packet.getAddress(), packet.getPort(), null);
-		}
-		else if (player != null)
-			connection = player.client();
-		else
-			return;
-
-		int off = Packet.additionalOffset(buffer, packet.getOffset(), packet.getLength());
-
-		p.onReceiveServer(buffer, packet.getLength() - off, packet.getOffset() + off, connection, this);
-	}
-
+	
 	@Override
 	public void run()
 	{
-		final CosmosNettyServer serverInstance = this;
-
+		server.start();
 		try
 		{
-			udpSocket = new DatagramSocket(1337);
-			tcpSocket = new ServerSocket(1337);
+			server.bind(Network.TCP_PORT, Network.UDP_PORT);
 		}
-		catch (IOException ex)
+		catch (IOException e)
 		{
-			System.err.println("Unable to setup server - throwing error.");
-			throw new RuntimeException(ex);
+			throw new RuntimeException(e);
 		}
 
-		udpThread = new Thread(() ->
+		server.addListener(new Listener()
 		{
-			byte[] buffer = new byte[1024]; // 1kb max data
-
-			Logger.LOGGER.info("UDP server listening...");
-
-			while (running)
+			public void received(Connection connection, Object object)
 			{
-				try
+				if (object instanceof Login)
 				{
-					DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-					udpSocket.receive(packet);
-
-					processUDP(packet, udpSocket);
-				}
-				catch (IOException e)
-				{
-					throw new RuntimeException(e);
+					Login obj = ((Login)object);
+					System.out.println(obj.name());
+					
+					if(Math.random() < 0.05f)
+					{
+						connection.close();
+						return;
+					}
+					
+					StatusResponse response = new StatusResponse(200);
+					connection.sendTCP(response);
 				}
 			}
-
-			udpSocket.close();
 		});
-		udpThread.start();
-
-//		tcpThread = new Thread(() ->
-//		{
-////			byte[] buffer = new byte[1024*1000];  // 1000kb max data
-//			
-//			while(running)
-//			{
-//				try
-//				{
-//					Socket clientSocket = tcpSocket.accept();
-//					
-//					TCPClientConnection connection = new TCPClientConnection(clientSocket, serverInstance);
-//					
-//					Thread connectionThread = new Thread(connection);
-//					connectionThread.start();
-//				}
-//				catch (IOException e)
-//				{
-//					throw new RuntimeException(e);
-//				}
-//			}		
-//		});
-
-		while (running)
-		{
-			try
-			{
-				Socket clientSocket = tcpSocket.accept();
-
-				TCPClientConnection connection = new TCPClientConnection(clientSocket, serverInstance);
-
-				Thread connectionThread = new Thread(connection);
-
-				connectionThread.start();
-			}
-			catch (IOException e)
-			{
-				throw new RuntimeException(e);
-			}
-		}
-
-		try
-		{
-			udpThread.join();
-//			tcpThread.join();
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
 	}
 
 	public boolean running()
@@ -236,6 +145,11 @@ public class CosmosNettyServer implements Runnable
 	public void running(boolean r)
 	{
 		running = r;
+		
+		if(!r)
+		{
+			server.stop();
+		}
 	}
 
 	public CommandHandler commandHandler()
@@ -256,10 +170,5 @@ public class CosmosNettyServer implements Runnable
 	public ServerPlayerList players()
 	{
 		return players;
-	}
-
-	public DatagramSocket socket()
-	{
-		return udpSocket;
 	}
 }

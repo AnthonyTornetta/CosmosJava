@@ -12,7 +12,7 @@ import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
@@ -93,7 +93,7 @@ public class ClientPlayer extends Player
 				p.init();
 				try
 				{
-					Client.instance().nettyClient().sendTCP(p);
+					CosmosClient.instance().nettyClient().sendTCP(p);
 				}
 				catch (IOException e)
 				{
@@ -108,7 +108,7 @@ public class ClientPlayer extends Player
 				esp.init();
 				try
 				{
-					Client.instance().nettyClient().sendTCP(esp);
+					CosmosClient.instance().nettyClient().sendTCP(esp);
 				}
 				catch (IOException e)
 				{
@@ -121,7 +121,7 @@ public class ClientPlayer extends Player
 
 		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
 		cmp.init();
-		Client.instance().nettyClient().sendUDP(cmp);
+		CosmosClient.instance().nettyClient().sendUDP(cmp);
 	}
 
 	private void handleInteractions()
@@ -183,7 +183,7 @@ public class ClientPlayer extends Player
 
 						try
 						{
-							Client.instance().nettyClient().sendTCP(cip);
+							CosmosClient.instance().nettyClient().sendTCP(cip);
 						}
 						catch (IOException e)
 						{

@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.client.states;
 
 import java.io.IOException;
 
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.interactable.GUIButton;
@@ -169,7 +169,7 @@ public class MainMenuState extends State
 			{
 				try
 				{
-					Client.instance().connectTo("127.0.0.1", 1337, nameo);
+					CosmosClient.instance().connectTo("127.0.0.1", 1337, nameo);
 				}
 				catch (IOException e)
 				{
@@ -190,9 +190,9 @@ public class MainMenuState extends State
 	@Override
 	public void update(float delta)
 	{
-		if(Client.instance().hasCompleteConnection())
+		if(CosmosClient.instance().hasCompleteConnection())
 		{
-			Client.instance().state(new GameState());
+			CosmosClient.instance().state(new GameState());
 		}
 		else
 			gui.update(delta);

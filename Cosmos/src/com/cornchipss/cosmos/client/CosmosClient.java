@@ -15,13 +15,13 @@ import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class Client implements Runnable
+public class CosmosClient implements Runnable
 {
 	private Window window;
 
-	private static Client instance;
+	private static CosmosClient instance;
 
-	public Client()
+	public CosmosClient()
 	{
 		NettySide.initNettySide(NettySide.CLIENT);
 
@@ -134,7 +134,7 @@ public class Client implements Runnable
 		Logger.LOGGER.info("Successfully closed.");
 	}
 
-	public static Client instance()
+	public static CosmosClient instance()
 	{
 		return instance;
 	}
