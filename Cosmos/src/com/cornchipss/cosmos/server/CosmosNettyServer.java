@@ -1,8 +1,6 @@
 package com.cornchipss.cosmos.server;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.packets.Packet;
@@ -11,7 +9,6 @@ import com.cornchipss.cosmos.server.command.CommandHandler;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.server.kyros.FancyServer;
 import com.cornchipss.cosmos.server.kyros.register.Network;
-import com.cornchipss.cosmos.utils.Utils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;

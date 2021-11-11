@@ -8,10 +8,9 @@ import java.util.List;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.packets.LoginPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
-import com.cornchipss.cosmos.netty.packets.PlayerDisconnectPacket;
 import com.cornchipss.cosmos.server.kyros.NettyClientObserver;
 import com.cornchipss.cosmos.server.kyros.register.Network;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.Logger;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -60,7 +59,8 @@ public class CosmosNettyClient implements Runnable
 				{
 					((Packet)object).receiveClient(instance, game);
 				}
-				Utils.println(object);
+				else
+					Logger.LOGGER.info(object);
 			}
 			
 			public void disconnected(Connection connection)
@@ -69,26 +69,14 @@ public class CosmosNettyClient implements Runnable
 				{
 					o.onDisconnect(connection);
 				}
-
-				Utils.println("Disconnected From Server!");
+				
+				Logger.LOGGER.info("Disconnected From Server!");
 			}
 		}));
 
 		client.connect(Network.TIMEOUT_MS, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
 		
 		sendTCP(new LoginPacket(name));
-		
-		try
-		{
-			Thread.sleep(5000);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		sendTCP(new PlayerDisconnectPacket());
 	}
 
 	public void sendUDP(Object o)
@@ -133,7 +121,7 @@ public class CosmosNettyClient implements Runnable
 	{
 		return ready;
 	}
-
+	
 	/**
 	 * If the world is ready to be updated on the client side
 	 * 

@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.physx;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -18,11 +19,26 @@ public class Transform
 	{
 		this(0, 0, 0);
 	}
+	
+	public Transform(Vector3fc v)
+	{
+		this(v, new Orientation());
+	}
+	
+	public Transform(Vector3fc v, Quaternionfc rot)
+	{
+		this(v, new Orientation(rot));
+	}
 
 	public Transform(float x, float y, float z)
 	{
-		position = new Vector3f(x, y, z);
-		orientation = new Orientation();
+		this(new Vector3f(0, 0, 0));
+	}
+	
+	public Transform(Vector3fc v, Orientation o)
+	{
+		position = new Vector3f(v);
+		orientation = o;
 
 		transMatrix = new Matrix4f();
 		invertedMatirx = new Matrix4f();
@@ -50,11 +66,6 @@ public class Transform
 	{
 		orientation.rotateRelative(dRot, right, up, forward);
 		updateMatrix();
-	}
-
-	public Transform(Vector3fc pos)
-	{
-		this(pos.x(), pos.y(), pos.z());
 	}
 
 	public void position(Vector3fc p)
