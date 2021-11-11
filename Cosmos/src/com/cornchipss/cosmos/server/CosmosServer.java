@@ -2,8 +2,6 @@ package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.NettySide;
-import com.cornchipss.cosmos.netty.PacketTypes;
-import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.server.command.DefaultCommandHandler;
 import com.cornchipss.cosmos.server.command.commands.HelpCommand;
@@ -13,9 +11,6 @@ import com.cornchipss.cosmos.server.command.commands.SayCommand;
 import com.cornchipss.cosmos.server.command.commands.StopCommand;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
-import com.esotericsoftware.kryonet.Server;
 
 public class CosmosServer implements Runnable
 {
@@ -49,27 +44,26 @@ public class CosmosServer implements Runnable
 		defaultCmd.addCommand(new SaveCommand());
 		defaultCmd.addCommand(new HelpCommand(defaultCmd));
 
-		PacketTypes.registerAll();
 		server = new CosmosNettyServer(game, defaultCmd);
+		
+//		PacketTypes.registerAll();
 
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 
 		ServerConsole cmd = new ServerConsole();
 
-		byte[] playerBuffer = new byte[128];
-
 		GameLoop loop = new GameLoop((float delta) ->
 		{
 			server.game().update(delta);
 
-			for (ServerPlayer p : server.players().players())
-			{
-				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
-				packet.init();
-
-				server.sendToAllExceptUDP(packet, p);
-			}
+//			for (ServerPlayer p : server.players().players())
+//			{
+//				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
+//				packet.init();
+//
+//				server.sendToAllExceptUDP(packet, p);
+//			}
 
 			return server.running();
 		}, 1000 / 50); // 20 tps

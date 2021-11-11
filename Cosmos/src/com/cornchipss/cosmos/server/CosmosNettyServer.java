@@ -6,11 +6,11 @@ import java.util.Set;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.packets.Packet;
+import com.cornchipss.cosmos.netty.packets.PlayerDisconnectPacket;
 import com.cornchipss.cosmos.server.command.CommandHandler;
+import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.server.kyros.FancyServer;
 import com.cornchipss.cosmos.server.kyros.register.Network;
-import com.cornchipss.cosmos.server.kyros.types.Login;
-import com.cornchipss.cosmos.server.kyros.types.StatusResponse;
 import com.cornchipss.cosmos.utils.Utils;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -31,113 +31,63 @@ public class CosmosNettyServer implements Runnable
 	public CosmosNettyServer(ServerGame game, CommandHandler cmdHandler)
 	{
 		server = new FancyServer();
-		
+
 		running = true;
 		this.game = game;
 
 		this.cmdHandler = cmdHandler;
 	}
 
-	public void sendToAllUDP(Packet packet)
+	public void sendToAllUDP(Object o)
 	{
-		for (ServerPlayer p : players.players())
-		{
-			try
-			{
-				p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
-			}
-			catch (IOException ex)
-			{
-
-			}
-		}
+		server.sendToAllUDP(o);
 	}
 
-	public void sendToAllTCP(Packet packet)
+	public void sendToAllTCP(Object o)
 	{
-		for (ServerPlayer p : players.players())
-		{
-			try
-			{
-				p.client().sendTCP(packet.buffer(), packet.bufferLength());
-			}
-			catch (IOException ex)
-			{
-
-			}
-		}
+		server.sendToAllTCP(o);
 	}
 
-	public void sendToAllExceptUDP(Packet packet, ServerPlayer exception)
+	public void sendToAllExceptUDP(Object packet, ServerPlayer exception)
 	{
-		for (ServerPlayer p : players.players())
-		{
-			if (!p.equals(exception))
-			{
-				try
-				{
-					p.client().sendUDP(packet.buffer(), packet.bufferLength(), this);
-				}
-				catch (IOException ex)
-				{
-
-				}
-			}
-		}
+		server.sendToAllExceptUDP(exception.connection().getID(), packet);
 	}
 
-	public void sendToAllExceptTCP(Packet packet, ServerPlayer exception)
+	public void sendToAllExceptTCP(Object packet, ServerPlayer exception)
 	{
-		for (ServerPlayer p : players.players())
-		{
-			if (!p.equals(exception))
-			{
-				try
-				{
-					p.client().sendTCP(packet.buffer(), packet.bufferLength());
-				}
-				catch (IOException ex)
-				{
-
-				}
-			}
-		}
+		server.sendToAllExceptTCP(exception.connection().getID(), packet);
 	}
-	
-	private Set<String> names = new HashSet<>();
-	
+
 	@Override
 	public void run()
 	{
 		server.start();
-		
-		Network.register(server);
 
-		server.addListener(new Listener() {
-			public void received (Connection c, Object object) {
-				Utils.println("Got Something!");
+		Network.register(server);
+		
+		final CosmosNettyServer instance = this;
+		
+		server.addListener(new Listener()
+		{
+			public void received(Connection connection, Object object)
+			{
+				ClientConnection c = (ClientConnection)connection;
 				
-				if(object instanceof Login)
+				if(object instanceof Packet)
 				{
-					Login l = (Login)object;
-					Utils.println(l.name() + " trying to connect.");
-					if(!names.contains(l.name()))
-					{
-						c.sendTCP(new StatusResponse(200, "Added!"));
-						names.add(l.name());
-					}
-					else
-					{
-						c.sendTCP(new StatusResponse(400, "Already Logged In!"));
-					}
+					((Packet)object).receiveServer(instance, game, c);
 				}
 			}
 
-			public void disconnected (Connection c) {
-				Connection connection = (Connection)c;
+			public void disconnected(Connection c)
+			{
+				ClientConnection connection = (ClientConnection) c;
+				
+				sendToAllExceptTCP(new PlayerDisconnectPacket(connection.player()), connection.player());
+				players.removePlayer(connection.player());
 			}
 		});
-		
+
 		try
 		{
 			server.bind(Network.TCP_PORT, Network.UDP_PORT);
@@ -157,8 +107,8 @@ public class CosmosNettyServer implements Runnable
 	public void running(boolean r)
 	{
 		running = r;
-		
-		if(!r)
+
+		if (!r)
 		{
 			server.stop();
 		}

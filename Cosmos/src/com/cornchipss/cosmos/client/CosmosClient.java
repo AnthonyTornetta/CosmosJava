@@ -8,7 +8,6 @@ import com.cornchipss.cosmos.client.states.MainMenuState;
 import com.cornchipss.cosmos.client.states.State;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.netty.NettySide;
-import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.GameLoop;
@@ -80,9 +79,7 @@ public class CosmosClient implements Runnable
 
 		Initializer loader = new Initializer();
 		loader.init();
-
-		PacketTypes.registerAll();
-
+		
 		Input.setWindow(window);
 		Input.update();
 
