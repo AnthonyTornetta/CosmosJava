@@ -17,6 +17,7 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 public class StructurePacket extends Packet
@@ -43,6 +44,9 @@ public class StructurePacket extends Packet
 			this.bytes = bos.toByteArray();
 			this.id = s.id();
 			this.clazz = s.getClass();
+			
+			Utils.println(bytes.length);
+			bytes = new byte[100];
 		}
 		catch (IOException e)
 		{

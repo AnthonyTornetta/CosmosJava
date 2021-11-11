@@ -25,6 +25,7 @@ public class Network
 		k.register(Quaternionf.class);
 		k.register(Vector3i.class);
 		k.register(byte[].class);
+		k.register(Class.class);
 		
 		k.register(Packet.class);
 		k.register(StatusPacket.class);
