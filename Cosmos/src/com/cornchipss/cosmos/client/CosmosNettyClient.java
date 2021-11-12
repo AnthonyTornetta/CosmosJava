@@ -32,7 +32,7 @@ public class CosmosNettyClient implements Runnable
 	{
 		players = new ClientPlayerList();
 
-		client = new Client();
+		client = new Client(Network.BUFFER_SIZE, Network.BUFFER_SIZE);
 	}
 
 	public void createConnection(String ip, int port, String name) throws IOException

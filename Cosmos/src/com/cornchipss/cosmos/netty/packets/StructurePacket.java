@@ -17,7 +17,6 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
 public class StructurePacket extends Packet
@@ -45,8 +44,8 @@ public class StructurePacket extends Packet
 			this.id = s.id();
 			this.clazz = s.getClass();
 			
-			Utils.println(bytes.length);
-			bytes = new byte[100];
+			this.pos = new Vector3f(s.body().transform().position());
+			this.rotation = new Quaternionf().set(s.body().transform().orientation().quaternion());
 		}
 		catch (IOException e)
 		{
@@ -59,7 +58,7 @@ public class StructurePacket extends Packet
 	{
 		try
 		{
-			Structure s = clazz.getConstructor(World.class, Integer.class).newInstance(game.world(), id);
+			Structure s = clazz.getConstructor(World.class, int.class).newInstance(game.world(), id);
 			s.read(new DataInputStream(new ByteArrayInputStream(bytes)));
 			
 			game.world().addStructure(s);
