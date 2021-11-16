@@ -2,6 +2,7 @@ package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.NettySide;
+import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.server.command.DefaultCommandHandler;
 import com.cornchipss.cosmos.server.command.commands.HelpCommand;
@@ -57,13 +58,14 @@ public class CosmosServer implements Runnable
 		{
 			server.game().update(delta);
 
-//			for (ServerPlayer p : server.players().players())
-//			{
-//				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
-//				packet.init();
-//
-//				server.sendToAllExceptUDP(packet, p);
-//			}
+			for (ServerPlayer p : server.players().players())
+			{
+//				System.out.println(p);
+
+				PlayerPacket packet = new PlayerPacket(p);
+
+				server.sendToAllExceptUDP(packet, p);
+			}
 
 			return server.running();
 		}, 1000 / 50); // 20 tps
