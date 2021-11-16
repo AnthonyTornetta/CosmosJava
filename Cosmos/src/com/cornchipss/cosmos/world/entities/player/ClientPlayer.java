@@ -1,5 +1,7 @@
 package com.cornchipss.cosmos.world.entities.player;
 
+import java.io.IOException;
+
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
@@ -9,6 +11,10 @@ import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
+import com.cornchipss.cosmos.client.CosmosClient;
+import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
@@ -34,8 +40,6 @@ public class ClientPlayer extends Player
 
 		cam = new GimbalLockCamera(transform);
 	}
-
-	private byte[] buffer = new byte[128];
 
 	@Override
 	public void update(float delta)
@@ -131,15 +135,16 @@ public class ClientPlayer extends Player
 
 				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
-//					byte[] buffer = new byte[64];
-//					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, sb.block().structureX(),
-//						sb.block().structureY(), sb.block().structureZ(), null);
-//					packet.init();
-//					try
-//					{
-//						ClientGame.instance().nettyClient().sendTCP(packet);
-//					}
-//					catch(IOException ex) {}
+					ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), null);
+
+					try
+					{
+						ClientGame.instance().nettyClient().sendTCP(packet);
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
 				}
 				else if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
@@ -153,12 +158,16 @@ public class ClientPlayer extends Player
 
 						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
-//							// lookingAt.block(xx, yy, zz, selectedBlock);
-//							byte[] buffer = new byte[64];
-//							ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, xx, yy, zz,
-//								selectedBlock);
-//							packet.init();
-//							ClientGame.instance().nettyClient().sendUDP(packet);
+							ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), selectedBlock);
+
+							try
+							{
+								ClientGame.instance().nettyClient().sendTCP(packet);
+							}
+							catch (IOException e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -166,18 +175,16 @@ public class ClientPlayer extends Player
 				{
 					if (sb.block().block() instanceof IInteractable)
 					{
-//						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, new StructureBlock(lookingAt,
-//							sb.block().structureX(), sb.block().structureY(), sb.block().structureZ()));
-//						cip.init();
-//
-//						try
-//						{
-//							CosmosClient.instance().nettyClient().sendTCP(cip);
-//						}
-//						catch (IOException e)
-//						{
-//							e.printStackTrace();
-//						}
+						PlayerInteractPacket packet = new PlayerInteractPacket(sb.block());
+
+						try
+						{
+							CosmosClient.instance().nettyClient().sendTCP(packet);
+						}
+						catch (IOException e)
+						{
+							e.printStackTrace();
+						}
 					}
 				}
 			}

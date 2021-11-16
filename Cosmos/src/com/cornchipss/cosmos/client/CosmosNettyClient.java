@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.NetworkRegistry;
 import com.cornchipss.cosmos.netty.packets.LoginPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.server.kyros.NettyClientObserver;
-import com.cornchipss.cosmos.server.kyros.register.Network;
 import com.cornchipss.cosmos.utils.Logger;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -32,14 +32,14 @@ public class CosmosNettyClient implements Runnable
 	{
 		players = new ClientPlayerList();
 
-		client = new Client(Network.BUFFER_SIZE, Network.BUFFER_SIZE);
+		client = new Client(NetworkRegistry.BUFFER_SIZE, NetworkRegistry.BUFFER_SIZE);
 	}
 
 	public void createConnection(String ip, int port, String name) throws IOException
 	{
 		client.start();
 
-		Network.register(client);
+		NetworkRegistry.register(client);
 
 		final CosmosNettyClient instance = this;
 
@@ -74,7 +74,7 @@ public class CosmosNettyClient implements Runnable
 			}
 		}));
 
-		client.connect(Network.TIMEOUT_MS, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
+		client.connect(NetworkRegistry.TIMEOUT_MS, InetAddress.getByName(ip), NetworkRegistry.TCP_PORT, NetworkRegistry.UDP_PORT);
 
 		for (NettyClientObserver o : observers)
 		{

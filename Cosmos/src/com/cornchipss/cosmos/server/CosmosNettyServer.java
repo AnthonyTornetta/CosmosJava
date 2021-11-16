@@ -3,12 +3,12 @@ package com.cornchipss.cosmos.server;
 import java.io.IOException;
 
 import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.netty.NetworkRegistry;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.netty.packets.PlayerDisconnectPacket;
 import com.cornchipss.cosmos.server.command.CommandHandler;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.server.kyros.FancyServer;
-import com.cornchipss.cosmos.server.kyros.register.Network;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -60,7 +60,7 @@ public class CosmosNettyServer implements Runnable
 	{
 		server.start();
 
-		Network.register(server);
+		NetworkRegistry.register(server);
 
 		final CosmosNettyServer instance = this;
 
@@ -87,7 +87,7 @@ public class CosmosNettyServer implements Runnable
 
 		try
 		{
-			server.bind(Network.TCP_PORT, Network.UDP_PORT);
+			server.bind(NetworkRegistry.TCP_PORT, NetworkRegistry.UDP_PORT);
 		}
 		catch (IOException e)
 		{
