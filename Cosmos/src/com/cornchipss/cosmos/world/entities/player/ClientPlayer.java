@@ -13,7 +13,11 @@ import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.netty.action.PlayerAction;
+import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
+import com.cornchipss.cosmos.netty.packets.MovementPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
@@ -81,40 +85,39 @@ public class ClientPlayer extends Player
 		{
 			if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
-//				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
-//				PlayerActionPacket p = new PlayerActionPacket(buffer, 0, action);
-//				p.init();
-//				try
-//				{
-//					CosmosClient.instance().nettyClient().sendTCP(p);
-//				}
-//				catch (IOException e)
-//				{
-//					e.printStackTrace();
-//				}
+				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
+				PlayerActionPacket p = new PlayerActionPacket(action);
+				
+				try
+				{
+					CosmosClient.instance().nettyClient().sendTCP(p);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 			{
-				// shipPiloting(null);
-//				ExitShipPacket esp = new ExitShipPacket(buffer, 0);
-//				esp.init();
-//				try
-//				{
-//					CosmosClient.instance().nettyClient().sendTCP(esp);
-//				}
-//				catch (IOException e)
-//				{
-//					e.printStackTrace();
-//				}
+				ExitShipPacket esp = new ExitShipPacket();
+				
+				try
+				{
+					CosmosClient.instance().nettyClient().sendTCP(esp);
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
 		}
 
 		camera().update();
 
-//		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
-//		cmp.init();
-//		CosmosClient.instance().nettyClient().sendUDP(cmp);
+		MovementPacket packet = new MovementPacket(movement());
+		
+		CosmosClient.instance().nettyClient().sendUDP(packet);
 	}
 
 	private void handleInteractions()
