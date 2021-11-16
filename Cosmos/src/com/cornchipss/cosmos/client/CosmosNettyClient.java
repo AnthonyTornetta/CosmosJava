@@ -76,6 +76,11 @@ public class CosmosNettyClient implements Runnable
 
 		client.connect(Network.TIMEOUT_MS, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
 		
+		for (NettyClientObserver o : observers)
+		{
+			o.onConnect();
+		}
+		
 		sendTCP(new LoginPacket(name));
 	}
 

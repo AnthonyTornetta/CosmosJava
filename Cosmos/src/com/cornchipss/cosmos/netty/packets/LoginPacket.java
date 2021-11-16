@@ -6,6 +6,7 @@ import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
+import com.cornchipss.cosmos.structures.Structure;
 
 public class LoginPacket extends Packet
 {
@@ -32,21 +33,24 @@ public class LoginPacket extends Packet
 	{
 		if(server.players().nameTaken(name))
 		{
-			c.sendTCP(new StatusPacket(400, "Name Taken"));
+			c.sendTCP(new JoinPacket(false, "Name Taken"));
 		}
 		else if(server.players().connectionRegistered(c))
 		{
-			c.sendTCP(new StatusPacket(400, "Already Connected!"));
+			c.sendTCP(new JoinPacket(false, "Already Connected!"));
 		}
 		else
 		{
 			c.player(server.players().createPlayer(game.world(), c, name));
 			
-			c.sendTCP(new StatusPacket(200, "Logged In"));
+			c.sendTCP(new JoinPacket(true, name));
 			
 			server.sendToAllExceptTCP(this, c.player());
 			
-			c.sendTCP(new StructurePacket(game.world().structureFromID(1)));
+			for(Structure s : game.world().structures())
+			{
+				c.sendTCP(new StructurePacket(s));
+			}
 		}
 	}
 }

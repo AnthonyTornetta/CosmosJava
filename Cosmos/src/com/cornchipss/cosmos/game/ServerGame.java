@@ -47,8 +47,6 @@ public class ServerGame extends Game
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
 	}
 
-	private byte[] buffer = new byte[128];
-
 	@Override
 	public void update(float delta)
 	{

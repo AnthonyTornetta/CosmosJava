@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.server;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.world.World;
 import com.esotericsoftware.kryonet.Connection;
 
-public class ServerPlayerList
+public class ServerPlayerList implements Iterable<ServerPlayer>
 {
 	private List<ServerPlayer> players;
 
@@ -67,5 +68,11 @@ public class ServerPlayerList
 	public List<ServerPlayer> players()
 	{
 		return players;
+	}
+	
+	@Override
+	public Iterator<ServerPlayer> iterator()
+	{
+		return players.iterator();
 	}
 }

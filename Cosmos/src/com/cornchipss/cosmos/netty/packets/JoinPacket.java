@@ -1,59 +1,74 @@
 package com.cornchipss.cosmos.netty.packets;
 
+import java.io.IOException;
+
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
-public class StatusPacket extends Packet
+public class JoinPacket extends Packet
 {
-	private int code;
+	private boolean success;
 	private String msg;
-	
-	public StatusPacket () {}
-	
-	public StatusPacket(int code)
+
+	public JoinPacket()
 	{
-		this(code, null);
 	}
-	
-	public StatusPacket(int code, String msg)
+
+	public JoinPacket(boolean success, String msg)
 	{
-		this.code = code;
+		this.success = success;
 		this.msg = msg;
 	}
-	
+
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		if(code == 200)
+		if (success)
+		{
 			Logger.LOGGER.info(this);
+			game.player(new ClientPlayer(game.world(), name()));
+		}
 		else
+		{
 			Logger.LOGGER.warning(this);
+			try
+			{
+				client.disconnect();
+			}
+			catch (IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
 	}
-	
+
 	@Override
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
-		if(code == 200)
-			Logger.LOGGER.info(this);
-		else
-			Logger.LOGGER.warning(this);
+		// not happening
 	}
-	
+
 	@Override
 	public String toString()
 	{
-		return "Status: " + code + (msg != null ? " - " + msg : "");
+		return success ? "Name: " + msg : "Error: " + (msg != null ? " - " + msg : "");
 	}
-	
-	public int code()
+
+	public boolean success()
 	{
-		return code;
+		return success;
 	}
-	
+
+	public String name()
+	{
+		return msg;
+	}
+
 	public String message()
 	{
 		return msg;

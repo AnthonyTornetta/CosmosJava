@@ -23,27 +23,27 @@ public class StructurePacket extends Packet
 {
 	private byte[] bytes;
 	private Class<? extends Structure> clazz;
-	
+
 	private Vector3f pos;
 	private Quaternionf rotation;
-	
+
 	private int id;
-	
+
 	public StructurePacket()
 	{
-		
+
 	}
-	
+
 	public StructurePacket(Structure s)
-	{		
+	{
 		try
 		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream(s.width()*s.height()*s.length());
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(s.width() * s.height() * s.length());
 			s.write(new DataOutputStream(bos));
 			this.bytes = bos.toByteArray();
 			this.id = s.id();
 			this.clazz = s.getClass();
-			
+
 			this.pos = new Vector3f(s.body().transform().position());
 			this.rotation = new Quaternionf().set(s.body().transform().orientation().quaternion());
 		}
@@ -60,9 +60,7 @@ public class StructurePacket extends Packet
 		{
 			Structure s = clazz.getConstructor(World.class, int.class).newInstance(game.world(), id);
 			s.read(new DataInputStream(new ByteArrayInputStream(bytes)));
-			
-			game.world().addStructure(s);
-			
+
 			s.addToWorld(new Transform(pos, rotation));
 		}
 		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException

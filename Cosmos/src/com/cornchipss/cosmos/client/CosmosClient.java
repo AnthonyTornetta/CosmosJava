@@ -4,15 +4,18 @@ import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.cosmos.client.states.GameState;
 import com.cornchipss.cosmos.client.states.MainMenuState;
 import com.cornchipss.cosmos.client.states.State;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
+import com.cornchipss.cosmos.server.kyros.NettyClientObserver;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
+import com.esotericsoftware.kryonet.Connection;
 
 public class CosmosClient implements Runnable
 {
@@ -58,6 +61,27 @@ public class CosmosClient implements Runnable
 
 		nettyThread = new Thread(client);
 		nettyThread.start();
+		
+		client.addObserver(new NettyClientObserver()
+		{
+			@Override
+			public boolean onReceiveObject(Connection connection, Object object)
+			{
+				return false;
+			}
+			
+			@Override
+			public void onDisconnect(Connection connection)
+			{
+				
+			}
+			
+			@Override
+			public void onConnect()
+			{
+				state(new GameState());
+			}
+		});
 	}
 
 	public void disconnect() throws IOException, InterruptedException
@@ -68,6 +92,8 @@ public class CosmosClient implements Runnable
 		client.disconnect();
 		nettyThread.join();
 		nettyThread = null;
+		
+		state(new MainMenuState());
 	}
 
 	@Override
@@ -79,7 +105,7 @@ public class CosmosClient implements Runnable
 
 		Initializer loader = new Initializer();
 		loader.init();
-		
+
 		Input.setWindow(window);
 		Input.update();
 
@@ -98,9 +124,9 @@ public class CosmosClient implements Runnable
 			state.update(delta);
 
 			window.clear(0, 0, 0, 1);
-
+			
 			state.render(delta);
-
+			
 			Input.update();
 
 			window.update();
@@ -119,11 +145,14 @@ public class CosmosClient implements Runnable
 		try
 		{
 			Logger.LOGGER.info("Netty thread joined");
+			
+			nettyClient().disconnect();
+			
 			if (nettyThread != null)
 				nettyThread.join();
 			Logger.LOGGER.info("Netty thread terminated gracefully");
 		}
-		catch (InterruptedException e)
+		catch (InterruptedException | IOException e)
 		{
 			e.printStackTrace();
 		}

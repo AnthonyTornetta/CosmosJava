@@ -142,7 +142,7 @@ public class ClientGame extends Game
 		GL30.glDepthFunc(GL30.GL_LESS);
 
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
-
+		
 		world().lock();
 		for (Structure s : world().structures())
 		{

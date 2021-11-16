@@ -6,11 +6,14 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
 import com.cornchipss.cosmos.netty.packets.LoginPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;
+import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerDisconnectPacket;
-import com.cornchipss.cosmos.netty.packets.StatusPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerPacket;
+import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.StructurePacket;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
@@ -36,12 +39,16 @@ public class Network
 		
 		k.register(Planet.class);
 		k.register(Ship.class);
+		k.register(PlayerAction.class);
 		
 		k.register(Packet.class);
-		k.register(StatusPacket.class);
+		k.register(JoinPacket.class);
 		k.register(LoginPacket.class);
 		k.register(PlayerDisconnectPacket.class);
 		k.register(ClientInteractPacket.class);
 		k.register(StructurePacket.class);
+		k.register(PlayerActionPacket.class);
+		k.register(PlayerPacket.class);
+		k.register(JoinPacket.class);
 	}
 }

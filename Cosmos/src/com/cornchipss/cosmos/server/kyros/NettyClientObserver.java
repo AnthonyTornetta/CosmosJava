@@ -7,4 +7,6 @@ public interface NettyClientObserver
 	public boolean onReceiveObject(Connection connection, Object object);
 	
 	public void onDisconnect(Connection connection);
+
+	public void onConnect();
 }
