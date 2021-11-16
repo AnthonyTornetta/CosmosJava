@@ -7,8 +7,7 @@ import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class LaserCannonBlock extends ShipBlock implements ISystemBlock
 {
-	private String[] systems = new String[] 
-		{ BlockSystemIDs.LASER_CANNON_ID };
+	private String[] systems = new String[] { BlockSystemIDs.LASER_CANNON_ID };
 
 	public LaserCannonBlock()
 	{

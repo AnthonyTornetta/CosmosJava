@@ -10,17 +10,17 @@ import com.cornchipss.cosmos.world.entities.player.Player;
 public class PlayerDisconnectPacket extends Packet
 {
 	private String name;
-	
+
 	public PlayerDisconnectPacket()
 	{
-		
+
 	}
-	
+
 	public PlayerDisconnectPacket(Player p)
 	{
 		this.name = p.name();
 	}
-	
+
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{

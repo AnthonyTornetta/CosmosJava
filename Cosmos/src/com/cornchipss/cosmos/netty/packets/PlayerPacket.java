@@ -17,25 +17,25 @@ public class PlayerPacket extends Packet
 	private String name;
 	private Vector3fc position;
 	private Quaternionfc rotation;
-	
+
 	public PlayerPacket(Player p)
 	{
 		this.name = p.name();
 		this.position = p.position();
 		this.rotation = p.body().transform().orientation().quaternion();
 	}
-	
+
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Player p = client.players().player(name);
-		if(p == null)
+		if (p == null)
 		{
 			p = new DummyPlayer(game.world(), name);
 			p.addToWorld(new Transform(position, rotation));
 			client.players().addPlayer(p);
 		}
-		else if(p.body() != null)
+		else if (p.body() != null)
 		{
 			p.body().transform().position(position);
 			p.body().transform().orientation().quaternion(rotation);
@@ -47,9 +47,9 @@ public class PlayerPacket extends Packet
 	{
 		c.player().body().transform().position(position);
 		c.player().body().transform().orientation().quaternion(rotation);
-		
+
 		name = c.player().name();
-		
+
 		server.sendToAllExceptUDP(this, c.player());
 	}
 }

@@ -13,23 +13,23 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInteractable	
+public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInteractable
 {
 	private List<GUIElement> children;
-	
+
 	private boolean locked = false;
-	
+
 	private PixelMeasurement scrollOffset;
-	
+
 	public GUIScrollBox(MeasurementPair position, MeasurementPair dimensions, Color color)
 	{
 		super(position, dimensions, color);
-		
+
 		children = new ArrayList<>();
-		
+
 		scrollOffset = new PixelMeasurement(0);
 	}
-	
+
 	@Override
 	public List<GUIElement> children()
 	{
@@ -39,29 +39,28 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 	@Override
 	public boolean update(float delta)
 	{
-		if(hovered() && Input.scrollWheelScrolled())
+		if (hovered() && Input.scrollWheelScrolled())
 		{
 			float amt = -Input.scrollAmount() * 8;
-			
+
 			float maxScroll = maxScroll();
-			
-			if(scrollOffset.value() + amt < 0)
+
+			if (scrollOffset.value() + amt < 0)
 				scrollOffset.value(0);
-			else if(scrollOffset.value() + amt < maxScroll)
+			else if (scrollOffset.value() + amt < maxScroll)
 				scrollOffset.value(scrollOffset.value() + amt);
 			else
 				scrollOffset.value(maxScroll);
-			
-			
-			for(GUIElement c : children)
+
+			for (GUIElement c : children)
 			{
 				c.updateTransform();
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	@Override
 	public boolean locked()
 	{
@@ -79,20 +78,20 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 	{
 		locked = false;
 	}
-	
+
 	private float maxScroll()
 	{
 		float maxY = 0;
-		
-		for(GUIElement elem : children)
+
+		for (GUIElement elem : children)
 		{
 			float y = elem.position().x().actualValue(Window.instance().getHeight());
 			float height = elem.dimensions().y().actualValue(Window.instance().getHeight());
-			
-			if(y + height > maxY)
+
+			if (y + height > maxY)
 				maxY = y;
 		}
-		
+
 		return maxY;
 	}
 
@@ -100,9 +99,9 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 	public void addChild(GUIElement elem)
 	{
 		children.add(elem);
-		
+
 		MeasurementPair p = elem.position();
-		
+
 		p.y(new AddedMeasurement(p.y(), scrollOffset));
 		elem.position(p);
 	}
@@ -111,10 +110,10 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 	public void removeChild(GUIElement elem)
 	{
 		children.remove(elem);
-		
+
 		MeasurementPair p = elem.position();
-		
-		p.y(((AddedMeasurement)p.y()).a());
+
+		p.y(((AddedMeasurement) p.y()).a());
 		elem.position(p);
 	}
 }

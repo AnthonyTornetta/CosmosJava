@@ -6,6 +6,7 @@ public interface IHasCollisionEvent
 {
 	/**
 	 * If this is false, cancel the collision
+	 * 
 	 * @param obj
 	 * @return
 	 */

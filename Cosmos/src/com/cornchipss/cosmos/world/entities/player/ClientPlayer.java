@@ -73,9 +73,9 @@ public class ClientPlayer extends Player
 
 			handleInteractions();
 		}
-		else 
+		else
 		{
-			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+			if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
 //				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
 //				PlayerActionPacket p = new PlayerActionPacket(buffer, 0, action);
@@ -89,7 +89,7 @@ public class ClientPlayer extends Player
 //					e.printStackTrace();
 //				}
 			}
-			
+
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 			{
 				// shipPiloting(null);
@@ -146,7 +146,7 @@ public class ClientPlayer extends Player
 					if (selectedBlock != null && selectedBlock.canAddTo(lookingAt))
 					{
 						BlockFace face = sb.face();
-						
+
 						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x)),
 							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y)),
 							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z));
@@ -205,7 +205,7 @@ public class ClientPlayer extends Player
 		dVel.x = (dVel.x() * (delta * 1000));
 		dVel.z = (dVel.z() * (delta * 1000));
 		dVel.y = (dVel.y() * (delta * 1000));
-		
+
 		Vector3fc dRot = movement().deltaRotation();
 
 		cam.rotate(dRot);
@@ -213,10 +213,10 @@ public class ClientPlayer extends Player
 		Vector3f vel = new Vector3f(body().velocity());
 
 		vel.mul(0.1f);
-		
+
 		vel.add(dVel);
 
-		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+		if (!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel = Maths.safeNormalize(vel, 2.5f);
 		else
 			vel = Maths.safeNormalize(vel, 50.0f);

@@ -45,7 +45,7 @@ public class CosmosServer implements Runnable
 		defaultCmd.addCommand(new HelpCommand(defaultCmd));
 
 		server = new CosmosNettyServer(game, defaultCmd);
-		
+
 //		PacketTypes.registerAll();
 
 		Thread serverThread = new Thread(server);

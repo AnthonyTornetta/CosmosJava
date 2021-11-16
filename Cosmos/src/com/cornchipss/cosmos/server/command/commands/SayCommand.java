@@ -12,18 +12,18 @@ public class SayCommand implements Command
 	{
 		return "say";
 	}
-	
+
 	@Override
 	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
 	{
-		if(arguments.size() == 0)
+		if (arguments.size() == 0)
 		{
 			System.out.println("I have nothing to say :(");
 			return true;
 		}
 		rawCommand = rawCommand.trim();
 		System.out.println("SAY: " + rawCommand.substring(rawCommand.indexOf(' ') + 1));
-		
+
 		return true;
 	}
 

@@ -42,7 +42,7 @@ public class CosmosNettyClient implements Runnable
 		Network.register(client);
 
 		final CosmosNettyClient instance = this;
-		
+
 		client.addListener(new ThreadedListener(new Listener()
 		{
 			public void received(Connection connection, Object object)
@@ -54,33 +54,33 @@ public class CosmosNettyClient implements Runnable
 						return;
 					}
 				}
-				
-				if(object instanceof Packet)
+
+				if (object instanceof Packet)
 				{
-					((Packet)object).receiveClient(instance, game);
+					((Packet) object).receiveClient(instance, game);
 				}
 				else
 					Logger.LOGGER.info(object);
 			}
-			
+
 			public void disconnected(Connection connection)
 			{
 				for (NettyClientObserver o : observers)
 				{
 					o.onDisconnect(connection);
 				}
-				
+
 				Logger.LOGGER.info("Disconnected From Server!");
 			}
 		}));
 
 		client.connect(Network.TIMEOUT_MS, InetAddress.getByName(ip), Network.TCP_PORT, Network.UDP_PORT);
-		
+
 		for (NettyClientObserver o : observers)
 		{
 			o.onConnect();
 		}
-		
+
 		sendTCP(new LoginPacket(name));
 	}
 
@@ -126,7 +126,7 @@ public class CosmosNettyClient implements Runnable
 	{
 		return ready;
 	}
-	
+
 	/**
 	 * If the world is ready to be updated on the client side
 	 * 
@@ -136,7 +136,7 @@ public class CosmosNettyClient implements Runnable
 	{
 		ready = b;
 	}
-	
+
 	public void addObserver(NettyClientObserver o)
 	{
 		observers.add(o);

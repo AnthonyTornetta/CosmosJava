@@ -13,12 +13,12 @@ public class PlayerActionPacket extends Packet
 {
 	private PlayerAction a;
 	private String name;
-	
+
 	public PlayerActionPacket()
 	{
-		
+
 	}
-	
+
 	public PlayerActionPacket(PlayerAction a)
 	{
 		this.a = a;
@@ -28,7 +28,7 @@ public class PlayerActionPacket extends Packet
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Player p;
-		if((p = client.players().player(name)).isPilotingShip())
+		if ((p = client.players().player(name)).isPilotingShip())
 		{
 			p.shipPiloting().sendAction(a);
 		}
@@ -38,12 +38,12 @@ public class PlayerActionPacket extends Packet
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		Player p = c.player();
-		if(p.isPilotingShip())
+		if (p.isPilotingShip())
 			p.shipPiloting().sendAction(a);
-		
+
 		name = p.name();
-		
-		for(ServerPlayer player : server.players())
+
+		for (ServerPlayer player : server.players())
 		{
 			player.connection().sendTCP(this);
 		}

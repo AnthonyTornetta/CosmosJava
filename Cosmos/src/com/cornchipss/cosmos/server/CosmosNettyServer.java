@@ -61,25 +61,25 @@ public class CosmosNettyServer implements Runnable
 		server.start();
 
 		Network.register(server);
-		
+
 		final CosmosNettyServer instance = this;
-		
+
 		server.addListener(new Listener()
 		{
 			public void received(Connection connection, Object object)
 			{
-				ClientConnection c = (ClientConnection)connection;
-				
-				if(object instanceof Packet)
+				ClientConnection c = (ClientConnection) connection;
+
+				if (object instanceof Packet)
 				{
-					((Packet)object).receiveServer(instance, game, c);
+					((Packet) object).receiveServer(instance, game, c);
 				}
 			}
 
 			public void disconnected(Connection c)
 			{
 				ClientConnection connection = (ClientConnection) c;
-				
+
 				sendToAllExceptTCP(new PlayerDisconnectPacket(connection.player()), connection.player());
 				players.removePlayer(connection.player());
 			}

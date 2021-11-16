@@ -61,7 +61,7 @@ public class CosmosClient implements Runnable
 
 		nettyThread = new Thread(client);
 		nettyThread.start();
-		
+
 		client.addObserver(new NettyClientObserver()
 		{
 			@Override
@@ -69,13 +69,13 @@ public class CosmosClient implements Runnable
 			{
 				return false;
 			}
-			
+
 			@Override
 			public void onDisconnect(Connection connection)
 			{
-				
+
 			}
-			
+
 			@Override
 			public void onConnect()
 			{
@@ -92,7 +92,7 @@ public class CosmosClient implements Runnable
 		client.disconnect();
 		nettyThread.join();
 		nettyThread = null;
-		
+
 		state(new MainMenuState());
 	}
 
@@ -124,9 +124,9 @@ public class CosmosClient implements Runnable
 			state.update(delta);
 
 			window.clear(0, 0, 0, 1);
-			
+
 			state.render(delta);
-			
+
 			Input.update();
 
 			window.update();
@@ -145,9 +145,9 @@ public class CosmosClient implements Runnable
 		try
 		{
 			Logger.LOGGER.info("Netty thread joined");
-			
+
 			nettyClient().disconnect();
-			
+
 			if (nettyThread != null)
 				nettyThread.join();
 			Logger.LOGGER.info("Netty thread terminated gracefully");

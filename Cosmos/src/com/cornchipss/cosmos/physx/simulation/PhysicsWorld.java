@@ -47,7 +47,7 @@ public class PhysicsWorld
 
 	public void removePhysicalObject(PhysicalObject obj)
 	{
-		if(!locked)
+		if (!locked)
 			bodies.remove(obj);
 		else
 			bodiesToRemove.add(obj);
@@ -88,9 +88,9 @@ public class PhysicsWorld
 
 		if (strategy.colliding(a, b, deltaA, info))
 		{
-			if(a instanceof IHasCollisionEvent)
+			if (a instanceof IHasCollisionEvent)
 			{
-				if(!((IHasCollisionEvent)a).onCollide(b))
+				if (!((IHasCollisionEvent) a).onCollide(b))
 					return;
 			}
 			Vector3f mulBy = new Vector3f();
@@ -124,14 +124,14 @@ public class PhysicsWorld
 	{
 		locked = true;
 	}
-	
+
 	public void unlock()
 	{
 		locked = false;
 
 		while (bodiesToAdd.size() != 0)
 		{
-			if(!bodiesToRemove.remove(bodiesToAdd.get(0)))
+			if (!bodiesToRemove.remove(bodiesToAdd.get(0)))
 			{
 				addPhysicalObject(bodiesToAdd.remove(0));
 			}
@@ -140,7 +140,7 @@ public class PhysicsWorld
 				bodiesToAdd.remove(0);
 			}
 		}
-		
+
 		while (bodiesToRemove.size() != 0)
 			removePhysicalObject(bodiesToRemove.remove(0));
 	}

@@ -20,20 +20,20 @@ public class ServerPlayerList implements Iterable<ServerPlayer>
 
 	public boolean nameTaken(String name)
 	{
-		for(ServerPlayer p : players)
-			if(p.name().toLowerCase().equals(name))
+		for (ServerPlayer p : players)
+			if (p.name().toLowerCase().equals(name))
 				return true;
 		return false;
 	}
-	
+
 	public boolean connectionRegistered(Connection c)
 	{
-		for(ServerPlayer p : players)
-			if(p.connection().equals(c))
+		for (ServerPlayer p : players)
+			if (p.connection().equals(c))
 				return true;
 		return false;
 	}
-	
+
 	public ServerPlayer createPlayer(World world, ClientConnection c, String name)
 	{
 		if (!connectionRegistered(c) && !nameTaken(name))
@@ -43,7 +43,7 @@ public class ServerPlayerList implements Iterable<ServerPlayer>
 			players.add(p);
 
 			p.addToWorld(new Transform());
-			
+
 			players.add(p);
 
 			return p;
@@ -59,17 +59,17 @@ public class ServerPlayerList implements Iterable<ServerPlayer>
 
 	public ServerPlayer player(String name)
 	{
-		for(ServerPlayer p : players)
-			if(p.name().equals(name))
+		for (ServerPlayer p : players)
+			if (p.name().equals(name))
 				return p;
 		return null;
 	}
-	
+
 	public List<ServerPlayer> players()
 	{
 		return players;
 	}
-	
+
 	@Override
 	public Iterator<ServerPlayer> iterator()
 	{

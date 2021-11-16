@@ -9,21 +9,21 @@ import com.cornchipss.cosmos.utils.io.Input;
 public class GameState extends State
 {
 	private Window window;
-	
+
 	private ClientGame game;
-	
+
 	@Override
 	public void init(Window window)
 	{
 		this.window = window;
-		
+
 		Input.hideCursor(true);
-		
+
 		game = CosmosClient.instance().nettyClient().game();
-		
+
 		Utils.println("SET");
 	}
-	
+
 	@Override
 	public void update(float delta)
 	{
@@ -41,12 +41,12 @@ public class GameState extends State
 	@Override
 	public void postUpdate()
 	{
-		if(window.wasWindowResized())
+		if (window.wasWindowResized())
 			game.onResize(window.getWidth(), window.getHeight());
-		
+
 		game.postUpdate();
 	}
-	
+
 	@Override
 	public void remove()
 	{

@@ -21,7 +21,7 @@ public class Ship extends Structure
 	private Player pilot;
 
 	private Movement movement;
-	
+
 	public Ship(World world, int id)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);

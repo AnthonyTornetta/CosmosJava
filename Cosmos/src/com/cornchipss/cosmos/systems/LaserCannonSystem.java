@@ -28,7 +28,7 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 
 		nodes = new LinkedList<>();
 	}
-	
+
 	@Override
 	public void addBlock(StructureBlock added)
 	{
@@ -38,24 +38,24 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 
 		for (Node n : nodes)
 		{
-			if(n.start.x == x && n.start.y == y)
+			if (n.start.x == x && n.start.y == y)
 			{
-				if(n.start.z - n.count == z)
+				if (n.start.z - n.count == z)
 				{
 					n.count++;
-					
-					for(Node n2 : nodes)
+
+					for (Node n2 : nodes)
 					{
-						if(!n2.equals(n))
+						if (!n2.equals(n))
 						{
-							if(n2.start.x == x && n2.start.y == y)
+							if (n2.start.x == x && n2.start.y == y)
 							{
-								if(n2.start.z == n.start.z - n.count)
+								if (n2.start.z == n.start.z - n.count)
 								{
 									n.count += n2.count;
-									
+
 									nodes.remove(n2);
-									
+
 									return;
 								}
 							}
@@ -63,24 +63,24 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 					}
 					return;
 				}
-				
-				if(n.start.z + 1 == z)
+
+				if (n.start.z + 1 == z)
 				{
 					n.start.z++;
 					n.count++;
-					
-					for(Node n2 : nodes)
+
+					for (Node n2 : nodes)
 					{
-						if(!n2.equals(n))
+						if (!n2.equals(n))
 						{
-							if(n2.start.x == x && n2.start.y == y)
+							if (n2.start.x == x && n2.start.y == y)
 							{
-								if(n2.start.z - n2.count == n.start.z)
+								if (n2.start.z - n2.count == n.start.z)
 								{
 									n2.count += n.count;
-									
+
 									nodes.remove(n);
-									
+
 									return;
 								}
 							}
@@ -106,39 +106,39 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 
 		for (Node n : nodes)
 		{
-			if(n.start.x == x && n.start.y == y)
+			if (n.start.x == x && n.start.y == y)
 			{
-				if(z == n.start.z - n.count + 1)
+				if (z == n.start.z - n.count + 1)
 				{
 					n.count--;
 
-					if(n.count == 0)
+					if (n.count == 0)
 						nodes.remove(n);
 					return;
 				}
-				
-				if(z == n.start.z)
+
+				if (z == n.start.z)
 				{
 					n.start.z--;
 					n.count--;
-					
-					if(n.count == 0)
+
+					if (n.count == 0)
 						nodes.remove(n);
 					return;
 				}
-				
-				if(z > n.start.z - n.count && z <= n.start.z)
+
+				if (z > n.start.z - n.count && z <= n.start.z)
 				{
 					Node newNode = new Node();
 					newNode.start = new Vector3i(x, y, z - 1);
-					
+
 					int newCount = n.start.z - z;
-					
+
 					newNode.count = n.count - newCount - 1;
 					n.count = newCount;
-					
+
 					nodes.add(newNode);
-					
+
 					return;
 				}
 			}
@@ -148,7 +148,7 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 	@Override
 	public void update(float delta)
 	{
-		
+
 	}
 
 	@Override
@@ -160,18 +160,18 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 	@Override
 	public void receiveAction(PlayerAction action)
 	{
-		if(action.isFiring())
+		if (action.isFiring())
 		{
-			for(Node n : nodes)
+			for (Node n : nodes)
 			{
 				Vector3i pos = new Vector3i(n.start.x, n.start.y, n.start.z - n.count);
 				Vector3f coords = structure().blockCoordsToWorldCoords(pos, new Vector3f());
-				
+
 				Laser laser = new Laser(structure().world(), 20, structure());
-				
+
 				Transform t = new Transform(coords);
 				t.orientation(structure().body().transform().orientation());
-				
+
 				laser.addToWorld(t);
 			}
 		}

@@ -12,13 +12,13 @@ public class EnergyStorageModel extends AnimatedCubeModel
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public float v(BlockFace side)
 	{
 		return material().vLength() * 3;
 	}
-	
+
 	@Override
 	public int maxAnimationStage(BlockFace side)
 	{
@@ -28,9 +28,9 @@ public class EnergyStorageModel extends AnimatedCubeModel
 	@Override
 	public float animationDelay(BlockFace side)
 	{
-		return 1/10.0f;
+		return 1 / 10.0f;
 	}
-	
+
 	@Override
 	public Material material()
 	{

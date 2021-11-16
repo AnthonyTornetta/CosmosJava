@@ -9,12 +9,12 @@ import com.cornchipss.cosmos.server.command.CommandHandler;
 public class HelpCommand implements Command
 {
 	private CommandHandler handler;
-	
+
 	public HelpCommand(CommandHandler handler)
 	{
 		this.handler = handler;
 	}
-	
+
 	@Override
 	public String name()
 	{
@@ -32,14 +32,14 @@ public class HelpCommand implements Command
 	{
 		return "Displays all available commands given no arguments or specific help for one or more given commands";
 	}
-	
+
 	@Override
 	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
 	{
-		if(arguments.size() == 0)
+		if (arguments.size() == 0)
 		{
 			System.out.println("== HELP ==");
-			for(Command cmd : handler)
+			for (Command cmd : handler)
 			{
 				System.out.println(cmd.name());
 			}
@@ -47,7 +47,7 @@ public class HelpCommand implements Command
 		}
 		else
 		{
-			for(String s : arguments)
+			for (String s : arguments)
 			{
 				Command cmd = handler.command(s);
 				System.out.println("Usage: " + cmd.name() + " " + cmd.argumentsHelp());

@@ -8,16 +8,14 @@ import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class ReactorBlock extends Block implements IEnergyProducerBlock, IEnergyStorageBlock
 {
-	private static final String[] properties = new String[]
-			{
-					BlockSystemIDs.POWER_GENERATOR_ID, BlockSystemIDs.POWER_STORAGE_ID
-			};
-	
+	private static final String[] properties = new String[] { BlockSystemIDs.POWER_GENERATOR_ID,
+		BlockSystemIDs.POWER_STORAGE_ID };
+
 	public ReactorBlock()
 	{
 		super(new ReactorModel(), "reactor", 10);
 	}
-	
+
 	@Override
 	public float energyGeneratedPerSecond()
 	{
@@ -29,7 +27,7 @@ public class ReactorBlock extends Block implements IEnergyProducerBlock, IEnergy
 	{
 		return 1_000;
 	}
-	
+
 	@Override
 	public String[] systemIds()
 	{

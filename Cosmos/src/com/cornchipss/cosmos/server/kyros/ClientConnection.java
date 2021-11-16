@@ -10,12 +10,12 @@ public class ClientConnection extends Connection
 	public ClientConnection()
 	{
 	}
-	
+
 	public void player(ServerPlayer p)
 	{
 		player = p;
 	}
-	
+
 	public ServerPlayer player()
 	{
 		return player;

@@ -10,6 +10,7 @@ public interface IInteractable
 {
 	/**
 	 * Called whenever a player interacts with the block
+	 * 
 	 * @param s The structure this is a part of
 	 * @param p The player that interacted with this
 	 */

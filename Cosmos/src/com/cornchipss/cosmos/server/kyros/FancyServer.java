@@ -10,7 +10,7 @@ public class FancyServer extends Server
 	{
 		super(Network.BUFFER_SIZE, Network.BUFFER_SIZE);
 	}
-	
+
 	protected Connection newConnection()
 	{
 		return new ClientConnection();

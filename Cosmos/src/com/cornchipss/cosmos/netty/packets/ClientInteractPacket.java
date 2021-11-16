@@ -28,19 +28,16 @@ public class ClientInteractPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game,
-		ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		Structure s = game.world().structureFromID(id);
-			((IInteractable) s.block(x, y, z)).onInteract(
-				new StructureBlock(s, x, y, z), c.player());
+		((IInteractable) s.block(x, y, z)).onInteract(new StructureBlock(s, x, y, z), c.player());
 	}
 
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
-	{	
+	{
 		Structure s = game.world().structureFromID(id);
-			((IInteractable) s.block(x, y, z)).onInteract(
-				new StructureBlock(s, x, y, z), game.player());
+		((IInteractable) s.block(x, y, z)).onInteract(new StructureBlock(s, x, y, z), game.player());
 	}
 }

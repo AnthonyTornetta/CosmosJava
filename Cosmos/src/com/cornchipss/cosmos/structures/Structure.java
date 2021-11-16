@@ -38,7 +38,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	private Chunk[] chunks;
 
 	private boolean initialized = false;
-	
+
 	private int width, height, length;
 
 	private int cWidth, cHeight, cLength;
@@ -483,7 +483,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to save " + width() + "x" + height + "x" + length()
 			+ " structure.");
 	}
-	
+
 	@Override
 	public void read(DataInputStream reader) throws IOException
 	{

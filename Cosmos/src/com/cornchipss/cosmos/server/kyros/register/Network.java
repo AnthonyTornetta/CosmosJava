@@ -24,11 +24,11 @@ public class Network
 {
 	public static final int TCP_PORT = 54455, UDP_PORT = TCP_PORT;
 	public static final int TIMEOUT_MS = 10_000;
-	
+
 	public static final int BUFFER_SIZE = 4_096_000;
-	
+
 	public static void register(EndPoint endPoint)
-	{		
+	{
 		Kryo k = endPoint.getKryo();
 		k.register(Vector3f.class);
 		k.register(Quaternionf.class);
@@ -36,11 +36,11 @@ public class Network
 		k.register(byte[].class);
 		k.register(Class.class);
 		k.register(ArrayList.class);
-		
+
 		k.register(Planet.class);
 		k.register(Ship.class);
 		k.register(PlayerAction.class);
-		
+
 		k.register(Packet.class);
 		k.register(JoinPacket.class);
 		k.register(LoginPacket.class);

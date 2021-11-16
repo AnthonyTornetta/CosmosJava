@@ -19,12 +19,12 @@ public class Transform
 	{
 		this(0, 0, 0);
 	}
-	
+
 	public Transform(Vector3fc v)
 	{
 		this(v, new Orientation());
 	}
-	
+
 	public Transform(Vector3fc v, Quaternionfc rot)
 	{
 		this(v, new Orientation(rot));
@@ -34,7 +34,7 @@ public class Transform
 	{
 		this(new Vector3f(0, 0, 0));
 	}
-	
+
 	public Transform(Vector3fc v, Orientation o)
 	{
 		position = new Vector3f(v);
