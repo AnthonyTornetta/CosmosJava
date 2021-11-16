@@ -18,6 +18,7 @@ import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.StructurePacket;
+import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.esotericsoftware.kryo.Kryo;
@@ -56,5 +57,6 @@ public class NetworkRegistry
 		k.register(ModifyBlockPacket.class);
 		k.register(PlayerInteractPacket.class);
 		k.register(ExitShipPacket.class);
+		k.register(StructureStatusPacket.class);
 	}
 }

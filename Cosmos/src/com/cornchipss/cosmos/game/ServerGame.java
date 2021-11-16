@@ -7,10 +7,13 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
+import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.structures.Structure;
 
 public class ServerGame extends Game
 {
@@ -52,18 +55,12 @@ public class ServerGame extends Game
 	{
 		super.update(delta);
 
-//		for (Structure s : world().structures())
-//		{
-//			if (s instanceof Ship)
-//			{
-//				Ship ship = (Ship) s;
-//
-//				ShipMovementPacket smp = new ShipMovementPacket(buffer, 0, ship);
-//				smp.init();
-//
-//				CosmosServer.nettyServer().sendToAllUDP(smp);
-//			}
-//		}
+		for (Structure s : world().structures())
+		{
+			StructureStatusPacket smp = new StructureStatusPacket(s);
+			
+			CosmosServer.nettyServer().sendToAllUDP(smp);
+		}
 	}
 
 	public static ServerGame instance()
