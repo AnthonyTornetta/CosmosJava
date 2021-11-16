@@ -74,7 +74,8 @@ public class CosmosNettyClient implements Runnable
 			}
 		}));
 
-		client.connect(NetworkRegistry.TIMEOUT_MS, InetAddress.getByName(ip), NetworkRegistry.TCP_PORT, NetworkRegistry.UDP_PORT);
+		client.connect(NetworkRegistry.TIMEOUT_MS, InetAddress.getByName(ip), NetworkRegistry.TCP_PORT,
+			NetworkRegistry.UDP_PORT);
 
 		for (NettyClientObserver o : observers)
 		{

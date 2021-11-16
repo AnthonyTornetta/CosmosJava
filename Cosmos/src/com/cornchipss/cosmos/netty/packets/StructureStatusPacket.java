@@ -36,6 +36,10 @@ public class StructureStatusPacket extends Packet
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Structure s = game.world().structureFromID(sid);
+		
+		if(s == null)
+			return;
+		
 		s.body().transform().position(pos);
 		s.body().transform().orientation().quaternion(rot);
 		s.energy(energy);
