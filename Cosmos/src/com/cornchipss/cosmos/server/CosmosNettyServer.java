@@ -35,24 +35,34 @@ public class CosmosNettyServer implements Runnable
 		this.cmdHandler = cmdHandler;
 	}
 
+	private void check(Object o)
+	{
+		if(!NetworkRegistry.check(o.getClass()))
+			throw new RuntimeException("Attempted to send non-registed type - " + o.getClass());
+	}
+	
 	public void sendToAllUDP(Object o)
 	{
+		check(o);
 		server.sendToAllUDP(o);
 	}
-
+	
 	public void sendToAllTCP(Object o)
 	{
+		check(o);
 		server.sendToAllTCP(o);
 	}
 
-	public void sendToAllExceptUDP(Object packet, ServerPlayer exception)
+	public void sendToAllExceptUDP(Object o, ServerPlayer exception)
 	{
-		server.sendToAllExceptUDP(exception.connection().getID(), packet);
+		check(o);
+		server.sendToAllExceptUDP(exception.connection().getID(), o);
 	}
 
-	public void sendToAllExceptTCP(Object packet, ServerPlayer exception)
+	public void sendToAllExceptTCP(Object o, ServerPlayer exception)
 	{
-		server.sendToAllExceptTCP(exception.connection().getID(), packet);
+		check(o);
+		server.sendToAllExceptTCP(exception.connection().getID(), o);
 	}
 
 	@Override

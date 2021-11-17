@@ -85,13 +85,21 @@ public class CosmosNettyClient implements Runnable
 		sendTCP(new LoginPacket(name));
 	}
 
+	private void check(Object o)
+	{
+		if(!NetworkRegistry.check(o.getClass()))
+			throw new RuntimeException("Attempted to send non-registed type - " + o.getClass());
+	}
+	
 	public void sendUDP(Object o)
 	{
+		check(o);
 		client.sendUDP(o);
 	}
 
 	public void sendTCP(Object o) throws IOException
 	{
+		check(o);
 		client.sendTCP(o);
 	}
 
