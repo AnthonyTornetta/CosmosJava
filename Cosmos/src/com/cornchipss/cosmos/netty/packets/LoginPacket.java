@@ -3,6 +3,7 @@ package com.cornchipss.cosmos.netty.packets;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
@@ -25,7 +26,9 @@ public class LoginPacket extends Packet
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		client.players().addPlayer(new DummyPlayer(game.world(), name));
+		DummyPlayer p;
+		client.players().addPlayer(p = new DummyPlayer(game.world(), name));
+		p.addToWorld(new Transform());
 	}
 
 	@Override

@@ -33,6 +33,10 @@ public class MovementPacket extends Packet
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Player p = client.players().player(name);
+
+		if (p == null)
+			return;
+
 		Movement m = Movement.movementFromCode(code);
 		m.addDeltaRotation(dRot);
 

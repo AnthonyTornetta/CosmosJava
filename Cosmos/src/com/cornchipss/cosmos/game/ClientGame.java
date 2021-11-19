@@ -164,7 +164,7 @@ public class ClientGame extends Game
 
 				Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
 					: player.shipPiloting().body().transform().invertedMatrix();
-
+				
 				playerMaterial.initUniforms(projectionMatrix, camera, p.body().transform().matrix(), false);
 
 				playerMesh.prepare();
@@ -280,13 +280,14 @@ public class ClientGame extends Game
 
 	public ClientPlayer player()
 	{
+		
 		return player;
 	}
 
 	public void player(ClientPlayer p)
 	{
+		new Exception().printStackTrace();
 		this.player = p;
-		p.addToWorld(new Transform());
 	}
 
 	public void running(boolean r)
