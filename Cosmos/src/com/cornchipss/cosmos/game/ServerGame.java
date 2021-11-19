@@ -58,7 +58,7 @@ public class ServerGame extends Game
 		for (Structure s : world().structures())
 		{
 			StructureStatusPacket smp = new StructureStatusPacket(s);
-			
+
 			CosmosServer.nettyServer().sendToAllUDP(smp);
 		}
 	}

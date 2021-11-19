@@ -28,6 +28,8 @@ public class CosmosNettyClient implements Runnable
 
 	private Client client;
 
+	private Listener listener;
+
 	public CosmosNettyClient()
 	{
 		players = new ClientPlayerList();
@@ -43,7 +45,7 @@ public class CosmosNettyClient implements Runnable
 
 		final CosmosNettyClient instance = this;
 
-		client.addListener(new ThreadedListener(new Listener()
+		client.addListener(listener = new ThreadedListener(new Listener()
 		{
 			public void received(Connection connection, Object object)
 			{
@@ -87,10 +89,10 @@ public class CosmosNettyClient implements Runnable
 
 	private void check(Object o)
 	{
-		if(!NetworkRegistry.check(o.getClass()))
+		if (!NetworkRegistry.check(o.getClass()))
 			throw new RuntimeException("Attempted to send non-registed type - " + o.getClass());
 	}
-	
+
 	public void sendUDP(Object o)
 	{
 		check(o);
@@ -105,7 +107,8 @@ public class CosmosNettyClient implements Runnable
 
 	public void disconnect() throws IOException
 	{
-		client.close();
+		client.removeListener(listener);
+		client.stop();
 	}
 
 	@Override

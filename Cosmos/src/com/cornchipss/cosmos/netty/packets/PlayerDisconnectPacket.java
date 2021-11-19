@@ -31,5 +31,6 @@ public class PlayerDisconnectPacket extends Packet
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		c.close();
+
 	}
 }

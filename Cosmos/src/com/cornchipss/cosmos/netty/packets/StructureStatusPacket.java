@@ -15,14 +15,14 @@ public class StructureStatusPacket extends Packet
 	private int sid;
 	private Vector3fc pos;
 	private Quaternionfc rot;
-	
+
 	float energy, maxEnergy;
-	
+
 	public StructureStatusPacket()
 	{
-		
+
 	}
-	
+
 	public StructureStatusPacket(Structure s)
 	{
 		sid = s.id();
@@ -31,15 +31,15 @@ public class StructureStatusPacket extends Packet
 		energy = s.energy();
 		maxEnergy = s.maxEnergy();
 	}
-	
+
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Structure s = game.world().structureFromID(sid);
-		
-		if(s == null)
+
+		if (s == null)
 			return;
-		
+
 		s.body().transform().position(pos);
 		s.body().transform().orientation().quaternion(rot);
 		s.energy(energy);

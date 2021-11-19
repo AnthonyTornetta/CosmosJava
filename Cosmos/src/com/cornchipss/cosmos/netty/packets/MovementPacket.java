@@ -15,14 +15,14 @@ public class MovementPacket extends Packet
 {
 	private int code;
 	private Vector3fc dRot;
-	
+
 	private String name;
-	
+
 	public MovementPacket()
 	{
-		
+
 	}
-	
+
 	public MovementPacket(Movement m)
 	{
 		code = m.code();
@@ -35,7 +35,7 @@ public class MovementPacket extends Packet
 		Player p = client.players().player(name);
 		Movement m = Movement.movementFromCode(code);
 		m.addDeltaRotation(dRot);
-		
+
 		p.movement(m);
 	}
 
@@ -46,9 +46,9 @@ public class MovementPacket extends Packet
 		name = p.name();
 		Movement m = Movement.movementFromCode(code);
 		m.addDeltaRotation(dRot);
-		
+
 		p.movement(m);
-		
+
 		server.sendToAllExceptTCP(this, p);
 	}
 }

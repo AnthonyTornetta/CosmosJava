@@ -84,6 +84,7 @@ public class CosmosServer implements Runnable
 		try
 		{
 			gameThread.join();
+			server.stop();
 			// I cannot join() the udp thread because it forever waits for a UDP connection
 			// that will never happen
 		}
@@ -93,6 +94,5 @@ public class CosmosServer implements Runnable
 		}
 
 		Logger.LOGGER.info("Server terminated.");
-		System.exit(0);
 	}
 }

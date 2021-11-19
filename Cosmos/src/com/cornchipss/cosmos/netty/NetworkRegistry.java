@@ -33,18 +33,19 @@ public class NetworkRegistry
 	public static final int TIMEOUT_MS = 10_000;
 
 	public static final int BUFFER_SIZE = 4_096_000;
-	
+
 	private static Set<Class<?>> registered = new HashSet<>();
 
 	private static void register(Class<?> c, Kryo k)
 	{
 		k.register(c);
-		
+
 		registered.add(c);
 	}
-	
+
 	/**
 	 * For debug purposes check if a type has been registered
+	 * 
 	 * @param c
 	 * @return
 	 */
@@ -52,7 +53,7 @@ public class NetworkRegistry
 	{
 		return registered.contains(c);
 	}
-	
+
 	public static void register(EndPoint endPoint)
 	{
 		Kryo k = endPoint.getKryo();
@@ -62,7 +63,7 @@ public class NetworkRegistry
 		register(byte[].class, k);
 		register(Class.class, k);
 		register(ArrayList.class, k);
-		
+
 		register(Planet.class, k);
 		register(Ship.class, k);
 		register(PlayerAction.class, k);

@@ -36,8 +36,6 @@ public class CosmosClient implements Runnable
 	private State state;
 	private CosmosNettyClient client;
 
-	private Thread nettyThread;
-
 	public boolean connected()
 	{
 		return client != null;
@@ -59,8 +57,7 @@ public class CosmosClient implements Runnable
 			throw ex;
 		}
 
-		nettyThread = new Thread(client);
-		nettyThread.start();
+		client.run();
 
 		client.addObserver(new NettyClientObserver()
 		{
@@ -90,8 +87,6 @@ public class CosmosClient implements Runnable
 			throw new IllegalStateException("Not connected");
 
 		client.disconnect();
-		nettyThread.join();
-		nettyThread = null;
 
 		state(new MainMenuState());
 	}
@@ -144,20 +139,22 @@ public class CosmosClient implements Runnable
 
 		try
 		{
-			Logger.LOGGER.info("Netty thread joined");
-
-			nettyClient().disconnect();
-
-			if (nettyThread != null)
-				nettyThread.join();
-			Logger.LOGGER.info("Netty thread terminated gracefully");
+			if (nettyClient() != null)
+			{
+				nettyClient().disconnect();
+				Logger.LOGGER.info("Netty connection closed gracefully");
+			}
 		}
-		catch (InterruptedException | IOException e)
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 
 		Logger.LOGGER.info("Successfully closed.");
+
+		// Remove once this issue is fixed:
+		// https://github.com/EsotericSoftware/kryonet/issues/142
+		System.exit(0);
 	}
 
 	public static CosmosClient instance()

@@ -14,12 +14,12 @@ public class PlayerInteractPacket extends Packet
 {
 	private int sid, x, y, z;
 	private String name;
-	
+
 	public PlayerInteractPacket()
 	{
-		
+
 	}
-	
+
 	public PlayerInteractPacket(StructureBlock b)
 	{
 		sid = b.structure().id();
@@ -27,36 +27,36 @@ public class PlayerInteractPacket extends Packet
 		y = b.structureY();
 		z = b.structureZ();
 	}
-	
+
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
 		Structure s = game.world().structureFromID(sid);
-		if(s == null)
+		if (s == null)
 			return;
-		
+
 		StructureBlock b = new StructureBlock(s, x, y, z);
 		Player p = client.players().player(name);
-		
-		if(s.block(x, y, z) instanceof IInteractable)
-			((IInteractable)s.block(x, y, z)).onInteract(b, p);
+
+		if (s.block(x, y, z) instanceof IInteractable)
+			((IInteractable) s.block(x, y, z)).onInteract(b, p);
 	}
 
 	@Override
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		Structure s = game.world().structureFromID(sid);
-		if(s == null)
+		if (s == null)
 			return;
-		
+
 		StructureBlock b = new StructureBlock(s, x, y, z);
 		Player p = c.player();
-		
-		if(s.block(x, y, z) instanceof IInteractable)
+
+		if (s.block(x, y, z) instanceof IInteractable)
 		{
-			((IInteractable)s.block(x, y, z)).onInteract(b, p);
+			((IInteractable) s.block(x, y, z)).onInteract(b, p);
 			name = c.player().name();
-			
+
 			server.sendToAllTCP(this);
 		}
 	}

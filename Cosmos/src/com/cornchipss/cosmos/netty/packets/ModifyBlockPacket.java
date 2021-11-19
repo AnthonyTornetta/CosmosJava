@@ -15,19 +15,19 @@ public class ModifyBlockPacket extends Packet
 	int x, y, z;
 	int sid;
 	short bid;
-	
+
 	public ModifyBlockPacket()
 	{
 
 	}
-	
+
 	public ModifyBlockPacket(StructureBlock b, Block newB)
 	{
 		x = b.structureX();
 		y = b.structureY();
 		z = b.structureZ();
 		sid = b.structure().id();
-		if(newB != null)
+		if (newB != null)
 			bid = newB.numericId();
 		else
 			bid = 0;
@@ -38,7 +38,7 @@ public class ModifyBlockPacket extends Packet
 	{
 		Structure s = game.world().structureFromID(sid);
 		Block b = Blocks.fromNumericId(bid);
-		
+
 		s.block(x, y, z, b);
 	}
 
@@ -47,9 +47,9 @@ public class ModifyBlockPacket extends Packet
 	{
 		Structure s = game.world().structureFromID(sid);
 		Block b = Blocks.fromNumericId(bid);
-		
+
 		s.block(x, y, z, b);
-		
+
 		server.sendToAllTCP(this);
 	}
 }

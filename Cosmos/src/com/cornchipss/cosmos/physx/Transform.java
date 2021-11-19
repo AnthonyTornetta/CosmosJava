@@ -32,7 +32,7 @@ public class Transform
 
 	public Transform(float x, float y, float z)
 	{
-		this(new Vector3f(0, 0, 0));
+		this(new Vector3f(x, y, z));
 	}
 
 	public Transform(Vector3fc v, Orientation o)

@@ -37,16 +37,16 @@ public class CosmosNettyServer implements Runnable
 
 	private void check(Object o)
 	{
-		if(!NetworkRegistry.check(o.getClass()))
+		if (!NetworkRegistry.check(o.getClass()))
 			throw new RuntimeException("Attempted to send non-registed type - " + o.getClass());
 	}
-	
+
 	public void sendToAllUDP(Object o)
 	{
 		check(o);
 		server.sendToAllUDP(o);
 	}
-	
+
 	public void sendToAllTCP(Object o)
 	{
 		check(o);
@@ -103,7 +103,6 @@ public class CosmosNettyServer implements Runnable
 		{
 			throw new RuntimeException(e);
 		}
-
 	}
 
 	public boolean running()
@@ -139,5 +138,10 @@ public class CosmosNettyServer implements Runnable
 	public ServerPlayerList players()
 	{
 		return players;
+	}
+
+	public void stop()
+	{
+		server.stop();
 	}
 }

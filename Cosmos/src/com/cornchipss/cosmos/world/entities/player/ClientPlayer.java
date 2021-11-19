@@ -87,7 +87,7 @@ public class ClientPlayer extends Player
 			{
 				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
 				PlayerActionPacket p = new PlayerActionPacket(action);
-				
+
 				try
 				{
 					CosmosClient.instance().nettyClient().sendTCP(p);
@@ -101,7 +101,7 @@ public class ClientPlayer extends Player
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 			{
 				ExitShipPacket esp = new ExitShipPacket();
-				
+
 				try
 				{
 					CosmosClient.instance().nettyClient().sendTCP(esp);
@@ -116,7 +116,7 @@ public class ClientPlayer extends Player
 		camera().update();
 
 		MovementPacket packet = new MovementPacket(movement());
-		
+
 		CosmosClient.instance().nettyClient().sendUDP(packet);
 	}
 
