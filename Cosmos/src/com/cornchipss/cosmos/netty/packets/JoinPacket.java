@@ -32,6 +32,7 @@ public class JoinPacket extends Packet
 		{
 			Logger.LOGGER.info(this);
 			game.player(new ClientPlayer(game.world(), name()));
+			client.players().addPlayer(game.player());
 		}
 		else
 		{

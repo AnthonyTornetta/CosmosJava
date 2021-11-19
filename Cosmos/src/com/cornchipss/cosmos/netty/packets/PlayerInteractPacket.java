@@ -8,6 +8,7 @@ import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerInteractPacket extends Packet
@@ -34,12 +35,14 @@ public class PlayerInteractPacket extends Packet
 		Structure s = game.world().structureFromID(sid);
 		if (s == null)
 			return;
-
+		
 		StructureBlock b = new StructureBlock(s, x, y, z);
 		Player p = client.players().player(name);
 
 		if (s.block(x, y, z) instanceof IInteractable)
+		{
 			((IInteractable) s.block(x, y, z)).onInteract(b, p);
+		}
 	}
 
 	@Override

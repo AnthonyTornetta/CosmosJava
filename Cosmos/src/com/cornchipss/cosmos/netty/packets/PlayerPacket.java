@@ -18,6 +18,11 @@ public class PlayerPacket extends Packet
 	private Vector3fc position;
 	private Quaternionfc rotation;
 
+	public PlayerPacket()
+	{
+		
+	}
+	
 	public PlayerPacket(Player p)
 	{
 		this.name = p.name();
