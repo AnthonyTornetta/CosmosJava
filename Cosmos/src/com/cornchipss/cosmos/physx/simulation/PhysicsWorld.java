@@ -64,7 +64,7 @@ public class PhysicsWorld
 				{
 					for (PhysicalObject b : bodies)
 					{
-						if (!b.equals(a))
+						if (!b.equals(a) && b.shouldCollideWith(a) && a.shouldCollideWith(b))
 						{
 							handlePotentialCollision(a, b, deltaA);
 						}

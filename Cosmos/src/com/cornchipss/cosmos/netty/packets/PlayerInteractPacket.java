@@ -8,7 +8,6 @@ import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerInteractPacket extends Packet

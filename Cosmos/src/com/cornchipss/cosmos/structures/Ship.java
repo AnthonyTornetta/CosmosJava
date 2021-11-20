@@ -5,6 +5,7 @@ import org.joml.Vector3f;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.physx.Movement;
+import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
@@ -57,6 +58,7 @@ public class Ship extends Structure
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setPilot(Player p)
 	{
 		if (!Utils.equals(pilot, p))
@@ -90,5 +92,11 @@ public class Ship extends Structure
 	public void sendAction(PlayerAction action)
 	{
 		blockSystemManager().sendAction(action);
+	}
+	
+	@Override
+	public boolean shouldCollideWith(PhysicalObject other)
+	{
+		return !other.equals(pilot());
 	}
 }

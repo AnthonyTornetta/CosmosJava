@@ -114,7 +114,12 @@ public abstract class Player extends PhysicalObject
 		return pilotingShip != null;
 	}
 
-	public void shipPiloting(Ship s)
+	/**
+	 * Use {@link Ship#setPilot(Player)}
+	 * 
+	 * @param s
+	 */
+	public @Deprecated void shipPiloting(Ship s)
 	{
 		if (Utils.equals(pilotingShip, s))
 			return;

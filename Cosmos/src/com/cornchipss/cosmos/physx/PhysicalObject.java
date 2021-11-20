@@ -54,4 +54,9 @@ public abstract class PhysicalObject
 	{
 		this.body = body;
 	}
+
+	public boolean shouldCollideWith(PhysicalObject other)
+	{
+		return true;
+	}
 }

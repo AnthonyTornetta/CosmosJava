@@ -8,7 +8,6 @@ import org.joml.Vector3fc;
 import com.cornchipss.cosmos.physx.simulation.PhysicsWorld;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Logger;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class World extends PhysicsWorld
 {
