@@ -19,6 +19,7 @@ import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.netty.packets.MovementPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
@@ -116,8 +117,10 @@ public class ClientPlayer extends Player
 		camera().update();
 
 		MovementPacket packet = new MovementPacket(movement());
+		PlayerPacket p = new PlayerPacket(this);
 
 		CosmosClient.instance().nettyClient().sendUDP(packet);
+		CosmosClient.instance().nettyClient().sendUDP(p);
 	}
 
 	private void handleInteractions()

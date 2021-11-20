@@ -35,6 +35,8 @@ public class CosmosNettyClient implements Runnable
 		players = new ClientPlayerList();
 
 		client = new Client(NetworkRegistry.BUFFER_SIZE, NetworkRegistry.BUFFER_SIZE);
+		
+		game = new ClientGame(this);
 	}
 
 	public void createConnection(String ip, int port, String name) throws IOException
@@ -114,8 +116,6 @@ public class CosmosNettyClient implements Runnable
 	@Override
 	public void run()
 	{
-		game = new ClientGame(this);
-
 		ready = true;
 	}
 

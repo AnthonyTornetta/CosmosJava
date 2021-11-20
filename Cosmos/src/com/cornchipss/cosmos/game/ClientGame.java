@@ -24,7 +24,6 @@ import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.models.entities.PlayerModel;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
@@ -164,7 +163,7 @@ public class ClientGame extends Game
 
 				Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
 					: player.shipPiloting().body().transform().invertedMatrix();
-				
+
 				playerMaterial.initUniforms(projectionMatrix, camera, p.body().transform().matrix(), false);
 
 				playerMesh.prepare();
@@ -280,13 +279,11 @@ public class ClientGame extends Game
 
 	public ClientPlayer player()
 	{
-		
 		return player;
 	}
 
 	public void player(ClientPlayer p)
 	{
-		new Exception().printStackTrace();
 		this.player = p;
 	}
 
