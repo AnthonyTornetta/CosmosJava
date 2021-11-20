@@ -5,32 +5,32 @@ import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
-import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
-public class ExitShipPacket extends Packet
+public class PlayerDisconnectPacket extends Packet
 {
-	private int sid;
+	private String name;
 
-	public ExitShipPacket()
+	public PlayerDisconnectPacket()
 	{
 
+	}
+
+	public PlayerDisconnectPacket(Player p)
+	{
+		this.name = p.name();
 	}
 
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		((Ship) game.world().structureFromID(sid)).setPilot(null);
+		client.players().removePlayer(client.players().player(name));
 	}
 
 	@Override
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
-		if (!c.player().isPilotingShip())
-			return;
+		c.close();
 
-		sid = c.player().shipPiloting().id();
-		c.player().shipPiloting().setPilot(null);
-
-		server.sendToAllTCP(this);
 	}
 }

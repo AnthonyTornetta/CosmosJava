@@ -16,7 +16,7 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent
 	private Vector3f halfwidths = new Vector3f(0.1f, 0.1f, 0.4f);
 
 	private float speed;
-	
+
 	private Structure sender;
 
 	public Laser(World world, float speed, Structure sender)
@@ -44,12 +44,12 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent
 	@Override
 	public boolean onCollide(PhysicalObject obj)
 	{
-		if(obj.equals(sender))
+		if (obj.equals(sender))
 			return false;
-		
+
 		Utils.println("BYE!");
 		this.world().removePhysicalObject(this);
-		
+
 		return true;
 	}
 }

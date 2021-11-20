@@ -7,7 +7,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
@@ -24,7 +24,6 @@ import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.models.entities.PlayerModel;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
@@ -286,7 +285,6 @@ public class ClientGame extends Game
 	public void player(ClientPlayer p)
 	{
 		this.player = p;
-		p.addToWorld(new Transform());
 	}
 
 	public void running(boolean r)
@@ -296,6 +294,6 @@ public class ClientGame extends Game
 
 	public boolean running()
 	{
-		return Client.instance().running() && running;
+		return CosmosClient.instance().running() && running;
 	}
 }

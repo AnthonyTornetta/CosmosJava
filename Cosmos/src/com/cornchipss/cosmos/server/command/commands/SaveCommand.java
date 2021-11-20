@@ -23,7 +23,8 @@ public class SaveCommand implements Command
 	{
 		new File("assets/structures/saves/").mkdirs();
 
-		try(DataOutputStream str = new DataOutputStream(new FileOutputStream(new File("assets/structures/saves/" + name + ".struct"))))
+		try (DataOutputStream str = new DataOutputStream(
+			new FileOutputStream(new File("assets/structures/saves/" + name + ".struct"))))
 		{
 			s.write(str);
 			System.out.println("Saved structure " + s.id() + " as " + name);

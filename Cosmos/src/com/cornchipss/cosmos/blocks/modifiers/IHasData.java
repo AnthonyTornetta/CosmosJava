@@ -4,12 +4,14 @@ import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.structures.Structure;
 
 /**
- * A way of storing data of a block in the world without multiple instances of a block
+ * A way of storing data of a block in the world without multiple instances of a
+ * block
  */
 public interface IHasData
 {
 	/**
 	 * Generates the block's default data
+	 * 
 	 * @param s The structure the block is a part of
 	 * @param x The x position of the block relative to the structure
 	 * @param y The y position of the block relative to the structure

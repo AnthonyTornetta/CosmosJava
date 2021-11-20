@@ -15,7 +15,7 @@ public class ThrusterSystem extends BlockSystem
 	{
 		super(s);
 	}
-	
+
 	private float thrustPerSecond = 0;
 	private float powerPerSecond = 0;;
 
@@ -90,7 +90,7 @@ public class ThrusterSystem extends BlockSystem
 	@Override
 	public void addBlock(StructureBlock added)
 	{
-		IThrustProducer p = (IThrustProducer)added.block();
+		IThrustProducer p = (IThrustProducer) added.block();
 		thrustPerSecond += p.thrustGeneratedPerSecond();
 		powerPerSecond += p.powerUsedPerSecond();
 	}
@@ -98,7 +98,7 @@ public class ThrusterSystem extends BlockSystem
 	@Override
 	public void removeBlock(StructureBlock removed)
 	{
-		IThrustProducer p = (IThrustProducer)removed.block();
+		IThrustProducer p = (IThrustProducer) removed.block();
 		thrustPerSecond -= p.thrustGeneratedPerSecond();
 		powerPerSecond -= p.powerUsedPerSecond();
 	}

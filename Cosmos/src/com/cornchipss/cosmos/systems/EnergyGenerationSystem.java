@@ -12,17 +12,17 @@ public class EnergyGenerationSystem extends BlockSystem
 	{
 		super(s);
 	}
-	
+
 	@Override
 	public void addBlock(StructureBlock added)
 	{
-		energyGeneratedPerSec += ((IEnergyProducerBlock)added.block()).energyGeneratedPerSecond();
+		energyGeneratedPerSec += ((IEnergyProducerBlock) added.block()).energyGeneratedPerSecond();
 	}
 
 	@Override
 	public void removeBlock(StructureBlock removed)
 	{
-		energyGeneratedPerSec -= ((IEnergyProducerBlock)removed.block()).energyGeneratedPerSecond();
+		energyGeneratedPerSec -= ((IEnergyProducerBlock) removed.block()).energyGeneratedPerSecond();
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class EnergyGenerationSystem extends BlockSystem
 	{
 		structure().addEnergy(energyGeneratedPerSec * delta);
 	}
-	
+
 	@Override
 	public String id()
 	{

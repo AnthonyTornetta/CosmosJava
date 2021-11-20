@@ -1,7 +1,6 @@
 package com.cornchipss.cosmos.structures;
 
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
@@ -23,19 +22,11 @@ public class Ship extends Structure
 
 	private Movement movement;
 
-	private Vector3f corePos = new Vector3f();
-
 	public Ship(World world, int id)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
 
 		movement = Movement.movement(MovementType.NONE);
-	}
-
-	public Vector3fc corePosition()
-	{
-		corePos.set(MAX_DIMENSIONS / 2.f, MAX_DIMENSIONS / 2.f, MAX_DIMENSIONS / 2.f);
-		return corePos;
 	}
 
 	@Override

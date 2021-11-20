@@ -2,85 +2,54 @@ package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
-import com.cornchipss.cosmos.client.ServerConnection;
-import com.cornchipss.cosmos.server.ClientConnection;
+import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.Server;
+import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
 
 public class ModifyBlockPacket extends Packet
 {
-	private Structure s;
-	private int x, y, z;
-	private Block to;
-	
+	int x, y, z;
+	int sid;
+	short bid;
+
 	public ModifyBlockPacket()
 	{
-		
+
 	}
-	
-	public ModifyBlockPacket(byte[] buffer, int bufferOffset)
+
+	public ModifyBlockPacket(StructureBlock b, Block newB)
 	{
-		super(buffer, bufferOffset);
-	}
-	
-	public ModifyBlockPacket(byte[] buffer, int bufferOffset, Structure s, int x, int y, int z, Block to)
-	{
-		super(buffer, bufferOffset);
-		
-		this.s = s;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.to = to;
-	}
-	
-	@Override
-	public void init()
-	{
-		super.init();
-		
-		writeInt(s.id());
-		writeInt(x);
-		writeInt(y);
-		writeInt(z);
-		writeShort(to == null ? 0 : to.numericId());
-	}
-	
-	@Override
-	public void onReceiveServer(byte[] data, int len, int offset, ClientConnection client, CosmosNettyServer server)
-	{
-		ModifyBlockPacket packet = new ModifyBlockPacket(data, offset);
-		
-		Structure s = server.game().world().structureFromID(packet.readInt());
-		int x, y, z;
-		x = packet.readInt();
-		y = packet.readInt();
-		z = packet.readInt();
-		
-		Block block = Blocks.fromNumericId(packet.readShort());
-		
-		s.block(x, y, z, block);
-		
-		packet.reset();
-		
-		Server.nettyServer().sendToAllTCP(packet);
+		x = b.structureX();
+		y = b.structureY();
+		z = b.structureZ();
+		sid = b.structure().id();
+		if (newB != null)
+			bid = newB.numericId();
+		else
+			bid = 0;
 	}
 
 	@Override
-	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
+	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		ModifyBlockPacket packet = new ModifyBlockPacket(data, offset);
-		
-		Structure s = client.game().world().structureFromID(packet.readInt());
-		int x, y, z;
-		x = packet.readInt();
-		y = packet.readInt();
-		z = packet.readInt();
-		
-		Block block = Blocks.fromNumericId(packet.readShort());
-		
-		s.block(x, y, z, block);
+		Structure s = game.world().structureFromID(sid);
+		Block b = Blocks.fromNumericId(bid);
+
+		s.block(x, y, z, b);
+	}
+
+	@Override
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	{
+		Structure s = game.world().structureFromID(sid);
+		Block b = Blocks.fromNumericId(bid);
+
+		s.block(x, y, z, b);
+
+		server.sendToAllTCP(this);
 	}
 }

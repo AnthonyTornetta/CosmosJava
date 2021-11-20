@@ -10,13 +10,13 @@ public class ScrollListener implements GLFWScrollCallbackI
 	{
 		yOffset = 0;
 	}
-	
+
 	@Override
 	public void invoke(long window, double xOffset, double yOffset)
 	{
 		this.yOffset += yOffset;
 	}
-	
+
 	public double scrollOffset()
 	{
 		return yOffset;

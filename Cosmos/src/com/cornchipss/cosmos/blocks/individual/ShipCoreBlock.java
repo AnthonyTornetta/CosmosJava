@@ -11,14 +11,22 @@ import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 /**
- * <p>The core block of any ship</p>
- * <p>If this is removed, then there is no ship</p>
+ * <p>
+ * The core block of any ship
+ * </p>
+ * <p>
+ * If this is removed, then there is no ship
+ * </p>
  */
 public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 {
 	/**
-	 * <p>The core block of any ship</p>
-	 * <p>If this is removed, then there is no ship</p>
+	 * <p>
+	 * The core block of any ship
+	 * </p>
+	 * <p>
+	 * If this is removed, then there is no ship
+	 * </p>
 	 */
 	public ShipCoreBlock()
 	{
@@ -28,9 +36,10 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	@Override
 	public boolean canAddTo(Structure s)
 	{
-		return false; // The player cannot place this without creating a ship - where the block is automatically placed.
+		return false; // The player cannot place this without creating a ship - where the block is
+						// automatically placed.
 	}
-	
+
 	@Override
 	public BlockData generateData(Structure s, int x, int y, int z)
 	{
@@ -42,8 +51,8 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	@Override
 	public void onInteract(StructureBlock s, Player p)
 	{
-		Ship ship = (Ship)s.structure(); // this will always be on a ship
-		
+		Ship ship = (Ship) s.structure(); // this will always be on a ship
+
 		ship.setPilot(p);
 	}
 }

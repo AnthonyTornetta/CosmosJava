@@ -206,23 +206,23 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			return hit;
 		} // BEWARE: UNTESTED CODE BELOW THIS LINE //
-		else if(b instanceof Structure)
-		{			
+		else if (b instanceof Structure)
+		{
 			OBBCollider obbA = a.OBB();
 
 			if (!obbChecker.testMovingOBBOBB(deltaA, obbA, b.OBB(), null))
 			{
 				return false;
 			}
-			
+
 			boolean hit = false;
-			
-			for(Chunk c : ((Structure) b).chunks())
+
+			for (Chunk c : ((Structure) b).chunks())
 			{
-				if(c.empty())
+				if (c.empty())
 					continue;
-				
-				if (obbChecker.testMovingOBBOBB(deltaA, obbA, ((Structure)b).obbForChunk(c), null))
+
+				if (obbChecker.testMovingOBBOBB(deltaA, obbA, ((Structure) b).obbForChunk(c), null))
 				{
 					for (Vector3fc pointOfInterest : obbA)
 					{
@@ -235,40 +235,41 @@ public class DefaultCollisionChecker implements ICollisionChecker
 					}
 				}
 			}
-			
+
 			return hit;
 		}
-		else if(a instanceof Structure)
-		{			
+		else if (a instanceof Structure)
+		{
 			OBBCollider obbB = b.OBB();
 
 			if (!obbChecker.testMovingOBBOBB(deltaA, a.OBB(), obbB, null))
 			{
 				return false;
 			}
-			
+
 			boolean hit = false;
-			
-			for(Chunk c : ((Structure) a).chunks())
+
+			for (Chunk c : ((Structure) a).chunks())
 			{
-				if(c.empty())
+				if (c.empty())
 					continue;
-				
-				if (obbChecker.testMovingOBBOBB(deltaA, ((Structure)a).obbForChunk(c), obbB, null))
+
+				if (obbChecker.testMovingOBBOBB(deltaA, ((Structure) a).obbForChunk(c), obbB, null))
 				{
-					for(int z = 0; z < c.length(); z++)
+					for (int z = 0; z < c.length(); z++)
 					{
-						for(int y = 0; y < c.height(); y++)
+						for (int y = 0; y < c.height(); y++)
 						{
-							for(int x = 0; x < c.width(); x++)
+							for (int x = 0; x < c.width(); x++)
 							{
-								if(c.hasBlock(x, y, z))
+								if (c.hasBlock(x, y, z))
 								{
-									if(obbChecker.testMovingOBBOBB(deltaA, ((Structure)a).obbForBlock(c, x, y, z), obbB, info))
+									if (obbChecker.testMovingOBBOBB(deltaA, ((Structure) a).obbForBlock(c, x, y, z),
+										obbB, info))
 									{
-										if(info == null || info.distanceSquared == 0)
+										if (info == null || info.distanceSquared == 0)
 											return true;
-										
+
 										hit = true;
 									}
 								}
@@ -277,7 +278,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 					}
 				}
 			}
-			
+
 			return hit;
 		}
 		else

@@ -4,24 +4,26 @@ import java.io.IOException;
 
 import org.lwjgl.glfw.GLFW;
 
+import com.cornchipss.cosmos.client.states.GameState;
 import com.cornchipss.cosmos.client.states.MainMenuState;
 import com.cornchipss.cosmos.client.states.State;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.netty.NettySide;
-import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.rendering.Window;
+import com.cornchipss.cosmos.server.kyros.NettyClientObserver;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.io.Input;
+import com.esotericsoftware.kryonet.Connection;
 
-public class Client implements Runnable
+public class CosmosClient implements Runnable
 {
 	private Window window;
 
-	private static Client instance;
+	private static CosmosClient instance;
 
-	public Client()
+	public CosmosClient()
 	{
 		NettySide.initNettySide(NettySide.CLIENT);
 
@@ -33,8 +35,6 @@ public class Client implements Runnable
 	private volatile boolean running = true;
 	private State state;
 	private CosmosNettyClient client;
-
-	private Thread nettyThread;
 
 	public boolean connected()
 	{
@@ -57,8 +57,28 @@ public class Client implements Runnable
 			throw ex;
 		}
 
-		nettyThread = new Thread(client);
-		nettyThread.start();
+		client.run();
+
+		client.addObserver(new NettyClientObserver()
+		{
+			@Override
+			public boolean onReceiveObject(Connection connection, Object object)
+			{
+				return false;
+			}
+
+			@Override
+			public void onDisconnect(Connection connection)
+			{
+
+			}
+
+			@Override
+			public void onConnect()
+			{
+				state(new GameState());
+			}
+		});
 	}
 
 	public void disconnect() throws IOException, InterruptedException
@@ -67,8 +87,8 @@ public class Client implements Runnable
 			throw new IllegalStateException("Not connected");
 
 		client.disconnect();
-		nettyThread.join();
-		nettyThread = null;
+
+		state(new MainMenuState());
 	}
 
 	@Override
@@ -80,8 +100,6 @@ public class Client implements Runnable
 
 		Initializer loader = new Initializer();
 		loader.init();
-
-		PacketTypes.registerAll();
 
 		Input.setWindow(window);
 		Input.update();
@@ -121,20 +139,25 @@ public class Client implements Runnable
 
 		try
 		{
-			Logger.LOGGER.info("Netty thread joined");
-			if (nettyThread != null)
-				nettyThread.join();
-			Logger.LOGGER.info("Netty thread terminated gracefully");
+			if (nettyClient() != null)
+			{
+				nettyClient().disconnect();
+				Logger.LOGGER.info("Netty connection closed gracefully");
+			}
 		}
-		catch (InterruptedException e)
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 
 		Logger.LOGGER.info("Successfully closed.");
+
+		// Remove once this issue is fixed:
+		// https://github.com/EsotericSoftware/kryonet/issues/142
+		System.exit(0);
 	}
 
-	public static Client instance()
+	public static CosmosClient instance()
 	{
 		return instance;
 	}

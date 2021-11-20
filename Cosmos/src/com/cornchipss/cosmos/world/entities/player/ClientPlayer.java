@@ -8,18 +8,18 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
-import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
-import com.cornchipss.cosmos.client.Client;
+import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
-import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
-import com.cornchipss.cosmos.netty.packets.ClientMovementPacket;
 import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
+import com.cornchipss.cosmos.netty.packets.MovementPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
+import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
@@ -45,8 +45,6 @@ public class ClientPlayer extends Player
 
 		cam = new GimbalLockCamera(transform);
 	}
-
-	private byte[] buffer = new byte[128];
 
 	@Override
 	public void update(float delta)
@@ -84,31 +82,30 @@ public class ClientPlayer extends Player
 
 			handleInteractions();
 		}
-		else 
+		else
 		{
-			if(Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+			if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
 				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
-				PlayerActionPacket p = new PlayerActionPacket(buffer, 0, action);
-				p.init();
+				PlayerActionPacket p = new PlayerActionPacket(action);
+
 				try
 				{
-					Client.instance().nettyClient().sendTCP(p);
+					CosmosClient.instance().nettyClient().sendTCP(p);
 				}
 				catch (IOException e)
 				{
 					e.printStackTrace();
 				}
 			}
-			
+
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
 			{
-				// shipPiloting(null);
-				ExitShipPacket esp = new ExitShipPacket(buffer, 0);
-				esp.init();
+				ExitShipPacket esp = new ExitShipPacket();
+
 				try
 				{
-					Client.instance().nettyClient().sendTCP(esp);
+					CosmosClient.instance().nettyClient().sendTCP(esp);
 				}
 				catch (IOException e)
 				{
@@ -119,9 +116,11 @@ public class ClientPlayer extends Player
 
 		camera().update();
 
-		ClientMovementPacket cmp = new ClientMovementPacket(buffer, 0, movement());
-		cmp.init();
-		Client.instance().nettyClient().sendUDP(cmp);
+		MovementPacket packet = new MovementPacket(movement());
+		PlayerPacket p = new PlayerPacket(this);
+
+		CosmosClient.instance().nettyClient().sendUDP(packet);
+		CosmosClient.instance().nettyClient().sendUDP(p);
 	}
 
 	private void handleInteractions()
@@ -142,34 +141,39 @@ public class ClientPlayer extends Player
 
 				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
-					byte[] buffer = new byte[64];
-					ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, sb.block().structureX(),
-						sb.block().structureY(), sb.block().structureZ(), null);
-					packet.init();
+					ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), null);
+
 					try
 					{
 						ClientGame.instance().nettyClient().sendTCP(packet);
 					}
-					catch(IOException ex) {}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
 				}
 				else if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
 					if (selectedBlock != null && selectedBlock.canAddTo(lookingAt))
 					{
 						BlockFace face = sb.face();
-						
+
 						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x)),
 							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y)),
 							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z));
 
 						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
-							// lookingAt.block(xx, yy, zz, selectedBlock);
-							byte[] buffer = new byte[64];
-							ModifyBlockPacket packet = new ModifyBlockPacket(buffer, 0, lookingAt, xx, yy, zz,
-								selectedBlock);
-							packet.init();
-							ClientGame.instance().nettyClient().sendUDP(packet);
+							ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), selectedBlock);
+
+							try
+							{
+								ClientGame.instance().nettyClient().sendTCP(packet);
+							}
+							catch (IOException e)
+							{
+								e.printStackTrace();
+							}
 						}
 					}
 				}
@@ -177,13 +181,11 @@ public class ClientPlayer extends Player
 				{
 					if (sb.block().block() instanceof IInteractable)
 					{
-						ClientInteractPacket cip = new ClientInteractPacket(buffer, 0, new StructureBlock(lookingAt,
-							sb.block().structureX(), sb.block().structureY(), sb.block().structureZ()));
-						cip.init();
+						PlayerInteractPacket packet = new PlayerInteractPacket(sb.block());
 
 						try
 						{
-							Client.instance().nettyClient().sendTCP(cip);
+							CosmosClient.instance().nettyClient().sendTCP(packet);
 						}
 						catch (IOException e)
 						{
@@ -216,7 +218,7 @@ public class ClientPlayer extends Player
 		dVel.x = (dVel.x() * (delta * 1000));
 		dVel.z = (dVel.z() * (delta * 1000));
 		dVel.y = (dVel.y() * (delta * 1000));
-		
+
 		Vector3fc dRot = movement().deltaRotation();
 
 		cam.rotate(dRot);
@@ -224,10 +226,10 @@ public class ClientPlayer extends Player
 		Vector3f vel = new Vector3f(body().velocity());
 
 		vel.mul(0.1f);
-		
+
 		vel.add(dVel);
 
-		if(!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
+		if (!Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT))
 			vel = Maths.safeNormalize(vel, 2.5f);
 		else
 			vel = Maths.safeNormalize(vel, 50.0f);

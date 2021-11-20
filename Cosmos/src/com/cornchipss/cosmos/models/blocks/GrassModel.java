@@ -8,14 +8,14 @@ public class GrassModel extends CubeModel
 	@Override
 	public float u(BlockFace side)
 	{
-		switch(side)
+		switch (side)
 		{
-		case TOP:
-			return 1 * material().uLength();
-		case BOTTOM:
-			return 3 * material().uLength();
-		default:
-			return 4 * material().uLength();
+			case TOP:
+				return 1 * material().uLength();
+			case BOTTOM:
+				return 3 * material().uLength();
+			default:
+				return 4 * material().uLength();
 		}
 	}
 

@@ -1,51 +1,58 @@
 package com.cornchipss.cosmos.netty.packets;
 
+import org.joml.Vector3fc;
+
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
-import com.cornchipss.cosmos.netty.action.PlayerAction;
+import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.ServerPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
-public class PlayerActionPacket extends Packet
+public class MovementPacket extends Packet
 {
-	private PlayerAction a;
+	private int code;
+	private Vector3fc dRot;
+
 	private String name;
 
-	public PlayerActionPacket()
+	public MovementPacket()
 	{
 
 	}
 
-	public PlayerActionPacket(PlayerAction a)
+	public MovementPacket(Movement m)
 	{
-		this.a = a;
+		code = m.code();
+		dRot = m.deltaRotation();
 	}
 
 	@Override
 	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		Player p;
-		if ((p = client.players().player(name)).isPilotingShip())
-		{
-			p.shipPiloting().sendAction(a);
-		}
+		Player p = client.players().player(name);
+
+		if (p == null)
+			return;
+
+		Movement m = Movement.movementFromCode(code);
+		m.addDeltaRotation(dRot);
+
+		p.movement(m);
 	}
 
 	@Override
 	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
-		Player p = c.player();
-		if (p.isPilotingShip())
-			p.shipPiloting().sendAction(a);
-
+		ServerPlayer p = c.player();
 		name = p.name();
+		Movement m = Movement.movementFromCode(code);
+		m.addDeltaRotation(dRot);
 
-		for (ServerPlayer player : server.players())
-		{
-			player.connection().sendTCP(this);
-		}
+		p.movement(m);
+
+		server.sendToAllExceptTCP(this, p);
 	}
 }

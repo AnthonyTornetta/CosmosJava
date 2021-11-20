@@ -12,20 +12,20 @@ public class PlayerModel implements Model
 {
 	private static LoadedModel baseModel;
 	private Material material;
-	
+
 	public PlayerModel(Material material)
 	{
 		this.material = material;
 	}
-	
+
 	public Mesh createMesh(float offX, float offY, float offZ, float scale)
 	{
-		if(baseModel == null)
+		if (baseModel == null)
 		{
 			try
 			{
 				baseModel = ModelLoader.fromFile("assets/models/player");
-				
+
 //				ModelLoader.toFile("assets/models/player-min.model", 
 //						baseModel.vertices(), baseModel.uvs(), baseModel.indices());
 			}
@@ -34,7 +34,7 @@ public class PlayerModel implements Model
 				throw new RuntimeException(e);
 			}
 		}
-		
+
 		return baseModel.createMesh(offX, offY, offZ, scale);
 	}
 

@@ -1,116 +1,60 @@
 package com.cornchipss.cosmos.netty.packets;
 
-import java.io.IOException;
-
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
+import org.joml.Quaternionfc;
+import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
-import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.server.ClientConnection;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.DummyPlayer;
+import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerPacket extends Packet
 {
-	private Player player;
-	
+	private String name;
+	private Vector3fc position;
+	private Quaternionfc rotation;
+
 	public PlayerPacket()
 	{
 		
 	}
 	
-	private PlayerPacket(byte[] buffer, int bufferOffset)
+	public PlayerPacket(Player p)
 	{
-		super(buffer, bufferOffset);
-	}
-	
-	public PlayerPacket(byte[] buffer, int bufferOffset, Player p)
-	{
-		super(buffer, bufferOffset);
-		
-		this.player = p;
-	}
-	
-	@Override
-	public void init()
-	{
-		super.init();
-		
-		writeString(player.name());
-		writeVector3fc(player.body().transform().position());
-		writeQuaternionfc(player.body().transform().orientation().quaternion());
-	}
-	
-	@Override
-	public void onReceiveServer(byte[] data, int len, int offset, 
-			ClientConnection client, CosmosNettyServer server)
-	{
-		PlayerPacket packet = new PlayerPacket(data, offset);
-		
-		String name = packet.readString();
-		
-		Player p = server.players().player(name);
-		
-		if(p == null)
-		{
-			p = server.players().createPlayer(server.game().world(), client, name);
-		}
-		
-		p.body().transform().position(packet.readVector3f(new Vector3f()));
-		p.body().transform().orientation().quaternion(packet.readQuaternionf(new Quaternionf()));
-		
-		PlayerPacket response = new PlayerPacket(data, 0, p);
-		response.init();
-		
-		try
-		{
-			client.sendTCP(response.buffer(), response.bufferLength());
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		this.name = p.name();
+		this.position = p.position();
+		this.rotation = p.body().transform().orientation().quaternion();
 	}
 
 	@Override
-	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
+	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		PlayerPacket packet = new PlayerPacket(data, offset);
-		String name = packet.readString();
-		
 		Player p = client.players().player(name);
-		if(p == null)
+		if (p == null)
 		{
-			p = new DummyPlayer(client.game().world(), name);
-			p.addToWorld(new Transform());
+			p = new DummyPlayer(game.world(), name);
+			p.addToWorld(new Transform(position, rotation));
 			client.players().addPlayer(p);
 		}
-		
-		if(p.body() != null)
+		else if (p.body() != null)
 		{
-			Vector3f newPos = packet.readVector3f(new Vector3f());
-
-//			Vector3f dPos = newPos.sub(p.body().transform().position(), new Vector3f());
-			
-			// if it's a small enough distance, move there smoothly
-//			if(dPos.x * dPos.x + dPos.y * dPos.y + dPos.z * dPos.z > 5)
-//			{
-				p.body().transform().position(newPos);
-//				
-//				Utils.println(name + " - " + Utils.toString(newPos));
-				
-//			}
-//			else
-//			{
-//				float time = 1 / 20.0f; // approximate
-//				p.body().velocity().add(new Vector3f(dPos.x * time, dPos.y * time, dPos.z * time));
-//			}
-			
-			// this hurts my eyes.  I should prob sync this
-//			p.body().transform().orientation().quaternion(packet.readQuaternionf(new Quaternionf()));
+			p.body().transform().position(position);
+			p.body().transform().orientation().quaternion(rotation);
 		}
+	}
+
+	@Override
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	{
+		c.player().body().transform().position(position);
+		c.player().body().transform().orientation().quaternion(rotation);
+
+		name = c.player().name();
+
+		server.sendToAllExceptUDP(this, c.player());
 	}
 }

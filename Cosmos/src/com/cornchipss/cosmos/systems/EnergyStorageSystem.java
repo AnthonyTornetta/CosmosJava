@@ -44,7 +44,7 @@ public class EnergyStorageSystem extends BlockSystem
 	@Override
 	public void update(float delta)
 	{
-		
+
 	}
 
 	@Override

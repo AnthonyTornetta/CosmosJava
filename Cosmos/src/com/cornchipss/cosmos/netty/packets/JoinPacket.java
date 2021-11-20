@@ -3,170 +3,80 @@ package com.cornchipss.cosmos.netty.packets;
 import java.io.IOException;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
-import com.cornchipss.cosmos.client.ServerConnection;
+import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
-import com.cornchipss.cosmos.server.ClientConnection;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.ServerPlayerList;
-import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class JoinPacket extends Packet
 {
-	private String name;
-	
+	private boolean success;
+	private String msg;
+
 	public JoinPacket()
 	{
-		
 	}
-	
-	private JoinPacket(byte[] buffer, int bufferOffset)
+
+	public JoinPacket(boolean success, String msg)
 	{
-		super(buffer, bufferOffset);
+		this.success = success;
+		this.msg = msg;
 	}
-	
-	public JoinPacket(byte[] buffer, int bufferOffset, String name)
-	{
-		super(buffer, bufferOffset);
-		
-		this.name = name;
-	}
-	
+
 	@Override
-	public void init()
+	public void receiveClient(CosmosNettyClient client, ClientGame game)
 	{
-		super.init();
-		
-		writeString(name);
-	}
-	
-	@Override
-	public void onReceiveServer(byte[] data, int len, int offset,
-			ClientConnection client, CosmosNettyServer server)
-	{
-		JoinPacket packet = new JoinPacket(data, offset);
-		
-		String name = packet.readString();
-		
-		ServerPlayerList list = server.players();
-		
-		if(!server.players().nameTaken(name))
+		if (success)
 		{
-			ClientConnection c = list.getPendingConnection(name);
+			Logger.LOGGER.info(this);
+			game.player(new ClientPlayer(game.world(), name()));
+			game.player().addToWorld(new Transform());
+			client.players().addPlayer(game.player());
 			
-			if(c == null)
-			{
-				if(client.hasUDP() && client.hasTCP())
-				{
-					// they have already joined since both connections were setup but there was no in progress join phase
-					return;
-				}
-				
-				list.beginJoin(client, name);
-			}
-			else
-			{
-				if(client.hasUDP())
-				{
-					c.initUDP(client.address(), client.port());
-				}
-				
-				if(client.hasTCP())
-				{
-					c.initTCP(client.tcpConnection());
-				}
-				
-				if(c.hasUDP() && c.hasTCP())
-				{
-					list.finishJoin(c, ServerGame.instance().world(), name);
-					
-					successJoin(server, data, name, c);
-				}
-			}
+			Utils.println("GOT THIS PACKET");
 		}
 		else
 		{
-			DisconnectedPacket dc = new DisconnectedPacket(data, 0);
-			dc.init();
-			
+			Logger.LOGGER.warning(this);
 			try
 			{
-				client.sendTCP(dc.buffer(), dc.bufferLength());
+				client.disconnect();
 			}
 			catch (IOException e)
 			{
-				e.printStackTrace();
+				throw new RuntimeException(e);
 			}
-		}
-	}
-	
-	private void successJoin(CosmosNettyServer server, byte[] data, String name, ClientConnection c)
-	{
-		JoinPacket jp = new JoinPacket(data, 0, name);
-		jp.init();
-		
-		Logger.LOGGER.info("PLAYER CONNECTED - " + name);
-		
-		try
-		{
-			c.sendTCP(jp.buffer(), jp.bufferLength());
-		}
-		catch (IOException ex)
-		{
-			ex.printStackTrace();
-		}
-		
-		for(Structure s : server.game().world().structures())
-		{
-			FullStructurePacket sp = new FullStructurePacket(s);
-			sp.init();
-			
-			try
-			{
-				c.sendTCP(sp.buffer(), sp.bufferLength());
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		
-		JoinFinishPacket jfp = new JoinFinishPacket(data, 0);
-		jfp.init();
-		
-		try
-		{
-			c.sendTCP(jfp.buffer(), jfp.bufferLength());
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		try
-		{
-			DebugPacket dbgP = new DebugPacket(data, 0, "TCP RECEIVED");
-			dbgP.init();
-			c.sendTCP(dbgP.buffer(), dbgP.bufferLength());
-			
-			dbgP = new DebugPacket(data, 0, "UDP RECEIVED");
-			dbgP.init();
-			c.sendUDP(dbgP.buffer(), dbgP.bufferLength(), server);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void onReceiveClient(byte[] data, int len, int offset, ServerConnection server, CosmosNettyClient client)
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
-		JoinPacket packet = new JoinPacket(data, offset);
-		
-		ClientPlayer p = new ClientPlayer(client.game().world(), packet.readString());
-		client.game().player(p);
-		client.players().addPlayer(p);
+		// not happening
+	}
+
+	@Override
+	public String toString()
+	{
+		return success ? "Name: " + msg : "Error: " + (msg != null ? " - " + msg : "");
+	}
+
+	public boolean success()
+	{
+		return success;
+	}
+
+	public String name()
+	{
+		return msg;
+	}
+
+	public String message()
+	{
+		return msg;
 	}
 }

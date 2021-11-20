@@ -23,56 +23,56 @@ class DefaultCollisionCheckerTest
 {
 	private static void fill(Structure s, Block b)
 	{
-		for(int z = 0; z < s.length(); z++)
+		for (int z = 0; z < s.length(); z++)
 		{
-			for(int y = 0; y < s.height(); y++)
+			for (int y = 0; y < s.height(); y++)
 			{
-				for(int x = 0; x < s.width(); x++)
+				for (int x = 0; x < s.width(); x++)
 				{
 					s.block(x, y, z, b);
 				}
 			}
 		}
 	}
-	
+
 	private static void fill(Structure s, Block b, int xx, int yy, int zz)
 	{
-		for(int z = 0; z < zz; z++)
+		for (int z = 0; z < zz; z++)
 		{
-			for(int y = 0; y < yy; y++)
+			for (int y = 0; y < yy; y++)
 			{
-				for(int x = 0; x < xx; x++)
+				for (int x = 0; x < xx; x++)
 				{
 					s.block(x, y, z, b);
 				}
 			}
 		}
 	}
-	
+
 	private Structure a, b;
 	private DefaultCollisionChecker dcc;
 	private CollisionInfo info;
 	private World w;
-	
+
 	@BeforeEach
 	void before()
 	{
 		w = new World();
-		
-		a = new Planet(w, 16*4, 16*4, 16*4, 1);
-		b = new Planet(w, 16*4, 16*4, 16*4, 2);
-		
+
+		a = new Planet(w, 16 * 4, 16 * 4, 16 * 4, 1);
+		b = new Planet(w, 16 * 4, 16 * 4, 16 * 4, 2);
+
 		fill(a, Blocks.STONE);
 		fill(b, Blocks.STONE);
-		
+
 		a.addToWorld(new Transform());
 		b.addToWorld(new Transform());
-		
+
 		dcc = new DefaultCollisionChecker();
-		
+
 		info = new CollisionInfo();
 	}
-	
+
 	@AfterEach
 	void after()
 	{
@@ -81,35 +81,34 @@ class DefaultCollisionCheckerTest
 		info = null;
 		w = null;
 	}
-	
+
 	private static final float EPSILON = 1e-5f;
-	
+
 	private static void assertVectorEquals(Vector3fc expected, Vector3fc actual)
 	{
-		if(expected.x() - actual.x() > EPSILON 
-				|| expected.y() - actual.y() > EPSILON
-				|| expected.z() - actual.z() > EPSILON)
+		if (expected.x() - actual.x() > EPSILON || expected.y() - actual.y() > EPSILON
+			|| expected.z() - actual.z() > EPSILON)
 		{
 			assertEquals(expected, actual); // this will be false but give nice printout
 		}
 		else
 			assertTrue(true); // it passed
 	}
-	
+
 	@Test
 	void asdasdasd()
 	{
-		b = new Planet(w, 16*4, 16*4, 16*4, 2);
+		b = new Planet(w, 16 * 4, 16 * 4, 16 * 4, 2);
 		b.addToWorld(new Transform());
 
 		fill(b, Blocks.STONE, 5, 16, 16);
-		
+
 		a.body().transform().position(new Vector3f(20, 0, 0));
 		assertTrue(dcc.colliding(a, b, new Vector3f(-20.5f, 0, 0), info));
-		
+
 		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
 	}
-	
+
 //	@Test
 //	void asdasdasd2()
 //	{
@@ -121,57 +120,58 @@ class DefaultCollisionCheckerTest
 //		
 //		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
 //	}
-	
+
 	@Test
 	void emptyStructure()
 	{
 		fill(a, null);
-		
+
 		a.body().transform().position(new Vector3f(-20, 0, 0));
 		assertFalse(dcc.colliding(a, b, new Vector3f(20, 0, 0), null));
 	}
-	
+
 	@Test
 	void structurePosX()
 	{
 		a.body().transform().position(new Vector3f(-20, 0, 0));
 		assertTrue(dcc.colliding(a, b, new Vector3f(20, 0, 0), info));
-		
+
 		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
 	}
-	
+
 	@Test
 	void structureNegX()
 	{
 		a.body().transform().position(new Vector3f(20, 0, 0));
 		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
-		
+
 		assertVectorEquals(new Vector3f(1, 0, 0), info.normal);
 	}
-	
+
 	@Test
 	void structureFarAwayX()
 	{
 		a.body().transform().position(new Vector3f(200, 0, 0));
 		b.body().transform().position(new Vector3f(190, 0, 0));
-		
+
 		assertTrue(dcc.colliding(a, b, new Vector3f(-20, 0, 0), info));
-		
+
 		assertVectorEquals(new Vector3f(-1, 0, 0), info.normal);
 	}
-	
+
 	@Test
 	void structureFarAway()
-	{	
+	{
 		float dx = 0.1f;
 		float dy = 0.1f;
 		float dz = 0.1f;
-		
-		a.body().transform().position(new Vector3f(100+a.width() / 2.f + dx, 100 + a.height() / 2.f + dy, 100 + a.length() / 2.f + dz));
+
+		a.body().transform().position(
+			new Vector3f(100 + a.width() / 2.f + dx, 100 + a.height() / 2.f + dy, 100 + a.length() / 2.f + dz));
 		b.body().transform().position(new Vector3f(100, 100, 100));
-		
+
 		assertTrue(dcc.colliding(a, b, new Vector3f(-2 * dx, -2 * dy, -2 * dz), info));
-		
+
 		assertVectorEquals(new Vector3f(1.f, 0, 0), info.normal);
 	}
 }

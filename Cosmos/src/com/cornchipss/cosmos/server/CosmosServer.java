@@ -2,7 +2,6 @@ package com.cornchipss.cosmos.server;
 
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.NettySide;
-import com.cornchipss.cosmos.netty.PacketTypes;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
 import com.cornchipss.cosmos.server.command.DefaultCommandHandler;
@@ -14,7 +13,7 @@ import com.cornchipss.cosmos.server.command.commands.StopCommand;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 
-public class Server implements Runnable
+public class CosmosServer implements Runnable
 {
 	private static CosmosNettyServer server;
 
@@ -23,7 +22,7 @@ public class Server implements Runnable
 		return server;
 	}
 
-	public Server()
+	public CosmosServer()
 	{
 		NettySide.initNettySide(NettySide.SERVER);
 	}
@@ -46,15 +45,14 @@ public class Server implements Runnable
 		defaultCmd.addCommand(new SaveCommand());
 		defaultCmd.addCommand(new HelpCommand(defaultCmd));
 
-		PacketTypes.registerAll();
 		server = new CosmosNettyServer(game, defaultCmd);
+		
+//		PacketTypes.registerAll();
 
 		Thread serverThread = new Thread(server);
 		serverThread.start();
 
 		ServerConsole cmd = new ServerConsole();
-
-		byte[] playerBuffer = new byte[128];
 
 		GameLoop loop = new GameLoop((float delta) ->
 		{
@@ -62,8 +60,9 @@ public class Server implements Runnable
 
 			for (ServerPlayer p : server.players().players())
 			{
-				PlayerPacket packet = new PlayerPacket(playerBuffer, 0, p);
-				packet.init();
+//				System.out.println(p);
+
+				PlayerPacket packet = new PlayerPacket(p);
 
 				server.sendToAllExceptUDP(packet, p);
 			}
@@ -85,6 +84,7 @@ public class Server implements Runnable
 		try
 		{
 			gameThread.join();
+			server.stop();
 			// I cannot join() the udp thread because it forever waits for a UDP connection
 			// that will never happen
 		}
@@ -94,6 +94,5 @@ public class Server implements Runnable
 		}
 
 		Logger.LOGGER.info("Server terminated.");
-		System.exit(0);
 	}
 }

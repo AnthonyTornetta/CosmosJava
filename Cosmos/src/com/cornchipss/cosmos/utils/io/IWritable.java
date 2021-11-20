@@ -7,5 +7,6 @@ import java.io.IOException;
 public interface IWritable
 {
 	public void write(DataOutputStream writer) throws IOException;
+
 	public void read(DataInputStream reader) throws IOException;
 }

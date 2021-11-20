@@ -11,21 +11,21 @@ import com.cornchipss.cosmos.netty.action.PlayerAction;
 public class BlockSystemManager
 {
 	private Map<String, BlockSystem> systems;
-	
+
 	public BlockSystemManager()
 	{
 		systems = new HashMap<>();
 	}
-	
+
 	public void addBlock(StructureBlock added)
 	{
-		if(added.block() instanceof ISystemBlock)
+		if (added.block() instanceof ISystemBlock)
 		{
-			for(String id : ((ISystemBlock)added.block()).systemIds())
+			for (String id : ((ISystemBlock) added.block()).systemIds())
 			{
-				if(!systems.containsKey(id))
+				if (!systems.containsKey(id))
 					systems.put(id, BlockSystemFactories.get(id).create(added.structure()));
-				
+
 				systems.get(id).addBlock(added);
 			}
 		}
@@ -33,9 +33,9 @@ public class BlockSystemManager
 
 	public void removeBlock(StructureBlock removed)
 	{
-		if(removed.block() instanceof ISystemBlock)
+		if (removed.block() instanceof ISystemBlock)
 		{
-			for(String id : ((ISystemBlock)removed.block()).systemIds())
+			for (String id : ((ISystemBlock) removed.block()).systemIds())
 			{
 				systems.get(id).removeBlock(removed);
 			}
@@ -44,7 +44,7 @@ public class BlockSystemManager
 
 	public void update(float delta)
 	{
-		for(BlockSystem s : systems.values())
+		for (BlockSystem s : systems.values())
 		{
 			s.update(delta);
 		}
@@ -52,11 +52,11 @@ public class BlockSystemManager
 
 	public void sendAction(PlayerAction action)
 	{
-		for(BlockSystem s : systems.values())
+		for (BlockSystem s : systems.values())
 		{
-			if(s instanceof IPlayerActionReceiver)
+			if (s instanceof IPlayerActionReceiver)
 			{
-				((IPlayerActionReceiver)s).receiveAction(action);
+				((IPlayerActionReceiver) s).receiveAction(action);
 			}
 		}
 	}

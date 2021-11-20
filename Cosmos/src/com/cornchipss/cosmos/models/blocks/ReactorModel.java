@@ -12,13 +12,13 @@ public class ReactorModel extends AnimatedCubeModel
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public float v(BlockFace side)
 	{
 		return material().vLength() * 2;
 	}
-	
+
 	@Override
 	public int maxAnimationStage(BlockFace side)
 	{
@@ -28,9 +28,9 @@ public class ReactorModel extends AnimatedCubeModel
 	@Override
 	public float animationDelay(BlockFace side)
 	{
-		return 1/10.0f;
+		return 1 / 10.0f;
 	}
-	
+
 	@Override
 	public Material material()
 	{
