@@ -21,7 +21,6 @@ import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.IUpdatable;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
@@ -41,7 +40,7 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	public Laser(World world, float speed, Structure sender)
 	{
 		super(world);
-		this.speed = 1;
+		this.speed = 1000;
 		this.sender = sender;
 	}
 
@@ -71,7 +70,6 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	@Override
 	public boolean onCollide(PhysicalObject obj, CollisionInfo info)
 	{
-		Utils.println(this + " -> " + obj);
 		if(obj instanceof Structure)
 		{
 			Structure s = (Structure)obj;

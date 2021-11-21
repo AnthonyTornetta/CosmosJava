@@ -37,7 +37,7 @@ public class Ship extends Structure
 	}
 
 	@Override
-	public void update(float delta)
+	public boolean update(float delta)
 	{
 		super.update(delta);
 
@@ -56,6 +56,8 @@ public class Ship extends Structure
 			pilot.body().transform().orientation(body().transform().orientation());
 			movement = pilot.movement();
 		}
+		
+		return true;
 	}
 
 	@SuppressWarnings("deprecation")

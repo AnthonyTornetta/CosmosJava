@@ -8,14 +8,17 @@ import org.joml.Vector3fc;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.simulation.PhysicsWorld;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.IUpdatable;
 
 public class World extends PhysicsWorld
 {
 	private List<Structure> structures;
+	private List<IUpdatable> updatableObjects;
 	
 	public World()
 	{
 		structures = new LinkedList<>();
+		updatableObjects = new LinkedList<>();
 	}
 
 	@Override
@@ -23,8 +26,8 @@ public class World extends PhysicsWorld
 	{
 		super.update(delta);
 
-		for (Structure s : structures)
-			s.update(delta);
+		for (IUpdatable o : updatableObjects)
+			o.update(delta);
 	}
 
 	public List<Structure> structures()
@@ -51,6 +54,9 @@ public class World extends PhysicsWorld
 		
 		if(obj instanceof Structure)
 			structures.add((Structure)obj);
+		
+		if(obj instanceof IUpdatable)
+			updatableObjects.add((IUpdatable)obj);
 	}
 	
 	@Override
@@ -60,6 +66,9 @@ public class World extends PhysicsWorld
 		
 		if(obj instanceof Structure)
 			structures.remove((Structure)obj);
+		
+		if(obj instanceof IUpdatable)
+			updatableObjects.remove((IUpdatable)obj);
 	}
 
 	public Structure structureFromID(int id)

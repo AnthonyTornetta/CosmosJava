@@ -28,6 +28,7 @@ import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystemManager;
+import com.cornchipss.cosmos.utils.IUpdatable;
 import com.cornchipss.cosmos.utils.Logger;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
@@ -36,7 +37,7 @@ import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
-public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder, IRenderable
+public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder, IRenderable, IUpdatable
 {
 	private Chunk[] chunks;
 
@@ -90,9 +91,12 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	/**
 	 * For sub classes to override if needed
 	 */
-	public void update(float delta)
+	@Override
+	public boolean update(float delta)
 	{
 		blockSystemManager.update(delta);
+		
+		return true;
 	}
 
 	public static final class RayRes
