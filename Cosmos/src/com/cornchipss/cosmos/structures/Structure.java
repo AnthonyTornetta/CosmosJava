@@ -306,8 +306,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	public void addToWorld(Transform transform)
 	{
 		body(new RigidBody(transform));
-		world().addPhysicalObject(this);
-		world().addStructure(this);
+		world().addObject(this);
 	}
 
 	public int chunksLength()
@@ -758,11 +757,11 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	public Vector3f blockCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
 	{
-		Vector4f c = new Vector4f(x - width() / 2, y - height() / 2, z - length() / 2, 1);
+		Vector4f c = new Vector4f(x - width() / 2 + 0.5f, y - height() / 2 + 0.5f, z - length() / 2 + 0.5f, 1);
 
 		body().transform().matrix().transform(c);
 
-		storage.set(c.x + 0.5f, c.y + 0.5f, c.z + 0.5f);
+		storage.set(c.x, c.y, c.z);
 
 		return storage;
 	}

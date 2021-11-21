@@ -16,5 +16,4 @@ public class CactusModel extends CubeModel
 	{
 		return 0;
 	}
-
 }

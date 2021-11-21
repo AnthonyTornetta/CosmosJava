@@ -18,7 +18,8 @@ public class PlayerModel implements Model
 		this.material = material;
 	}
 
-	public Mesh createMesh(float offX, float offY, float offZ, float scale)
+	@Override
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
 	{
 		if (baseModel == null)
 		{
@@ -35,7 +36,13 @@ public class PlayerModel implements Model
 			}
 		}
 
-		return baseModel.createMesh(offX, offY, offZ, scale);
+		return baseModel.createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ);
+	}
+
+	@Override
+	public Mesh createMesh(float offX, float offY, float offZ, float scale)
+	{
+		return createMesh(offX, offY, offZ, scale, scale, scale);
 	}
 
 	public Material material()

@@ -23,12 +23,10 @@ import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Window;
-import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
-import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ClientGame extends Game
 {
@@ -138,11 +136,13 @@ public class ClientGame extends Game
 
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 
+		world().lock();
+		
 		Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
 			: player.shipPiloting().body().transform().invertedMatrix();
-		
-		world().lock();
+
 		world().draw(projectionMatrix, camera, player());
+		
 		world().unlock();
 
 		gui.update(delta);
@@ -170,6 +170,8 @@ public class ClientGame extends Game
 	@Override
 	public void update(float delta)
 	{
+		world().lock();
+		
 		if (shipGUI != null)
 		{
 			if (!Utils.equals(player.shipPiloting(), shipGUI.ship()))
@@ -209,6 +211,8 @@ public class ClientGame extends Game
 				hotbarGUI.select(row);
 			}
 		}
+		
+		world().unlock();
 	}
 
 	public ClientPlayer player()

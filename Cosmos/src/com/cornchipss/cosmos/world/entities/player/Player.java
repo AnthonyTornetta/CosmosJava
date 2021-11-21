@@ -69,7 +69,7 @@ public abstract class Player extends PhysicalObject
 	public void addToWorld(Transform transform)
 	{
 		body(new RigidBody(transform));
-		world().addPhysicalObject(this);
+		world().addObject(this);
 	}
 
 	@Override
@@ -190,5 +190,11 @@ public abstract class Player extends PhysicalObject
 	public Movement movement()
 	{
 		return movement;
+	}
+	
+	@Override
+	public boolean shouldCollideWith(PhysicalObject o)
+	{
+		return !isPilotingShip();
 	}
 }

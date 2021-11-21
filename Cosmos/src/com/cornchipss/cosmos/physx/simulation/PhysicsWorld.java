@@ -36,19 +36,29 @@ public class PhysicsWorld
 
 		strategy = new DefaultCollisionChecker();
 	}
+	
+	protected void addObjectDuringUnlock(PhysicalObject bdy)
+	{
+		bodies.add(bdy);
+	}
 
-	public void addPhysicalObject(PhysicalObject bdy)
+	protected void removeObjectDuringUnlock(PhysicalObject bdy)
+	{
+		bodies.remove(bdy);
+	}
+	
+	public void addObject(PhysicalObject bdy)
 	{
 		if (!locked)
-			bodies.add(bdy);
+			addObjectDuringUnlock(bdy);
 		else
 			bodiesToAdd.add(bdy);
 	}
 
-	public void removePhysicalObject(PhysicalObject obj)
+	public void removeObject(PhysicalObject obj)
 	{
 		if (!locked)
-			bodies.remove(obj);
+			removeObjectDuringUnlock(obj);
 		else
 			bodiesToRemove.add(obj);
 	}
@@ -57,28 +67,26 @@ public class PhysicsWorld
 	{
 		for (PhysicalObject a : bodies)
 		{
-			{
-				Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
+			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
 
-				if (deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
+			if (deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
+			{
+				for (PhysicalObject b : bodies)
 				{
-					for (PhysicalObject b : bodies)
+					if (!b.equals(a) && b.shouldCollideWith(a) && a.shouldCollideWith(b))
 					{
-						if (!b.equals(a) && b.shouldCollideWith(a) && a.shouldCollideWith(b))
-						{
-							handlePotentialCollision(a, b, deltaA);
-						}
+						handlePotentialCollision(a, b, deltaA);
 					}
 				}
-
-				a.body().velocity().mul(delta, deltaA);
-
-				a.body().transform().position(a.body().transform().position().add(deltaA, deltaA));
-
-				Vector3f deltaR = a.body().angularVelocity().mul(delta, new Vector3f());
-
-				a.body().transform().rotateRelative(deltaR);
 			}
+
+			a.body().velocity().mul(delta, deltaA);
+
+			a.body().transform().position(a.body().transform().position().add(deltaA, deltaA));
+
+			Vector3f deltaR = a.body().angularVelocity().mul(delta, new Vector3f());
+
+			a.body().transform().rotateRelative(deltaR);
 		}
 	}
 
@@ -90,7 +98,7 @@ public class PhysicsWorld
 		{
 			if (a instanceof IHasCollisionEvent)
 			{
-				if (!((IHasCollisionEvent) a).onCollide(b))
+				if (!((IHasCollisionEvent) a).onCollide(b, info))
 					return;
 			}
 			Vector3f mulBy = new Vector3f();
@@ -133,7 +141,7 @@ public class PhysicsWorld
 		{
 			if (!bodiesToRemove.remove(bodiesToAdd.get(0)))
 			{
-				addPhysicalObject(bodiesToAdd.remove(0));
+				addObjectDuringUnlock(bodiesToAdd.remove(0));
 			}
 			else
 			{
@@ -142,6 +150,6 @@ public class PhysicsWorld
 		}
 
 		while (bodiesToRemove.size() != 0)
-			removePhysicalObject(bodiesToRemove.remove(0));
+			removeObjectDuringUnlock(bodiesToRemove.remove(0));
 	}
 }

@@ -10,5 +10,5 @@ public interface IHasCollisionEvent
 	 * @param obj
 	 * @return
 	 */
-	public boolean onCollide(PhysicalObject obj);
+	public boolean onCollide(PhysicalObject obj, CollisionInfo info);
 }

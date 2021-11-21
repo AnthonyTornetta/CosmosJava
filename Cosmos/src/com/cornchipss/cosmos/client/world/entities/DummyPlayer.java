@@ -14,8 +14,6 @@ import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
-import jdk.internal.net.http.common.Utils;
-
 public class DummyPlayer extends Player implements IRenderable
 {
 	private GimbalLockCamera cam;

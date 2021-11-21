@@ -3,6 +3,8 @@ package com.cornchipss.cosmos.models;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
@@ -161,26 +163,38 @@ public abstract class CubeModel implements Model
 				return null;
 		}
 	}
+	
+	@Override
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
+	{
+		return createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ, BlockFace.RIGHT, BlockFace.LEFT, BlockFace.BOTTOM, BlockFace.TOP,
+			BlockFace.FRONT, BlockFace.BACK);
+	}
 
 	@Override
 	public Mesh createMesh(float offX, float offY, float offZ, float scale)
 	{
-		return createMesh(offX, offY, offZ, scale, BlockFace.RIGHT, BlockFace.LEFT, BlockFace.BOTTOM, BlockFace.TOP,
-			BlockFace.FRONT, BlockFace.BACK);
+		return createMesh(offX, offY, offZ, scale, scale, scale);
 	}
 
-	protected void fillVertices(List<Float> vertices, float offX, float offY, float offZ, float scale,
+	protected void fillVertices(List<Float> vertices, float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
 		BlockFace... sides)
 	{
+		Vector3f scales = new Vector3f(scaleX, scaleY, scaleZ);
+		
+		
 		for (BlockFace s : sides)
 		{
+			int i = 0;
 			for (float f : verticies(s, offX, offY, offZ))
-				vertices.add(f * scale);
+			{
+				vertices.add(f * scales.get(i % 3));
+				i++;
+			}
 		}
 	}
 
-	protected void fillIndices(List<Integer> indices, float offX, float offY, float offZ, float scale,
-		BlockFace... sides)
+	protected void fillIndices(List<Integer> indices, float offX, float offY, float offZ, BlockFace... sides)
 	{
 		int maxI = 0;
 
@@ -199,7 +213,7 @@ public abstract class CubeModel implements Model
 		}
 	}
 
-	protected void fillUVs(List<Float> uvs, float offX, float offY, float offZ, float scale, BlockFace... sides)
+	protected void fillUVs(List<Float> uvs, float offX, float offY, float offZ, BlockFace... sides)
 	{
 		for (BlockFace s : sides)
 		{
@@ -223,26 +237,38 @@ public abstract class CubeModel implements Model
 		}
 	}
 
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
+		BlockFace... sides)
+	{
+		return createMesh(true, offX, offY, offZ, scaleX, scaleY, scaleZ, sides);
+	}
+
 	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
 	{
 		return createMesh(true, offX, offY, offZ, scale, sides);
 	}
 
-	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scale, BlockFace... sides)
+	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
+		BlockFace... sides)
 	{
 		List<Float> verts = new LinkedList<>();
 		List<Integer> indices = new LinkedList<>();
 		List<Float> uvs = new LinkedList<>();
 
-		fillVertices(verts, offX, offY, offZ, scale, sides);
-		fillIndices(indices, offX, offY, offZ, scale, sides);
-		fillUVs(uvs, offX, offY, offZ, scale, sides);
+		fillVertices(verts, offX, offY, offZ, scaleX, scaleY, scaleZ, sides);
+		fillIndices(indices, offX, offY, offZ, sides);
+		fillUVs(uvs, offX, offY, offZ, sides);
 
 		float[] asArrVerts = Utils.toArray(verts);
 		int[] asArrIndicies = Utils.toArrayInt(indices);
 		float[] asArrUvs = Utils.toArray(uvs);
 
 		return Mesh.createMesh(asArrVerts, asArrIndicies, asArrUvs, unbind);
+	}
+
+	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scale, BlockFace... sides)
+	{
+		return createMesh(unbind, offX, offY, offZ, scale, scale, scale, sides);
 	}
 
 	public boolean opaque()

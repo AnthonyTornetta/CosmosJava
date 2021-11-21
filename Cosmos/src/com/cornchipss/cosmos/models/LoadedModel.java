@@ -41,21 +41,27 @@ public class LoadedModel implements Model
 	}
 
 	@Override
-	public Mesh createMesh(float offX, float offY, float offZ, float scale)
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
 	{
-		if (offX == 0 && offY == 0 && offZ == 0 && scale == 1)
+		if (offX == 0 && offY == 0 && offZ == 0 && scaleX == 1 && scaleY == 1 && scaleZ == 1)
 			return Mesh.createMesh(verts, indices, uvs);
 		else
 		{
 			for (int i = 0; i < verts.length; i += 3)
 			{
-				tempVerts[i] = offX + scale * verts[i];
-				tempVerts[i + 1] = offY + scale * verts[i + 1];
-				tempVerts[i + 2] = offZ + scale * verts[i + 2];
+				tempVerts[i] = offX + scaleX * verts[i];
+				tempVerts[i + 1] = offY + scaleY * verts[i + 1];
+				tempVerts[i + 2] = offZ + scaleZ * verts[i + 2];
 			}
 
 			return Mesh.createMesh(tempVerts, indices, uvs);
 		}
+	}
+	
+	@Override
+	public Mesh createMesh(float offX, float offY, float offZ, float scale)
+	{
+		return createMesh(offX, offY, offZ, scale, scale, scale);
 	}
 
 	public String groupContaining(int index)
