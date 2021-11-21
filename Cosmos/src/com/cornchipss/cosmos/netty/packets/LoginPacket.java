@@ -1,11 +1,11 @@
 package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.world.entities.DummyPlayer;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.DummyPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Structure;
 

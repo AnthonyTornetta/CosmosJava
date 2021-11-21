@@ -6,9 +6,9 @@ public abstract class Game
 {
 	private World world;
 
-	public Game()
+	public Game(World w)
 	{
-		world = new World();
+		world = w;
 	}
 
 	public void update(float delta)

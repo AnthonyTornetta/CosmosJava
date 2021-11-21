@@ -4,11 +4,11 @@ import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.world.entities.DummyPlayer;
 import com.cornchipss.cosmos.game.ClientGame;
 import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
-import com.cornchipss.cosmos.server.DummyPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.world.entities.player.Player;
 

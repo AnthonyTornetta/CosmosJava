@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
+import com.cornchipss.cosmos.client.world.ClientWorld;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.guis.HotbarGUI;
@@ -20,18 +21,12 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
-import com.cornchipss.cosmos.material.Material;
 import com.cornchipss.cosmos.material.Materials;
-import com.cornchipss.cosmos.material.RawImageMaterial;
-import com.cornchipss.cosmos.models.entities.PlayerModel;
-import com.cornchipss.cosmos.rendering.MaterialMesh;
-import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
-import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
@@ -61,8 +56,6 @@ public class ClientGame extends Game
 		return instance;
 	}
 
-	private Mesh playerMesh;
-	private Material playerMaterial;
 
 	private PauseMenuGUI pauseMenu;
 
@@ -98,15 +91,12 @@ public class ClientGame extends Game
 
 		fpsText = new GUIText("-- --ms", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
-
-		playerMaterial = new RawImageMaterial("assets/images/atlas/player");
-		playerMaterial.init();
-
-		playerMesh = new PlayerModel(playerMaterial).createMesh(0, 0, 0, 1);
 	}
 
 	public ClientGame(CosmosNettyClient nettyClient)
 	{
+		super(new ClientWorld());
+		
 		if (instance != null)
 			throw new IllegalStateException("A game is already running.");
 
@@ -117,6 +107,12 @@ public class ClientGame extends Game
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float) Math.toRadians(90),
 			Window.instance().getWidth() / (float) Window.instance().getHeight(), 0.1f, 1000);
+	}
+	
+	@Override
+	public ClientWorld world()
+	{
+		return (ClientWorld)super.world();
 	}
 
 	public void onResize(int w, int h)
@@ -142,31 +138,12 @@ public class ClientGame extends Game
 
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 
+		Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
+			: player.shipPiloting().body().transform().invertedMatrix();
+		
 		world().lock();
-		for (Structure s : world().structures())
-		{
-			drawStructure(s, projectionMatrix, player);
-		}
+		world().draw(projectionMatrix, camera, player());
 		world().unlock();
-
-		for (Player p : nettyClient.players().players())
-		{
-			if (!p.equals(player))
-			{
-				playerMaterial.use();
-
-				Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
-					: player.shipPiloting().body().transform().invertedMatrix();
-
-				playerMaterial.initUniforms(projectionMatrix, camera, p.body().transform().matrix(), false);
-
-				playerMesh.prepare();
-				playerMesh.draw();
-				playerMesh.finish();
-
-				playerMaterial.stop();
-			}
-		}
 
 		gui.update(delta);
 
@@ -179,8 +156,7 @@ public class ClientGame extends Game
 	{
 		if (nettyClient.ready())
 		{
-			for (Structure s : world().structures())
-				updateStructureGraphics(s);
+			world().updateGraphics();
 		}
 	}
 
@@ -231,42 +207,6 @@ public class ClientGame extends Game
 			if (prevRow != row)
 			{
 				hotbarGUI.select(row);
-			}
-		}
-	}
-
-	private static void updateStructureGraphics(Structure s)
-	{
-		if (s.lightMap().needsUpdating())
-			s.calculateLights();
-
-		for (Chunk c : s.chunks())
-			if (c.needsRendered())
-				c.render();
-	}
-
-	private static void drawStructure(Structure s, Matrix4fc projectionMatrix, ClientPlayer p)
-	{
-		for (Chunk chunk : s.chunks())
-		{
-			Matrix4f transform = new Matrix4f();
-			Matrix4fc trans = s.openGLMatrix();
-			trans.mul(chunk.transformMatrix(), transform);
-
-			for (MaterialMesh m : chunk.model().materialMeshes())
-			{
-				m.material().use();
-
-				Matrix4fc camera = p.shipPiloting() == null ? p.camera().viewMatrix()
-					: p.shipPiloting().body().transform().invertedMatrix();
-
-				m.material().initUniforms(projectionMatrix, camera, transform, false);
-
-				m.mesh().prepare();
-				m.mesh().draw();
-				m.mesh().finish();
-
-				m.material().stop();
 			}
 		}
 	}

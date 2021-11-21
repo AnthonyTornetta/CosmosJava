@@ -14,6 +14,7 @@ import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.world.World;
 
 public class ServerGame extends Game
 {
@@ -24,12 +25,14 @@ public class ServerGame extends Game
 
 	public ServerGame()
 	{
+		super(new World());
+
 		instance = this;
 
 		mainPlanet = new Planet(world(), 16 * 8, 16 * 4, 16 * 8, 1);
 		mainPlanet.init();
 
-		Biosphere def = Biospheres.newInstance("cosmos:desert");
+		Biosphere def = Biospheres.newInstance("cosmos:grass");
 		def.generatePlanet(mainPlanet);
 
 		ship = new Ship(world(), 2);

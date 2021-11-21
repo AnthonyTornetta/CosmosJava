@@ -24,6 +24,8 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
+import com.cornchipss.cosmos.rendering.IRenderable;
+import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystemManager;
 import com.cornchipss.cosmos.utils.Logger;
@@ -32,8 +34,9 @@ import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
+import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
-public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder
+public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder, IRenderable
 {
 	private Chunk[] chunks;
 
@@ -901,5 +904,46 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	protected BlockSystemManager blockSystemManager()
 	{
 		return blockSystemManager;
+	}
+	
+	@Override
+	public void updateGraphics()
+	{
+		if (lightMap().needsUpdating())
+			calculateLights();
+
+		for (Chunk c : chunks())
+			if (c.needsRendered())
+				c.render();
+	}
+	
+	@Override
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
+	{
+		for (Chunk chunk : chunks())
+		{
+			Matrix4f transform = new Matrix4f();
+			Matrix4fc trans = openGLMatrix();
+			trans.mul(chunk.transformMatrix(), transform);
+
+			for (MaterialMesh m : chunk.model().materialMeshes())
+			{
+				m.material().use();
+				
+				m.material().initUniforms(projectionMatrix, camera, transform, false);
+
+				m.mesh().prepare();
+				m.mesh().draw();
+				m.mesh().finish();
+
+				m.material().stop();
+			}
+		}
+	}
+	
+	@Override
+	public boolean shouldBeDrawn()
+	{
+		return true;
 	}
 }
