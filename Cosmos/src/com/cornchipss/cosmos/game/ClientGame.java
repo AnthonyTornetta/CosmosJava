@@ -145,12 +145,6 @@ public class ClientGame extends Game
 		world().lock();
 		for (Structure s : world().structures())
 		{
-//			if(!s.hasBeenRendered())
-//			{
-//				s.calculateLights();
-//				s.render();
-//			}
-
 			drawStructure(s, projectionMatrix, player);
 		}
 		world().unlock();

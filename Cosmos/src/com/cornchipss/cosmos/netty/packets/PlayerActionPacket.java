@@ -7,21 +7,22 @@ import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.ServerPlayer;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class PlayerActionPacket extends Packet
 {
-	private PlayerAction a;
+	private int code;
 	private String name;
 
 	public PlayerActionPacket()
 	{
-
+		
 	}
 
 	public PlayerActionPacket(PlayerAction a)
 	{
-		this.a = a;
+		this.code = a.code();
 	}
 
 	@Override
@@ -30,7 +31,7 @@ public class PlayerActionPacket extends Packet
 		Player p;
 		if ((p = client.players().player(name)).isPilotingShip())
 		{
-			p.shipPiloting().sendAction(a);
+			p.shipPiloting().sendAction(new PlayerAction(code));
 		}
 	}
 
@@ -39,7 +40,7 @@ public class PlayerActionPacket extends Packet
 	{
 		Player p = c.player();
 		if (p.isPilotingShip())
-			p.shipPiloting().sendAction(a);
+			p.shipPiloting().sendAction(new PlayerAction(code));
 
 		name = p.name();
 

@@ -89,7 +89,7 @@ public class ClientPlayer extends Player
 			{
 				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
 				PlayerActionPacket p = new PlayerActionPacket(action);
-
+				
 				try
 				{
 					CosmosClient.instance().nettyClient().sendTCP(p);

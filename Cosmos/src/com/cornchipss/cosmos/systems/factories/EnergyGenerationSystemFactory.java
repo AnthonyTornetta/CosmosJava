@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.systems.factories;
 
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.systems.BlockSystem;
-import com.cornchipss.cosmos.systems.EnergyGenerationSystem;
+import com.cornchipss.cosmos.systems.blocksystems.EnergyGenerationSystem;
 
 public class EnergyGenerationSystemFactory implements BlockSystemFactory
 {

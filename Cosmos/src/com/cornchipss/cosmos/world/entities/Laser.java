@@ -40,13 +40,19 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent
 
 		this.body().velocity(this.body().transform().orientation().forward().mul(speed, new Vector3f()));
 	}
+	
+	@Override
+	public boolean shouldCollideWith(PhysicalObject obj)
+	{
+		if (obj.equals(sender))
+			return false;
+		
+		return true;
+	}
 
 	@Override
 	public boolean onCollide(PhysicalObject obj)
 	{
-		if (obj.equals(sender))
-			return false;
-
 		Utils.println("BYE!");
 		this.world().removePhysicalObject(this);
 

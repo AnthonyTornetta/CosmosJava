@@ -1,8 +1,10 @@
-package com.cornchipss.cosmos.systems;
+package com.cornchipss.cosmos.systems.blocksystems;
 
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IEnergyProducerBlock;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.systems.BlockSystem;
+import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class EnergyGenerationSystem extends BlockSystem
 {

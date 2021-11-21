@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.systems;
+package com.cornchipss.cosmos.systems.blocksystems;
 
 import org.joml.Vector3f;
 
@@ -7,6 +7,8 @@ import com.cornchipss.cosmos.blocks.modifiers.IThrustProducer;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.systems.BlockSystem;
+import com.cornchipss.cosmos.systems.BlockSystemIDs;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class ThrusterSystem extends BlockSystem
