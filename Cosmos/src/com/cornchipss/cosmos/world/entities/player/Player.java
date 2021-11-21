@@ -104,7 +104,7 @@ public abstract class Player extends PhysicalObject
 			}
 		}
 
-		Utils.println(closestHit);
+//		Utils.println(closestHit);
 
 		return closestHit;
 	}

@@ -30,7 +30,7 @@ public class Blocks
 
 	public static final Block GRASS = new Block(new GrassModel(), "grass", 10),
 		DIRT = new Block(new DirtModel(), "dirt", 10), STONE = new Block(new StoneModel(), "stone", 20),
-		LIGHT = new LitBlock(new LightModel(), new LightSource(16, 1, 1, 1), "light", 5),
+		LIGHT = new LitBlock(new LightModel(), new LightSource(16, 1.0f, 1.0f, 1.0f), "light", 5),
 		LOG = new Block(new LogModel(), "log", 15), LEAF = new Block(new LeafModel(), "leaf", 2),
 		SHIP_CORE = new ShipCoreBlock(), SHIP_HULL = new Block(new ShipHullModel(), "ship_hull", 20),
 		THRUSTER = new ThrusterBlock(), SAND = new Block(new SandModel(), "sand", 10),

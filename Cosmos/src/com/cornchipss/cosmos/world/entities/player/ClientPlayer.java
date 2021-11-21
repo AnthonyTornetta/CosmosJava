@@ -8,6 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
@@ -164,7 +165,8 @@ public class ClientPlayer extends Player
 
 						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
 						{
-							ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), selectedBlock);
+							ModifyBlockPacket packet = new ModifyBlockPacket(
+								new StructureBlock(sb.block().structure(), xx, yy, zz), selectedBlock);
 
 							try
 							{
