@@ -8,18 +8,27 @@ import java.util.List;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
+import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.types.DebugMaterial;
 import com.cornchipss.cosmos.models.ModelLoader;
+import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 
-public class DebugRenderer implements IDebugRenderer
+public class DebugRenderer implements IRenderable
 {
 	private static class DebugInfo
 	{
 		Mesh mesh;
 		Matrix4fc transform;
+		DrawMode mode;
+	}
+	
+	public static enum DrawMode
+	{
+		LINES,
+		FILL
 	}
 
 	private List<DebugInfo> info = new LinkedList<>();
@@ -49,7 +58,6 @@ public class DebugRenderer implements IDebugRenderer
 		}
 	}
 
-	@Override
 	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
 		ClientPlayer p)
 	{
@@ -60,6 +68,15 @@ public class DebugRenderer implements IDebugRenderer
 			debugMaterial.initUniforms(projectionMatrix, camera, m.transform,
 				false);
 
+			switch(m.mode)
+			{
+				case LINES:
+					GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
+					break;
+				default:
+					GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
+			}
+			
 			m.mesh.prepare();
 			m.mesh.draw();
 			m.mesh.finish();
@@ -73,6 +90,8 @@ public class DebugRenderer implements IDebugRenderer
 		}
 
 		info.clear();
+		
+		GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
 	}
 
 	@Override
@@ -81,9 +100,8 @@ public class DebugRenderer implements IDebugRenderer
 		return debugMaterial != null;
 	}
 
-	@Override
 	public void drawRectangle(Matrix4fc transform, Vector3fc halfwidths,
-		Color color)
+		Color color, DrawMode mode)
 	{
 		try
 		{
@@ -96,8 +114,11 @@ public class DebugRenderer implements IDebugRenderer
 			b = color.getBlue() / 255.0f;
 
 			m.storeData(Mesh.COLOR_INDEX, 3,
-				new float[] { r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g,
-					b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b });
+				new float[] { 
+					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, 
+					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b,
+					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, 
+					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b});
 
 			m.unbind();
 
@@ -105,6 +126,7 @@ public class DebugRenderer implements IDebugRenderer
 
 			dinfo.mesh = m;
 			dinfo.transform = new Matrix4f().set(transform);
+			dinfo.mode = mode;
 
 			info.add(dinfo);
 		}

@@ -23,12 +23,13 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.IUpdatable;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
 
-public class Laser extends PhysicalObject implements IHasCollisionEvent, IRenderable, IUpdatable
+public class Laser extends PhysicalObject
+	implements IHasCollisionEvent, IRenderable, IUpdatable
 {
 	private Vector3f halfwidths = new Vector3f(0.5f, 0.5f, 0.5f);
 
@@ -51,7 +52,8 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	@Override
 	public OBBCollider OBB()
 	{
-		return new OBBCollider(this.position(), this.body().transform().orientation(), halfwidths);
+		return new OBBCollider(this.position(),
+			this.body().transform().orientation(), halfwidths);
 	}
 
 	@Override
@@ -62,7 +64,8 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 
 		origin = new Vector3f(transform.position());
 
-		this.body().velocity(this.body().transform().orientation().forward().mul(speed, new Vector3f()));
+		this.body().velocity(this.body().transform().orientation().forward()
+			.mul(speed, new Vector3f()));
 	}
 
 	@Override
@@ -74,11 +77,12 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	@Override
 	public boolean onCollide(PhysicalObject obj, CollisionInfo info)
 	{
-		if(obj instanceof Structure)
+		if (obj instanceof Structure)
 		{
-			Structure s = (Structure)obj;
-			Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint, new Vector3i());
-			
+			Structure s = (Structure) obj;
+			Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
+				new Vector3i());
+
 			s.block(point.x, point.y, point.z, Blocks.LIGHT);
 		}
 		this.world().removeObject(this);
@@ -93,7 +97,8 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 		{
 			try
 			{
-				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0, 0, 0, 1.0f, 1.0f, 1.0f);
+				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0,
+					0, 0, halfwidths.x, halfwidths.y, halfwidths.z);
 
 				material = new RawImageMaterial("assets/images/atlas/laser");
 				material.init();
@@ -106,11 +111,13 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	}
 
 	@Override
-	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
+		ClientPlayer p)
 	{
 		material.use();
 
-		material.initUniforms(projectionMatrix, camera, body().transform().matrix(), false);
+		material.initUniforms(projectionMatrix, camera,
+			body().transform().matrix(), false);
 
 		mesh.prepare();
 		mesh.draw();
@@ -128,11 +135,14 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	@Override
 	public boolean update(float delta)
 	{
-		if(NettySide.side() == NettySide.CLIENT)
+		if (NettySide.side() == NettySide.CLIENT)
 		{
-			DebugRenderer.instance().drawRectangle(body().transform().matrix(), new Vector3f(1.0f, 1.0f, 1.0f), Color.blue);
+			DebugRenderer.instance().drawRectangle(
+				body().transform().matrix(), new Vector3f(halfwidths.x + 0.01f,
+					halfwidths.y + 0.01f, halfwidths.z + 0.01f),
+				Color.red, DrawMode.LINES);
 		}
-		
+
 		float dSqrd = origin.distanceSquared(body().transform().position());
 
 		if (dSqrd > 10_000)
