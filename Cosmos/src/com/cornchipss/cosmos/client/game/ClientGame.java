@@ -171,8 +171,6 @@ public class ClientGame extends Game
 	@Override
 	public void update(float delta)
 	{
-		world().lock();
-		
 		if (shipGUI != null)
 		{
 			if (!Utils.equals(player.shipPiloting(), shipGUI.ship()))
@@ -212,8 +210,6 @@ public class ClientGame extends Game
 				hotbarGUI.select(row);
 			}
 		}
-		
-		world().unlock();
 	}
 
 	public ClientPlayer player()

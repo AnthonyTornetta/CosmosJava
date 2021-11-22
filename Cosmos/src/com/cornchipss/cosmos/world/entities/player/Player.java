@@ -1,5 +1,7 @@
 package com.cornchipss.cosmos.world.entities.player;
 
+import java.util.ConcurrentModificationException;
+
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
@@ -83,25 +85,32 @@ public abstract class Player extends PhysicalObject
 		Structure.RayRes closestHit = null;
 		float closestDist = -1;
 
-		for (Structure s : world().structuresNear(body().transform().position()))
+		try
 		{
-			Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()),
-				jomlChecker);
-			if (hit != null)
+			for (Structure s : world().structuresNear(body().transform().position()))
 			{
-				float distSqrd = hit.distance();
-
-				if (closestHit == null)
+				Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()),
+					jomlChecker);
+				if (hit != null)
 				{
-					closestHit = hit;
-					closestDist = distSqrd;
-				}
-				else if (closestDist > distSqrd)
-				{
-					closestHit = hit;
-					closestDist = distSqrd;
+					float distSqrd = hit.distance();
+	
+					if (closestHit == null)
+					{
+						closestHit = hit;
+						closestDist = distSqrd;
+					}
+					else if (closestDist > distSqrd)
+					{
+						closestHit = hit;
+						closestDist = distSqrd;
+					}
 				}
 			}
+		}
+		catch(ConcurrentModificationException ex)
+		{
+			return null;
 		}
 
 //		Utils.println(closestHit);

@@ -1,7 +1,9 @@
 package com.cornchipss.cosmos.client.world.entities;
 
+import java.awt.Color;
 import java.io.IOException;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.glfw.GLFW;
@@ -25,6 +27,9 @@ import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -127,11 +132,25 @@ public class ClientPlayer extends Player
 
 	private void handleInteractions()
 	{
+		Structure.RayRes sb = calculateLookingAt();
+		
+		if (sb != null)
+		{
+			OBBCollider c = sb.block().structure().obbForBlock(sb.block().structureX(), sb.block().structureY(), sb.block().structureZ());
+			
+			Matrix4f mat = Maths.createTransformationMatrix(c.center(), c.orientation().quaternion());
+			
+			Vector3f hw = new Vector3f().set(c.halfwidths());
+			hw.add(0.51f, 0.51f, 0.51f);
+			
+			DebugRenderer.instance().drawRectangle(mat, hw, Color.yellow, DrawMode.LINES);
+		}
+		
 		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
-			Structure.RayRes sb = calculateLookingAt();
+			
 
 			if (sb != null)
 			{

@@ -224,13 +224,6 @@ public abstract class Structure extends PhysicalObject
 		return rr;
 	}
 
-	private OBBCollider wholeOBBForBlock(int x, int y, int z)
-	{
-		return new OBBCollider(
-			blockCoordsToWorldCoords(x, y, z, new Vector3f()),
-			body().transform().orientation(), HALF_WIDTHS_DEFAULT);
-	}
-
 	public void energy(float f)
 	{
 		energy = f;
@@ -958,18 +951,23 @@ public abstract class Structure extends PhysicalObject
 		this.body().transform().orientation().applyRotation(out, out);
 
 		Vector3f pos = this.chunkWorldPosCentered(a, new Vector3f());
-		
+
 		out.add(pos);
 
 		return out;
 	}
 
+	private OBBCollider genOBB(Vector3fc pos, Vector3fc halfwidths)
+	{
+		return new OBBCollider(pos, body().transform().orientation(),
+			halfwidths);
+	}
+
 	private OBBCollider genOBB(Chunk a, int x, int y, int z,
 		Vector3fc halfwidths)
 	{
-		return new OBBCollider(
-			blockCoordToWorldCoord(a, x, y, z, new Vector3f()),
-			body().transform().orientation(), halfwidths);
+		return genOBB(blockCoordToWorldCoord(a, x, y, z, new Vector3f()),
+			halfwidths);
 	}
 
 	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f,
@@ -987,6 +985,24 @@ public abstract class Structure extends PhysicalObject
 	{
 		if (a.hasBlock(x, y, z))
 			return genOBB(a, x, y, z, a.block(x, y, z).halfWidths());
+
+		return null;
+	}
+
+	public OBBCollider obbForBlock(int x, int y, int z)
+	{
+		if (hasBlock(x, y, z))
+			return genOBB(blockCoordsToWorldCoords(x, y, z, new Vector3f()),
+				block(x, y, z).halfWidths());
+
+		return null;
+	}
+
+	public OBBCollider wholeOBBForBlock(int x, int y, int z)
+	{
+		if (withinBlocks(x, y, z))
+			return genOBB(blockCoordsToWorldCoords(x, y, z, new Vector3f()),
+				HALF_WIDTHS_DEFAULT);
 
 		return null;
 	}
