@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 
@@ -50,7 +50,7 @@ public abstract class GUIElementHolder extends GUIElement implements IGUIContain
 		children.remove(elem);
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return Materials.GUI_PAUSE_MENU;
 	}

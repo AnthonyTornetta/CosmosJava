@@ -1,11 +1,12 @@
-package com.cornchipss.cosmos.material;
+package com.cornchipss.cosmos.material.types;
 
 import org.joml.Matrix4fc;
 
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.shaders.Shader;
 
-public class RawImageMaterial extends Material
+public class RawImageMaterial extends TexturedMaterial
 {
 	private int guiProjLoc, guiTransLoc, camLoc;
 

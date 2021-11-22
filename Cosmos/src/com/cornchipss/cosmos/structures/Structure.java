@@ -16,6 +16,7 @@ import org.joml.Vector4f;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.StructureBlock;
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -35,9 +36,9 @@ import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.IWritable;
 import com.cornchipss.cosmos.world.Chunk;
 import com.cornchipss.cosmos.world.World;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
-public abstract class Structure extends PhysicalObject implements IWritable, IEnergyHolder, IRenderable, IUpdatable
+public abstract class Structure extends PhysicalObject
+	implements IWritable, IEnergyHolder, IRenderable, IUpdatable
 {
 	private Chunk[] chunks;
 
@@ -73,7 +74,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		this(world, id);
 
 		if (width <= 0 || height <= 0 || length <= 0)
-			throw new IllegalArgumentException("A Structure's width/height/length cannot be <= 0");
+			throw new IllegalArgumentException(
+				"A Structure's width/height/length cannot be <= 0");
 
 		this.width = width;
 		this.height = height;
@@ -95,7 +97,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	public boolean update(float delta)
 	{
 		blockSystemManager.update(delta);
-		
+
 		return true;
 	}
 
@@ -130,16 +132,19 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		@Override
 		public String toString()
 		{
-			return block.block() + " " + face + " " + Utils.toEasyString(distance) + "m";
+			return block.block() + " " + face + " "
+				+ Utils.toEasyString(distance) + "m";
 		}
 	}
 
-	public RayRes raycast(Vector3fc start, Vector3fc direction, float length, IOBBCollisionChecker obc)
+	public RayRes raycast(Vector3fc start, Vector3fc direction, float length,
+		IOBBCollisionChecker obc)
 	{
 		return raycast(start, direction.mul(length, new Vector3f()), obc);
 	}
 
-	public RayRes raycast(Vector3fc start, Vector3fc delta, IOBBCollisionChecker obc)
+	public RayRes raycast(Vector3fc start, Vector3fc delta,
+		IOBBCollisionChecker obc)
 	{
 		Vector3i sc = worldCoordsToBlockCoords(start, new Vector3i());
 		if (!withinBlocks(sc.x, sc.y, sc.z))
@@ -179,27 +184,35 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			{
 				for (int zi = -zz - 1; zi <= zz + 10; zi++)
 				{
-					Vector3f point = new Vector3f(start.x() + xi * signX, start.y() + yi * signY,
-						start.z() + zi * signZ);
+					Vector3f point = new Vector3f(start.x() + xi * signX,
+						start.y() + yi * signY, start.z() + zi * signZ);
 
-					Vector3i blockCoords = worldCoordsToBlockCoords(point, new Vector3i());
+					Vector3i blockCoords = worldCoordsToBlockCoords(point,
+						new Vector3i());
 
 					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
-						&& withinBlocks(blockCoords.x, blockCoords.y, blockCoords.z))
+						&& withinBlocks(blockCoords.x, blockCoords.y,
+							blockCoords.z))
 					{
-						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x, blockCoords.y, blockCoords.z);
+						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x,
+							blockCoords.y, blockCoords.z);
 
 						CollisionInfo temp = new CollisionInfo();
 
 						if (obc.testLineOBB(start, delta, obbBlock, temp))
 						{
-							if (temp.distanceSquared < info.distanceSquared && temp.normal.dot(temp.normal) != 0)
+							if (temp.distanceSquared < info.distanceSquared
+								&& temp.normal.dot(temp.normal) != 0)
 							{
 								info.set(temp);
-								BlockFace face = BlockFace.fromNormal(
-									body().transform().orientation().applyInverseRotation(info.normal, new Vector3f()));
+								BlockFace face = BlockFace
+									.fromNormal(body().transform().orientation()
+										.applyInverseRotation(info.normal,
+											new Vector3f()));
 
-								rr = new RayRes(new StructureBlock(this, blockCoords.x, blockCoords.y, blockCoords.z),
+								rr = new RayRes(
+									new StructureBlock(this, blockCoords.x,
+										blockCoords.y, blockCoords.z),
 									Maths.sqrt(info.distanceSquared), face);
 							}
 						}
@@ -213,8 +226,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	private OBBCollider wholeOBBForBlock(int x, int y, int z)
 	{
-		return new OBBCollider(blockCoordsToWorldCoords(x, y, z, new Vector3f()), body().transform().orientation(),
-			HALF_WIDTHS_DEFAULT);
+		return new OBBCollider(
+			blockCoordsToWorldCoords(x, y, z, new Vector3f()),
+			body().transform().orientation(), HALF_WIDTHS_DEFAULT);
 	}
 
 	public void energy(float f)
@@ -337,7 +351,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	{
 		if (!withinChunks(x, y, z))
 			throw new IndexOutOfBoundsException(
-				x + "," + y + "," + z + " is out of bounds for " + cWidth + "x" + cHeight + "x" + cLength + ".");
+				x + "," + y + "," + z + " is out of bounds for " + cWidth + "x"
+					+ cHeight + "x" + cLength + ".");
 		return x + cWidth * (y + cHeight * z);
 	}
 
@@ -378,19 +393,22 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	public Vector3f chunkRelativePosCentered(int x, int y, int z, Vector3f out)
 	{
-		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f) + Chunk.WIDTH / 2.f,
+		return out.set(
+			Chunk.WIDTH * (x - chunksWidth() / 2.f) + Chunk.WIDTH / 2.f,
 			Chunk.HEIGHT * (x - chunksHeight() / 2.f) + Chunk.HEIGHT / 2.f,
 			Chunk.LENGTH * (x - chunksLength() / 2.f) + Chunk.LENGTH / 2.f);
 	}
 
 	public Vector3f chunkRelativePos(Chunk c, Vector3f out)
 	{
-		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(), c.localPosition().z(), out);
+		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(),
+			c.localPosition().z(), out);
 	}
 
 	public Vector3f chunkRelativePos(int x, int y, int z, Vector3f out)
 	{
-		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f), Chunk.HEIGHT * (x - chunksHeight() / 2.f),
+		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f),
+			Chunk.HEIGHT * (x - chunksHeight() / 2.f),
 			Chunk.LENGTH * (x - chunksLength() / 2.f));
 	}
 
@@ -406,13 +424,21 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				{
 					int i = flatten(x, y, z);
 					chunks[i] = new Chunk(x, y, z,
-						(x - cWidth / 2) * Chunk.WIDTH + ((1 - cWidth % 2) * Chunk.WIDTH / 2.f),
-						(y - cHeight / 2) * Chunk.HEIGHT + ((1 - cHeight % 2) * Chunk.HEIGHT / 2.f),
-						(z - cLength / 2) * Chunk.LENGTH + ((1 - cLength % 2) * Chunk.LENGTH / 2.f),
-						x * Chunk.WIDTH + 1, y * Chunk.HEIGHT + 1, z * Chunk.LENGTH + 1, this);
+						(x - cWidth / 2) * Chunk.WIDTH
+							+ ((1 - cWidth % 2) * Chunk.WIDTH / 2.f),
+						(y - cHeight / 2) * Chunk.HEIGHT
+							+ ((1 - cHeight % 2) * Chunk.HEIGHT / 2.f),
+						(z - cLength / 2) * Chunk.LENGTH
+							+ ((1 - cLength % 2) * Chunk.LENGTH / 2.f),
+						x * Chunk.WIDTH + 1, y * Chunk.HEIGHT + 1,
+						z * Chunk.LENGTH + 1, this);
 
-					chunks[i].transformMatrix(Maths.createTransformationMatrix(
-						new Vector3f(x * Chunk.WIDTH, y * Chunk.HEIGHT, z * Chunk.LENGTH), Maths.blankQuaternion()));
+					chunks[i]
+						.transformMatrix(
+							Maths.createTransformationMatrix(
+								new Vector3f(x * Chunk.WIDTH, y * Chunk.HEIGHT,
+									z * Chunk.LENGTH),
+								Maths.blankQuaternion()));
 
 				}
 			}
@@ -426,12 +452,24 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 				{
 					int i = flatten(x, y, z);
 
-					chunks[i].leftNeighbor(withinChunks(x - 1, y, z) ? chunks[flatten(x - 1, y, z)] : null);
-					chunks[i].rightNeighbor(withinChunks(x + 1, y, z) ? chunks[flatten(x + 1, y, z)] : null);
-					chunks[i].topNeighbor(withinChunks(x, y + 1, z) ? chunks[flatten(x, y + 1, z)] : null);
-					chunks[i].bottomNeighbor(withinChunks(x, y - 1, z) ? chunks[flatten(x, y - 1, z)] : null);
-					chunks[i].frontNeighbor(withinChunks(x, y, z + 1) ? chunks[flatten(x, y, z + 1)] : null);
-					chunks[i].backNeighbor(withinChunks(x, y, z - 1) ? chunks[flatten(x, y, z - 1)] : null);
+					chunks[i].leftNeighbor(
+						withinChunks(x - 1, y, z) ? chunks[flatten(x - 1, y, z)]
+							: null);
+					chunks[i].rightNeighbor(
+						withinChunks(x + 1, y, z) ? chunks[flatten(x + 1, y, z)]
+							: null);
+					chunks[i].topNeighbor(
+						withinChunks(x, y + 1, z) ? chunks[flatten(x, y + 1, z)]
+							: null);
+					chunks[i].bottomNeighbor(
+						withinChunks(x, y - 1, z) ? chunks[flatten(x, y - 1, z)]
+							: null);
+					chunks[i].frontNeighbor(
+						withinChunks(x, y, z + 1) ? chunks[flatten(x, y, z + 1)]
+							: null);
+					chunks[i].backNeighbor(
+						withinChunks(x, y, z - 1) ? chunks[flatten(x, y, z - 1)]
+							: null);
 
 				}
 			}
@@ -448,14 +486,19 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			{
 				int radius = changedAreas.get(point);
 
-				Vector3i extremeNeg = new Vector3i(point.x() - radius, point.y() - radius, point.z() - radius);
-				Vector3i extremePos = new Vector3i(point.x() + radius, point.y() + radius, point.z() + radius);
+				Vector3i extremeNeg = new Vector3i(point.x() - radius,
+					point.y() - radius, point.z() - radius);
+				Vector3i extremePos = new Vector3i(point.x() + radius,
+					point.y() + radius, point.z() + radius);
 
-				for (int cz = extremeNeg.z() / 16; cz < Math.ceil(extremePos.z() / 16.0f); cz++)
+				for (int cz = extremeNeg.z() / 16; cz < Math
+					.ceil(extremePos.z() / 16.0f); cz++)
 				{
-					for (int cy = extremeNeg.y() / 16; cy < Math.ceil(extremePos.y() / 16.0f); cy++)
+					for (int cy = extremeNeg.y() / 16; cy < Math
+						.ceil(extremePos.y() / 16.0f); cy++)
 					{
-						for (int cx = extremeNeg.x() / 16; cx < Math.ceil(extremePos.x() / 16.0f); cx++)
+						for (int cx = extremeNeg.x() / 16; cx < Math
+							.ceil(extremePos.x() / 16.0f); cx++)
 						{
 							if (withinChunks(cx, cy, cz))
 								chunks[flatten(cx, cy, cz)].needsRendered(true);
@@ -486,8 +529,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 		}
 
-		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to save " + width() + "x" + height + "x" + length()
-			+ " structure.");
+		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to save "
+			+ width() + "x" + height + "x" + length() + " structure.");
 	}
 
 	@Override
@@ -532,32 +575,37 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 						totalMass += b.mass();
 
-						blockSystemManager.addBlock(new StructureBlock(this, x, y, z));
+						blockSystemManager
+							.addBlock(new StructureBlock(this, x, y, z));
 					}
 				}
 			}
 		}
 
-		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to read " + width() + "x" + height + "x" + length()
-			+ " structure.");
+		Logger.LOGGER.debug((System.currentTimeMillis() - sec) + "ms to read "
+			+ width() + "x" + height + "x" + length() + " structure.");
 	}
 
 	public boolean withinChunks(int x, int y, int z)
 	{
-		return x >= 0 && x < cWidth && y >= 0 && y < cHeight && z >= 0 && z < cLength;
+		return x >= 0 && x < cWidth && y >= 0 && y < cHeight && z >= 0
+			&& z < cLength;
 	}
 
 	public boolean withinBlocks(int x, int y, int z)
 	{
-		return x >= 0 && x < width && y >= 0 && y < height && z >= 0 && z < length;
+		return x >= 0 && x < width && y >= 0 && y < height && z >= 0
+			&& z < length;
 	}
 
 	public Vector3i structureCoordsToChunkCoords(Vector3ic local)
 	{
-		return new Vector3i(local.x() % Chunk.WIDTH, local.y() % Chunk.HEIGHT, local.z() % Chunk.LENGTH);
+		return new Vector3i(local.x() % Chunk.WIDTH, local.y() % Chunk.HEIGHT,
+			local.z() % Chunk.LENGTH);
 	}
 
-	public Vector3f chunkCoordsToWorldCoords(Chunk c, Vector3i pos, Vector3f out)
+	public Vector3f chunkCoordsToWorldCoords(Chunk c, Vector3i pos,
+		Vector3f out)
 	{
 		Vector3f posF = new Vector3f(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
 
@@ -585,7 +633,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.x = (Chunk.WIDTH + (int) Math.floor(temp.x) % Chunk.WIDTH) % Chunk.WIDTH;
+				ret.x = (Chunk.WIDTH + (int) Math.floor(temp.x) % Chunk.WIDTH)
+					% Chunk.WIDTH;
 			}
 		}
 		else
@@ -596,7 +645,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.x = (Chunk.WIDTH - (int) Math.abs(Math.floor(temp.x - Chunk.WIDTH / 2)) % Chunk.WIDTH)
+				ret.x = (Chunk.WIDTH
+					- (int) Math.abs(Math.floor(temp.x - Chunk.WIDTH / 2))
+						% Chunk.WIDTH)
 					% Chunk.WIDTH;
 			}
 		}
@@ -609,7 +660,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.y = (Chunk.HEIGHT + (int) Math.floor(temp.y) % Chunk.HEIGHT) % Chunk.HEIGHT;
+				ret.y = (Chunk.HEIGHT + (int) Math.floor(temp.y) % Chunk.HEIGHT)
+					% Chunk.HEIGHT;
 			}
 		}
 		else
@@ -620,7 +672,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.y = (Chunk.HEIGHT - (int) Math.abs(Math.floor(temp.y - Chunk.HEIGHT / 2)) % Chunk.HEIGHT)
+				ret.y = (Chunk.HEIGHT
+					- (int) Math.abs(Math.floor(temp.y - Chunk.HEIGHT / 2))
+						% Chunk.HEIGHT)
 					% Chunk.HEIGHT;
 			}
 		}
@@ -633,7 +687,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.z = (Chunk.LENGTH + (int) Math.floor(temp.z) % Chunk.LENGTH) % Chunk.LENGTH;
+				ret.z = (Chunk.LENGTH + (int) Math.floor(temp.z) % Chunk.LENGTH)
+					% Chunk.LENGTH;
 			}
 		}
 		else
@@ -644,7 +699,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 			else
 			{
-				ret.z = (Chunk.LENGTH - (int) Math.abs(Math.floor(temp.z - Chunk.LENGTH / 2)) % Chunk.LENGTH)
+				ret.z = (Chunk.LENGTH
+					- (int) Math.abs(Math.floor(temp.z - Chunk.LENGTH / 2))
+						% Chunk.LENGTH)
 					% Chunk.LENGTH;
 			}
 		}
@@ -661,7 +718,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		{
 			Chunk c = chunk_old(x, y, z);
 
-			Block old = c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
+			Block old = c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT,
+				z % Chunk.LENGTH);
 
 			if (old != null)
 			{
@@ -683,7 +741,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		}
 		else
 			throw new IndexOutOfBoundsException(
-				x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
+				x + ", " + y + ", " + z + " was out of bounds for " + width
+					+ "x" + height + "x" + length);
 	}
 
 	public Block block(int x, int y, int z)
@@ -699,7 +758,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		}
 		else
 			throw new IndexOutOfBoundsException(
-				x + ", " + y + ", " + z + " was out of bounds for " + width + "x" + height + "x" + length);
+				x + ", " + y + ", " + z + " was out of bounds for " + width
+					+ "x" + height + "x" + length);
 	}
 
 	public Vector3fc center()
@@ -750,18 +810,22 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 		return worldCoordsToStructureCoords(v.x(), v.y(), v.z(), out);
 	}
 
-	public Vector3i worldCoordsToStructureCoords(float x, float y, float z, Vector3i out)
+	public Vector3i worldCoordsToStructureCoords(float x, float y, float z,
+		Vector3i out)
 	{
 		Vector4f c = new Vector4f(x, y, z, 1);
 
 		body().transform().invertedMatrix().transform(c);
 
-		return out.set((int) c.x + width() / 2, (int) c.y + height() / 2, (int) c.z + length() / 2);
+		return out.set((int) c.x + width() / 2, (int) c.y + height() / 2,
+			(int) c.z + length() / 2);
 	}
 
-	public Vector3f blockCoordsToWorldCoords(float x, float y, float z, Vector3f storage)
+	public Vector3f blockCoordsToWorldCoords(float x, float y, float z,
+		Vector3f storage)
 	{
-		Vector4f c = new Vector4f(x - width() / 2 + 0.5f, y - height() / 2 + 0.5f, z - length() / 2 + 0.5f, 1);
+		Vector4f c = new Vector4f(x - width() / 2 + 0.5f,
+			y - height() / 2 + 0.5f, z - length() / 2 + 0.5f, 1);
 
 		body().transform().matrix().transform(c);
 
@@ -863,8 +927,8 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 
 	public OBBCollider obbForChunk(Chunk c)
 	{
-		return new OBBCollider(chunkWorldPosCentered(c, new Vector3f()), body().transform().orientation(),
-			Chunk.HALF_DIMENSIONS);
+		return new OBBCollider(chunkWorldPosCentered(c, new Vector3f()),
+			body().transform().orientation(), Chunk.HALF_DIMENSIONS);
 	}
 
 	public OBBCollider OBB()
@@ -873,20 +937,43 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			new Vector3f(width() / 2.f, height() / 2.f, length() / 2.f));
 	}
 
-	private OBBCollider genOBB(Chunk a, int x, int y, int z, Vector3fc halfwidths)
+	public Vector3f blockCoordToWorldCoord(Vector3ic b, Vector3f out)
 	{
-		Vector3f pos = this.chunkWorldPosCentered(a, new Vector3f());
+		out.set(b.x() - width() / 2.f - 0.5f, b.y() - height() / 2.f - 0.5f,
+			b.z() - length() / 2.f - 0.5f);
 
-		Vector3f delta = new Vector3f(x - a.width() / 2.f + 0.5f, y - a.height() / 2.f + 0.5f,
-			z - a.length() / 2.f + 0.5f);
+		this.body().transform().orientation().applyRotation(out, out);
 
-		this.body().transform().orientation().applyRotation(delta, delta);
-		pos.add(delta);
+		out.add(position());
 
-		return new OBBCollider(pos, body().transform().orientation(), halfwidths);
+		return out;
 	}
 
-	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f, 0.5f, 0.5f);
+	public Vector3f blockCoordToWorldCoord(Chunk a, int x, int y, int z,
+		Vector3f out)
+	{
+		out.set(x - a.width() / 2.f + 0.5f, y - a.height() / 2.f + 0.5f,
+			z - a.length() / 2.f + 0.5f);
+
+		this.body().transform().orientation().applyRotation(out, out);
+
+		Vector3f pos = this.chunkWorldPosCentered(a, new Vector3f());
+		
+		out.add(pos);
+
+		return out;
+	}
+
+	private OBBCollider genOBB(Chunk a, int x, int y, int z,
+		Vector3fc halfwidths)
+	{
+		return new OBBCollider(
+			blockCoordToWorldCoord(a, x, y, z, new Vector3f()),
+			body().transform().orientation(), halfwidths);
+	}
+
+	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f,
+		0.5f, 0.5f);
 
 	public OBBCollider wholeOBBForBlock(Chunk a, int x, int y, int z)
 	{
@@ -908,7 +995,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	{
 		return blockSystemManager;
 	}
-	
+
 	@Override
 	public void updateGraphics()
 	{
@@ -919,9 +1006,10 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			if (c.needsRendered())
 				c.render();
 	}
-	
+
 	@Override
-	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
+		ClientPlayer p)
 	{
 		for (Chunk chunk : chunks())
 		{
@@ -932,8 +1020,9 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			for (MaterialMesh m : chunk.model().materialMeshes())
 			{
 				m.material().use();
-				
-				m.material().initUniforms(projectionMatrix, camera, transform, false);
+
+				m.material().initUniforms(projectionMatrix, camera, transform,
+					false);
 
 				m.mesh().prepare();
 				m.mesh().draw();
@@ -943,7 +1032,7 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean shouldBeDrawn()
 	{

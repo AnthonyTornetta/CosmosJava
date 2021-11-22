@@ -1,6 +1,5 @@
 package com.cornchipss.cosmos.server;
 
-import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
 import com.cornchipss.cosmos.registry.Initializer;
@@ -10,6 +9,7 @@ import com.cornchipss.cosmos.server.command.commands.PingCommand;
 import com.cornchipss.cosmos.server.command.commands.SaveCommand;
 import com.cornchipss.cosmos.server.command.commands.SayCommand;
 import com.cornchipss.cosmos.server.command.commands.StopCommand;
+import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.utils.GameLoop;
 import com.cornchipss.cosmos.utils.Logger;
 

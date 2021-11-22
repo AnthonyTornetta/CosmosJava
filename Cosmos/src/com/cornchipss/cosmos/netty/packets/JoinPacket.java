@@ -3,13 +3,13 @@ package com.cornchipss.cosmos.netty.packets;
 import java.io.IOException;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
-import com.cornchipss.cosmos.game.ClientGame;
-import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.client.game.ClientGame;
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
+import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.utils.Logger;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class JoinPacket extends Packet
 {

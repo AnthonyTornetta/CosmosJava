@@ -5,7 +5,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
@@ -135,7 +135,7 @@ public abstract class GUIElement
 		guiMesh().delete();
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return Materials.GUI_MATERIAL;
 	}

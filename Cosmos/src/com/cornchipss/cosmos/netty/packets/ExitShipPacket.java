@@ -1,9 +1,9 @@
 package com.cornchipss.cosmos.netty.packets;
 
 import com.cornchipss.cosmos.client.CosmosNettyClient;
-import com.cornchipss.cosmos.game.ClientGame;
-import com.cornchipss.cosmos.game.ServerGame;
+import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
+import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.structures.Ship;
 

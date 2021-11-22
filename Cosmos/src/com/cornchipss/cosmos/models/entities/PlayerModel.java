@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.models.entities;
 
 import java.io.IOException;
 
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.models.LoadedModel;
 import com.cornchipss.cosmos.models.Model;
 import com.cornchipss.cosmos.models.ModelLoader;
@@ -11,9 +11,9 @@ import com.cornchipss.cosmos.rendering.Mesh;
 public class PlayerModel implements Model
 {
 	private static LoadedModel baseModel;
-	private Material material;
+	private TexturedMaterial material;
 
-	public PlayerModel(Material material)
+	public PlayerModel(TexturedMaterial material)
 	{
 		this.material = material;
 	}
@@ -45,7 +45,7 @@ public class PlayerModel implements Model
 		return createMesh(offX, offY, offZ, scale, scale, scale);
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return material;
 	}

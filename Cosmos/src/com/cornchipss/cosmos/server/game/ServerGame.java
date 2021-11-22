@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.game;
+package com.cornchipss.cosmos.server.game;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.game.Game;
 import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;

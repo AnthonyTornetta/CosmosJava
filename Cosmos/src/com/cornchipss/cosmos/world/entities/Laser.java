@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.world.entities;
 
+import java.awt.Color;
 import java.io.IOException;
 
 import org.joml.Matrix4fc;
@@ -8,9 +9,11 @@ import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.blocks.Blocks;
-import com.cornchipss.cosmos.material.Material;
-import com.cornchipss.cosmos.material.RawImageMaterial;
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
+import com.cornchipss.cosmos.material.TexturedMaterial;
+import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.models.ModelLoader;
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
@@ -19,28 +22,29 @@ import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.IUpdatable;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class Laser extends PhysicalObject implements IHasCollisionEvent, IRenderable, IUpdatable
 {
-	private Vector3f halfwidths = new Vector3f(0.05f, 0.05f, 20.5f);
+	private Vector3f halfwidths = new Vector3f(0.5f, 0.5f, 0.5f);
 
 	private float speed;
 
 	private Structure sender;
 
 	private static Mesh mesh;
-	private static Material material;
+	private static TexturedMaterial material;
 
 	private Vector3fc origin;
 
 	public Laser(World world, float speed, Structure sender)
 	{
 		super(world);
-		this.speed = 1000;
+		this.speed = 2;
 		this.sender = sender;
 	}
 
@@ -89,7 +93,7 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 		{
 			try
 			{
-				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0, 0, 0, 0.1f, 0.1f, 40.0f);
+				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0, 0, 0, 1.0f, 1.0f, 1.0f);
 
 				material = new RawImageMaterial("assets/images/atlas/laser");
 				material.init();
@@ -124,6 +128,11 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 	@Override
 	public boolean update(float delta)
 	{
+		if(NettySide.side() == NettySide.CLIENT)
+		{
+			DebugRenderer.instance().drawRectangle(body().transform().matrix(), new Vector3f(1.0f, 1.0f, 1.0f), Color.blue);
+		}
+		
 		float dSqrd = origin.distanceSquared(body().transform().position());
 
 		if (dSqrd > 10_000)

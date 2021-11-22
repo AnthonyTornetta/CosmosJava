@@ -4,14 +4,13 @@ import org.joml.Matrix4fc;
 
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
-import com.cornchipss.cosmos.material.Material;
-import com.cornchipss.cosmos.material.RawImageMaterial;
+import com.cornchipss.cosmos.material.TexturedMaterial;
+import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.models.entities.PlayerModel;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.world.World;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class DummyPlayer extends Player implements IRenderable
@@ -19,7 +18,7 @@ public class DummyPlayer extends Player implements IRenderable
 	private GimbalLockCamera cam;
 
 	private Mesh playerMesh;
-	private Material playerMaterial;
+	private TexturedMaterial playerMaterial;
 
 	public DummyPlayer(World world, String name)
 	{

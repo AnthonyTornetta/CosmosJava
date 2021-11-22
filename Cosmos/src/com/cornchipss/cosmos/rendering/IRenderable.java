@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.rendering;
 
 import org.joml.Matrix4fc;
 
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 
 public interface IRenderable
 {

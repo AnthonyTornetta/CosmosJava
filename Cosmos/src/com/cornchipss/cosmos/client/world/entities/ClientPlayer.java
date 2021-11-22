@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.world.entities.player;
+package com.cornchipss.cosmos.client.world.entities;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.client.CosmosClient;
-import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
@@ -29,6 +29,7 @@ import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
+import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ClientPlayer extends Player
 {

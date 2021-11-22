@@ -6,10 +6,11 @@ import java.util.List;
 
 import org.joml.Matrix4fc;
 
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.rendering.IRenderable;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.world.World;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class ClientWorld extends World implements IRenderable
 {
@@ -36,6 +37,8 @@ public class ClientWorld extends World implements IRenderable
 	{
 		for (IRenderable r : renderables)
 			r.updateGraphics();
+		
+		DebugRenderer.instance().updateGraphics();
 	}
 
 	@Override
@@ -46,6 +49,9 @@ public class ClientWorld extends World implements IRenderable
 			for (IRenderable r : renderables)
 				if(r.shouldBeDrawn())
 					r.draw(projectionMatrix, camera, p);
+			
+			if(DebugRenderer.instance().shouldBeDrawn())
+				DebugRenderer.instance().draw(projectionMatrix, camera, p);
 		}
 		catch(ConcurrentModificationException ex)
 		{

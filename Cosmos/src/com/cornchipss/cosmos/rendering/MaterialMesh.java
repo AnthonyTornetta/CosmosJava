@@ -1,22 +1,22 @@
 package com.cornchipss.cosmos.rendering;
 
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 
 /**
  * It's a mesh and a material.
  */
 public class MaterialMesh
 {
-	private Material mat;
+	private TexturedMaterial mat;
 	private Mesh mesh;
 
-	public MaterialMesh(Material mat, Mesh mesh)
+	public MaterialMesh(TexturedMaterial mat, Mesh mesh)
 	{
 		this.mat = mat;
 		this.mesh = mesh;
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return mat;
 	}

@@ -5,7 +5,7 @@ import java.net.InetAddress;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.netty.NetworkRegistry;
 import com.cornchipss.cosmos.netty.packets.LoginPacket;
 import com.cornchipss.cosmos.netty.packets.Packet;

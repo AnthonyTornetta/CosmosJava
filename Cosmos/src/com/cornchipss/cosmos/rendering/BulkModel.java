@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.lights.LightMap;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.models.AnimatedCubeModel;
 import com.cornchipss.cosmos.models.CubeModel;
@@ -43,7 +43,7 @@ public class BulkModel
 
 	private List<MaterialMesh> meshes;
 
-	private Map<Material, MaterialMeshGenerator> indevMeshes;
+	private Map<TexturedMaterial, MaterialMeshGenerator> indevMeshes;
 
 	public BulkModel(IHasModel[][][] models)
 	{
@@ -96,7 +96,7 @@ public class BulkModel
 					{
 						boolean withinB;
 
-						Material mat = cubes[z][y][x].model().material();
+						TexturedMaterial mat = cubes[z][y][x].model().material();
 
 						boolean animated = Materials.ANIMATED_DEFAULT_MATERIAL.equals(mat);
 
@@ -221,7 +221,7 @@ public class BulkModel
 
 		computeEverything(left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
 
-		for (Material m : indevMeshes.keySet())
+		for (TexturedMaterial m : indevMeshes.keySet())
 		{
 			MaterialMeshGenerator matMesh = indevMeshes.get(m);
 

@@ -15,9 +15,9 @@ import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
+import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.material.Materials;
-import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.rendering.Window;
 
 public class MainMenuState extends State
@@ -35,7 +35,7 @@ public class MainMenuState extends State
 		gui = new GUI(Materials.GUI_MATERIAL);
 		gui.init(0, 0, window.getWidth(), window.getHeight());
 
-		Material bgTexture = new RawImageMaterial("assets/images/screenshot-upgraded");
+		TexturedMaterial bgTexture = new RawImageMaterial("assets/images/screenshot-upgraded");
 		bgTexture.init();
 		GUITexture background = new GUITexture(new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO),
 			new MeasurementPair(PercentMeasurement.ONE, PercentMeasurement.ONE), 0, 0, bgTexture);

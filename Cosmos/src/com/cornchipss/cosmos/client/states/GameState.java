@@ -1,7 +1,7 @@
 package com.cornchipss.cosmos.client.states;
 
 import com.cornchipss.cosmos.client.CosmosClient;
-import com.cornchipss.cosmos.game.ClientGame;
+import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 

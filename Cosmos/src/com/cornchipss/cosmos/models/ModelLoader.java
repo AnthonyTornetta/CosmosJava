@@ -15,6 +15,8 @@ import org.joml.Vector2i;
 
 public class ModelLoader
 {
+	private ModelLoader() {}
+	
 	public static void toFile(String file, float[] vertices, float[] uvs, int[] indices, Map<String, Integer> groups,
 		boolean pretty) throws IOException
 	{

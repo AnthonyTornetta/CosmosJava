@@ -8,19 +8,19 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
 
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.utils.IUpdatable;
 
 public class GUI
 {
 	private List<GUIElement> elements;
 
-	private Material material;
+	private TexturedMaterial material;
 
 	private Matrix4f projectionMatrix;
 	private Matrix4f cameraMatrix;
 
-	public GUI(Material material)
+	public GUI(TexturedMaterial material)
 	{
 		this.material = material;
 		elements = new LinkedList<>();
@@ -80,7 +80,7 @@ public class GUI
 		}
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return material;
 	}

@@ -80,7 +80,7 @@ public class Mesh
 		// enable all the required GL buffers when you draw it.
 
 		if (unbind)
-			GL30.glBindVertexArray(0);
+			m.unbind();
 
 		return m;
 	}

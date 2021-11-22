@@ -1,7 +1,7 @@
 package com.cornchipss.cosmos.gui;
 
 import com.cornchipss.cosmos.gui.measurement.MeasurementPair;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.Window;
@@ -25,7 +25,7 @@ public class GUITexture extends GUIElement
 	}
 
 	private Mesh guiMesh;
-	private Material material;
+	private TexturedMaterial material;
 
 	private float initialWidth, initialHeight;
 
@@ -34,7 +34,7 @@ public class GUITexture extends GUIElement
 		this(position, dimensions, u, v, Materials.GUI_MATERIAL);
 	}
 
-	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v, Material material)
+	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v, TexturedMaterial material)
 	{
 		super(position, dimensions);
 
@@ -48,7 +48,7 @@ public class GUITexture extends GUIElement
 	}
 
 	@Override
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return material;
 	}

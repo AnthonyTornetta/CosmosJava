@@ -1,4 +1,4 @@
-package com.cornchipss.cosmos.game;
+package com.cornchipss.cosmos.client.game;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -10,6 +10,8 @@ import org.lwjgl.opengl.GL30;
 import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.world.ClientWorld;
+import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
+import com.cornchipss.cosmos.game.Game;
 import com.cornchipss.cosmos.gui.GUI;
 import com.cornchipss.cosmos.gui.GUITexture;
 import com.cornchipss.cosmos.gui.guis.HotbarGUI;
@@ -26,7 +28,6 @@ import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
-import com.cornchipss.cosmos.world.entities.player.ClientPlayer;
 
 public class ClientGame extends Game
 {

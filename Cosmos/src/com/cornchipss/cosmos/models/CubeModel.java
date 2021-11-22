@@ -6,7 +6,7 @@ import java.util.List;
 import org.joml.Vector3f;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.utils.Utils;
@@ -276,7 +276,7 @@ public abstract class CubeModel implements Model
 		return true;
 	}
 
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return Materials.DEFAULT_MATERIAL;
 	}

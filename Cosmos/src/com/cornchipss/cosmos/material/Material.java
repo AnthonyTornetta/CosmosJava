@@ -1,41 +1,27 @@
 package com.cornchipss.cosmos.material;
 
-import org.joml.Matrix4fc;
-
-import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.shaders.Shader;
 
-public abstract class Material
+public abstract class Material implements IMaterial
 {
 	private Shader shader;
-	private String textureLoc;
-
-	private Texture texture;
-
-	public Material(String shaderLoc, String textureLoc)
+	
+	public Material(String shaderLoc)
 	{
-		this(new Shader(shaderLoc), textureLoc);
+		this(new Shader(shaderLoc));
 	}
 
-	public Material(Shader s, String t)
+	public Material(Shader s)
 	{
 		shader = s;
-		textureLoc = t;
 	}
-
-	public Material(Shader s, Texture texture)
-	{
-		shader = s;
-		this.texture = texture;
-	}
-
-	public abstract void initUniforms(Matrix4fc projectionMatrix, Matrix4fc camera, Matrix4fc transform, boolean inGUI);
-
+	
 	/**
 	 * Used to get the uniform locations
 	 */
 	protected abstract void initShader();
 
+	@Override
 	public Shader shader()
 	{
 		return shader;
@@ -45,12 +31,7 @@ public abstract class Material
 	{
 		shader = s;
 	}
-
-	public Texture texture()
-	{
-		return texture;
-	}
-
+	
 	public void useShader()
 	{
 		shader.use();
@@ -61,33 +42,22 @@ public abstract class Material
 		shader.stop();
 	}
 
-	public void bindTexture()
-	{
-		texture.bind();
-	}
-
+	@Override
 	public void use()
 	{
 		shader.use();
-		texture.bind();
 	}
 
+	@Override
 	public void stop()
 	{
-		Texture.unbind();
 		shader.stop();
 	}
 
+	@Override
 	public void init()
 	{
 		shader.init();
 		initShader();
-
-		if (texture == null)
-			texture = Texture.loadTexture(textureLoc);
 	}
-
-	public abstract float uLength();
-
-	public abstract float vLength();
 }

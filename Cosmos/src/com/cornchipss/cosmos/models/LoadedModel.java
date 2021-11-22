@@ -43,8 +43,13 @@ public class LoadedModel implements Model
 	@Override
 	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
 	{
+		return createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ, true);
+	}
+	
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ, boolean unbind)
+	{
 		if (offX == 0 && offY == 0 && offZ == 0 && scaleX == 1 && scaleY == 1 && scaleZ == 1)
-			return Mesh.createMesh(verts, indices, uvs);
+			return Mesh.createMesh(verts, indices, uvs, unbind);
 		else
 		{
 			for (int i = 0; i < verts.length; i += 3)
@@ -54,7 +59,7 @@ public class LoadedModel implements Model
 				tempVerts[i + 2] = offZ + scaleZ * verts[i + 2];
 			}
 
-			return Mesh.createMesh(tempVerts, indices, uvs);
+			return Mesh.createMesh(tempVerts, indices, uvs, unbind);
 		}
 	}
 	

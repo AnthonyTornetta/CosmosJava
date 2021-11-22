@@ -1,7 +1,7 @@
 package com.cornchipss.cosmos.models.blocks;
 
 import com.cornchipss.cosmos.blocks.BlockFace;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.models.AnimatedCubeModel;
 
@@ -32,7 +32,7 @@ public class ReactorModel extends AnimatedCubeModel
 	}
 
 	@Override
-	public Material material()
+	public TexturedMaterial material()
 	{
 		return Materials.ANIMATED_DEFAULT_MATERIAL;
 	}

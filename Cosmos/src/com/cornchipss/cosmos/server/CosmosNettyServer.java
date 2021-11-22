@@ -2,11 +2,11 @@ package com.cornchipss.cosmos.server;
 
 import java.io.IOException;
 
-import com.cornchipss.cosmos.game.ServerGame;
 import com.cornchipss.cosmos.netty.NetworkRegistry;
 import com.cornchipss.cosmos.netty.packets.Packet;
 import com.cornchipss.cosmos.netty.packets.PlayerDisconnectPacket;
 import com.cornchipss.cosmos.server.command.CommandHandler;
+import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.server.kyros.FancyServer;
 import com.esotericsoftware.kryonet.Connection;

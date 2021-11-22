@@ -25,9 +25,9 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.gui.measurement.SubtractedMeasurement;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
-import com.cornchipss.cosmos.material.Material;
+import com.cornchipss.cosmos.material.TexturedMaterial;
+import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.material.Materials;
-import com.cornchipss.cosmos.material.RawImageMaterial;
 import com.cornchipss.cosmos.models.LoadedModel;
 import com.cornchipss.cosmos.models.ModelLoader;
 import com.cornchipss.cosmos.physx.Transform;
@@ -58,7 +58,7 @@ public class ModelCreator
 		
 		Mesh m = playerModel.createMesh(0, 0, 0, 1);
 		
-		Material mat = new RawImageMaterial("assets/images/atlas/player");
+		TexturedMaterial mat = new RawImageMaterial("assets/images/atlas/player");
 		mat.init();
 		
 		Matrix4fc identityMatrix = new Matrix4f().identity();

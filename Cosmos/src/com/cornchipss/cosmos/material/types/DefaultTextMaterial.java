@@ -1,12 +1,13 @@
-package com.cornchipss.cosmos.material;
+package com.cornchipss.cosmos.material.types;
 
 import org.joml.Matrix4fc;
 
+import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.rendering.Texture;
 import com.cornchipss.cosmos.shaders.Shader;
 
 // TODO: fix how this works
-public class DefaultTextMaterial extends Material
+public class DefaultTextMaterial extends TexturedMaterial
 {
 	public DefaultTextMaterial(Shader s, Texture t)
 	{

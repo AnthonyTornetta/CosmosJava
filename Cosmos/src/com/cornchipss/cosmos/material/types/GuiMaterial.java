@@ -1,8 +1,10 @@
-package com.cornchipss.cosmos.material;
+package com.cornchipss.cosmos.material.types;
 
 import org.joml.Matrix4fc;
 
-public class GuiMaterial extends Material
+import com.cornchipss.cosmos.material.TexturedMaterial;
+
+public class GuiMaterial extends TexturedMaterial
 {
 	private int guiProjLoc, guiTransLoc;
 
