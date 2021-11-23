@@ -817,13 +817,13 @@ public abstract class Structure extends PhysicalObject
 	public Vector3f blockCoordsToWorldCoords(float x, float y, float z,
 		Vector3f storage)
 	{
-		Vector4f c = new Vector4f(x - width() / 2 + 0.5f,
-			y - height() / 2 + 0.5f, z - length() / 2 + 0.5f, 1);
+		storage.set(x - width() / 2.f + 0.5f,
+			y - height() / 2.f + 0.5f, z - length() / 2.f + 0.5f);
 
-		body().transform().matrix().transform(c);
-
-		storage.set(c.x, c.y, c.z);
-
+		body().transform().orientation().applyRotation(storage, storage);
+		
+		storage.add(body().transform().position());
+		
 		return storage;
 	}
 

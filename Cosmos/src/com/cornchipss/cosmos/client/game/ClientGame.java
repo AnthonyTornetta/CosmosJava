@@ -55,14 +55,14 @@ public class ClientGame extends Game
 		return instance;
 	}
 
-
 	private PauseMenuGUI pauseMenu;
 
 	private ShipGUI shipGUI;
 
 	private void initPauseMenu()
 	{
-		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO,
+			MeasurementPair.HUNDRED_PERCENT);
 
 		gui.addElement(pauseMenu);
 	}
@@ -70,32 +70,39 @@ public class ClientGame extends Game
 	private void initGraphics()
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
-		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
+		gui.init(0, 0, Window.instance().getWidth(),
+			Window.instance().getHeight());
 
 		initPauseMenu();
 
-		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO,
+			MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(hotbarGUI);
 
-		shipGUI = new ShipGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
+		shipGUI = new ShipGUI(MeasurementPair.ZERO,
+			MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(shipGUI);
 
 		GUITexture crosshair = new GUITexture(
-			new MeasurementPair(MeasurementParser.parse("50% - 16"), MeasurementParser.parse("50% - 16")),
-			new MeasurementPair(new PixelMeasurement(32), new PixelMeasurement(32)), 0, 0);
+			new MeasurementPair(MeasurementParser.parse("50% - 16"),
+				MeasurementParser.parse("50% - 16")),
+			new MeasurementPair(new PixelMeasurement(32),
+				new PixelMeasurement(32)),
+			0, 0);
 
 		gui.addElement(crosshair);
 
 		OpenGLFont font = Fonts.ARIAL_28;
 
-		fpsText = new GUIText("-- --ms", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
+		fpsText = new GUIText("-- --ms", font,
+			new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
 	}
 
 	public ClientGame(CosmosNettyClient nettyClient)
 	{
 		super(new ClientWorld());
-		
+
 		if (instance != null)
 			throw new IllegalStateException("A game is already running.");
 
@@ -105,19 +112,22 @@ public class ClientGame extends Game
 
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float) Math.toRadians(90),
-			Window.instance().getWidth() / (float) Window.instance().getHeight(), 0.1f, 1000);
+			Window.instance().getWidth()
+				/ (float) Window.instance().getHeight(),
+			0.1f, 1000);
 	}
-	
+
 	@Override
 	public ClientWorld world()
 	{
-		return (ClientWorld)super.world();
+		return (ClientWorld) super.world();
 	}
 
 	public void onResize(int w, int h)
 	{
 		projectionMatrix.identity();
-		projectionMatrix.perspective((float) Math.toRadians(90), w / (float) h, 0.1f, 1000);
+		projectionMatrix.perspective((float) Math.toRadians(90), w / (float) h,
+			0.1f, 1000);
 
 		gui.onResize(w, h);
 		pauseMenu.onResize(w, h);
@@ -138,12 +148,13 @@ public class ClientGame extends Game
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 
 		world().lock();
-		
-		Matrix4fc camera = player.shipPiloting() == null ? player.camera().viewMatrix()
+
+		Matrix4fc camera = player.shipPiloting() == null
+			? player.camera().viewMatrix()
 			: player.shipPiloting().body().transform().invertedMatrix();
 
 		world().draw(projectionMatrix, camera, player());
-		
+
 		world().unlock();
 
 		gui.update(delta);
@@ -196,8 +207,9 @@ public class ClientGame extends Game
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
 				drawGUI = !drawGUI;
 
-			fpsText
-				.text(DebugMonitor.get("ups") + " " + (int) ((Float) DebugMonitor.get("ups-variance") * 1000) + "ms");
+			fpsText.text(DebugMonitor.get("ups") + " "
+				+ (int) ((Float) DebugMonitor.get("ups-variance") * 1000)
+				+ "ms");
 
 			int prevRow = player.selectedInventoryColumn();
 

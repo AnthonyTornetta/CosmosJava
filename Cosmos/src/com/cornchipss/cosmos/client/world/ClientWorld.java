@@ -35,10 +35,17 @@ public class ClientWorld extends World implements IRenderable
 	@Override
 	public void updateGraphics()
 	{
-		for (IRenderable r : renderables)
-			r.updateGraphics();
-		
-		DebugRenderer.instance().updateGraphics();
+		try
+		{
+			for (IRenderable r : renderables)
+				r.updateGraphics();
+			
+			DebugRenderer.instance().updateGraphics();
+		}
+		catch(ConcurrentModificationException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	@Override
