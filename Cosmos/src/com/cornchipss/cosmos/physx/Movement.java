@@ -57,6 +57,12 @@ public class Movement
 		return ((o instanceof Movement) && ((Movement) o).code == code);
 	}
 
+	@Override
+	public int hashCode()
+	{
+		return code;
+	}
+	
 	public static Movement movementFromCode(int code)
 	{
 		return new Movement(code);

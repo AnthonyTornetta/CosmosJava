@@ -132,11 +132,6 @@ public class Maths
 		return new Matrix4f(buf);
 	}
 
-	public static Matrix4f createRotationMatrix(Vector3f axis, float angle)
-	{
-		return createRotationMatrix(axis, angle);
-	}
-
 	public static Matrix4f createRotationMatrix(Vector3fc axis, float angle)
 	{
 		/*

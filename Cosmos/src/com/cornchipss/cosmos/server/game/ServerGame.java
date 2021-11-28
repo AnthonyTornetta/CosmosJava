@@ -27,7 +27,10 @@ public class ServerGame extends Game
 	public ServerGame()
 	{
 		super(new World());
-
+		
+		if (instance != null)
+			throw new IllegalStateException("ServerGame already created! Cannot have multiple games already running!");
+		
 		instance = this;
 
 		mainPlanet = new Planet(world(), 16 * 8, 16 * 4, 16 * 8, 1);

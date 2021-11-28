@@ -31,7 +31,7 @@ public class Window
 	private int width, height;
 
 	private boolean wasWindowResized = false;
-
+	
 	private static Window instance;
 
 	public boolean wasWindowResized()
@@ -43,6 +43,9 @@ public class Window
 
 	public Window(int w, int h, String title)
 	{
+		if(instance != null)
+			throw new IllegalStateException("Only one openGL window can be created!d");
+		
 		instance = this;
 
 		this.width = w;

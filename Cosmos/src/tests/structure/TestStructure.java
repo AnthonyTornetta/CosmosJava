@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,13 @@ class TestStructure
 
 		init(W, H, L);
 
-		OBBCollider c = a.obbForBlock(a.chunk(0, 0, 0), 0, 0, 0);
+		Vector3i temp = new Vector3i(), out = new Vector3i();
+		
+		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
+		
+		assertEquals(new Vector3i(), out);
+		
+		OBBCollider c = a.obbForBlock(out);
 
 		assertEquals(new OBBCollider(new Vector3f(0, 0, 0), new Orientation(), new Vector3f(8, 8, 8)),
 			a.obbForChunk(a.chunk(0, 0, 0)));
@@ -89,8 +96,10 @@ class TestStructure
 			new OBBCollider(new Vector3f(-7.5f, -7.5f, -7.5f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)), c);
 
 		init(W + W, H + H, L + L);
-
-		c = a.obbForBlock(a.chunk(0, 0, 0), 0, 0, 0);
+		
+		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
+		
+		c = a.obbForBlock(out);
 
 		assertEquals(
 			new OBBCollider(new Vector3f(-15.5f, -15.5f, -15.5f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)),
@@ -98,7 +107,11 @@ class TestStructure
 
 		a.body().transform().orientation().rotateRelative(new Vector3f(0, Maths.PI, 0));
 		a.body().transform().position(new Vector3f(100, 0, 0));
-		c = a.obbForBlock(a.chunk(0, 0, 0), 15, 0, 0);
+		
+		temp.x = 15;
+		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
+		
+		c = a.obbForBlock(out);
 
 		assertEquals(new OBBCollider(new Vector3f(100.5f, -15.5f, 15.5f), a.body().transform().orientation(),
 			new Vector3f(0.5f, 0.5f, 0.5f)), c);

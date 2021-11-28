@@ -34,6 +34,12 @@ public class LightSource
 		}
 		return false;
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return color.hashCode() * strength();
+	}
 
 	public int strength()
 	{

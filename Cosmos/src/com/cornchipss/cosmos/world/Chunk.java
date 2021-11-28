@@ -437,12 +437,16 @@ public class Chunk implements IWritable
 		if (done.contains(temp.set(x, y, z)))
 			return false;
 
-		done.add(new Vector3i(x, y, z));
+		Vector3i v = new Vector3i(x, y, z);
+		
+		done.add(v);
 
 		if (!within(x, y, z))
 			return false;
+		
+		Vector3i blockCoords = structure().chunkCoordsToBlockCoords(this, v, new Vector3i());
 
-		OBBCollider c = structure().wholeOBBForBlock(this, x, y, z);
+		OBBCollider c = structure().wholeOBBForBlock(blockCoords);
 		if (c == null)
 			return false;
 
@@ -451,7 +455,7 @@ public class Chunk implements IWritable
 
 		if (hasBlock(x, y, z))
 		{
-			OBBCollider obbc = structure().obbForBlock(this, x, y, z);
+			OBBCollider obbc = structure().obbForBlock(blockCoords);
 			if (checker.testLineOBB(lineStart, lineDelta, obbc, info))
 			{
 				return true;
