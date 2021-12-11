@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -162,6 +163,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		}
 
 		boolean hit = false;
+		
+		Vector3i temp = new Vector3i(), out = new Vector3i();
 
 		for (int z : zs)
 		{
@@ -171,8 +174,10 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				{
 					if (a.hasBlock(x, y, z))
 					{
-						OBBCollider obbBlockA = a.structure().obbForBlock(a, x,
-							y, z);
+						temp.set(x, y, z);
+						Vector3i blockCoords = a.structure().chunkCoordsToBlockCoords(a, temp, out);
+						
+						OBBCollider obbBlockA = a.structure().obbForBlock(blockCoords);
 
 						if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA,
 							b.structure().obbForChunk(b), null))
@@ -295,6 +300,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				if (c.empty())
 					continue;
+				
+				Vector3i chunkCoords = new Vector3i(), blockCoords = new Vector3i();
 
 				if (obbChecker.testMovingOBBOBB(deltaA,
 					((Structure) a).obbForChunk(c), obbB, null))
@@ -307,8 +314,10 @@ public class DefaultCollisionChecker implements ICollisionChecker
 							{
 								if (c.hasBlock(x, y, z))
 								{
-									if (obbChecker.testMovingOBBOBB(deltaA,
-										((Structure) a).obbForBlock(c, x, y, z),
+									chunkCoords.set(x, y, z);
+									((Structure)a).chunkCoordsToBlockCoords(c, chunkCoords, blockCoords);
+									
+									if (obbChecker.testMovingOBBOBB(deltaA, ((Structure) a).obbForBlock(blockCoords),
 										obbB, info))
 									{
 										if (info == null

@@ -22,6 +22,9 @@ import com.cornchipss.cosmos.world.World;
 
 public abstract class Player extends PhysicalObject
 {
+	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
+	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
+
 	private Ship pilotingShip;
 
 	private Inventory inventory;
@@ -36,8 +39,6 @@ public abstract class Player extends PhysicalObject
 
 	private Movement movement;
 
-	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
-	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
 
 	private OBBCollisionCheckerJOML jomlChecker;
 
@@ -133,12 +134,10 @@ public abstract class Player extends PhysicalObject
 		if (Utils.equals(pilotingShip, s))
 			return;
 
-		Ship temp = pilotingShip;
+		if(pilotingShip != null)
+			pilotingShip.setPilot(null);
 		pilotingShip = null;
-
-		if (temp != null)
-			temp.setPilot(null);
-
+		
 		if (s != null)
 		{
 			pilotingShip = s;
@@ -168,13 +167,13 @@ public abstract class Player extends PhysicalObject
 	{
 		if (other instanceof Player)
 		{
-			Player o = (Player) other;
+			final Player o = (Player) other;
 			return name().equals(o.name());
 		}
 
 		return false;
 	}
-
+	
 	@Override
 	public int hashCode()
 	{
