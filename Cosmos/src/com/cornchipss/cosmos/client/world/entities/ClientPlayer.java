@@ -93,9 +93,10 @@ public class ClientPlayer extends Player
 		{
 			if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
-				PlayerAction action = new PlayerAction.Builder().setFiring(true).create();
+				PlayerAction action = new PlayerAction.Builder().setFiring(true)
+					.create();
 				PlayerActionPacket p = new PlayerActionPacket(action);
-				
+
 				try
 				{
 					CosmosClient.instance().nettyClient().sendTCP(p);
@@ -133,24 +134,34 @@ public class ClientPlayer extends Player
 	private void handleInteractions()
 	{
 		Structure.RayRes sb = calculateLookingAt();
-		
+
 		if (sb != null)
 		{
-			OBBCollider c = sb.block().structure().obbForBlock(sb.block().structureX(), sb.block().structureY(), sb.block().structureZ());
+			OBBCollider c = sb.block().structure().obbForBlock(
+				sb.block().structureX(), sb.block().structureY(),
+				sb.block().structureZ());
+
+//			Matrix4f mat = Maths.createTransformationMatrix(c.center(),
+//				c.orientation().quaternion());
 			
-			Matrix4f mat = Maths.createTransformationMatrix(c.center(), c.orientation().quaternion());
+			Matrix4f mat = new Matrix4f();
 			
+			mat.translate(c.center());
+
+			c.orientation().applyRotation(mat);
+
 			Vector3f hw = new Vector3f().set(c.halfwidths());
-			hw.add(0.51f, 0.51f, 0.51f);
-			
-			DebugRenderer.instance().drawRectangle(mat, hw, Color.yellow, DrawMode.LINES);
+			hw.add(0.001f, 0.001f, 0.001f);
+
+			DebugRenderer.instance().drawRectangle(mat, hw, Color.yellow,
+				DrawMode.LINES);
 		}
-		
-		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R) || Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1)
+
+		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R)
+			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_3)))
 		{
-			
 
 			if (sb != null)
 			{
@@ -162,7 +173,8 @@ public class ClientPlayer extends Player
 
 				if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1))
 				{
-					ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(), null);
+					ModifyBlockPacket packet = new ModifyBlockPacket(sb.block(),
+						null);
 
 					try
 					{
@@ -175,22 +187,30 @@ public class ClientPlayer extends Player
 				}
 				else if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_2))
 				{
-					if (selectedBlock != null && selectedBlock.canAddTo(lookingAt))
+					if (selectedBlock != null
+						&& selectedBlock.canAddTo(lookingAt))
 					{
 						BlockFace face = sb.face();
 
-						int xx = Maths.floor(sb.block().structureX() + (face.getRelativePosition().x)),
-							yy = Maths.floor(sb.block().structureY() + (face.getRelativePosition().y)),
-							zz = Maths.floor(sb.block().structureZ() + (face.getRelativePosition().z));
+						int xx = Maths.floor(sb.block().structureX()
+							+ (face.getRelativePosition().x)),
+							yy = Maths.floor(sb.block().structureY()
+								+ (face.getRelativePosition().y)),
+							zz = Maths.floor(sb.block().structureZ()
+								+ (face.getRelativePosition().z));
 
-						if (lookingAt.withinBlocks(xx, yy, zz) && !lookingAt.hasBlock(xx, yy, zz))
+						if (lookingAt.withinBlocks(xx, yy, zz)
+							&& !lookingAt.hasBlock(xx, yy, zz))
 						{
 							ModifyBlockPacket packet = new ModifyBlockPacket(
-								new StructureBlock(sb.block().structure(), xx, yy, zz), selectedBlock);
+								new StructureBlock(sb.block().structure(), xx,
+									yy, zz),
+								selectedBlock);
 
 							try
 							{
-								ClientGame.instance().nettyClient().sendTCP(packet);
+								ClientGame.instance().nettyClient()
+									.sendTCP(packet);
 							}
 							catch (IOException e)
 							{
@@ -203,11 +223,13 @@ public class ClientPlayer extends Player
 				{
 					if (sb.block().block() instanceof IInteractable)
 					{
-						PlayerInteractPacket packet = new PlayerInteractPacket(sb.block());
+						PlayerInteractPacket packet = new PlayerInteractPacket(
+							sb.block());
 
 						try
 						{
-							CosmosClient.instance().nettyClient().sendTCP(packet);
+							CosmosClient.instance().nettyClient()
+								.sendTCP(packet);
 						}
 						catch (IOException e)
 						{

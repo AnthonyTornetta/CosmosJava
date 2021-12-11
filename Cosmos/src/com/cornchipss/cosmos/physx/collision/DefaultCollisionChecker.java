@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.physx.collision;
 
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,11 +9,15 @@ import java.util.Map;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -24,7 +29,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		obbChecker = new OBBCollisionCheckerJOML();
 	}
 
-	private void aggregateChunks(Structure a, Structure b, Vector3fc deltaA, Map<Chunk, List<Chunk>> map)
+	private void aggregateChunks(Structure a, Structure b, Vector3fc deltaA,
+		Map<Chunk, List<Chunk>> map)
 	{
 		for (int z = 0; z < a.chunksLength(); z++)
 		{
@@ -52,9 +58,11 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 								OBBCollider obbB = b.obbForChunk(bChunk);
 
-								if (obbChecker.testMovingOBBOBB(deltaA, obbA, obbB, null))
+								if (obbChecker.testMovingOBBOBB(deltaA, obbA,
+									obbB, null))
 								{
-									List<Chunk> here = map.getOrDefault(aChunk, new LinkedList<>());
+									List<Chunk> here = map.getOrDefault(aChunk,
+										new LinkedList<>());
 									here.add(bChunk);
 									map.put(aChunk, here);
 								}
@@ -66,7 +74,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		}
 	}
 
-	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA, CollisionInfo info)
+	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA,
+		CollisionInfo info)
 	{
 		OBBCollider bOBB = b.structure().obbForChunk(b);
 
@@ -78,14 +87,18 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 		{
 			Vector3f at = new Vector3f(pos);
-			at.sub(a.structure().body().transform().orientation().up().mul(Chunk.HEIGHT / 2.f, new Vector3f()));
+			at.sub(a.structure().body().transform().orientation().up()
+				.mul(Chunk.HEIGHT / 2.f, new Vector3f()));
 
 			// Start Y
-			Vector3f halfWidthsY = new Vector3f(Chunk.WIDTH / 2.f, 0.5f, Chunk.LENGTH / 2.f);
+			Vector3f halfWidthsY = new Vector3f(Chunk.WIDTH / 2.f, 0.5f,
+				Chunk.LENGTH / 2.f);
 
 			for (int y = 0; y < a.height(); y++)
 			{
-				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsY);
+				OBBCollider obc = new OBBCollider(at,
+					a.structure().body().transform().orientation(),
+					halfWidthsY);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -98,14 +111,18 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 		{
 			Vector3f at = new Vector3f(pos);
-			at.sub(a.structure().body().transform().orientation().right().mul(Chunk.WIDTH / 2.f, new Vector3f()));
+			at.sub(a.structure().body().transform().orientation().right()
+				.mul(Chunk.WIDTH / 2.f, new Vector3f()));
 
 			// Start X
-			Vector3f halfWidthsX = new Vector3f(0.5f, Chunk.HEIGHT / 2.f, Chunk.LENGTH / 2.f);
+			Vector3f halfWidthsX = new Vector3f(0.5f, Chunk.HEIGHT / 2.f,
+				Chunk.LENGTH / 2.f);
 
 			for (int x = 0; x < a.width(); x++)
 			{
-				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsX);
+				OBBCollider obc = new OBBCollider(at,
+					a.structure().body().transform().orientation(),
+					halfWidthsX);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -116,19 +133,24 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 		}
 
-		Vector3fc backward = a.structure().body().transform().orientation().forward().mul(-1, new Vector3f());
+		Vector3fc backward = a.structure().body().transform().orientation()
+			.forward().mul(-1, new Vector3f());
 
 		{
 			Vector3f at = new Vector3f(pos);
 			// it is add here
-			at.add(a.structure().body().transform().orientation().forward().mul(Chunk.LENGTH / 2.f, new Vector3f()));
+			at.add(a.structure().body().transform().orientation().forward()
+				.mul(Chunk.LENGTH / 2.f, new Vector3f()));
 
 			// Start Z
-			Vector3f halfWidthsZ = new Vector3f(Chunk.WIDTH / 2.f, Chunk.HEIGHT / 2.f, 0.5f);
+			Vector3f halfWidthsZ = new Vector3f(Chunk.WIDTH / 2.f,
+				Chunk.HEIGHT / 2.f, 0.5f);
 
 			for (int z = 0; z < a.length(); z++)
 			{
-				OBBCollider obc = new OBBCollider(at, a.structure().body().transform().orientation(), halfWidthsZ);
+				OBBCollider obc = new OBBCollider(at,
+					a.structure().body().transform().orientation(),
+					halfWidthsZ);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -149,15 +171,19 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				{
 					if (a.hasBlock(x, y, z))
 					{
-						OBBCollider obbBlockA = a.structure().obbForBlock(a, x, y, z);
+						OBBCollider obbBlockA = a.structure().obbForBlock(a, x,
+							y, z);
 
-						if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA, b.structure().obbForChunk(b), null))
+						if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA,
+							b.structure().obbForChunk(b), null))
 						{
 							for (Vector3fc pointOfInterest : obbBlockA)
 							{
-								if (b.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
+								if (b.testLineIntersection(pointOfInterest,
+									deltaA, info, obbChecker))
 								{
-									if (info == null || info.distanceSquared == 0)
+									if (info == null
+										|| info.distanceSquared == 0)
 										return true;
 									hit = true;
 								}
@@ -172,7 +198,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 	}
 
 	@Override
-	public boolean colliding(PhysicalObject a, PhysicalObject b, Vector3fc deltaA, CollisionInfo info)
+	public boolean colliding(PhysicalObject a, PhysicalObject b,
+		Vector3fc deltaA, CollisionInfo info)
 	{
 		if (a instanceof Structure && b instanceof Structure)
 		{
@@ -210,8 +237,17 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		{
 			OBBCollider obbA = a.OBB();
 
+			if (NettySide.side() == NettySide.CLIENT)
+			{
+				DebugRenderer.instance().drawOBB(obbA, Color.red,
+					DrawMode.LINES);
+				DebugRenderer.instance().drawOBB(b.OBB(), Color.blue,
+					DrawMode.LINES);
+			}
+
 			if (!obbChecker.testMovingOBBOBB(deltaA, obbA, b.OBB(), null))
 			{
+//				Utils.println("EARLY RETURN");
 				return false;
 			}
 
@@ -221,12 +257,18 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				if (c.empty())
 					continue;
+				
+				OBBCollider cldr = ((Structure) b).obbForChunk(c);
+				
+				if (obbChecker.testMovingOBBOBB(deltaA, obbA,
+					cldr, null))
+				{				
+					DebugRenderer.instance().drawOBB(cldr, Color.green, DrawMode.LINES);
 
-				if (obbChecker.testMovingOBBOBB(deltaA, obbA, ((Structure) b).obbForChunk(c), null))
-				{
 					for (Vector3fc pointOfInterest : obbA)
 					{
-						if (c.testLineIntersection(pointOfInterest, deltaA, info, obbChecker))
+						if (c.testLineIntersection(pointOfInterest, deltaA,
+							info, obbChecker))
 						{
 							if (info == null || info.distanceSquared == 0)
 								return true;
@@ -254,7 +296,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				if (c.empty())
 					continue;
 
-				if (obbChecker.testMovingOBBOBB(deltaA, ((Structure) a).obbForChunk(c), obbB, null))
+				if (obbChecker.testMovingOBBOBB(deltaA,
+					((Structure) a).obbForChunk(c), obbB, null))
 				{
 					for (int z = 0; z < c.length(); z++)
 					{
@@ -264,10 +307,12 @@ public class DefaultCollisionChecker implements ICollisionChecker
 							{
 								if (c.hasBlock(x, y, z))
 								{
-									if (obbChecker.testMovingOBBOBB(deltaA, ((Structure) a).obbForBlock(c, x, y, z),
+									if (obbChecker.testMovingOBBOBB(deltaA,
+										((Structure) a).obbForBlock(c, x, y, z),
 										obbB, info))
 									{
-										if (info == null || info.distanceSquared == 0)
+										if (info == null
+											|| info.distanceSquared == 0)
 											return true;
 
 										hit = true;

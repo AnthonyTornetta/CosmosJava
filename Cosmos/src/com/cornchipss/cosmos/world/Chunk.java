@@ -1,5 +1,6 @@
 package com.cornchipss.cosmos.world;
 
+import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.BulkModel;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
@@ -53,8 +55,10 @@ public class Chunk implements IWritable
 	 * Dimensions of a Chunk - must be even
 	 */
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
-	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT, LENGTH);
-	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS).div(2);
+	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT,
+		LENGTH);
+	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS)
+		.div(2);
 
 	private static final float EPSILON = 1E-4f;
 
@@ -81,7 +85,8 @@ public class Chunk implements IWritable
 	 */
 	private Structure structure;
 
-	public Chunk(int x, int y, int z, float relX, float relY, float relZ, int offX, int offY, int offZ, Structure s)
+	public Chunk(int x, int y, int z, float relX, float relY, float relZ,
+		int offX, int offY, int offZ, Structure s)
 	{
 		this.lightingOffset = new Vector3i(offX, offY, offZ);
 		this.localPosition = new Vector3i(x, y, z);
@@ -107,7 +112,9 @@ public class Chunk implements IWritable
 			{
 				for (int x = 0; x < blocks[z][y].length; x++)
 				{
-					short id = blocks[z][y][x] != null ? blocks[z][y][x].numericId() : 0;
+					short id = blocks[z][y][x] != null
+						? blocks[z][y][x].numericId()
+						: 0;
 
 					if (currentId == -1)
 					{
@@ -231,7 +238,8 @@ public class Chunk implements IWritable
 
 	public boolean within(int x, int y, int z)
 	{
-		return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT && z >= 0 && z < LENGTH;
+		return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT && z >= 0
+			&& z < LENGTH;
 	}
 
 	/**
@@ -246,16 +254,19 @@ public class Chunk implements IWritable
 	 * @param y            The Y coordinate relative to this chunk
 	 * @param z            The Z coordinate relative to this chunk
 	 * @param block        The block to set it to
-	 * @param shouldRender If true, the chunk will update the lightmap + re-render
-	 *                     the mesh. If the chunk has not been rendered yet - this
-	 *                     will be false no matter what is passed
+	 * @param shouldRender If true, the chunk will update the lightmap +
+	 *                     re-render the mesh. If the chunk has not been
+	 *                     rendered yet - this will be false no matter what is
+	 *                     passed
 	 */
 	public void block(int x, int y, int z, Block block)
 	{
 		if (!within(x, y, z))
-			throw new IllegalArgumentException("Bad x,y,z: " + x + ", " + y + ", " + z);
+			throw new IllegalArgumentException(
+				"Bad x,y,z: " + x + ", " + y + ", " + z);
 
-		boolean shouldRender = false;// rendered && shouldRender && NettySide.side() == NettySide.CLIENT;
+		boolean shouldRender = false;// rendered && shouldRender &&
+										// NettySide.side() == NettySide.CLIENT;
 
 		if (block != null)
 			empty = false;
@@ -265,31 +276,33 @@ public class Chunk implements IWritable
 			blocks[z][y][x] = block;
 
 			if (block != null)
-				structure.lightMap().setBlocking(x + lightingOffset.x(), y + lightingOffset.y(),
-					z + lightingOffset.z());
+				structure.lightMap().setBlocking(x + lightingOffset.x(),
+					y + lightingOffset.y(), z + lightingOffset.z());
 			else
-				structure.lightMap().removeBlocking(x + lightingOffset.x(), y + lightingOffset.y(),
-					z + lightingOffset.z());
+				structure.lightMap().removeBlocking(x + lightingOffset.x(),
+					y + lightingOffset.y(), z + lightingOffset.z());
 
 			if (block instanceof LitBlock)
 			{
 				// remove it if there is already one
-				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(),
-					z + lightingOffset.z());
-
-				structure.lightMap().addLight(((LitBlock) block).lightSource(), x + lightingOffset.x(),
+				structure.lightMap().removeLight(x + lightingOffset.x(),
 					y + lightingOffset.y(), z + lightingOffset.z());
-			}
-			else if (structure.lightMap().hasLightSource(x + lightingOffset.x(), y + lightingOffset.y(),
-				z + lightingOffset.z()))
-			{
-				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(),
+
+				structure.lightMap().addLight(((LitBlock) block).lightSource(),
+					x + lightingOffset.x(), y + lightingOffset.y(),
 					z + lightingOffset.z());
+			}
+			else if (structure.lightMap().hasLightSource(x + lightingOffset.x(),
+				y + lightingOffset.y(), z + lightingOffset.z()))
+			{
+				structure.lightMap().removeLight(x + lightingOffset.x(),
+					y + lightingOffset.y(), z + lightingOffset.z());
 			}
 
 			needsRendered(true);
 
-			// Make sure if this block is neighboring another chunk, that chunk updates
+			// Make sure if this block is neighboring another chunk, that chunk
+			// updates
 			// aswell
 			if (x == 0 && left != null && shouldRender)
 				left.needsRendered(true);
@@ -314,18 +327,20 @@ public class Chunk implements IWritable
 	 * {@link Chunk#mesh()}
 	 * </p>
 	 * <p>
-	 * Once this method is called, all changes to this chunk's blocks will call this
-	 * method.
+	 * Once this method is called, all changes to this chunk's blocks will call
+	 * this method.
 	 * </p>
 	 */
 	public void render()
 	{
 		needsRendered = false;
 
-		model.render(left != null ? left.model : null, right != null ? right.model : null,
-			top != null ? top.model : null, bottom != null ? bottom.model : null, front != null ? front.model : null,
-			back != null ? back.model : null, lightingOffset.x(), lightingOffset.y(), lightingOffset.z(),
-			structure.lightMap());
+		model.render(left != null ? left.model : null,
+			right != null ? right.model : null, top != null ? top.model : null,
+			bottom != null ? bottom.model : null,
+			front != null ? front.model : null,
+			back != null ? back.model : null, lightingOffset.x(),
+			lightingOffset.y(), lightingOffset.z(), structure.lightMap());
 	}
 
 	/**
@@ -371,8 +386,8 @@ public class Chunk implements IWritable
 	 * The mesh of all the blocks - null if {@link Chunk#render()} has not been
 	 * called.
 	 * 
-	 * @return The mesh of all the blocks - null if {@link Chunk#render()} has not
-	 *         been called.
+	 * @return The mesh of all the blocks - null if {@link Chunk#render()} has
+	 *         not been called.
 	 */
 	public List<MaterialMesh> meshes()
 	{
@@ -431,8 +446,10 @@ public class Chunk implements IWritable
 		return localPosition;
 	}
 
-	private boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, Vector3ic dir, CollisionInfo info,
-		IOBBCollisionChecker checker, int x, int y, int z, Set<Vector3i> done, Vector3i temp)
+	private boolean testLineIntersection(Vector3fc lineStart,
+		Vector3fc lineDelta, Vector3ic dir, CollisionInfo info,
+		IOBBCollisionChecker checker, int x, int y, int z, Set<Vector3i> done,
+		Vector3i temp)
 	{
 		if (done.contains(temp.set(x, y, z)))
 			return false;
@@ -458,14 +475,17 @@ public class Chunk implements IWritable
 			}
 		}
 
-		boolean res = testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y, z, done, temp);
+		boolean res = testLineIntersection(lineStart, lineDelta, dir, info,
+			checker, x + dir.x(), y, z, done, temp);
 
 		if (res && info == null)
 			return true;
-		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z, done, temp);
+		res = res || testLineIntersection(lineStart, lineDelta, dir, info,
+			checker, x, y + dir.y(), z, done, temp);
 		if (res && info == null)
 			return true;
-		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y, z + dir.z(), done, temp);
+		res = res || testLineIntersection(lineStart, lineDelta, dir, info,
+			checker, x, y, z + dir.z(), done, temp);
 		if (res && info == null)
 			return true;
 
@@ -488,8 +508,8 @@ public class Chunk implements IWritable
 		return res;
 	}
 
-	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, CollisionInfo info,
-		IOBBCollisionChecker checker)
+	public boolean testLineIntersection(Vector3fc lineStart,
+		Vector3fc lineDelta, CollisionInfo info, IOBBCollisionChecker checker)
 	{
 		OBBCollider chunkCollider = structure.obbForChunk(this);
 
@@ -499,6 +519,7 @@ public class Chunk implements IWritable
 		if (!checker.testLineOBB(lineStart, lineDelta, chunkCollider, tempInfo))
 		{
 			tempInfo.collisionPoint.set(lineStart);
+			DebugRenderer.instance().drawPoint(lineStart, Color.blue);
 		}
 
 		Set<Vector3i> done = new HashSet<>();
@@ -506,10 +527,11 @@ public class Chunk implements IWritable
 		Vector3i direction = Maths.signumi(lineDelta, new Vector3i());
 
 		Vector3i here = structure.worldCoordsToChunkCoords(
-			tempInfo.collisionPoint.add(EPSILON * direction.x, EPSILON * direction.y, EPSILON * direction.z));
+			tempInfo.collisionPoint.add(EPSILON * direction.x,
+				EPSILON * direction.y, EPSILON * direction.z));
 
-		return testLineIntersection(lineStart, lineDelta, direction, info, checker, here.x, here.y, here.z, done,
-			new Vector3i());
+		return testLineIntersection(lineStart, lineDelta, direction, info,
+			checker, here.x, here.y, here.z, done, new Vector3i());
 
 //		OBBCollider chunkCollider = structure.obbForChunk(this);
 //		

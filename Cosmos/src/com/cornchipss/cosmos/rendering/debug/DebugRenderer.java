@@ -7,12 +7,14 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.types.DebugMaterial;
 import com.cornchipss.cosmos.models.ModelLoader;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 
@@ -99,6 +101,17 @@ public class DebugRenderer implements IRenderable
 	{
 		return debugMaterial != null;
 	}
+	
+	public void drawOBB(OBBCollider c, Color color, DrawMode mode)
+	{
+		Matrix4f mat = new Matrix4f();
+		
+		mat.translate(c.center());
+
+		c.orientation().applyRotation(mat);
+		
+		drawRectangle(mat, c.halfwidths(), color, mode);
+	}
 
 	public void drawRectangle(Matrix4fc transform, Vector3fc halfwidths,
 		Color color, DrawMode mode)
@@ -106,7 +119,7 @@ public class DebugRenderer implements IRenderable
 		try
 		{
 			Mesh m = ModelLoader.fromFile("assets/models/rectangle").createMesh(
-				0, 0, 0, halfwidths.x(), halfwidths.y(), halfwidths.z(), false);
+				0, 0, 0, halfwidths.x()*2, halfwidths.y()*2, halfwidths.z()*2, false);
 
 			float r, g, b;
 			r = color.getRed() / 255.0f;
@@ -134,5 +147,10 @@ public class DebugRenderer implements IRenderable
 		{
 			e.printStackTrace();
 		}
+	}
+
+	public void drawPoint(Vector3fc lineStart, Color color)
+	{
+		drawRectangle(new Matrix4f().translate(lineStart), new Vector3f(0.01f, 0.01f, 0.01f), color, DrawMode.FILL);
 	}
 }
