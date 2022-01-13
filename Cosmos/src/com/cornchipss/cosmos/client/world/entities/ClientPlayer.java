@@ -156,6 +156,11 @@ public class ClientPlayer extends Player
 			DebugRenderer.instance().drawRectangle(mat, hw, Color.yellow,
 				DrawMode.LINES);
 		}
+		
+		if(Input.isKeyJustDown(GLFW.GLFW_KEY_F))
+		{
+			this.body().transform().position(new Vector3f());
+		}
 
 		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R)
 			|| Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_1)

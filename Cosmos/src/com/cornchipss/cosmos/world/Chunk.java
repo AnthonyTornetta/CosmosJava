@@ -477,7 +477,7 @@ public class Chunk implements IWritable
 				if(c == null)
 					continue;
 				
-				DebugRenderer.instance().drawOBB(c, Color.PINK, DrawMode.LINES);
+//				DebugRenderer.instance().drawOBB(c, Color.PINK, DrawMode.LINES);
 				
 				Vector3f wc = structure().chunkCoordsToWorldCoords(this, v,
 					new Vector3f());

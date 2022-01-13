@@ -138,6 +138,8 @@ public abstract class Player extends PhysicalObject
 			pilotingShip.setPilot(null);
 		pilotingShip = null;
 		
+		this.body().transform().position(this.position().add(new Vector3f(0, -5, 0), new Vector3f()));
+		
 		if (s != null)
 		{
 			pilotingShip = s;

@@ -53,7 +53,7 @@ public class ServerGame extends Game
 			ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2, Blocks.SHIP_CORE);
 		}
 
-		ship.addToWorld(new Transform());
+		ship.addToWorld(new Transform(0, 5, 0));
 		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
 	}
 
