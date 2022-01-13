@@ -458,7 +458,6 @@ public class Chunk implements IWritable
 		boolean res = false;
 
 		float dist = Maths.sqrt(lineDelta.dot(lineDelta));
-//		Utils.println(dist);
 
 		Set<Vector3i> todo = new HashSet<>();
 		Set<Vector3i> nextTodo = new HashSet<>();
@@ -474,47 +473,25 @@ public class Chunk implements IWritable
 			{
 				structure().chunkCoordsToBlockCoords(this, v, here);
 				OBBCollider c = structure().wholeOBBForBlock(here);
-
+				
 				if(c == null)
 					continue;
-				else
-				{
-//					if(structure().block(here.x, here.y, here.z) != null)
-//						Utils.println(structure().block(here.x, here.y, here.z));
-
-//					DebugRenderer.instance().drawOBB(c, Color.pink,
-//						DrawMode.FILL);
-						
-				}
+				
+				DebugRenderer.instance().drawOBB(c, Color.PINK, DrawMode.LINES);
+				
 				Vector3f wc = structure().chunkCoordsToWorldCoords(this, v,
 					new Vector3f());
 
-//				Utils.println(lineStart);
-//				Utils.println(v);
-//				Utils.println(wc);
-//				Utils.println(this.relativePosition());
-//				Utils.println(wc.distance(lineStart));
-//				Utils.println(dist);
-
+				// 1 doesnt work so I use 2
 				if (wc.distance(lineStart) > dist + 2)
 				{
-//					DebugRenderer.instance().drawOBB(c, Color.pink,
-//						DrawMode.FILL);
-
 					continue;
-				}
-				else
-				{
-//					DebugRenderer.instance().drawOBB(c, Color.green,
-//						DrawMode.FILL);
 				}
 				
 				DebugRenderer.instance().drawRectangle(Maths.createTransformationMatrix(lineStart.add(lineDelta.div(2, new Vector3f()), new Vector3f()), Maths.blankQuaternion()), lineDelta.div(2, new Vector3f()), Color.black, DrawMode.FILL);
 
 				if (checker.testLineOBB(lineStart, lineDelta, c, null))
 				{
-					Utils.println("TRUE");
-					
 					temp.set(v.x + 1, v.y, v.z);
 					if (structure().withinBlocks(temp.x, temp.y, temp.z)
 						&& !todo.contains(temp) && !done.contains(temp))
@@ -542,12 +519,8 @@ public class Chunk implements IWritable
 
 					c = structure().obbForBlock(here);
 
-					Utils.println(c);
-					
 					if (c != null && checker.testLineOBB(lineStart, lineDelta, c, info))
 					{
-						Utils.println("DOUBLE TRUE");
-						Utils.println(structure().block(here.x, here.y, here.z));
 						DebugRenderer.instance().drawOBB(c, Color.GREEN, DrawMode.FILL);
 						res = true;
 					}
@@ -563,70 +536,6 @@ public class Chunk implements IWritable
 			else
 				return res;
 		}
-
-//		if (done.contains(temp.set(x, y, z)))
-//			return false;
-//
-//		Vector3i v = new Vector3i(x, y, z);
-//		
-//		done.add(v);
-//
-//		if (!within(x, y, z))
-//			return false;
-//		
-//		Vector3i blockCoords = structure().chunkCoordsToBlockCoords(this, v, new Vector3i());
-//
-//		OBBCollider c = structure().wholeOBBForBlock(blockCoords);
-//		if (c == null)
-//			return false;
-//
-//		DebugRenderer.instance().drawOBB(c, Color.pink, DrawMode.FILL);
-//		
-//		if (!checker.testLineOBB(lineStart, lineDelta, c, null))
-//		{	
-//			DebugRenderer.instance().drawOBB(c, Color.magenta, DrawMode.LINES);
-//			return false;
-//		}
-//		else
-//			DebugRenderer.instance().drawOBB(c, Color.pink, DrawMode.FILL);
-//		if (hasBlock(x, y, z))
-//		{
-//			OBBCollider obbc = structure().obbForBlock(blockCoords);
-//			if (checker.testLineOBB(lineStart, lineDelta, obbc, info))
-//			{
-//				return true;
-//			}
-//		}
-//
-//		boolean res = testLineIntersection(lineStart, lineDelta, dir, info,
-//			checker, x + dir.x(), y, z, done, temp);
-//
-//		if (res && info == null)
-//			return true;
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info,
-//			checker, x, y + dir.y(), z, done, temp);
-//		if (res && info == null)
-//			return true;
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info,
-//			checker, x, y, z + dir.z(), done, temp);
-//		if (res && info == null)
-//			return true;
-
-		// me thinks these are useless but me not 100% sure
-
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
-//		if(res && info == null)
-//			return true;
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x, y + dir.y(), z + dir.z(), done, temp);
-//		if(res && info == null)
-//			return true;
-//		
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z, done, temp);
-//		if(res && info == null)
-//			return true;
-//		res = res || testLineIntersection(lineStart, lineDelta, dir, info, checker, x + dir.x(), y + dir.y(), z + dir.z(), done, temp);
-//		if(res && info == null)
-//			return true;
 
 		return res;
 	}
@@ -646,8 +555,6 @@ public class Chunk implements IWritable
 			DebugRenderer.instance().drawPoint(lineStart.add(lineDelta, new Vector3f()), Color.orange);
 		}
 
-//		Logger.LOGGER.info("within");
-
 		Set<Vector3i> done = new HashSet<>();
 
 		Vector3i direction = Maths.signumi(lineDelta, new Vector3i());
@@ -658,84 +565,6 @@ public class Chunk implements IWritable
 
 		return testLineIntersection(lineStart, lineDelta, direction, info,
 			checker, here.x, here.y, here.z, done, new Vector3i());
-
-//		OBBCollider chunkCollider = structure.obbForChunk(this);
-//		
-//		CollisionInfo tempInfo = new CollisionInfo();
-//		
-//		// Checks if the line is within the chunk
-//		if(!checker.testLineOBB(lineStart, lineDelta, chunkCollider, tempInfo))
-//		{
-//			tempInfo.collisionPoint.set(lineStart);
-//		}
-//		
-//		Vector3f point = tempInfo.collisionPoint;
-//		point.add(lineDelta.normalize(EPSILON, new Vector3f()));
-//		
-//		float totalDist = lineDelta.dot(lineDelta);
-//		
-//		Set<Vector3i> places = new HashSet<>();
-//		places.add(structure.worldCoordsToChunkCoords(point));
-//		
-//		Set<Vector3i> nextPlaces = new HashSet<>();
-//		
-//		while(places.size() != 0)
-//		{
-//			boolean hit = false;
-//			boolean tooFar = false;
-//			
-//			for(Vector3i p : places)
-//			{
-//				if(this.hasBlock(p) && 
-//						checker.testLineOBB(lineStart, lineDelta, 
-//								structure.obbForBlock(this, p.x, p.y, p.z), info))
-//				{
-//					if(info == null)
-//						return true;
-//					
-//					if(info.distanceSquared <= totalDist)
-//						hit = true;
-//					else
-//						tooFar = true;
-//				}
-//				else if(checker.testLineOBB(lineStart, lineDelta, structure.wholeOBBForBlock(this, p.x, p.y, p.z), null))
-//				{
-//					for(int dz = 0; dz <= 1; dz++)
-//					{
-//						for(int dy = 0; dy <= 1; dy++)
-//						{
-//							// skip 0, 0, 0
-//							for(int dx = (dz == 0 && dy == 0) ? 1 : 0; dx <= 1; dx++)
-//							{
-//								int xx, yy, zz;
-//								xx = p.x + (int)Math.signum(lineDelta.x()) * dx;
-//								yy = p.y + (int)Math.signum(lineDelta.y()) * dy;
-//								zz = p.z + (int)Math.signum(lineDelta.z()) * dz;
-//								
-//								if(within(xx, yy, zz))
-//								{
-//									Vector3i v = new Vector3i(xx, yy, zz);
-//									if(!places.contains(v))
-//									{
-//										nextPlaces.add(v);
-//									}
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-//			
-//			places = nextPlaces;
-//			nextPlaces = new HashSet<>();
-//
-//			if(hit)
-//				return true;
-//			else if(tooFar)
-//				return false;
-//		}
-//		
-//		return false;
 	}
 
 	public boolean empty()

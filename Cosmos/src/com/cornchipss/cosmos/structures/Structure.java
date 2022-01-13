@@ -611,8 +611,8 @@ public abstract class Structure extends PhysicalObject
 	public Vector3i worldCoordsToChunkCoords(Vector3fc v)
 	{
 		Vector3f temp = new Vector3f(v);
-		this.body().transform().orientation().applyInverseRotation(temp, temp);
 		temp.sub(body().transform().position());
+		this.body().transform().orientation().applyInverseRotation(temp, temp);
 
 		Vector3i ret = new Vector3i();
 		if (cWidth % 2 == 0)
