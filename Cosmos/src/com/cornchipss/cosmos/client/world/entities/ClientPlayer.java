@@ -149,7 +149,7 @@ public class ClientPlayer extends Player
 			mat.translate(c.center());
 
 			c.orientation().applyRotation(mat);
-
+			
 			Vector3f hw = new Vector3f().set(c.halfwidths());
 			hw.add(0.001f, 0.001f, 0.001f);
 

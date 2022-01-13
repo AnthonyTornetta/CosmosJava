@@ -18,7 +18,6 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -80,7 +79,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 	{
 		OBBCollider bOBB = b.structure().obbForChunk(b);
 
-		Vector3fc pos = a.structure().chunkWorldPosCentered(a, new Vector3f());
+		Vector3fc pos = a.structure().chunkWorldPosition(a, new Vector3f());
 
 		List<Integer> xs = new LinkedList<>();
 		List<Integer> ys = new LinkedList<>();
@@ -200,6 +199,103 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		}
 
 		return hit;
+	}
+	
+	private boolean c(OBBCollider a, OBBCollider b)
+	{
+		Vector3fc[] A = a.localAxis();
+		Vector3fc[] B = b.localAxis();
+		
+		// cij = Ai · Bj
+		float[][] c = new float[3][3];
+		for(int i = 0; i < 3; i++)
+		{
+			for(int j = 0; j < 3; j++)
+			{
+				c[i][j] = A[i].dot(B[j]);
+			}
+		}
+		
+		// file:///C:/Users/Cornchip/AppData/Local/Temp/DynamicCollisionDetection.pdf
+		
+		Vector3fc D = b.center().sub(a.center(), new Vector3f());
+		
+		for(int i = 0; i < 3; i++)
+		{
+			if(Math.abs(A[i].dot(D)) > a.halfwidths().get(i) 
+				+ b.halfwidths().x() * Math.abs(c[i][0]) 
+				+ b.halfwidths().y() * Math.abs(c[i][1]) 
+				+ b.halfwidths().z() * Math.abs(c[i][2]))
+			{
+				return false;
+			}
+		}
+		
+		for(int i = 0; i < 3; i++)
+		{
+			if(Math.abs(B[i].dot(D)) > b.halfwidths().get(i) 
+				+ a.halfwidths().x() * Math.abs(c[0][i]) 
+				+ a.halfwidths().y() * Math.abs(c[1][i]) 
+				+ a.halfwidths().z() * Math.abs(c[2][i]))
+			{
+				return false;
+			}
+		}
+		
+		if(c[1][0] * A[2].dot(D) - c[2][0] * A[1].dot(D) > 
+			a.halfwidths().y() * Math.abs(c[2][0]) 
+			+ a.halfwidths().z() * Math.abs(c[1][0]) 
+			+ b.halfwidths().y() * Math.abs(c[0][2]) 
+			+ b.halfwidths().z() * Math.abs(c[0][1]))
+		{
+			return false;
+		}
+		
+		if(c[1][1] * A[2].dot(D) - c[2][1] * A[1].dot(D) > 
+			a.halfwidths().y() * Math.abs(c[2][1]) 
+			+ a.halfwidths().z() * Math.abs(c[1][1]) 
+			+ b.halfwidths().x() * Math.abs(c[0][2]) 
+			+ b.halfwidths().z() * Math.abs(c[0][0]))
+		{
+			return false;
+		}
+		
+		if(Math.abs(c[1][2] * A[2].dot(D) - c[2][2] * A[1].dot(D)) > 
+			a.halfwidths().y() * Math.abs(c[2][2]) 
+			+ a.halfwidths().z() * Math.abs(c[1][2]) 
+			+ b.halfwidths().x() * Math.abs(c[0][1]) 
+			+ b.halfwidths().y() * Math.abs(c[0][0]))
+		{
+			return false;
+		}
+		
+		if(Math.abs(c[2][0] * A[0].dot(D) - c[0][0] * A[2].dot(D)) > 
+			a.halfwidths().x() * Math.abs(c[2][0]) 
+			+ a.halfwidths().z() * Math.abs(c[0][0]) 
+			+ b.halfwidths().y() * Math.abs(c[1][2]) 
+			+ b.halfwidths().z() * Math.abs(c[1][1]))
+		{
+			return false;
+		}
+		
+		if(Math.abs(c[2][0] * A[0].dot(D) - c[0][0] * A[2].dot(D)) > 
+			a.halfwidths().x() * Math.abs(c[2][0]) 
+			+ a.halfwidths().z() * Math.abs(c[0][0]) 
+			+ b.halfwidths().y() * Math.abs(c[1][2]) 
+			+ b.halfwidths().z() * Math.abs(c[1][1]))
+		{
+			return false;
+		}
+		
+		for(int i = 0; i < A.length; i++)
+		{
+			for(int j = 0; j < B.length; j++)
+			{
+				
+			}
+		}
+		
+		return true;
 	}
 
 	@Override

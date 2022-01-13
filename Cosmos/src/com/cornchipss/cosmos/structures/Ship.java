@@ -67,8 +67,12 @@ public class Ship extends Structure
 		{
 			movement(Movement.movement(MovementType.NONE));
 
-			if (pilot != null)
-				pilot.shipPiloting(null);
+			Player temp = pilot;
+			
+			pilot = null;
+			
+			if (temp != null)
+				temp.shipPiloting(null);
 
 			pilot = p;
 			if (p != null)

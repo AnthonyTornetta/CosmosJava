@@ -367,44 +367,29 @@ public abstract class Structure extends PhysicalObject
 		return chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH);
 	}
 
+	/**
+	 * The center of the chunk relative to the world's center
+	 * @param c The chunk
+	 * @param out The output vector
+	 * @return center of the chunk relative to the structure's center
+	 */
 	public Vector3f chunkWorldPosition(Chunk c, Vector3f out)
 	{
-		return chunkRelativePos(c, out).add(position());
+		chunkRelativePosCentered(c, out);
+		this.body().transform().orientation().applyRotation(out, out);
+		return out.add(position());
 	}
 
-	public Vector3f chunkWorldPosCentered(Chunk c, Vector3f out)
-	{
-		return chunkRelativePosCentered(c, out).add(position());
-	}
-
+	/**
+	 * The center of the chunk relative to the structure's center
+	 * @param c The chunk
+	 * @param out The output vector
+	 * @return center of the chunk relative to the structure's center
+	 */
 	public Vector3f chunkRelativePosCentered(Chunk c, Vector3f out)
 	{
-		Orientation o = body().transform().orientation();
-
-		Vector3f temp = new Vector3f(c.relativePosition());
-
-		return o.applyRotation(temp, temp);
-	}
-
-	public Vector3f chunkRelativePosCentered(int x, int y, int z, Vector3f out)
-	{
-		return out.set(
-			Chunk.WIDTH * (x - chunksWidth() / 2.f) + Chunk.WIDTH / 2.f,
-			Chunk.HEIGHT * (x - chunksHeight() / 2.f) + Chunk.HEIGHT / 2.f,
-			Chunk.LENGTH * (x - chunksLength() / 2.f) + Chunk.LENGTH / 2.f);
-	}
-
-	public Vector3f chunkRelativePos(Chunk c, Vector3f out)
-	{
-		return chunkRelativePos(c.localPosition().x(), c.localPosition().y(),
-			c.localPosition().z(), out);
-	}
-
-	public Vector3f chunkRelativePos(int x, int y, int z, Vector3f out)
-	{
-		return out.set(Chunk.WIDTH * (x - chunksWidth() / 2.f),
-			Chunk.HEIGHT * (x - chunksHeight() / 2.f),
-			Chunk.LENGTH * (x - chunksLength() / 2.f));
+		return out.set(c.relativePosition().x(), c.relativePosition().y(),
+			c.relativePosition().z());
 	}
 
 	public void init()
@@ -599,17 +584,27 @@ public abstract class Structure extends PhysicalObject
 			local.z() % Chunk.LENGTH);
 	}
 
+	/**
+	 * The position of the center the block in the world at this position in chunk coordinates [0-16)
+	 * @param c The chunk
+	 * @param pos The position relative to the chunk (bounded by [0, 16))
+	 * @param out The output vector
+	 * @return position of the center the block in the world at this position in chunk coordinates
+	 */
 	public Vector3f chunkCoordsToWorldCoords(Chunk c, Vector3i pos,
 		Vector3f out)
 	{
-		Vector3f posF = new Vector3f(pos.x + 0.5f, pos.y + 0.5f, pos.z + 0.5f);
-
-		this.chunkWorldPosition(c, out);
-
-		this.body().transform().orientation().applyRotation(posF, posF);
-
-		out.add(posF);
-
+		this.chunkRelativePosCentered(c, out);
+		
+		out.add(
+			pos.x - Chunk.HALF_WIDTH + 0.5f, 
+			pos.y - Chunk.HALF_HEIGHT + 0.5f, 
+			pos.z - Chunk.HALF_LENGTH + 0.5f);
+		
+		body().transform().orientation().applyRotation(out, out);
+		
+		out.add(position());
+		
 		return out;
 	}
 
@@ -935,7 +930,7 @@ public abstract class Structure extends PhysicalObject
 
 	public OBBCollider obbForChunk(Chunk c)
 	{
-		return new OBBCollider(chunkWorldPosCentered(c, new Vector3f()),
+		return new OBBCollider(chunkWorldPosition(c, new Vector3f()),
 			body().transform().orientation(), Chunk.HALF_DIMENSIONS);
 	}
 
@@ -947,8 +942,8 @@ public abstract class Structure extends PhysicalObject
 
 	public Vector3f blockCoordToWorldCoord(Vector3ic b, Vector3f out)
 	{
-		out.set(b.x() - width() / 2.f - 0.5f, b.y() - height() / 2.f - 0.5f,
-			b.z() - length() / 2.f - 0.5f);
+		out.set(b.x() - width() / 2.f + 0.5f, b.y() - height() / 2.f + 0.5f,
+			b.z() - length() / 2.f + 0.5f);
 
 		this.body().transform().orientation().applyRotation(out, out);
 
@@ -963,7 +958,7 @@ public abstract class Structure extends PhysicalObject
 			halfwidths);
 	}
 
-	private OBBCollider genOBB(Vector3i pos, Vector3fc halfwidths)
+	private OBBCollider genOBB(Vector3ic pos, Vector3fc halfwidths)
 	{
 		return genOBB(blockCoordToWorldCoord(pos, new Vector3f()),
 			halfwidths);
@@ -972,9 +967,9 @@ public abstract class Structure extends PhysicalObject
 	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f,
 		0.5f, 0.5f);
 
-	public OBBCollider wholeOBBForBlock(Vector3i pos)
+	public OBBCollider wholeOBBForBlock(Vector3ic pos)
 	{
-		if (withinBlocks(pos.x, pos.y, pos.z))
+		if (withinBlocks(pos.x(), pos.y(), pos.z()))
 			return genOBB(pos, HALF_WIDTHS_DEFAULT);
 
 		return null;
@@ -983,7 +978,7 @@ public abstract class Structure extends PhysicalObject
 	public OBBCollider obbForBlock(Vector3ic pos)
 	{
 		if (hasBlock(pos.x(), pos.y(), pos.z()))
-			return genOBB(blockCoordsToWorldCoords(pos, new Vector3f()), block(pos.x(), pos.y(), pos.z()).halfWidths());
+			return genOBB(pos, block(pos.x(), pos.y(), pos.z()).halfWidths());
 
 		return null;
 	}
