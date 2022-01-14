@@ -50,8 +50,6 @@ public abstract class Structure extends PhysicalObject
 	private int width, height, length;
 
 	private int cWidth, cHeight, cLength;
-	private boolean rendered = false;
-
 	private LightMap lightMap;
 
 	private int id;
@@ -170,16 +168,10 @@ public abstract class Structure extends PhysicalObject
 		CollisionInfo info = new CollisionInfo();
 		info.distanceSquared = totalDistSquared;
 		RayRes rr = null;
-
-//		int xx = (int) Math.abs(delta.z());
-//		int yy = (int) Math.abs(delta.y());
-//		int zz = (int) Math.abs(delta.z());
-
+		
 		int signX = (int) Math.signum(delta.x());
 		int signY = (int) Math.signum(delta.y());
 		int signZ = (int) Math.signum(delta.z());
-
-		// TODO: make this more efficient
 
 		Set<Vector3ic> done = new HashSet<>();
 		Set<Vector3ic> todo = new HashSet<>();
@@ -189,9 +181,6 @@ public abstract class Structure extends PhysicalObject
 
 		todo.add(worldCoordsToBlockCoords(start, tempVec));
 
-//		for(int dz = -1; dz)
-//		todo.add(new Vector3i(tempVec.x, tempVec.y - 1, tempVec.z));
-		
 		Vector3f tempDistanceVec = new Vector3f();
 
 		float ddddd = Maths.sqrt(delta.dot(delta));
@@ -261,49 +250,6 @@ public abstract class Structure extends PhysicalObject
 				nextTodo = new HashSet<>();
 			}
 		}
-
-//		for (int xi = -xx - 1; xi <= xx + 10; xi++)
-//		{
-//			for (int yi = -yy - 1; yi <= yy + 10; yi++)
-//			{
-//				for (int zi = -zz - 1; zi <= zz + 10; zi++)
-//				{
-//					Vector3f point = new Vector3f(start.x() + xi * signX,
-//						start.y() + yi * signY, start.z() + zi * signZ);
-//
-//					Vector3i blockCoords = worldCoordsToBlockCoords(point,
-//						new Vector3i());
-//
-//					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
-//						&& withinBlocks(blockCoords.x, blockCoords.y,
-//							blockCoords.z))
-//					{
-//						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x,
-//							blockCoords.y, blockCoords.z);
-//
-//						CollisionInfo temp = new CollisionInfo();
-//
-//						if (obc.testLineOBB(start, delta, obbBlock, temp))
-//						{
-//							if (temp.distanceSquared < info.distanceSquared
-//								&& temp.normal.dot(temp.normal) != 0)
-//							{
-//								info.set(temp);
-//								BlockFace face = BlockFace
-//									.fromNormal(body().transform().orientation()
-//										.applyInverseRotation(info.normal,
-//											new Vector3f()));
-//
-//								rr = new RayRes(
-//									new StructureBlock(this, blockCoords.x,
-//										blockCoords.y, blockCoords.z),
-//									Maths.sqrt(info.distanceSquared), face);
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
 
 		return rr;
 	}
@@ -662,12 +608,6 @@ public abstract class Structure extends PhysicalObject
 			&& z < length;
 	}
 
-	public Vector3i structureCoordsToChunkCoords(Vector3ic local)
-	{
-		return new Vector3i(local.x() % Chunk.WIDTH, local.y() % Chunk.HEIGHT,
-			local.z() % Chunk.LENGTH);
-	}
-
 	/**
 	 * The position of the center the block in the world at this position in
 	 * chunk coordinates [0-16)
@@ -964,19 +904,6 @@ public abstract class Structure extends PhysicalObject
 	public int id()
 	{
 		return id;
-	}
-
-	public boolean hasBeenRendered()
-	{
-		return rendered;
-	}
-
-	public void render()
-	{
-		for (Chunk c : chunks)
-			c.render();
-
-		rendered = true;
 	}
 
 	@Override
