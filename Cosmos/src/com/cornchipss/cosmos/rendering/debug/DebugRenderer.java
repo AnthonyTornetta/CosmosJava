@@ -35,6 +35,8 @@ public class DebugRenderer implements IRenderable
 
 	private List<DebugInfo> info = new LinkedList<>();
 	private DebugMaterial debugMaterial;
+	
+	private boolean enabled = false;
 
 	private DebugRenderer()
 	{
@@ -62,7 +64,7 @@ public class DebugRenderer implements IRenderable
 
 	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
 		ClientPlayer p)
-	{
+	{		
 		debugMaterial.use();
 
 		for (DebugInfo m : info)
@@ -104,6 +106,9 @@ public class DebugRenderer implements IRenderable
 	
 	public void drawOBB(OBBCollider c, Color color, DrawMode mode)
 	{
+		if(!enabled())
+			return;
+		
 		Matrix4f mat = new Matrix4f();
 		
 		mat.translate(c.center());
@@ -116,6 +121,9 @@ public class DebugRenderer implements IRenderable
 	public void drawRectangle(Matrix4fc transform, Vector3fc halfwidths,
 		Color color, DrawMode mode)
 	{
+		if(!enabled())
+			return;
+		
 		try
 		{
 			Mesh m = ModelLoader.fromFile("assets/models/rectangle").createMesh(
@@ -151,6 +159,24 @@ public class DebugRenderer implements IRenderable
 
 	public void drawPoint(Vector3fc lineStart, Color color)
 	{
+		if(!enabled())
+			return;
+		
 		drawRectangle(new Matrix4f().translate(lineStart), new Vector3f(0.01f, 0.01f, 0.01f), color, DrawMode.FILL);
+	}
+
+	public boolean enabled()
+	{
+		return enabled;
+	}	
+	
+	public void enabled(boolean b)
+	{
+		enabled = b;
+	}
+	
+	public void toggleEnabled()
+	{
+		enabled = !enabled;
 	}
 }

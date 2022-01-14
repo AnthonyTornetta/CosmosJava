@@ -1,9 +1,12 @@
 package com.cornchipss.cosmos.structures;
 
+import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
@@ -11,14 +14,12 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
-import org.joml.Vector4f;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
-import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
@@ -27,6 +28,8 @@ import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.MaterialMesh;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
 import com.cornchipss.cosmos.systems.BlockSystemManager;
 import com.cornchipss.cosmos.utils.IUpdatable;
@@ -168,9 +171,9 @@ public abstract class Structure extends PhysicalObject
 		info.distanceSquared = totalDistSquared;
 		RayRes rr = null;
 
-		int xx = (int) Math.abs(delta.z());
-		int yy = (int) Math.abs(delta.y());
-		int zz = (int) Math.abs(delta.z());
+//		int xx = (int) Math.abs(delta.z());
+//		int yy = (int) Math.abs(delta.y());
+//		int zz = (int) Math.abs(delta.z());
 
 		int signX = (int) Math.signum(delta.x());
 		int signY = (int) Math.signum(delta.y());
@@ -178,48 +181,129 @@ public abstract class Structure extends PhysicalObject
 
 		// TODO: make this more efficient
 
-		for (int xi = -xx - 1; xi <= xx + 10; xi++)
+		Set<Vector3ic> done = new HashSet<>();
+		Set<Vector3ic> todo = new HashSet<>();
+		Set<Vector3ic> nextTodo = new HashSet<>();
+
+		Vector3i tempVec = new Vector3i();
+
+		todo.add(worldCoordsToBlockCoords(start, tempVec));
+
+//		for(int dz = -1; dz)
+//		todo.add(new Vector3i(tempVec.x, tempVec.y - 1, tempVec.z));
+		
+		Vector3f tempDistanceVec = new Vector3f();
+
+		float ddddd = Maths.sqrt(delta.dot(delta));
+
+		while (todo.size() != 0 && rr == null)
 		{
-			for (int yi = -yy - 1; yi <= yy + 10; yi++)
+			for (Vector3ic point : todo)
 			{
-				for (int zi = -zz - 1; zi <= zz + 10; zi++)
+				this.blockCoordsToWorldCoords(point, tempDistanceVec);
+
+				if (start.distance(tempDistanceVec) + 2 > ddddd)
+					continue;
+
+				if (withinBlocks(point.x(), point.y(), point.z()))
 				{
-					Vector3f point = new Vector3f(start.x() + xi * signX,
-						start.y() + yi * signY, start.z() + zi * signZ);
+					OBBCollider obbBlock = wholeOBBForBlock(point.x(),
+						point.y(), point.z());
 
-					Vector3i blockCoords = worldCoordsToBlockCoords(point,
-						new Vector3i());
+					CollisionInfo temp = new CollisionInfo();
 
-					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
-						&& withinBlocks(blockCoords.x, blockCoords.y,
-							blockCoords.z))
+					DebugRenderer.instance().drawOBB(obbBlock, Color.pink,
+						DrawMode.LINES);
+
+					if (obc.testLineOBB(start, delta, obbBlock, temp))
 					{
-						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x,
-							blockCoords.y, blockCoords.z);
 
-						CollisionInfo temp = new CollisionInfo();
-
-						if (obc.testLineOBB(start, delta, obbBlock, temp))
+						if (hasBlock(point.x(), point.y(), point.z())
+							&& temp.distanceSquared < info.distanceSquared
+							&& temp.normal.dot(temp.normal) != 0)
 						{
-							if (temp.distanceSquared < info.distanceSquared
-								&& temp.normal.dot(temp.normal) != 0)
-							{
-								info.set(temp);
-								BlockFace face = BlockFace
-									.fromNormal(body().transform().orientation()
-										.applyInverseRotation(info.normal,
-											new Vector3f()));
+							info.set(temp);
+							BlockFace face = BlockFace.fromNormal(body()
+								.transform().orientation().applyInverseRotation(
+									info.normal, new Vector3f()));
 
-								rr = new RayRes(
-									new StructureBlock(this, blockCoords.x,
-										blockCoords.y, blockCoords.z),
-									Maths.sqrt(info.distanceSquared), face);
-							}
+							rr = new RayRes(
+								new StructureBlock(this, point.x(), point.y(),
+									point.z()),
+								Maths.sqrt(info.distanceSquared), face);
+						}
+						else if (rr == null)
+						{
+							Vector3i tempV = new Vector3i(point.x() + signX,
+								point.y(), point.z());
+							if (!done.contains(tempV) && !todo.contains(tempV))
+								nextTodo.add(tempV);
+
+							tempV = new Vector3i(point.x(), point.y() + signY,
+								point.z());
+							if (!done.contains(tempV) && !todo.contains(tempV))
+								nextTodo.add(tempV);
+
+							tempV = new Vector3i(point.x(), point.y(),
+								point.z() + signZ);
+							if (!done.contains(tempV) && !todo.contains(tempV))
+								nextTodo.add(tempV);
 						}
 					}
+
 				}
 			}
+
+			if (rr == null)
+			{
+				done.addAll(todo);
+				todo = nextTodo;
+				nextTodo = new HashSet<>();
+			}
 		}
+
+//		for (int xi = -xx - 1; xi <= xx + 10; xi++)
+//		{
+//			for (int yi = -yy - 1; yi <= yy + 10; yi++)
+//			{
+//				for (int zi = -zz - 1; zi <= zz + 10; zi++)
+//				{
+//					Vector3f point = new Vector3f(start.x() + xi * signX,
+//						start.y() + yi * signY, start.z() + zi * signZ);
+//
+//					Vector3i blockCoords = worldCoordsToBlockCoords(point,
+//						new Vector3i());
+//
+//					if (hasBlock(blockCoords.x, blockCoords.y, blockCoords.z)
+//						&& withinBlocks(blockCoords.x, blockCoords.y,
+//							blockCoords.z))
+//					{
+//						OBBCollider obbBlock = wholeOBBForBlock(blockCoords.x,
+//							blockCoords.y, blockCoords.z);
+//
+//						CollisionInfo temp = new CollisionInfo();
+//
+//						if (obc.testLineOBB(start, delta, obbBlock, temp))
+//						{
+//							if (temp.distanceSquared < info.distanceSquared
+//								&& temp.normal.dot(temp.normal) != 0)
+//							{
+//								info.set(temp);
+//								BlockFace face = BlockFace
+//									.fromNormal(body().transform().orientation()
+//										.applyInverseRotation(info.normal,
+//											new Vector3f()));
+//
+//								rr = new RayRes(
+//									new StructureBlock(this, blockCoords.x,
+//										blockCoords.y, blockCoords.z),
+//									Maths.sqrt(info.distanceSquared), face);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		return rr;
 	}
@@ -289,8 +373,6 @@ public abstract class Structure extends PhysicalObject
 		Vector3f temp = new Vector3f();
 		Vector3f tempPos = new Vector3f(pos.x, pos.y, pos.z);
 
-		Vector3f tempX = new Vector3f();
-		
 		for (int dz = -radius; dz <= radius; dz++)
 		{
 			for (int dy = -radius; dy <= radius; dy++)
@@ -369,7 +451,8 @@ public abstract class Structure extends PhysicalObject
 
 	/**
 	 * The center of the chunk relative to the world's center
-	 * @param c The chunk
+	 * 
+	 * @param c   The chunk
 	 * @param out The output vector
 	 * @return center of the chunk relative to the structure's center
 	 */
@@ -382,7 +465,8 @@ public abstract class Structure extends PhysicalObject
 
 	/**
 	 * The center of the chunk relative to the structure's center
-	 * @param c The chunk
+	 * 
+	 * @param c   The chunk
 	 * @param out The output vector
 	 * @return center of the chunk relative to the structure's center
 	 */
@@ -585,26 +669,27 @@ public abstract class Structure extends PhysicalObject
 	}
 
 	/**
-	 * The position of the center the block in the world at this position in chunk coordinates [0-16)
-	 * @param c The chunk
+	 * The position of the center the block in the world at this position in
+	 * chunk coordinates [0-16)
+	 * 
+	 * @param c   The chunk
 	 * @param pos The position relative to the chunk (bounded by [0, 16))
 	 * @param out The output vector
-	 * @return position of the center the block in the world at this position in chunk coordinates
+	 * @return position of the center the block in the world at this position in
+	 *         chunk coordinates
 	 */
 	public Vector3f chunkCoordsToWorldCoords(Chunk c, Vector3i pos,
 		Vector3f out)
 	{
 		this.chunkRelativePosCentered(c, out);
-		
-		out.add(
-			pos.x - Chunk.HALF_WIDTH + 0.5f, 
-			pos.y - Chunk.HALF_HEIGHT + 0.5f, 
-			pos.z - Chunk.HALF_LENGTH + 0.5f);
-		
+
+		out.add(pos.x - Chunk.HALF_WIDTH + 0.5f,
+			pos.y - Chunk.HALF_HEIGHT + 0.5f, pos.z - Chunk.HALF_LENGTH + 0.5f);
+
 		body().transform().orientation().applyRotation(out, out);
-		
+
 		out.add(position());
-		
+
 		return out;
 	}
 
@@ -797,30 +882,27 @@ public abstract class Structure extends PhysicalObject
 
 	public Vector3i worldCoordsToBlockCoords(Vector3fc v, Vector3i out)
 	{
-		return worldCoordsToStructureCoords(v.x(), v.y(), v.z(), out);
-	}
-
-	public Vector3i worldCoordsToStructureCoords(float x, float y, float z,
-		Vector3i out)
-	{
-		Vector4f c = new Vector4f(x, y, z, 1);
-
-		body().transform().invertedMatrix().transform(c);
-
-		return out.set((int) c.x + width() / 2, (int) c.y + height() / 2,
-			(int) c.z + length() / 2);
+		Vector3f temp = new Vector3f(v);
+		temp.sub(position());
+		body().transform().orientation().applyInverseRotation(temp, temp);
+		
+		temp.add(width() / 2.f, height() / 2.f, length() / 2.f);
+		
+		out.set((int)temp.x, (int)temp.y, (int)temp.z);
+		
+		return out;
 	}
 
 	public Vector3f blockCoordsToWorldCoords(float x, float y, float z,
 		Vector3f storage)
 	{
-		storage.set(x - width() / 2.f + 0.5f,
-			y - height() / 2.f + 0.5f, z - length() / 2.f + 0.5f);
+		storage.set(x - width() / 2.f + 0.5f, y - height() / 2.f + 0.5f,
+			z - length() / 2.f + 0.5f);
 
 		body().transform().orientation().applyRotation(storage, storage);
-		
+
 		storage.add(body().transform().position());
-		
+
 		return storage;
 	}
 
@@ -833,13 +915,13 @@ public abstract class Structure extends PhysicalObject
 	{
 		return blockCoordsToWorldCoords(v.x(), v.y(), v.z(), storage);
 	}
-	
+
 	public Vector3i chunkCoordsToBlockCoords(Chunk c, Vector3ic v, Vector3i out)
 	{
 		Vector3fc rp = c.relativePosition();
-		
-		out.set((int)rp.x(), (int)rp.y(), (int)rp.z());
-		
+
+		out.set((int) rp.x(), (int) rp.y(), (int) rp.z());
+
 		out.x += v.x() - Chunk.WIDTH / 2 + width() / 2;
 		out.y += v.y() - Chunk.HEIGHT / 2 + height() / 2;
 		out.z += v.z() - Chunk.LENGTH / 2 + length() / 2;
@@ -960,8 +1042,7 @@ public abstract class Structure extends PhysicalObject
 
 	private OBBCollider genOBB(Vector3ic pos, Vector3fc halfwidths)
 	{
-		return genOBB(blockCoordToWorldCoord(pos, new Vector3f()),
-			halfwidths);
+		return genOBB(blockCoordToWorldCoord(pos, new Vector3f()), halfwidths);
 	}
 
 	private static final Vector3fc HALF_WIDTHS_DEFAULT = new Vector3f(0.5f,

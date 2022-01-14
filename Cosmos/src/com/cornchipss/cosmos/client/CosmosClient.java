@@ -2,8 +2,6 @@ package com.cornchipss.cosmos.client;
 
 import java.io.IOException;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.cornchipss.cosmos.client.states.GameState;
 import com.cornchipss.cosmos.client.states.MainMenuState;
 import com.cornchipss.cosmos.client.states.State;
@@ -110,12 +108,6 @@ public class CosmosClient implements Runnable
 
 		GameLoop loop = new GameLoop((float delta) ->
 		{
-			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
-				Input.toggleCursor();
-
-			if (Input.isKeyDown(GLFW.GLFW_KEY_ESCAPE))
-				running(false);
-
 			state.update(delta);
 
 			window.clear(0, 0, 0, 1);

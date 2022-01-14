@@ -25,6 +25,7 @@ import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Window;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.utils.DebugMonitor;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -190,7 +191,7 @@ public class ClientGame extends Game
 			}
 		}
 
-		if (Input.isKeyJustDown(GLFW.GLFW_KEY_P))
+		if (Input.isKeyJustDown(GLFW.GLFW_KEY_ESCAPE))
 		{
 			togglePause();
 		}
@@ -204,8 +205,11 @@ public class ClientGame extends Game
 			if (gui == null)
 				initGraphics();
 
-			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
+			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
 				drawGUI = !drawGUI;
+			
+			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
+				DebugRenderer.instance().toggleEnabled();
 
 			fpsText.text(DebugMonitor.get("ups") + " "
 				+ (int) ((Float) DebugMonitor.get("ups-variance") * 1000)

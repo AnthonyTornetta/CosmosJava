@@ -57,7 +57,7 @@ public class ClientWorld extends World implements IRenderable
 				if(r.shouldBeDrawn())
 					r.draw(projectionMatrix, camera, p);
 			
-			if(DebugRenderer.instance().shouldBeDrawn())
+			if(DebugRenderer.instance().enabled() && DebugRenderer.instance().shouldBeDrawn())
 				DebugRenderer.instance().draw(projectionMatrix, camera, p);
 		}
 		catch(ConcurrentModificationException ex)

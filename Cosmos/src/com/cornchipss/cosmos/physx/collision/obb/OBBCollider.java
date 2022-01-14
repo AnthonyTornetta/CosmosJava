@@ -15,7 +15,7 @@ public class OBBCollider implements Iterable<Vector3fc>
 	private Vector3f halfwidths;
 	private Orientation or;
 
-	private int ccX, ccY, ccZ;
+	private int cornerCountX, cornerCountY, cornerCountZ;
 
 	public OBBCollider(Vector3fc center, Orientation orientation,
 		Vector3fc halfwidths)
@@ -26,9 +26,9 @@ public class OBBCollider implements Iterable<Vector3fc>
 		localAxis[2] = new Vector3f(orientation.forward());
 		this.halfwidths = new Vector3f(halfwidths);
 
-		ccX = (int) Math.ceil(halfwidths.x() * 2);
-		ccY = (int) Math.ceil(halfwidths.y() * 2);
-		ccZ = (int) Math.ceil(halfwidths.z() * 2);
+		cornerCountX = (int) Math.ceil(halfwidths.x() * 2);
+		cornerCountY = (int) Math.ceil(halfwidths.y() * 2);
+		cornerCountZ = (int) Math.ceil(halfwidths.z() * 2);
 
 		this.or = orientation;
 	}
@@ -36,7 +36,7 @@ public class OBBCollider implements Iterable<Vector3fc>
 	private static class CornerIterator implements Iterator<Vector3fc>
 	{
 		int cx = 0, cy = 0, cz = 0;
-		
+
 		OBBCollider obc;
 		Vector3f temp = new Vector3f();
 
@@ -48,41 +48,28 @@ public class OBBCollider implements Iterable<Vector3fc>
 		@Override
 		public boolean hasNext()
 		{
-			return cz <= obc.ccZ;
+			return cz <= obc.cornerCountZ;
 		}
 
 		@Override
 		public Vector3fc next()
 		{
-//			float x = ((i % obc.ccX + 1) / obc.ccX - 0.5f) * obc.halfwidths.x() * 2;
-//			float y = ((i % obc.ccY + 1) / obc.ccY - 0.5f) * obc.halfwidths.y() * 2;
-//			float z = ((i % obc.ccZ + 1) / obc.ccZ - 0.5f) * obc.halfwidths.z() * 2;
-			
-//			int zp = i / (obc.ccY * obc.ccX);
-//			int yp = (i - zp * obc.ccY * obc.ccX) / obc.ccX;
-//			int xp = (i - zp * obc.ccY * obc.ccX - yp * obc.ccX);
-//			
-//			float x = 2 * (xp / (float)obc.ccX) - 1.0f;
-//			float y = 2 * (yp / (float)obc.ccY) - 1.0f;
-//			float z = 2 * (zp / (float)obc.ccZ) - 1.0f;
-			
-			
-			float x = 2 * (cx / (float)obc.ccX) - 1.0f;
-			float y = 2 * (cy / (float)obc.ccY) - 1.0f;
-			float z = 2 * (cz / (float)obc.ccZ) - 1.0f;
-			
+			float x = 2 * (cx / (float) obc.cornerCountX) - 1.0f;
+			float y = 2 * (cy / (float) obc.cornerCountY) - 1.0f;
+			float z = 2 * (cz / (float) obc.cornerCountZ) - 1.0f;
+
 			Vector3f corner = new Vector3f(obc.center);
-			
+
 			corner.add(obc.localAxis[2].mul(obc.halfwidths.z * z, temp));
 			corner.add(obc.localAxis[1].mul(obc.halfwidths.y * y, temp));
 			corner.add(obc.localAxis[0].mul(obc.halfwidths.x * x, temp));
-			
+
 			cx++;
-			if(cx > obc.ccX)
+			if (cx > obc.cornerCountX)
 			{
 				cx = 0;
 				cy++;
-				if(cy > obc.ccY)
+				if (cy > obc.cornerCountY)
 				{
 					cy = 0;
 					cz++;

@@ -487,8 +487,6 @@ public class Chunk implements IWritable
 				{
 					continue;
 				}
-				
-				DebugRenderer.instance().drawRectangle(Maths.createTransformationMatrix(lineStart.add(lineDelta.div(2, new Vector3f()), new Vector3f()), Maths.blankQuaternion()), lineDelta.div(2, new Vector3f()), Color.black, DrawMode.FILL);
 
 				if (checker.testLineOBB(lineStart, lineDelta, c, null))
 				{
