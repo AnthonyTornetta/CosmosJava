@@ -220,7 +220,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
 
 			aggregateChunks(sa, sb, deltaA, chunks);
-
+			
 			for (Chunk aC : chunks.keySet())
 			{
 				for (Chunk bC : chunks.get(aC))

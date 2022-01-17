@@ -49,7 +49,7 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 
 		boolean hit = false;
 
-		for (Vector3fc point : a)
+		for (Vector3fc point : a.cornerIterator())
 		{
 			if (testLineOBB(point, aDeltaPos, b, info))
 			{

@@ -1,10 +1,8 @@
 package tests.structure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,18 +59,18 @@ class TestStructure
 		a = null;
 	}
 
-	private static final float EPSILON = 1e-5f;
+//	private static final float EPSILON = 1e-5f;
 
-	private static void assertVectorEquals(Vector3fc expected, Vector3fc actual)
-	{
-		if (expected.x() - actual.x() > EPSILON || expected.y() - actual.y() > EPSILON
-			|| expected.z() - actual.z() > EPSILON)
-		{
-			assertEquals(expected, actual); // this will be false but give nice printout
-		}
-		else
-			assertTrue(true); // it passed
-	}
+//	private static void assertVectorEquals(Vector3fc expected, Vector3fc actual)
+//	{
+//		if (expected.x() - actual.x() > EPSILON || expected.y() - actual.y() > EPSILON
+//			|| expected.z() - actual.z() > EPSILON)
+//		{
+//			assertEquals(expected, actual); // this will be false but give nice printout
+//		}
+//		else
+//			assertTrue(true); // it passed
+//	}
 
 	@Test
 	void blocks()
