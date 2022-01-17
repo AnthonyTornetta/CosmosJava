@@ -63,37 +63,37 @@ public abstract class CubeModel implements Model
 			{
 				tempReturn[0] = offX;
 				tempReturn[1] = offY;
-				tempReturn[2] = offZ;
+				tempReturn[2] = offZ + 1;
 
 				tempReturn[3] = offX;
 				tempReturn[4] = offY;
-				tempReturn[5] = offZ + 1;
+				tempReturn[5] = offZ;
 
 				tempReturn[6] = offX + 1;
 				tempReturn[7] = offY;
-				tempReturn[8] = offZ + 1;
+				tempReturn[8] = offZ;
 
 				tempReturn[9] = offX + 1;
 				tempReturn[10] = offY;
-				tempReturn[11] = offZ;
+				tempReturn[11] = offZ + 1;
 
 				return tempReturn;
 			}
 			case FRONT:
 			{
-				tempReturn[0] = offX;
+				tempReturn[0] = offX + 1;
 				tempReturn[1] = offY;
 				tempReturn[2] = offZ + 1;
 
-				tempReturn[3] = offX;
+				tempReturn[3] = offX + 1;
 				tempReturn[4] = offY + 1;
 				tempReturn[5] = offZ + 1;
 
-				tempReturn[6] = offX + 1;
+				tempReturn[6] = offX;
 				tempReturn[7] = offY + 1;
 				tempReturn[8] = offZ + 1;
 
-				tempReturn[9] = offX + 1;
+				tempReturn[9] = offX;
 				tempReturn[10] = offY;
 				tempReturn[11] = offZ + 1;
 
@@ -142,19 +142,19 @@ public abstract class CubeModel implements Model
 			case LEFT:
 			{
 				tempReturn[0] = offX;
-				tempReturn[1] = offY;
+				tempReturn[1] = offY + 1;
 				tempReturn[2] = offZ;
 
 				tempReturn[3] = offX;
-				tempReturn[4] = offY + 1;
+				tempReturn[4] = offY;
 				tempReturn[5] = offZ;
 
 				tempReturn[6] = offX;
-				tempReturn[7] = offY + 1;
+				tempReturn[7] = offY;
 				tempReturn[8] = offZ + 1;
 
 				tempReturn[9] = offX;
-				tempReturn[10] = offY;
+				tempReturn[10] = offY + 1;
 				tempReturn[11] = offZ + 1;
 
 				return tempReturn;

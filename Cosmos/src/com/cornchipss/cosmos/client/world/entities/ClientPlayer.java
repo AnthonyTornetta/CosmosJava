@@ -34,6 +34,7 @@ import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.Player;
@@ -150,6 +151,8 @@ public class ClientPlayer extends Player
 
 		if (sb != null)
 		{
+			Utils.println(sb.face());
+			
 			OBBCollider c = sb.block().structure().obbForBlock(
 				sb.block().structureX(), sb.block().structureY(),
 				sb.block().structureZ());
