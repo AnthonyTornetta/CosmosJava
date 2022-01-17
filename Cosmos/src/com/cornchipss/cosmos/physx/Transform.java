@@ -62,7 +62,8 @@ public class Transform
 		rotateRelative(dRot, right(), up(), forward());
 	}
 
-	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
+	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up,
+		Vector3fc forward)
 	{
 		orientation.rotateRelative(dRot, right, up, forward);
 		updateMatrix();

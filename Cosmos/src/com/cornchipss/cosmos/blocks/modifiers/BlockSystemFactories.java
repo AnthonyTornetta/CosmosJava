@@ -22,7 +22,8 @@ public class BlockSystemFactories
 	public static BlockSystemFactory get(String id)
 	{
 		if (!factories.containsKey(id))
-			throw new IllegalArgumentException(id + " is bad - " + factories.keySet());
+			throw new IllegalArgumentException(
+				id + " is bad - " + factories.keySet());
 		return factories.get(id);
 	}
 }

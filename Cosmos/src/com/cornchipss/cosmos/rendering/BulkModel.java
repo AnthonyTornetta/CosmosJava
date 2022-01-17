@@ -32,11 +32,12 @@ public class BulkModel
 		List<Float> lights = new LinkedList<>();
 
 		/**
-		 * Only used for an animated material TODO: put this class in the Material and
-		 * make it modifyable by the material class so I don't have to hardcode this
-		 * stuff here
+		 * Only used for an animated material TODO: put this class in the
+		 * Material and make it modifyable by the material class so I don't have
+		 * to hardcode this stuff here
 		 */
-		List<Float> animationInfo; // only initialized if it is an animated material
+		List<Float> animationInfo; // only initialized if it is an animated
+									// material
 
 		int maxIndex = 0;
 	}
@@ -56,11 +57,13 @@ public class BulkModel
 
 	boolean within(int x, int y, int z)
 	{
-		return z >= 0 && z < cubes.length && y >= 0 && y < cubes[z].length && x >= 0 && x < cubes[z][y].length;
+		return z >= 0 && z < cubes.length && y >= 0 && y < cubes[z].length
+			&& x >= 0 && x < cubes[z][y].length;
 	}
 
-	private void doStuff(LightMap lightMap, int x, int y, int z, int dx, int dy, int dz, int offX, int offY, int offZ,
-		BlockFace face, MaterialMeshGenerator matMesh)
+	private void doStuff(LightMap lightMap, int x, int y, int z, int dx, int dy,
+		int dz, int offX, int offY, int offZ, BlockFace face,
+		MaterialMeshGenerator matMesh)
 	{
 		CubeModel model = cubes[z][y][x].model();
 		boolean animated = model instanceof AnimatedCubeModel;
@@ -75,16 +78,19 @@ public class BulkModel
 			AnimatedCubeModel modelAnimated = (AnimatedCubeModel) model;
 			for (int i = 0; i < 4; i++)
 			{
-				matMesh.animationInfo.add((float) modelAnimated.maxAnimationStage(face));
-				matMesh.animationInfo.add(modelAnimated.animationDelay(face) * 1000);
+				matMesh.animationInfo
+					.add((float) modelAnimated.maxAnimationStage(face));
+				matMesh.animationInfo
+					.add(modelAnimated.animationDelay(face) * 1000);
 			}
 		}
 
 		lighting(offX, offY, offZ, x + dx, y + dy, z + dz, lightMap, matMesh);
 	}
 
-	private void computeEverything(BulkModel left, BulkModel right, BulkModel top, BulkModel bottom, BulkModel front,
-		BulkModel back, int offX, int offY, int offZ, LightMap lightMap)
+	private void computeEverything(BulkModel left, BulkModel right,
+		BulkModel top, BulkModel bottom, BulkModel front, BulkModel back,
+		int offX, int offY, int offZ, LightMap lightMap)
 	{
 		for (int z = 0; z < length(); z++)
 		{
@@ -96,9 +102,11 @@ public class BulkModel
 					{
 						boolean withinB;
 
-						TexturedMaterial mat = cubes[z][y][x].model().material();
+						TexturedMaterial mat = cubes[z][y][x].model()
+							.material();
 
-						boolean animated = Materials.ANIMATED_DEFAULT_MATERIAL.equals(mat);
+						boolean animated = Materials.ANIMATED_DEFAULT_MATERIAL
+							.equals(mat);
 
 						if (!indevMeshes.containsKey(mat))
 						{
@@ -112,40 +120,49 @@ public class BulkModel
 
 						MaterialMeshGenerator matMesh = indevMeshes.get(mat);
 
-						if ((!(withinB = within(x, y + 1, z)) && (top == null || top.cubes[z][0][x] == null))
+						if ((!(withinB = within(x, y + 1, z))
+							&& (top == null || top.cubes[z][0][x] == null))
 							|| withinB && cubes[z][y + 1][x] == null)
 						{
-							doStuff(lightMap, x, y, z, 0, 1, 0, offX, offY, offZ, BlockFace.TOP, matMesh);
+							doStuff(lightMap, x, y, z, 0, 1, 0, offX, offY,
+								offZ, BlockFace.TOP, matMesh);
 						}
-						if ((!(withinB = within(x, y - 1, z))
-							&& (bottom == null || bottom.cubes[z][bottom.height() - 1][x] == null))
+						if ((!(withinB = within(x, y - 1, z)) && (bottom == null
+							|| bottom.cubes[z][bottom.height() - 1][x] == null))
 							|| withinB && cubes[z][y - 1][x] == null)
 						{
-							doStuff(lightMap, x, y, z, 0, -1, 0, offX, offY, offZ, BlockFace.BOTTOM, matMesh);
+							doStuff(lightMap, x, y, z, 0, -1, 0, offX, offY,
+								offZ, BlockFace.BOTTOM, matMesh);
 						}
 
-						if ((!(withinB = within(x, y, z + 1)) && (front == null || front.cubes[0][y][x] == null))
+						if ((!(withinB = within(x, y, z + 1))
+							&& (front == null || front.cubes[0][y][x] == null))
 							|| withinB && cubes[z + 1][y][x] == null)
 						{
-							doStuff(lightMap, x, y, z, 0, 0, 1, offX, offY, offZ, BlockFace.FRONT, matMesh);
+							doStuff(lightMap, x, y, z, 0, 0, 1, offX, offY,
+								offZ, BlockFace.FRONT, matMesh);
 						}
-						if ((!(withinB = within(x, y, z - 1))
-							&& (back == null || back.cubes[back.length() - 1][y][x] == null))
+						if ((!(withinB = within(x, y, z - 1)) && (back == null
+							|| back.cubes[back.length() - 1][y][x] == null))
 							|| withinB && cubes[z - 1][y][x] == null)
 						{
-							doStuff(lightMap, x, y, z, 0, 0, -1, offX, offY, offZ, BlockFace.BACK, matMesh);
+							doStuff(lightMap, x, y, z, 0, 0, -1, offX, offY,
+								offZ, BlockFace.BACK, matMesh);
 						}
 
-						if ((!(withinB = within(x + 1, y, z)) && (right == null || right.cubes[z][y][0] == null))
+						if ((!(withinB = within(x + 1, y, z))
+							&& (right == null || right.cubes[z][y][0] == null))
 							|| withinB && cubes[z][y][x + 1] == null)
 						{
-							doStuff(lightMap, x, y, z, 1, 0, 0, offX, offY, offZ, BlockFace.RIGHT, matMesh);
+							doStuff(lightMap, x, y, z, 1, 0, 0, offX, offY,
+								offZ, BlockFace.RIGHT, matMesh);
 						}
-						if ((!(withinB = within(x - 1, y, z))
-							&& (left == null || left.cubes[z][y][left.width() - 1] == null))
+						if ((!(withinB = within(x - 1, y, z)) && (left == null
+							|| left.cubes[z][y][left.width() - 1] == null))
 							|| withinB && cubes[z][y][x - 1] == null)
 						{
-							doStuff(lightMap, x, y, z, -1, 0, 0, offX, offY, offZ, BlockFace.LEFT, matMesh);
+							doStuff(lightMap, x, y, z, -1, 0, 0, offX, offY,
+								offZ, BlockFace.LEFT, matMesh);
 						}
 					}
 				}
@@ -153,8 +170,8 @@ public class BulkModel
 		}
 	}
 
-	private void lighting(int offX, int offY, int offZ, int x, int y, int z, LightMap lightMap,
-		MaterialMeshGenerator matMesh)
+	private void lighting(int offX, int offY, int offZ, int x, int y, int z,
+		LightMap lightMap, MaterialMeshGenerator matMesh)
 	{
 		Vector3f col = new Vector3f();
 		if (lightMap.within(offX + x, offY + y, offZ + z))
@@ -177,7 +194,8 @@ public class BulkModel
 		matMesh.lights.add(col.z);
 	}
 
-	private int indiciesAndUvs(BlockFace side, CubeModel model, MaterialMeshGenerator matMesh)
+	private int indiciesAndUvs(BlockFace side, CubeModel model,
+		MaterialMeshGenerator matMesh)
 	{
 		int[] indiciesArr = model.indicies(side);
 		int max = -1;
@@ -213,13 +231,15 @@ public class BulkModel
 	/**
 	 * algorithm kinda
 	 */
-	public void render(BulkModel left, BulkModel right, BulkModel top, BulkModel bottom, BulkModel front,
-		BulkModel back, int offX, int offY, int offZ, LightMap lightMap)
+	public void render(BulkModel left, BulkModel right, BulkModel top,
+		BulkModel bottom, BulkModel front, BulkModel back, int offX, int offY,
+		int offZ, LightMap lightMap)
 	{
 		indevMeshes.clear();
 		meshes.clear();
 
-		computeEverything(left, right, top, bottom, front, back, offX, offY, offZ, lightMap);
+		computeEverything(left, right, top, bottom, front, back, offX, offY,
+			offZ, lightMap);
 
 		for (TexturedMaterial m : indevMeshes.keySet())
 		{
@@ -239,8 +259,11 @@ public class BulkModel
 
 			// verticies must be in the order of x,y,z
 			for (float vertex : matMesh.verticies)
-				verticiesArr[i++] = vertex;// - (i % 3 == 0 ? dx : (i % 3 == 1 ? dy : dz)); // centers everything around
-											// the center of the bulk model's 0,0
+				verticiesArr[i++] = vertex;// - (i % 3 == 0 ? dx : (i % 3 == 1 ?
+											// dy : dz)); // centers everything
+											// around
+											// the center of the bulk model's
+											// 0,0
 
 			i = 0;
 			float[] uvsArr = new float[matMesh.uvs.size()];
@@ -254,11 +277,13 @@ public class BulkModel
 
 			boolean isAnimated = matMesh.animationInfo != null;
 
-			Mesh mesh = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr, lightsArr, !isAnimated);
+			Mesh mesh = Mesh.createMesh(verticiesArr, indiciesArr, uvsArr,
+				lightsArr, !isAnimated);
 
 			if (isAnimated)
 			{
-				float[] animationInfoArr = new float[matMesh.animationInfo.size()];
+				float[] animationInfoArr = new float[matMesh.animationInfo
+					.size()];
 				i = 0;
 				for (float f : matMesh.animationInfo)
 					animationInfoArr[i++] = f;

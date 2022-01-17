@@ -21,7 +21,8 @@ public class GUITexture extends GUIElement
 
 	public static float[] makeUVs(float u, float v, float uWidth, float uHeight)
 	{
-		return new float[] { u + uWidth, v, u + uWidth, v + uHeight, u, v + uHeight, u, v };
+		return new float[] { u + uWidth, v, u + uWidth, v + uHeight, u,
+			v + uHeight, u, v };
 	}
 
 	private Mesh guiMesh;
@@ -29,20 +30,23 @@ public class GUITexture extends GUIElement
 
 	private float initialWidth, initialHeight;
 
-	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v)
+	public GUITexture(MeasurementPair position, MeasurementPair dimensions,
+		float u, float v)
 	{
 		this(position, dimensions, u, v, Materials.GUI_MATERIAL);
 	}
 
-	public GUITexture(MeasurementPair position, MeasurementPair dimensions, float u, float v, TexturedMaterial material)
+	public GUITexture(MeasurementPair position, MeasurementPair dimensions,
+		float u, float v, TexturedMaterial material)
 	{
 		super(position, dimensions);
 
 		initialWidth = dimensions.x().actualValue(Window.instance().getWidth());
-		initialHeight = dimensions.y().actualValue(Window.instance().getHeight());
+		initialHeight = dimensions.y()
+			.actualValue(Window.instance().getHeight());
 
-		guiMesh = Mesh.createMesh(makeVerts(initialWidth, initialHeight), indices,
-			makeUVs(u, v, material.uLength(), material.vLength()));
+		guiMesh = Mesh.createMesh(makeVerts(initialWidth, initialHeight),
+			indices, makeUVs(u, v, material.uLength(), material.vLength()));
 
 		this.material = material;
 	}

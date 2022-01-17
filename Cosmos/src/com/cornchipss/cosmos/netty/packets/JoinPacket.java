@@ -51,7 +51,8 @@ public class JoinPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		// not happening
 	}
@@ -59,7 +60,8 @@ public class JoinPacket extends Packet
 	@Override
 	public String toString()
 	{
-		return success ? "Name: " + msg : "Error: " + (msg != null ? " - " + msg : "");
+		return success ? "Name: " + msg
+			: "Error: " + (msg != null ? " - " + msg : "");
 	}
 
 	public boolean success()

@@ -90,7 +90,8 @@ public class GUI
 		for (GUIElement elem : e)
 		{
 			if (elem == null)
-				throw new IllegalArgumentException("Attempt to add a null GUI element");
+				throw new IllegalArgumentException(
+					"Attempt to add a null GUI element");
 			elements.add(elem);
 
 			if (elem instanceof IHasGUIAddEvent)
@@ -126,7 +127,8 @@ public class GUI
 		}
 	}
 
-	public void updateProjection(float offX, float offY, float width, float height)
+	public void updateProjection(float offX, float offY, float width,
+		float height)
 	{
 		if (projectionMatrix == null)
 			projectionMatrix = new Matrix4f();

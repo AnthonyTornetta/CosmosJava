@@ -168,7 +168,7 @@ public abstract class Structure extends PhysicalObject
 		CollisionInfo info = new CollisionInfo();
 		info.distanceSquared = totalDistSquared;
 		RayRes rr = null;
-		
+
 		int signX = (int) Math.signum(delta.x());
 		int signY = (int) Math.signum(delta.y());
 		int signZ = (int) Math.signum(delta.z());
@@ -825,11 +825,11 @@ public abstract class Structure extends PhysicalObject
 		Vector3f temp = new Vector3f(v);
 		temp.sub(position());
 		body().transform().orientation().applyInverseRotation(temp, temp);
-		
+
 		temp.add(width() / 2.f, height() / 2.f, length() / 2.f);
-		
-		out.set((int)temp.x, (int)temp.y, (int)temp.z);
-		
+
+		out.set((int) temp.x, (int) temp.y, (int) temp.z);
+
 		return out;
 	}
 

@@ -9,7 +9,8 @@ public class GUITextureMultiple extends GUITexture
 	private Mesh[] meshes;
 	private int state;
 
-	public GUITextureMultiple(MeasurementPair position, MeasurementPair dimensions, float... uvs)
+	public GUITextureMultiple(MeasurementPair position,
+		MeasurementPair dimensions, float... uvs)
 	{
 		super(position, dimensions, uvs[0], uvs[1]);
 
@@ -21,13 +22,14 @@ public class GUITextureMultiple extends GUITexture
 
 		meshes[0] = super.guiMesh();
 
-		float[] verts = makeVerts(dimensions.x().actualValue(Window.instance().getWidth()),
+		float[] verts = makeVerts(
+			dimensions.x().actualValue(Window.instance().getWidth()),
 			dimensions.y().actualValue(Window.instance().getHeight()));
 
 		for (int i = 2; i < uvs.length; i += 2)
 		{
-			meshes[i / 2] = Mesh.createMesh(verts, indices,
-				makeUVs(uvs[i], uvs[i + 1], material().uLength(), material().vLength()));
+			meshes[i / 2] = Mesh.createMesh(verts, indices, makeUVs(uvs[i],
+				uvs[i + 1], material().uLength(), material().vLength()));
 		}
 	}
 
@@ -45,7 +47,8 @@ public class GUITextureMultiple extends GUITexture
 	public void state(int state)
 	{
 		if (state > maxState() || state < minState())
-			throw new IllegalArgumentException("minState() <= state <= maxState");
+			throw new IllegalArgumentException(
+				"minState() <= state <= maxState");
 
 		this.state = state;
 	}

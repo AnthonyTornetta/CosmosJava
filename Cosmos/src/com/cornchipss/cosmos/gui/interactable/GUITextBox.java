@@ -21,7 +21,8 @@ public class GUITextBox extends GUIElement implements IGUIInteractable
 	private boolean typing = false;
 	private boolean locked = false;
 
-	public GUITextBox(MeasurementPair position, MeasurementPair dimensions, OpenGLFont font)
+	public GUITextBox(MeasurementPair position, MeasurementPair dimensions,
+		OpenGLFont font)
 	{
 		super(position, dimensions);
 
@@ -98,7 +99,8 @@ public class GUITextBox extends GUIElement implements IGUIInteractable
 		if (!typing())
 			return true;
 
-		boolean shift = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT) || Input.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
+		boolean shift = Input.isKeyDown(GLFW.GLFW_KEY_LEFT_SHIFT)
+			|| Input.isKeyDown(GLFW.GLFW_KEY_RIGHT_SHIFT);
 
 		for (char key = 'a'; key <= 'z'; key++)
 		{

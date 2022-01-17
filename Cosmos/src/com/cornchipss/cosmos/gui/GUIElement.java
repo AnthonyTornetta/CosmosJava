@@ -24,13 +24,16 @@ public abstract class GUIElement
 
 	protected void createMatrix()
 	{
-		positionVector.set(position.x().actualValue(Window.instance().getWidth()),
+		positionVector.set(
+			position.x().actualValue(Window.instance().getWidth()),
 			position.y().actualValue(Window.instance().getHeight()), 0);
 
-		Maths.createTransformationMatrix(positionVector, rotation.x, rotation.y, rotation.z, scale, transform);
+		Maths.createTransformationMatrix(positionVector, rotation.x, rotation.y,
+			rotation.z, scale, transform);
 	}
 
-	public GUIElement(MeasurementPair position, MeasurementPair dimensions, float rx, float ry, float rz, float scale)
+	public GUIElement(MeasurementPair position, MeasurementPair dimensions,
+		float rx, float ry, float rz, float scale)
 	{
 		this.position = position;
 		this.rotation = new Vector3f(rx, ry, rz);
@@ -54,13 +57,16 @@ public abstract class GUIElement
 
 		float minX = position().x().actualValue(width);
 		float minY = position().y().actualValue(height);
-		float maxX = position().x().actualValue(width) + this.dimensions.x().actualValue(width);
-		float maxY = position().y().actualValue(height) + this.dimensions.y().actualValue(height);
+		float maxX = position().x().actualValue(width)
+			+ this.dimensions.x().actualValue(width);
+		float maxY = position().y().actualValue(height)
+			+ this.dimensions.y().actualValue(height);
 
 		float mouseX = Input.getRelativeMouseX();
 		float mouseY = Input.getRelativeMouseY();
 
-		return mouseX >= minX && mouseY >= minY && mouseX <= maxX && mouseY <= maxY;
+		return mouseX >= minX && mouseY >= minY && mouseX <= maxX
+			&& mouseY <= maxY;
 	}
 
 	public void onResize(float w, float h)
@@ -68,7 +74,8 @@ public abstract class GUIElement
 		createMatrix();
 	}
 
-	public GUIElement(MeasurementPair position, MeasurementPair dimensions, float scale)
+	public GUIElement(MeasurementPair position, MeasurementPair dimensions,
+		float scale)
 	{
 		this(position, dimensions, 0, 0, 0, scale);
 	}
@@ -85,8 +92,8 @@ public abstract class GUIElement
 	}
 
 	/**
-	 * If this is false, no attempt to draw this element will be made. Its children
-	 * will go through the normal drawing steps
+	 * If this is false, no attempt to draw this element will be made. Its
+	 * children will go through the normal drawing steps
 	 * 
 	 * @return
 	 */
@@ -95,11 +102,13 @@ public abstract class GUIElement
 		return true;
 	}
 
-	public void fullDraw(GUI gui, Matrix4fc projectionMatrix, Matrix4fc cameraMatrix)
+	public void fullDraw(GUI gui, Matrix4fc projectionMatrix,
+		Matrix4fc cameraMatrix)
 	{
 		material().use();
 
-		material().initUniforms(projectionMatrix, cameraMatrix, transform(), true);
+		material().initUniforms(projectionMatrix, cameraMatrix, transform(),
+			true);
 
 		prepare(gui);
 		draw(gui);

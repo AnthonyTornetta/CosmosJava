@@ -36,7 +36,8 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	@Override
 	public boolean canAddTo(Structure s)
 	{
-		return false; // The player cannot place this without creating a ship - where the block is
+		return false; // The player cannot place this without creating a ship -
+						// where the block is
 						// automatically placed.
 	}
 

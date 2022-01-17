@@ -24,7 +24,8 @@ public class BlockSystemManager
 			for (String id : ((ISystemBlock) added.block()).systemIds())
 			{
 				if (!systems.containsKey(id))
-					systems.put(id, BlockSystemFactories.get(id).create(added.structure()));
+					systems.put(id,
+						BlockSystemFactories.get(id).create(added.structure()));
 
 				systems.get(id).addBlock(added);
 			}

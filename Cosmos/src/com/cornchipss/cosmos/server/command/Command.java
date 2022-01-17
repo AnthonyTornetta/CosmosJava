@@ -12,5 +12,6 @@ public interface Command
 
 	public String description();
 
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand);
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand);
 }

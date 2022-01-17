@@ -464,21 +464,21 @@ public class Chunk implements IWritable
 
 		Vector3i start = new Vector3i(x, y, z);
 		todo.add(start);
-		
+
 		Vector3i here = new Vector3i();
-		
+
 		while (todo.size() != 0)
 		{
 			for (Vector3i v : todo)
 			{
 				structure().chunkCoordsToBlockCoords(this, v, here);
 				OBBCollider c = structure().wholeOBBForBlock(here);
-				
-				if(c == null)
+
+				if (c == null)
 					continue;
-				
+
 //				DebugRenderer.instance().drawOBB(c, Color.PINK, DrawMode.LINES);
-				
+
 				Vector3f wc = structure().chunkCoordsToWorldCoords(this, v,
 					new Vector3f());
 
@@ -517,9 +517,11 @@ public class Chunk implements IWritable
 
 					c = structure().obbForBlock(here);
 
-					if (c != null && checker.testLineOBB(lineStart, lineDelta, c, info))
+					if (c != null
+						&& checker.testLineOBB(lineStart, lineDelta, c, info))
 					{
-						DebugRenderer.instance().drawOBB(c, Color.GREEN, DrawMode.FILL);
+						DebugRenderer.instance().drawOBB(c, Color.GREEN,
+							DrawMode.FILL);
 						res = true;
 					}
 				}
@@ -550,7 +552,8 @@ public class Chunk implements IWritable
 		{
 			tempInfo.collisionPoint.set(lineStart);
 			DebugRenderer.instance().drawPoint(lineStart, Color.blue);
-			DebugRenderer.instance().drawPoint(lineStart.add(lineDelta, new Vector3f()), Color.orange);
+			DebugRenderer.instance().drawPoint(
+				lineStart.add(lineDelta, new Vector3f()), Color.orange);
 		}
 
 		Set<Vector3i> done = new HashSet<>();

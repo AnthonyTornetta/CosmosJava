@@ -16,7 +16,8 @@ import com.cornchipss.cosmos.systems.IPlayerActionReceiver;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.world.entities.Laser;
 
-public class LaserCannonSystem extends BlockSystem implements IPlayerActionReceiver
+public class LaserCannonSystem extends BlockSystem
+	implements IPlayerActionReceiver
 {
 	private static class Node
 	{
@@ -168,13 +169,17 @@ public class LaserCannonSystem extends BlockSystem implements IPlayerActionRecei
 		{
 			for (Node n : nodes)
 			{
-				Vector3i pos = new Vector3i(n.start.x, n.start.y, n.start.z - n.count);
-				Vector3f coords = structure().blockCoordsToWorldCoords(pos, new Vector3f());
+				Vector3i pos = new Vector3i(n.start.x, n.start.y,
+					n.start.z - n.count);
+				Vector3f coords = structure().blockCoordsToWorldCoords(pos,
+					new Vector3f());
 
-				float baseSpeed = structure().body().velocity().dot(structure().body().velocity());
+				float baseSpeed = structure().body().velocity()
+					.dot(structure().body().velocity());
 				baseSpeed = Maths.sqrt(baseSpeed);
-				
-				Laser laser = new Laser(structure().world(), baseSpeed + 1000, structure());
+
+				Laser laser = new Laser(structure().world(), baseSpeed + 1000,
+					structure());
 
 				Transform t = new Transform(coords);
 				t.orientation(structure().body().transform().orientation());

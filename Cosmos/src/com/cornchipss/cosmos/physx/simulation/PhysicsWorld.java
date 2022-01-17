@@ -37,7 +37,7 @@ public class PhysicsWorld
 
 		strategy = new DefaultCollisionChecker();
 	}
-	
+
 	protected void addObjectDuringUnlock(PhysicalObject bdy)
 	{
 		bodies.add(bdy);
@@ -47,7 +47,7 @@ public class PhysicsWorld
 	{
 		bodies.remove(bdy);
 	}
-	
+
 	public void addObject(PhysicalObject bdy)
 	{
 		if (!locked)
@@ -74,7 +74,8 @@ public class PhysicsWorld
 			{
 				for (PhysicalObject b : bodies)
 				{
-					if (!b.equals(a) && b.shouldCollideWith(a) && a.shouldCollideWith(b))
+					if (!b.equals(a) && b.shouldCollideWith(a)
+						&& a.shouldCollideWith(b))
 					{
 						handlePotentialCollision(a, b, deltaA);
 					}
@@ -83,15 +84,18 @@ public class PhysicsWorld
 
 			a.body().velocity().mul(delta, deltaA);
 
-			a.body().transform().position(a.body().transform().position().add(deltaA, deltaA));
+			a.body().transform()
+				.position(a.body().transform().position().add(deltaA, deltaA));
 
-			Vector3f deltaR = a.body().angularVelocity().mul(delta, new Vector3f());
+			Vector3f deltaR = a.body().angularVelocity().mul(delta,
+				new Vector3f());
 
 			a.body().transform().rotateRelative(deltaR);
 		}
 	}
 
-	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b, Vector3fc deltaA)
+	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b,
+		Vector3fc deltaA)
 	{
 		CollisionInfo info = new CollisionInfo();
 
@@ -103,9 +107,12 @@ public class PhysicsWorld
 					return;
 			}
 			Vector3f mulBy = new Vector3f();
-			mulBy.x = Math.signum(a.body().velocity().x()) == Math.signum(info.normal.x) ? 1 : -1;
-			mulBy.y = Math.signum(a.body().velocity().y()) == Math.signum(info.normal.y) ? 1 : -1;
-			mulBy.z = Math.signum(a.body().velocity().z()) == Math.signum(info.normal.z) ? 1 : -1;
+			mulBy.x = Math.signum(a.body().velocity().x()) == Math
+				.signum(info.normal.x) ? 1 : -1;
+			mulBy.y = Math.signum(a.body().velocity().y()) == Math
+				.signum(info.normal.y) ? 1 : -1;
+			mulBy.z = Math.signum(a.body().velocity().z()) == Math
+				.signum(info.normal.z) ? 1 : -1;
 
 			info.normal.x = Math.abs(info.normal.x) * mulBy.x;
 			info.normal.y = Math.abs(info.normal.y) * mulBy.y;

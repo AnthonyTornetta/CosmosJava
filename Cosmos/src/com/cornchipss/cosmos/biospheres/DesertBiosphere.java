@@ -19,10 +19,11 @@ public class DesertBiosphere extends Biosphere
 			for (int x = 0; x < s.width(); x++)
 			{
 				float n = 7 * SimplexNoise.noise(x * 0.01f, z * 0.01f);
-				float n2 = 7 * SimplexNoise.noise(100+x * 0.007f, 100+z * 0.007f);
-				
+				float n2 = 7
+					* SimplexNoise.noise(100 + x * 0.007f, 100 + z * 0.007f);
+
 				n *= n2;
-				
+
 				int h = Maths.round(s.height() - 30 + n);
 
 				for (int y = 0; y < h; y++)

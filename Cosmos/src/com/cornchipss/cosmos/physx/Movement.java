@@ -7,7 +7,8 @@ public class Movement
 {
 	public static enum MovementType
 	{
-		NONE(0), FORWARD(0b1), BACKWARD(0b10), LEFT(0b100), RIGHT(0b1000), UP(0b10000), DOWN(0b100000), STOP(0b1000000);
+		NONE(0), FORWARD(0b1), BACKWARD(0b10), LEFT(0b100), RIGHT(0b1000),
+		UP(0b10000), DOWN(0b100000), STOP(0b1000000);
 
 		private final int code;
 
@@ -62,7 +63,7 @@ public class Movement
 	{
 		return code;
 	}
-	
+
 	public static Movement movementFromCode(int code)
 	{
 		return new Movement(code);

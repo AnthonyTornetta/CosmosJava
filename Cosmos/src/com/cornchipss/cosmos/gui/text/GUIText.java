@@ -16,7 +16,8 @@ public class GUIText extends GUIElement
 	public GUIText(String text, OpenGLFont font, MeasurementPair position)
 	{
 		super(position,
-			new MeasurementPair(new PixelMeasurement(font.stringWidth(text)), new PixelMeasurement(font.height())));
+			new MeasurementPair(new PixelMeasurement(font.stringWidth(text)),
+				new PixelMeasurement(font.height())));
 
 		this.font = font;
 
@@ -36,7 +37,8 @@ public class GUIText extends GUIElement
 				mesh.delete();
 
 			mesh = TextRenderer.createMesh(newText, font);
-			dimensions(new MeasurementPair(new PixelMeasurement(font.stringWidth(newText)),
+			dimensions(new MeasurementPair(
+				new PixelMeasurement(font.stringWidth(newText)),
 				new PixelMeasurement(font.height())));
 
 			newText = null;

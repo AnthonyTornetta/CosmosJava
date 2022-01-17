@@ -77,7 +77,8 @@ public class Shader
 		Logger.LOGGER.info("Validating Shader...");
 		GL20.glValidateProgram(programID);
 
-		Logger.LOGGER.info("Shader Loader > " + GL30.glGetProgramInfoLog(programID));
+		Logger.LOGGER
+			.info("Shader Loader > " + GL30.glGetProgramInfoLog(programID));
 
 		if (GL30.glGetProgrami(programID, GL30.GL_LINK_STATUS) == 0)
 		{
@@ -100,7 +101,8 @@ public class Shader
 		{
 			br = new BufferedReader(new FileReader(shaderLocation));
 
-			for (String line = br.readLine(); line != null; line = br.readLine())
+			for (String line = br.readLine(); line != null; line = br
+				.readLine())
 			{
 				shaderCode.append(line + System.lineSeparator());
 			}

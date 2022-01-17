@@ -31,11 +31,13 @@ public class MeasurementParser
 		{
 			if (s.charAt(i) == '*')
 			{
-				return new MultipliedMeasurement(parseInnards(s.substring(0, i)), parseNum(num));
+				return new MultipliedMeasurement(
+					parseInnards(s.substring(0, i)), parseNum(num));
 			}
 			else if (s.charAt(i) == '/')
 			{
-				return new DividedMeasurement(parseInnards(s.substring(0, i)), parseNum(num));
+				return new DividedMeasurement(parseInnards(s.substring(0, i)),
+					parseNum(num));
 			}
 			else
 			{
@@ -55,7 +57,8 @@ public class MeasurementParser
 	private static Measurement parseNum(String s)
 	{
 		if (s.charAt(s.length() - 1) == '%')
-			return new PercentMeasurement(Float.parseFloat(s.substring(0, s.length() - 1)) / 100.0f);
+			return new PercentMeasurement(
+				Float.parseFloat(s.substring(0, s.length() - 1)) / 100.0f);
 		else
 			return new PixelMeasurement(Float.parseFloat(s));
 	}
@@ -69,7 +72,8 @@ public class MeasurementParser
 	 * @param start  The position to start the parsing at
 	 * @return The measurement generated from this parsing
 	 */
-	private static Measurement parseSplitInput(String[] arr, char[] tokens, int start)
+	private static Measurement parseSplitInput(String[] arr, char[] tokens,
+		int start)
 	{
 		if (start == 0)
 		{
@@ -80,9 +84,13 @@ public class MeasurementParser
 			switch (tokens[start - 1])
 			{
 				case '+':
-					return new AddedMeasurement(parseSplitInput(arr, tokens, start - 1), parseInnards(arr[start]));
+					return new AddedMeasurement(
+						parseSplitInput(arr, tokens, start - 1),
+						parseInnards(arr[start]));
 				case '-':
-					return new SubtractedMeasurement(parseSplitInput(arr, tokens, start - 1), parseInnards(arr[start]));
+					return new SubtractedMeasurement(
+						parseSplitInput(arr, tokens, start - 1),
+						parseInnards(arr[start]));
 			}
 		}
 

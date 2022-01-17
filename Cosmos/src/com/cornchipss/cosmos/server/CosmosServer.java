@@ -46,7 +46,7 @@ public class CosmosServer implements Runnable
 		defaultCmd.addCommand(new HelpCommand(defaultCmd));
 
 		server = new CosmosNettyServer(game, defaultCmd);
-		
+
 //		PacketTypes.registerAll();
 
 		Thread serverThread = new Thread(server);
@@ -85,7 +85,8 @@ public class CosmosServer implements Runnable
 		{
 			gameThread.join();
 			server.stop();
-			// I cannot join() the udp thread because it forever waits for a UDP connection
+			// I cannot join() the udp thread because it forever waits for a UDP
+			// connection
 			// that will never happen
 		}
 		catch (InterruptedException e)

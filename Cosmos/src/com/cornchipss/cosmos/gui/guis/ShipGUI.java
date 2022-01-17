@@ -29,11 +29,17 @@ public class ShipGUI extends GUIElementHolder implements IUpdatable
 	public void onAdd(GUI gui)
 	{
 		GUIRectangle bg = new GUIRectangle(
-			new MeasurementPair(MeasurementParser.parse("50% - 320"), new PixelMeasurement(64)),
-			new MeasurementPair(new PixelMeasurement(640), new PixelMeasurement(26)), Color.GRAY);
+			new MeasurementPair(MeasurementParser.parse("50% - 320"),
+				new PixelMeasurement(64)),
+			new MeasurementPair(new PixelMeasurement(640),
+				new PixelMeasurement(26)),
+			Color.GRAY);
 
-		energy = new GUIRectangle(new MeasurementPair(MeasurementParser.parse("50% - 320"), new PixelMeasurement(64)),
-			new MeasurementPair(energyWidth, new PixelMeasurement(26)), new Color(0.4f, 0.4f, 1));
+		energy = new GUIRectangle(
+			new MeasurementPair(MeasurementParser.parse("50% - 320"),
+				new PixelMeasurement(64)),
+			new MeasurementPair(energyWidth, new PixelMeasurement(26)),
+			new Color(0.4f, 0.4f, 1));
 
 		addChild(bg);
 		addChild(energy);

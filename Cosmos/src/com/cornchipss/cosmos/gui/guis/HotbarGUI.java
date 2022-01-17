@@ -37,9 +37,11 @@ public class HotbarGUI extends GUIElementHolder
 
 		for (int i = 0; i < inventorySlots.length; i++)
 		{
-			inventorySlots[i] = new GUITextureMultiple(new MeasurementPair(
-				new AddedMeasurement(new PixelMeasurement(offset + i * slotDimensions), PercentMeasurement.HALF),
-				PixelMeasurement.ZERO), new MeasurementPair(slotDims, slotDims), 0.25f, 0, 0, 0.25f);
+			inventorySlots[i] = new GUITextureMultiple(
+				new MeasurementPair(new AddedMeasurement(
+					new PixelMeasurement(offset + i * slotDimensions),
+					PercentMeasurement.HALF), PixelMeasurement.ZERO),
+				new MeasurementPair(slotDims, slotDims), 0.25f, 0, 0, 0.25f);
 
 			addChild(inventorySlots[i]);
 		}
@@ -62,8 +64,12 @@ public class HotbarGUI extends GUIElementHolder
 				int margin = 4;
 
 				inventoryModels[i] = new GUIModel(
-					new MeasurementPair(new AddedMeasurement(new PixelMeasurement(offset + i * slotDimensions + margin),
-						PercentMeasurement.HALF), new PixelMeasurement(margin)),
+					new MeasurementPair(
+						new AddedMeasurement(
+							new PixelMeasurement(
+								offset + i * slotDimensions + margin),
+							PercentMeasurement.HALF),
+						new PixelMeasurement(margin)),
 					slotDimensions - margin * 2, inventory.block(0, i).model());
 
 				addChild(inventoryModels[i]);

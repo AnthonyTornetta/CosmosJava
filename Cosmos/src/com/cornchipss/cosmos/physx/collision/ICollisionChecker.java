@@ -6,5 +6,6 @@ import com.cornchipss.cosmos.physx.PhysicalObject;
 
 public interface ICollisionChecker
 {
-	public boolean colliding(PhysicalObject a, PhysicalObject b, Vector3fc deltaA, CollisionInfo info);
+	public boolean colliding(PhysicalObject a, PhysicalObject b,
+		Vector3fc deltaA, CollisionInfo info);
 }

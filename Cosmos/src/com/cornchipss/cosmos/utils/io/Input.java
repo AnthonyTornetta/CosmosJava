@@ -27,7 +27,8 @@ public class Input
 	public static void setWindow(Window window)
 	{
 		if (Input.window != null)
-			throw new IllegalStateException("Input handler already initialized to a window!");
+			throw new IllegalStateException(
+				"Input handler already initialized to a window!");
 
 		Input.window = window;
 
@@ -64,11 +65,13 @@ public class Input
 	{
 		if (hide)
 		{
-			GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+			GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR,
+				GLFW.GLFW_CURSOR_DISABLED);
 		}
 		else
 		{
-			GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
+			GLFW.glfwSetInputMode(window.getId(), GLFW.GLFW_CURSOR,
+				GLFW.GLFW_CURSOR_NORMAL);
 		}
 	}
 
@@ -95,8 +98,8 @@ public class Input
 	/**
 	 * Where 0,0 is the bottom left corner returns the x coordinate of the mouse
 	 * 
-	 * @return Where 0,0 is the bottom left corner returns the x coordinate of the
-	 *         mouse
+	 * @return Where 0,0 is the bottom left corner returns the x coordinate of
+	 *         the mouse
 	 */
 	public static float getRelativeMouseX()
 	{
@@ -106,8 +109,8 @@ public class Input
 	/**
 	 * Where 0,0 is the bottom left corner returns the y coordinate of the mouse
 	 * 
-	 * @return Where 0,0 is the bottom left corner returns the y coordinate of the
-	 *         mouse
+	 * @return Where 0,0 is the bottom left corner returns the y coordinate of
+	 *         the mouse
 	 */
 	public static float getRelativeMouseY()
 	{
@@ -131,6 +134,7 @@ public class Input
 
 	public static boolean cursorShown()
 	{
-		return GLFW.glfwGetInputMode(window.getId(), GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_NORMAL;
+		return GLFW.glfwGetInputMode(window.getId(),
+			GLFW.GLFW_CURSOR) == GLFW.GLFW_CURSOR_NORMAL;
 	}
 }

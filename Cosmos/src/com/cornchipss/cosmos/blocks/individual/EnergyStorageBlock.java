@@ -7,7 +7,8 @@ import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class EnergyStorageBlock extends Block implements IEnergyStorageBlock
 {
-	private static final String[] systems = new String[] { BlockSystemIDs.POWER_STORAGE_ID };
+	private static final String[] systems = new String[] {
+		BlockSystemIDs.POWER_STORAGE_ID };
 
 	public EnergyStorageBlock()
 	{

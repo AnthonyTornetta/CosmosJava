@@ -34,7 +34,8 @@ public class ServerPlayerList implements Iterable<ServerPlayer>
 		return false;
 	}
 
-	public ServerPlayer createPlayer(World world, ClientConnection c, String name)
+	public ServerPlayer createPlayer(World world, ClientConnection c,
+		String name)
 	{
 		if (!connectionRegistered(c) && !nameTaken(name))
 		{

@@ -60,7 +60,8 @@ public class Utils
 
 		String clazz = trace.getClassName();
 
-		System.out.print(clazz.substring(clazz.lastIndexOf(".") + 1) + " (" + trace.getLineNumber() + ")> " + s);
+		System.out.print(clazz.substring(clazz.lastIndexOf(".") + 1) + " ("
+			+ trace.getLineNumber() + ")> " + s);
 	}
 
 	public static void printCaller()
@@ -72,7 +73,8 @@ public class Utils
 	{
 		StackTraceElement trace = Thread.currentThread().getStackTrace()[4];
 		String clazz = trace.getClassName();
-		return clazz.substring(clazz.lastIndexOf(".") + 1) + " (" + trace.getLineNumber() + ")";
+		return clazz.substring(clazz.lastIndexOf(".") + 1) + " ("
+			+ trace.getLineNumber() + ")";
 	}
 
 	public static void printStackTrace()
@@ -133,7 +135,8 @@ public class Utils
 		if (obj instanceof Quaternionfc)
 		{
 			Quaternionfc q = (Quaternionfc) obj;
-			return "[" + q.x() + ", " + q.y() + ", " + q.z() + ", " + q.w() + "]";// toString(Maths.toDegs(eulers));
+			return "[" + q.x() + ", " + q.y() + ", " + q.z() + ", " + q.w()
+				+ "]";// toString(Maths.toDegs(eulers));
 		}
 
 		if (obj instanceof Vector3fc)
@@ -154,7 +157,8 @@ public class Utils
 		else if (obj instanceof Vector4fc)
 		{
 			Vector4fc t = (Vector4fc) obj;
-			return "[" + t.x() + ", " + t.y() + ", " + t.z() + ", " + t.w() + "]";
+			return "[" + t.x() + ", " + t.y() + ", " + t.z() + ", " + t.w()
+				+ "]";
 		}
 
 		return obj.toString();
@@ -171,7 +175,8 @@ public class Utils
 		float[] arr = new float[list.size()];
 
 		int i = 0;
-		for (float f : list) // Avoids multiple O(n) calculations w/ linked lists
+		for (float f : list) // Avoids multiple O(n) calculations w/ linked
+								// lists
 		{
 			arr[i++] = f;
 		}
@@ -190,7 +195,8 @@ public class Utils
 		int[] arr = new int[list.size()];
 
 		int i = 0;
-		for (int num : list) // Avoids multiple O(n) calculations w/ linked lists
+		for (int num : list) // Avoids multiple O(n) calculations w/ linked
+								// lists
 		{
 			arr[i++] = num;
 		}
@@ -200,8 +206,8 @@ public class Utils
 
 	/**
 	 * <p>
-	 * Not Thread Safe - the FloatBuffer used is pre-allocated in memory and is a
-	 * static variable to this class
+	 * Not Thread Safe - the FloatBuffer used is pre-allocated in memory and is
+	 * a static variable to this class
 	 * </p>
 	 * <p>
 	 * Puts a matrix into a FloatBuffer.
@@ -217,8 +223,8 @@ public class Utils
 	}
 
 	/**
-	 * Converts 3D array coordinates to 1D array coordinates, useful for parallel
-	 * arrays but with a 3D and 1D
+	 * Converts 3D array coordinates to 1D array coordinates, useful for
+	 * parallel arrays but with a 3D and 1D
 	 * 
 	 * @param x      The x in the 3D array
 	 * @param y      The y in the 3D array
@@ -308,7 +314,8 @@ public class Utils
 
 	public static String toEasyString(Vector3fc v)
 	{
-		return "[" + toEasyString(v.x()) + ", " + toEasyString(v.y()) + ", " + toEasyString(v.z()) + "]";
+		return "[" + toEasyString(v.x()) + ", " + toEasyString(v.y()) + ", "
+			+ toEasyString(v.z()) + "]";
 	}
 
 	public static String toEasyString(float f)

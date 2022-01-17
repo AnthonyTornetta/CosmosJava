@@ -10,7 +10,8 @@ import com.cornchipss.cosmos.utils.Utils;
  */
 public enum BlockFace
 {
-	FRONT(0), BACK(1), TOP(2), BOTTOM(3), RIGHT(4), LEFT(5), MAX(5), UNKNOWN(-1);
+	FRONT(0), BACK(1), TOP(2), BOTTOM(3), RIGHT(4), LEFT(5), MAX(5),
+	UNKNOWN(-1);
 
 	private int f;
 

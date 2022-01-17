@@ -68,7 +68,8 @@ public class Block implements IHasModel
 	public short numericId()
 	{
 		if (id == -1)
-			throw new IllegalStateException("Id of a block was asked for before the block was initialized");
+			throw new IllegalStateException(
+				"Id of a block was asked for before the block was initialized");
 
 		return id;
 	}
@@ -76,7 +77,8 @@ public class Block implements IHasModel
 	public void blockId(short s)
 	{
 		if (id != -1)
-			throw new IllegalStateException("Id of a block cannot be set more than once!!!");
+			throw new IllegalStateException(
+				"Id of a block cannot be set more than once!!!");
 
 		id = s;
 	}

@@ -26,16 +26,15 @@ public class DebugRenderer implements IRenderable
 		Matrix4fc transform;
 		DrawMode mode;
 	}
-	
+
 	public static enum DrawMode
 	{
-		LINES,
-		FILL
+		LINES, FILL
 	}
 
 	private List<DebugInfo> info = new LinkedList<>();
 	private DebugMaterial debugMaterial;
-	
+
 	private boolean enabled = false;
 
 	private DebugRenderer()
@@ -64,7 +63,7 @@ public class DebugRenderer implements IRenderable
 
 	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
 		ClientPlayer p)
-	{		
+	{
 		debugMaterial.use();
 
 		for (DebugInfo m : info)
@@ -72,7 +71,7 @@ public class DebugRenderer implements IRenderable
 			debugMaterial.initUniforms(projectionMatrix, camera, m.transform,
 				false);
 
-			switch(m.mode)
+			switch (m.mode)
 			{
 				case LINES:
 					GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
@@ -80,7 +79,7 @@ public class DebugRenderer implements IRenderable
 				default:
 					GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
 			}
-			
+
 			m.mesh.prepare();
 			m.mesh.draw();
 			m.mesh.finish();
@@ -94,7 +93,7 @@ public class DebugRenderer implements IRenderable
 		}
 
 		info.clear();
-		
+
 		GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
 	}
 
@@ -103,31 +102,32 @@ public class DebugRenderer implements IRenderable
 	{
 		return debugMaterial != null;
 	}
-	
+
 	public void drawOBB(OBBCollider c, Color color, DrawMode mode)
 	{
-		if(!enabled())
+		if (!enabled())
 			return;
-		
+
 		Matrix4f mat = new Matrix4f();
-		
+
 		mat.translate(c.center());
 
 		c.orientation().applyRotation(mat);
-		
+
 		drawRectangle(mat, c.halfwidths(), color, mode);
 	}
 
 	public void drawRectangle(Matrix4fc transform, Vector3fc halfwidths,
 		Color color, DrawMode mode)
 	{
-		if(!enabled())
+		if (!enabled())
 			return;
-		
+
 		try
 		{
 			Mesh m = ModelLoader.fromFile("assets/models/rectangle").createMesh(
-				0, 0, 0, halfwidths.x()*2, halfwidths.y()*2, halfwidths.z()*2, false);
+				0, 0, 0, halfwidths.x() * 2, halfwidths.y() * 2,
+				halfwidths.z() * 2, false);
 
 			float r, g, b;
 			r = color.getRed() / 255.0f;
@@ -135,11 +135,10 @@ public class DebugRenderer implements IRenderable
 			b = color.getBlue() / 255.0f;
 
 			m.storeData(Mesh.COLOR_INDEX, 3,
-				new float[] { 
-					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, 
-					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b,
-					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, 
-					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b});
+				new float[] { r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g,
+					b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r,
+					g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b,
+					r, g, b, r, g, b, r, g, b, r, g, b, r, g, b });
 
 			m.unbind();
 
@@ -159,22 +158,23 @@ public class DebugRenderer implements IRenderable
 
 	public void drawPoint(Vector3fc lineStart, Color color)
 	{
-		if(!enabled())
+		if (!enabled())
 			return;
-		
-		drawRectangle(new Matrix4f().translate(lineStart), new Vector3f(0.01f, 0.01f, 0.01f), color, DrawMode.FILL);
+
+		drawRectangle(new Matrix4f().translate(lineStart),
+			new Vector3f(0.01f, 0.01f, 0.01f), color, DrawMode.FILL);
 	}
 
 	public boolean enabled()
 	{
 		return enabled;
-	}	
-	
+	}
+
 	public void enabled(boolean b)
 	{
 		enabled = b;
 	}
-	
+
 	public void toggleEnabled()
 	{
 		enabled = !enabled;

@@ -25,7 +25,8 @@ public interface IOBBCollisionChecker
 	 *                  collision happened
 	 * @return True if they hit - false if not
 	 */
-	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, CollisionInfo info);
+	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a,
+		OBBCollider b, CollisionInfo info);
 
 	/**
 	 * Checks if a line intersections with an OBB
@@ -37,5 +38,6 @@ public interface IOBBCollisionChecker
 	 *                  info needed
 	 * @return True if a hit happened, false if not
 	 */
-	public boolean testLineOBB(Vector3fc lineStart, Vector3fc lineDelta, OBBCollider c, CollisionInfo info);
+	public boolean testLineOBB(Vector3fc lineStart, Vector3fc lineDelta,
+		OBBCollider c, CollisionInfo info);
 }

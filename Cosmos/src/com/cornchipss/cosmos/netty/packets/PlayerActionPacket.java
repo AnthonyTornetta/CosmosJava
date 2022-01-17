@@ -15,7 +15,7 @@ public class PlayerActionPacket extends Packet
 
 	public PlayerActionPacket()
 	{
-		
+
 	}
 
 	public PlayerActionPacket(PlayerAction a)
@@ -34,7 +34,8 @@ public class PlayerActionPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		Player p = c.player();
 		if (p.isPilotingShip())

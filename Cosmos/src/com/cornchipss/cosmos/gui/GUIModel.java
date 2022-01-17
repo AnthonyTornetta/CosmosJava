@@ -14,12 +14,16 @@ public class GUIModel extends GUIElement
 
 	public GUIModel(MeasurementPair position, float scale, CubeModel model)
 	{
-		this(position, scale, model.createMesh(0, 0, -1, scale, BlockFace.FRONT), model.material());
+		this(position, scale,
+			model.createMesh(0, 0, -1, scale, BlockFace.FRONT),
+			model.material());
 	}
 
-	public GUIModel(MeasurementPair position, float scale, Mesh m, TexturedMaterial mat)
+	public GUIModel(MeasurementPair position, float scale, Mesh m,
+		TexturedMaterial mat)
 	{
-		super(position, new MeasurementPair(new PixelMeasurement(scale), new PixelMeasurement(scale)), 1);
+		super(position, new MeasurementPair(new PixelMeasurement(scale),
+			new PixelMeasurement(scale)), 1);
 
 		this.mesh = m;
 		this.mat = mat;

@@ -16,10 +16,14 @@ public class Initializer
 {
 	protected void initBlockSystemFactories()
 	{
-		BlockSystemFactories.register(new EnergyGenerationSystemFactory(), BlockSystemIDs.POWER_GENERATOR_ID);
-		BlockSystemFactories.register(new EnergyStorageSystemFactory(), BlockSystemIDs.POWER_STORAGE_ID);
-		BlockSystemFactories.register(new ThrusterSystemFactory(), BlockSystemIDs.THRUSTER_ID);
-		BlockSystemFactories.register(new LaserCannonSystemFactory(), BlockSystemIDs.LASER_CANNON_ID);
+		BlockSystemFactories.register(new EnergyGenerationSystemFactory(),
+			BlockSystemIDs.POWER_GENERATOR_ID);
+		BlockSystemFactories.register(new EnergyStorageSystemFactory(),
+			BlockSystemIDs.POWER_STORAGE_ID);
+		BlockSystemFactories.register(new ThrusterSystemFactory(),
+			BlockSystemIDs.THRUSTER_ID);
+		BlockSystemFactories.register(new LaserCannonSystemFactory(),
+			BlockSystemIDs.LASER_CANNON_ID);
 	}
 
 	protected void initTerrainGeneration()

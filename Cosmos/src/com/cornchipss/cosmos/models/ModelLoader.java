@@ -15,10 +15,13 @@ import org.joml.Vector2i;
 
 public class ModelLoader
 {
-	private ModelLoader() {}
-	
-	public static void toFile(String file, float[] vertices, float[] uvs, int[] indices, Map<String, Integer> groups,
-		boolean pretty) throws IOException
+	private ModelLoader()
+	{
+	}
+
+	public static void toFile(String file, float[] vertices, float[] uvs,
+		int[] indices, Map<String, Integer> groups, boolean pretty)
+		throws IOException
 	{
 		StringBuilder str = new StringBuilder();
 
@@ -87,8 +90,8 @@ public class ModelLoader
 		bw.close();
 	}
 
-	public static void toFile(String file, float[] vertices, float[] uvs, int[] indices, Map<String, Integer> groups)
-		throws IOException
+	public static void toFile(String file, float[] vertices, float[] uvs,
+		int[] indices, Map<String, Integer> groups) throws IOException
 	{
 		toFile(file, vertices, uvs, indices, groups, false);
 	}
@@ -96,7 +99,8 @@ public class ModelLoader
 	public static LoadedModel fromFile(String file) throws IOException
 	{
 		// used for the auto close on the reader
-		try (BufferedReader br = new BufferedReader(new FileReader(new File(file + ".model"))))
+		try (BufferedReader br = new BufferedReader(
+			new FileReader(new File(file + ".model"))))
 		{
 			List<Float> verts = new LinkedList<>();
 			List<Integer> indices = new LinkedList<>();
@@ -108,7 +112,8 @@ public class ModelLoader
 			String prevGroup = null;
 			int prevIndex = -1;
 
-			for (String line = br.readLine(); line != null; line = br.readLine())
+			for (String line = br.readLine(); line != null; line = br
+				.readLine())
 			{
 				line = line.trim();
 
@@ -119,7 +124,9 @@ public class ModelLoader
 				{
 					mode = Character.toLowerCase(line.charAt(0));
 					if (mode != 'u' && mode != 'v' && mode != 'i')
-						throw new IOException("File must begin with the mode (v/u/i) - began with " + mode);
+						throw new IOException(
+							"File must begin with the mode (v/u/i) - began with "
+								+ mode);
 
 					line = line.substring(1);
 				}
@@ -154,7 +161,8 @@ public class ModelLoader
 							}
 							else
 							{
-								groups.put(prevGroup, new Vector2i(prevIndex, indices.size() - 1));
+								groups.put(prevGroup, new Vector2i(prevIndex,
+									indices.size() - 1));
 
 								prevGroup = group;
 								prevIndex = indices.size();
@@ -181,7 +189,8 @@ public class ModelLoader
 
 			if (prevGroup != null)
 			{
-				groups.put(prevGroup, new Vector2i(prevIndex, indices.size() - 1));
+				groups.put(prevGroup,
+					new Vector2i(prevIndex, indices.size() - 1));
 			}
 			else
 			{

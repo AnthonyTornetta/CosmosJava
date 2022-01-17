@@ -18,7 +18,8 @@ public class TextRenderer
 		return createMesh(text, font, 0, 0);
 	}
 
-	public static Mesh createMesh(String text, OpenGLFont font, float x, float y)
+	public static Mesh createMesh(String text, OpenGLFont font, float x,
+		float y)
 	{
 		float xOff = 0;
 		float yOff = 0;

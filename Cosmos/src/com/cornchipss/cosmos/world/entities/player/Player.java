@@ -23,7 +23,8 @@ import com.cornchipss.cosmos.world.World;
 public abstract class Player extends PhysicalObject
 {
 	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
-	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
+	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2,
+		HEIGHT / 2, LENGTH / 2);
 
 	private Ship pilotingShip;
 
@@ -38,7 +39,6 @@ public abstract class Player extends PhysicalObject
 	}
 
 	private Movement movement;
-
 
 	private OBBCollisionCheckerJOML jomlChecker;
 
@@ -78,7 +78,8 @@ public abstract class Player extends PhysicalObject
 	@Override
 	public OBBCollider OBB()
 	{
-		return new OBBCollider(this.position(), this.body().transform().orientation(), HALF_WIDTHS);
+		return new OBBCollider(this.position(),
+			this.body().transform().orientation(), HALF_WIDTHS);
 	}
 
 	public Structure.RayRes calculateLookingAt()
@@ -88,14 +89,15 @@ public abstract class Player extends PhysicalObject
 
 		try
 		{
-			for (Structure s : world().structuresNear(body().transform().position()))
+			for (Structure s : world()
+				.structuresNear(body().transform().position()))
 			{
-				Structure.RayRes hit = s.raycast(camera().position(), camera().forward().mul(50.0f, new Vector3f()),
-					jomlChecker);
+				Structure.RayRes hit = s.raycast(camera().position(),
+					camera().forward().mul(50.0f, new Vector3f()), jomlChecker);
 				if (hit != null)
 				{
 					float distSqrd = hit.distance();
-	
+
 					if (closestHit == null)
 					{
 						closestHit = hit;
@@ -109,7 +111,7 @@ public abstract class Player extends PhysicalObject
 				}
 			}
 		}
-		catch(ConcurrentModificationException ex)
+		catch (ConcurrentModificationException ex)
 		{
 			return null;
 		}
@@ -134,12 +136,13 @@ public abstract class Player extends PhysicalObject
 		if (Utils.equals(pilotingShip, s))
 			return;
 
-		if(pilotingShip != null)
+		if (pilotingShip != null)
 			pilotingShip.setPilot(null);
 		pilotingShip = null;
-		
-		this.body().transform().position(this.position().add(new Vector3f(0, -5, 0), new Vector3f()));
-		
+
+		this.body().transform().position(
+			this.position().add(new Vector3f(0, -5, 0), new Vector3f()));
+
 		if (s != null)
 		{
 			pilotingShip = s;
@@ -175,7 +178,7 @@ public abstract class Player extends PhysicalObject
 
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
@@ -201,7 +204,7 @@ public abstract class Player extends PhysicalObject
 	{
 		return movement;
 	}
-	
+
 	@Override
 	public boolean shouldCollideWith(PhysicalObject o)
 	{

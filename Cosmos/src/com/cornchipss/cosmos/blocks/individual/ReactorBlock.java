@@ -6,10 +6,11 @@ import com.cornchipss.cosmos.blocks.modifiers.IEnergyStorageBlock;
 import com.cornchipss.cosmos.models.blocks.ReactorModel;
 import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
-public class ReactorBlock extends Block implements IEnergyProducerBlock, IEnergyStorageBlock
+public class ReactorBlock extends Block
+	implements IEnergyProducerBlock, IEnergyStorageBlock
 {
-	private static final String[] properties = new String[] { BlockSystemIDs.POWER_GENERATOR_ID,
-		BlockSystemIDs.POWER_STORAGE_ID };
+	private static final String[] properties = new String[] {
+		BlockSystemIDs.POWER_GENERATOR_ID, BlockSystemIDs.POWER_STORAGE_ID };
 
 	public ReactorBlock()
 	{

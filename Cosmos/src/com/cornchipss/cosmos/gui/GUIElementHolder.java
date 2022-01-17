@@ -8,11 +8,13 @@ import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Mesh;
 
-public abstract class GUIElementHolder extends GUIElement implements IGUIContainer, IHasGUIAddEvent
+public abstract class GUIElementHolder extends GUIElement
+	implements IGUIContainer, IHasGUIAddEvent
 {
 	private List<GUIElement> children = new LinkedList<>();
 
-	public GUIElementHolder(MeasurementPair position, MeasurementPair dimensions)
+	public GUIElementHolder(MeasurementPair position,
+		MeasurementPair dimensions)
 	{
 		super(position, dimensions);
 	}

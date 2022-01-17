@@ -50,9 +50,12 @@ public class ThrusterSystem extends BlockSystem
 			if (ship.movement().down())
 				dVel.sub(ship.body().transform().up());
 
-			if (dVel.x != 0 || dVel.y != 0 || dVel.z != 0 || ship.movement().deltaRotation().x() != 0
-				|| ship.movement().deltaRotation().y() != 0 || ship.movement().deltaRotation().z() != 0
-				|| ship.movement().stop() && (ship.body().velocity().dot(ship.body().velocity()) != 0))
+			if (dVel.x != 0 || dVel.y != 0 || dVel.z != 0
+				|| ship.movement().deltaRotation().x() != 0
+				|| ship.movement().deltaRotation().y() != 0
+				|| ship.movement().deltaRotation().z() != 0
+				|| ship.movement().stop() && (ship.body().velocity()
+					.dot(ship.body().velocity()) != 0))
 			{
 				if (!ship.useEnergy(energyCost))
 					return;
@@ -70,7 +73,8 @@ public class ThrusterSystem extends BlockSystem
 
 			if (ship.movement().stop())
 			{
-				Vector3f r = new Vector3f(0.1f * ship.body().velocity().x(), 0.1f * ship.body().velocity().y(),
+				Vector3f r = new Vector3f(0.1f * ship.body().velocity().x(),
+					0.1f * ship.body().velocity().y(),
 					0.1f * ship.body().velocity().z());
 
 				if (r.dot(r) != 0)
@@ -85,7 +89,8 @@ public class ThrusterSystem extends BlockSystem
 
 			ship.body().velocity(vel);
 
-			ship.body().angularVelocity(ship.movement().deltaRotation().negate(new Vector3f()));
+			ship.body().angularVelocity(
+				ship.movement().deltaRotation().negate(new Vector3f()));
 		}
 	}
 

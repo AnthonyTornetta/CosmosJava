@@ -14,7 +14,7 @@ public class OBBCollider implements Iterable<Vector3fc>
 	private Vector3f[] localAxis = new Vector3f[3];
 	private Vector3f halfwidths;
 	private Orientation or;
-	
+
 	private CornerIterable cornerIterable;
 
 	private int cornerCountX, cornerCountY, cornerCountZ;
@@ -33,10 +33,10 @@ public class OBBCollider implements Iterable<Vector3fc>
 		cornerCountZ = (int) Math.ceil(halfwidths.z() * 2);
 
 		this.or = orientation;
-		
+
 		cornerIterable = new CornerIterable(this);
 	}
-	
+
 	private static class OldCornerIterator implements Iterator<Vector3fc>
 	{
 		int z = -1, y = -1, x = -1;
@@ -88,24 +88,24 @@ public class OBBCollider implements Iterable<Vector3fc>
 			return corner;
 		}
 	}
-	
+
 	private static class CornerIterable implements Iterable<Vector3fc>
 	{
 		OBBCollider c;
-		
+
 		private CornerIterable(OBBCollider c)
 		{
 			this.c = c;
 		}
-		
+
 		@Override
 		public Iterator<Vector3fc> iterator()
 		{
 			return new OldCornerIterator(c);
 		}
-		
+
 	}
-	
+
 	public Iterable<Vector3fc> cornerIterator()
 	{
 		return cornerIterable;

@@ -15,7 +15,8 @@ public class DefaultTextMaterial extends TexturedMaterial
 	}
 
 	@Override
-	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc matrix4fc, Matrix4fc transform, boolean inGUI)
+	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc matrix4fc,
+		Matrix4fc transform, boolean inGUI)
 	{
 		// not needed.
 	}

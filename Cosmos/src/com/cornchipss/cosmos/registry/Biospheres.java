@@ -16,7 +16,8 @@ public class Biospheres
 	private static Map<String, Constructor<? extends Biosphere>> constructors = new HashMap<>();
 
 	@SuppressWarnings("unchecked")
-	public static void registerBiosphere(@Nonnull Class<? extends Biosphere> clazz, @Nonnull String id)
+	public static void registerBiosphere(
+		@Nonnull Class<? extends Biosphere> clazz, @Nonnull String id)
 	{
 		Constructor<?>[] ctors = clazz.getConstructors();
 
@@ -26,14 +27,16 @@ public class Biospheres
 		{
 			if (ctors[i].getParameterCount() == 0)
 			{
-				constructors.put(id, (Constructor<? extends Biosphere>) ctors[i]);
+				constructors.put(id,
+					(Constructor<? extends Biosphere>) ctors[i]);
 				noarg = true;
 				break;
 			}
 		}
 
 		if (!noarg)
-			throw new IllegalArgumentException("The Biosphere must have a no-arg constructor!");
+			throw new IllegalArgumentException(
+				"The Biosphere must have a no-arg constructor!");
 
 		biospheres.put(id, clazz);
 	}

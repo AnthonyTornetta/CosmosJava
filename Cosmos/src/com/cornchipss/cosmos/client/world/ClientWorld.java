@@ -15,23 +15,23 @@ import com.cornchipss.cosmos.world.World;
 public class ClientWorld extends World implements IRenderable
 {
 	private List<IRenderable> renderables = new LinkedList<>();
-	
+
 	public void addObjectDuringUnlock(PhysicalObject bdy)
 	{
 		super.addObjectDuringUnlock(bdy);
-		
+
 		if (bdy instanceof IRenderable)
-			renderables.add((IRenderable)bdy);
+			renderables.add((IRenderable) bdy);
 	}
-	
+
 	public void removeObjectDuringUnlock(PhysicalObject obj)
 	{
 		super.removeObjectDuringUnlock(obj);
-		
+
 		if (obj instanceof IRenderable)
-			renderables.remove((IRenderable)obj);
+			renderables.remove((IRenderable) obj);
 	}
-	
+
 	@Override
 	public void updateGraphics()
 	{
@@ -39,28 +39,30 @@ public class ClientWorld extends World implements IRenderable
 		{
 			for (IRenderable r : renderables)
 				r.updateGraphics();
-			
+
 			DebugRenderer.instance().updateGraphics();
 		}
-		catch(ConcurrentModificationException e)
+		catch (ConcurrentModificationException e)
 		{
 			e.printStackTrace();
 		}
 	}
 
 	@Override
-	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
+		ClientPlayer p)
 	{
 		try
 		{
 			for (IRenderable r : renderables)
-				if(r.shouldBeDrawn())
+				if (r.shouldBeDrawn())
 					r.draw(projectionMatrix, camera, p);
-			
-			if(DebugRenderer.instance().enabled() && DebugRenderer.instance().shouldBeDrawn())
+
+			if (DebugRenderer.instance().enabled()
+				&& DebugRenderer.instance().shouldBeDrawn())
 				DebugRenderer.instance().draw(projectionMatrix, camera, p);
 		}
-		catch(ConcurrentModificationException ex)
+		catch (ConcurrentModificationException ex)
 		{
 			ex.printStackTrace();
 		}

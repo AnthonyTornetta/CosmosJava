@@ -207,7 +207,7 @@ public class ClientGame extends Game
 
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F1))
 				drawGUI = !drawGUI;
-			
+
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
 				DebugRenderer.instance().toggleEnabled();
 

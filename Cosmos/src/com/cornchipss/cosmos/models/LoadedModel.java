@@ -15,7 +15,8 @@ public class LoadedModel implements Model
 
 	private Map<String, Vector2i> subcomponents;
 
-	public LoadedModel(float[] verts, float[] uvs, int[] indices, Map<String, Vector2i> components)
+	public LoadedModel(float[] verts, float[] uvs, int[] indices,
+		Map<String, Vector2i> components)
 	{
 		this.verts = verts;
 		this.uvs = uvs;
@@ -41,14 +42,17 @@ public class LoadedModel implements Model
 	}
 
 	@Override
-	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX,
+		float scaleY, float scaleZ)
 	{
 		return createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ, true);
 	}
-	
-	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ, boolean unbind)
+
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX,
+		float scaleY, float scaleZ, boolean unbind)
 	{
-		if (offX == 0 && offY == 0 && offZ == 0 && scaleX == 1 && scaleY == 1 && scaleZ == 1)
+		if (offX == 0 && offY == 0 && offZ == 0 && scaleX == 1 && scaleY == 1
+			&& scaleZ == 1)
 			return Mesh.createMesh(verts, indices, uvs, unbind);
 		else
 		{
@@ -62,7 +66,7 @@ public class LoadedModel implements Model
 			return Mesh.createMesh(tempVerts, indices, uvs, unbind);
 		}
 	}
-	
+
 	@Override
 	public Mesh createMesh(float offX, float offY, float offZ, float scale)
 	{

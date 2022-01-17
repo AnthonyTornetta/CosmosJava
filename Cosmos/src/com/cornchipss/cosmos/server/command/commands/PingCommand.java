@@ -14,7 +14,8 @@ public class PingCommand implements Command
 	}
 
 	@Override
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand)
 	{
 		System.out.println("Pong");
 		return true;

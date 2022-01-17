@@ -143,21 +143,21 @@ public class ClientPlayer extends Player
 
 //			Matrix4f mat = Maths.createTransformationMatrix(c.center(),
 //				c.orientation().quaternion());
-			
+
 			Matrix4f mat = new Matrix4f();
-			
+
 			mat.translate(c.center());
 
 			c.orientation().applyRotation(mat);
-			
+
 			Vector3f hw = new Vector3f().set(c.halfwidths());
 			hw.add(0.001f, 0.001f, 0.001f);
 
 			DebugRenderer.instance().drawRectangle(mat, hw, Color.yellow,
 				DrawMode.LINES);
 		}
-		
-		if(Input.isKeyJustDown(GLFW.GLFW_KEY_F))
+
+		if (Input.isKeyJustDown(GLFW.GLFW_KEY_F))
 		{
 			this.body().transform().position(new Vector3f());
 		}

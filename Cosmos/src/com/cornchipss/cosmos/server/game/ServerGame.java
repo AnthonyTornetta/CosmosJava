@@ -27,10 +27,11 @@ public class ServerGame extends Game
 	public ServerGame()
 	{
 		super(new World());
-		
+
 		if (instance != null)
-			throw new IllegalStateException("ServerGame already created! Cannot have multiple games already running!");
-		
+			throw new IllegalStateException(
+				"ServerGame already created! Cannot have multiple games already running!");
+
 		instance = this;
 
 		mainPlanet = new Planet(world(), 16 * 8, 16 * 4, 16 * 8, 1);
@@ -42,15 +43,16 @@ public class ServerGame extends Game
 		ship = new Ship(world(), 2);
 		ship.init();
 
-		try (DataInputStream shipStr = new DataInputStream(
-			new FileInputStream(new File("assets/structures/ships/gunship.struct"))))
+		try (DataInputStream shipStr = new DataInputStream(new FileInputStream(
+			new File("assets/structures/ships/gunship.struct"))))
 		{
 			ship.read(shipStr);
 		}
 		catch (IOException ex)
 		{
 			ex.printStackTrace();
-			ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2, Blocks.SHIP_CORE);
+			ship.block(ship.width() / 2, ship.height() / 2, ship.length() / 2,
+				Blocks.SHIP_CORE);
 		}
 
 		ship.addToWorld(new Transform(0, 5, 0));

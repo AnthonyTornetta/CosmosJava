@@ -38,14 +38,16 @@ public class StructurePacket extends Packet
 	{
 		try
 		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream(s.width() * s.height() * s.length());
+			ByteArrayOutputStream bos = new ByteArrayOutputStream(
+				s.width() * s.height() * s.length());
 			s.write(new DataOutputStream(bos));
 			this.bytes = bos.toByteArray();
 			this.id = s.id();
 			this.clazz = s.getClass();
 
 			this.pos = new Vector3f(s.body().transform().position());
-			this.rotation = new Quaternionf().set(s.body().transform().orientation().quaternion());
+			this.rotation = new Quaternionf()
+				.set(s.body().transform().orientation().quaternion());
 		}
 		catch (IOException e)
 		{
@@ -58,12 +60,14 @@ public class StructurePacket extends Packet
 	{
 		try
 		{
-			Structure s = clazz.getConstructor(World.class, int.class).newInstance(game.world(), id);
+			Structure s = clazz.getConstructor(World.class, int.class)
+				.newInstance(game.world(), id);
 			s.read(new DataInputStream(new ByteArrayInputStream(bytes)));
 
 			s.addToWorld(new Transform(pos, rotation));
 		}
-		catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+		catch (InstantiationException | IllegalAccessException
+			| IllegalArgumentException | InvocationTargetException
 			| NoSuchMethodException | IOException | SecurityException e)
 		{
 			throw new RuntimeException(e);
@@ -71,7 +75,8 @@ public class StructurePacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		// never going to happen
 	}

@@ -31,7 +31,7 @@ public class Window
 	private int width, height;
 
 	private boolean wasWindowResized = false;
-	
+
 	private static Window instance;
 
 	public boolean wasWindowResized()
@@ -43,9 +43,10 @@ public class Window
 
 	public Window(int w, int h, String title)
 	{
-		if(instance != null)
-			throw new IllegalStateException("Only one openGL window can be created!d");
-		
+		if (instance != null)
+			throw new IllegalStateException(
+				"Only one openGL window can be created!d");
+
 		instance = this;
 
 		this.width = w;
@@ -60,9 +61,12 @@ public class Window
 			throw new IllegalStateException("Unable to initialize GLFW");
 
 		// Configure GLFW
-		glfwDefaultWindowHints(); // optional, the current window hints are already the default
-		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // the window will stay hidden after creation
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+		glfwDefaultWindowHints(); // optional, the current window hints are
+									// already the default
+		glfwWindowHint(GLFW_VISIBLE, GLFW_TRUE); // the window will stay hidden
+													// after creation
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be
+													// resizable
 
 		// Create the window
 		window = glfwCreateWindow(w, h, title, NULL, NULL);

@@ -14,7 +14,8 @@ public class StopCommand implements Command
 	}
 
 	@Override
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand)
 	{
 		server.running(false);
 		return false;

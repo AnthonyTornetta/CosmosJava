@@ -2,9 +2,10 @@ package com.cornchipss.cosmos.gui.measurement;
 
 public class MeasurementPair
 {
-	public static final MeasurementPair ZERO = new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO);
-	public static final MeasurementPair HUNDRED_PERCENT = new MeasurementPair(PercentMeasurement.ONE,
-		PercentMeasurement.ONE);
+	public static final MeasurementPair ZERO = new MeasurementPair(
+		PixelMeasurement.ZERO, PixelMeasurement.ZERO);
+	public static final MeasurementPair HUNDRED_PERCENT = new MeasurementPair(
+		PercentMeasurement.ONE, PercentMeasurement.ONE);
 
 	private Measurement x, y;
 

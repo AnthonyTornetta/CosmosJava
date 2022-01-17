@@ -12,21 +12,21 @@ public abstract class TexturedMaterial extends Material
 	public TexturedMaterial(String shaderLoc, String textureLoc)
 	{
 		super(shaderLoc);
-		
+
 		this.textureLoc = textureLoc;
 	}
 
 	public TexturedMaterial(Shader s, String t)
 	{
 		super(s);
-		
+
 		this.textureLoc = t;
 	}
 
 	public TexturedMaterial(Shader s, Texture texture)
 	{
 		super(s);
-		
+
 		this.texture = texture;
 	}
 

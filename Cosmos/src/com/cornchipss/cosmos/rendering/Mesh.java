@@ -41,8 +41,10 @@ public class Mesh
 		dataBuffer.put(data);
 		dataBuffer.flip();
 
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, dataBuffer, GL15.GL_STATIC_DRAW);
-		GL30.glVertexAttribPointer(index, dimensions, GL11.GL_FLOAT, false, 0, 0);
+		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, dataBuffer,
+			GL15.GL_STATIC_DRAW);
+		GL30.glVertexAttribPointer(index, dimensions, GL11.GL_FLOAT, false, 0,
+			0);
 
 		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 	}
@@ -57,7 +59,8 @@ public class Mesh
 		buf.put(data);
 		buf.flip();
 
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW);
+		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, buf,
+			GL15.GL_STATIC_DRAW);
 	}
 
 	public static Mesh createMesh(float[] vertices, int[] indices, float[] uvs)
@@ -65,7 +68,8 @@ public class Mesh
 		return createMesh(vertices, indices, uvs, true);
 	}
 
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, boolean unbind)
+	public static Mesh createMesh(float[] verticies, int[] indicies,
+		float[] uvs, boolean unbind)
 	{
 		Mesh m = new Mesh(indicies.length);
 		GL30.glBindVertexArray(m.vao());
@@ -76,7 +80,8 @@ public class Mesh
 
 		m.storeData(UV_INDEX, 2, uvs);
 
-		// hey idiot. are you adding something and it's not working? make sure you
+		// hey idiot. are you adding something and it's not working? make sure
+		// you
 		// enable all the required GL buffers when you draw it.
 
 		if (unbind)
@@ -85,7 +90,8 @@ public class Mesh
 		return m;
 	}
 
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr, boolean unbind)
+	public static Mesh createMesh(float[] verticies, int[] indicies,
+		float[] uvs, float[] lightsArr, boolean unbind)
 	{
 		Mesh m = new Mesh(indicies.length);
 		GL30.glBindVertexArray(m.vao());
@@ -98,7 +104,8 @@ public class Mesh
 
 		m.storeData(LIGHT_INDEX, 3, lightsArr);
 
-		// hey idiot. are you adding something and it's not working? make sure you
+		// hey idiot. are you adding something and it's not working? make sure
+		// you
 		// enable all the required GL buffers when you draw it.
 
 		if (unbind)
@@ -107,7 +114,8 @@ public class Mesh
 		return m;
 	}
 
-	public static Mesh createMesh(float[] verticies, int[] indicies, float[] uvs, float[] lightsArr)
+	public static Mesh createMesh(float[] verticies, int[] indicies,
+		float[] uvs, float[] lightsArr)
 	{
 		return createMesh(verticies, indicies, uvs, lightsArr, true);
 	}
@@ -146,7 +154,8 @@ public class Mesh
 
 	public void draw()
 	{
-		GL11.glDrawElements(GL20.GL_TRIANGLES, verticies(), GL11.GL_UNSIGNED_INT, 0);
+		GL11.glDrawElements(GL20.GL_TRIANGLES, verticies(),
+			GL11.GL_UNSIGNED_INT, 0);
 	}
 
 	public void delete()

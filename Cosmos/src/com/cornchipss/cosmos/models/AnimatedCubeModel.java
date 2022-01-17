@@ -11,7 +11,8 @@ import com.cornchipss.cosmos.utils.Utils;
 public abstract class AnimatedCubeModel extends CubeModel
 {
 	@Override
-	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
+	public Mesh createMesh(float offX, float offY, float offZ, float scale,
+		BlockFace... sides)
 	{
 		Mesh mesh = super.createMesh(false, offX, offY, offZ, scale, sides);
 

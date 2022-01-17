@@ -41,30 +41,35 @@ public class Logger
 
 		String clazz = trace.getClassName();
 
-		return clazz.substring(clazz.lastIndexOf(".") + 1) + ":" + trace.getLineNumber() + "";
+		return clazz.substring(clazz.lastIndexOf(".") + 1) + ":"
+			+ trace.getLineNumber() + "";
 	}
 
 	public void debug(Object msg)
 	{
 		if (level.val <= LogLevel.DEBUG.val)
-			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Debug"));
+			System.out.println(
+				raw(msg != null ? Utils.toString(msg) : "null", "Debug"));
 	}
 
 	public void info(Object msg)
 	{
 		if (level.val <= LogLevel.INFO.val)
-			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Info"));
+			System.out.println(
+				raw(msg != null ? Utils.toString(msg) : "null", "Info"));
 	}
 
 	public void warning(Object msg)
 	{
 		if (level.val <= LogLevel.WARNING.val)
-			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Warning"));
+			System.out.println(
+				raw(msg != null ? Utils.toString(msg) : "null", "Warning"));
 	}
 
 	public void error(Object msg)
 	{
 		if (level.val <= LogLevel.ERROR.val)
-			System.out.println(raw(msg != null ? Utils.toString(msg) : "null", "Error"));
+			System.out.println(
+				raw(msg != null ? Utils.toString(msg) : "null", "Error"));
 	}
 }

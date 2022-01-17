@@ -43,7 +43,8 @@ public class RawImageMaterial extends TexturedMaterial
 	}
 
 	@Override
-	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc cam, Matrix4fc transform, boolean isGUI)
+	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc cam,
+		Matrix4fc transform, boolean isGUI)
 	{
 		shader().setUniformMatrix(guiTransLoc, transform);
 		shader().setUniformMatrix(guiProjLoc, projectionMatrix);

@@ -38,7 +38,8 @@ public class DefaultCommandHandler implements CommandHandler
 
 		if (cmdObj == null)
 		{
-			System.out.println("Unknown command - type help for a list of commands.");
+			System.out
+				.println("Unknown command - type help for a list of commands.");
 			return true;
 		}
 		else

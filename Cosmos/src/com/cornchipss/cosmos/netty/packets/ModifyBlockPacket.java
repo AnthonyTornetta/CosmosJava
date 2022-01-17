@@ -43,7 +43,8 @@ public class ModifyBlockPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		Structure s = game.world().structureFromID(sid);
 		Block b = Blocks.fromNumericId(bid);

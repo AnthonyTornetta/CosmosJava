@@ -20,7 +20,8 @@ public class Texture
 
 	public static Texture loadTexture(BufferedImage image)
 	{
-		ByteBuffer buffer = ByteBuffer.allocateDirect(image.getWidth() * image.getHeight() * 4);
+		ByteBuffer buffer = ByteBuffer
+			.allocateDirect(image.getWidth() * image.getHeight() * 4);
 
 		for (int h = 0; h < image.getHeight(); h++)
 		{
@@ -44,8 +45,12 @@ public class Texture
 	{
 		try
 		{
-			PNGDecoder decoder = new PNGDecoder(new FileInputStream(texture + ".png"));
-			ByteBuffer buffer = BufferUtils.createByteBuffer(decoder.getWidth() * decoder.getHeight() * 4); // 4 -> rgba
+			PNGDecoder decoder = new PNGDecoder(
+				new FileInputStream(texture + ".png"));
+			ByteBuffer buffer = BufferUtils
+				.createByteBuffer(decoder.getWidth() * decoder.getHeight() * 4); // 4
+																					// ->
+																					// rgba
 			decoder.decode(buffer, decoder.getWidth() * 4, PNGDecoder.RGBA);
 			buffer.rewind();
 
@@ -63,10 +68,13 @@ public class Texture
 		int id = GL11.glGenTextures();
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id);
 
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER,
+			GL11.GL_NEAREST);
+		GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER,
+			GL11.GL_NEAREST);
 
-		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, w, h, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+		GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, w, h, 0,
+			GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 

@@ -8,8 +8,10 @@ import org.lwjgl.glfw.GLFWMouseButtonCallbackI;
 
 public class MouseListener implements GLFWMouseButtonCallbackI
 {
-	private boolean[] mouseButtonsDown = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST + 1];
-	private boolean[] mouseBtnsJustDown = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST + 1];
+	private boolean[] mouseButtonsDown = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST
+		+ 1];
+	private boolean[] mouseBtnsJustDown = new boolean[GLFW.GLFW_MOUSE_BUTTON_LAST
+		+ 1];
 
 	private List<Integer> mouseButtonsJustPressed = new LinkedList<>();
 

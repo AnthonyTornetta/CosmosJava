@@ -32,7 +32,8 @@ public class LoginPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		if (server.players().nameTaken(name))
 		{

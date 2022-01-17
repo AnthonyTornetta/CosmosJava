@@ -18,7 +18,8 @@ public class LitBlock extends Block
 	 * @param m   The model to use
 	 * @param src The {@link LightSource} the block emits
 	 */
-	public LitBlock(CubeModel m, @Nonnull LightSource src, String name, int mass)
+	public LitBlock(CubeModel m, @Nonnull LightSource src, String name,
+		int mass)
 	{
 		super(m, name, mass);
 

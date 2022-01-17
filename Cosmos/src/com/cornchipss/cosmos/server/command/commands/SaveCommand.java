@@ -23,8 +23,8 @@ public class SaveCommand implements Command
 	{
 		new File("assets/structures/saves/").mkdirs();
 
-		try (DataOutputStream str = new DataOutputStream(
-			new FileOutputStream(new File("assets/structures/saves/" + name + ".struct"))))
+		try (DataOutputStream str = new DataOutputStream(new FileOutputStream(
+			new File("assets/structures/saves/" + name + ".struct"))))
 		{
 			s.write(str);
 			System.out.println("Saved structure " + s.id() + " as " + name);
@@ -36,7 +36,8 @@ public class SaveCommand implements Command
 	}
 
 	@Override
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand)
 	{
 		boolean isId = arguments.size() != 0;
 		boolean saved = false;
@@ -63,7 +64,8 @@ public class SaveCommand implements Command
 			}
 			catch (NumberFormatException ex)
 			{
-				System.out.println(arguments.get(0) + " is not a valid integer ID!");
+				System.out
+					.println(arguments.get(0) + " is not a valid integer ID!");
 			}
 		}
 		else

@@ -34,12 +34,14 @@ public class CosmosNettyClient implements Runnable
 	{
 		players = new ClientPlayerList();
 
-		client = new Client(NetworkRegistry.BUFFER_SIZE, NetworkRegistry.BUFFER_SIZE);
-		
+		client = new Client(NetworkRegistry.BUFFER_SIZE,
+			NetworkRegistry.BUFFER_SIZE);
+
 		game = new ClientGame(this);
 	}
 
-	public void createConnection(String ip, int port, String name) throws IOException
+	public void createConnection(String ip, int port, String name)
+		throws IOException
 	{
 		client.start();
 
@@ -78,8 +80,8 @@ public class CosmosNettyClient implements Runnable
 			}
 		}));
 
-		client.connect(NetworkRegistry.TIMEOUT_MS, InetAddress.getByName(ip), NetworkRegistry.TCP_PORT,
-			NetworkRegistry.UDP_PORT);
+		client.connect(NetworkRegistry.TIMEOUT_MS, InetAddress.getByName(ip),
+			NetworkRegistry.TCP_PORT, NetworkRegistry.UDP_PORT);
 
 		for (NettyClientObserver o : observers)
 		{
@@ -92,7 +94,8 @@ public class CosmosNettyClient implements Runnable
 	private void check(Object o)
 	{
 		if (!NetworkRegistry.check(o.getClass()))
-			throw new RuntimeException("Attempted to send non-registed type - " + o.getClass());
+			throw new RuntimeException(
+				"Attempted to send non-registed type - " + o.getClass());
 	}
 
 	public void sendUDP(Object o)

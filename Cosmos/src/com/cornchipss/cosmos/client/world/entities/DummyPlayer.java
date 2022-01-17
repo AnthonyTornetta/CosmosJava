@@ -58,11 +58,13 @@ public class DummyPlayer extends Player implements IRenderable
 	}
 
 	@Override
-	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
+		ClientPlayer p)
 	{
 		playerMaterial.use();
 
-		playerMaterial.initUniforms(projectionMatrix, camera, body().transform().matrix(), false);
+		playerMaterial.initUniforms(projectionMatrix, camera,
+			body().transform().matrix(), false);
 
 		playerMesh.prepare();
 		playerMesh.draw();

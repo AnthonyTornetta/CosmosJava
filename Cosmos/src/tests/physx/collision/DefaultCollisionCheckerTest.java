@@ -86,10 +86,12 @@ class DefaultCollisionCheckerTest
 
 	private static void assertVectorEquals(Vector3fc expected, Vector3fc actual)
 	{
-		if (expected.x() - actual.x() > EPSILON || expected.y() - actual.y() > EPSILON
+		if (expected.x() - actual.x() > EPSILON
+			|| expected.y() - actual.y() > EPSILON
 			|| expected.z() - actual.z() > EPSILON)
 		{
-			assertEquals(expected, actual); // this will be false but give nice printout
+			assertEquals(expected, actual); // this will be false but give nice
+											// printout
 		}
 		else
 			assertTrue(true); // it passed
@@ -166,11 +168,12 @@ class DefaultCollisionCheckerTest
 		float dy = 0.1f;
 		float dz = 0.1f;
 
-		a.body().transform().position(
-			new Vector3f(100 + a.width() / 2.f + dx, 100 + a.height() / 2.f + dy, 100 + a.length() / 2.f + dz));
+		a.body().transform().position(new Vector3f(100 + a.width() / 2.f + dx,
+			100 + a.height() / 2.f + dy, 100 + a.length() / 2.f + dz));
 		b.body().transform().position(new Vector3f(100, 100, 100));
 
-		assertTrue(dcc.colliding(a, b, new Vector3f(-2 * dx, -2 * dy, -2 * dz), info));
+		assertTrue(
+			dcc.colliding(a, b, new Vector3f(-2 * dx, -2 * dy, -2 * dz), info));
 
 		assertVectorEquals(new Vector3f(1.f, 0, 0), info.normal);
 	}

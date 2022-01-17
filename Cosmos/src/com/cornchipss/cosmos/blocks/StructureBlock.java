@@ -53,9 +53,10 @@ public class StructureBlock
 
 		StructureBlock otr = (StructureBlock) o;
 
-		return x == otr.x && y == otr.y && z == otr.z && structure.equals(otr.structure);
+		return x == otr.x && y == otr.y && z == otr.z
+			&& structure.equals(otr.structure);
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

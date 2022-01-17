@@ -53,7 +53,8 @@ public class LightMap
 		{
 			if (o instanceof LightResult)
 			{
-				return ((LightResult) o).strength == strength && ((LightResult) o).origin.equals(origin);
+				return ((LightResult) o).strength == strength
+					&& ((LightResult) o).origin.equals(origin);
 			}
 			return false;
 		}
@@ -75,7 +76,8 @@ public class LightMap
 			for (LightResult rs : lightResults.values())
 			{
 				float ratio = rs.strength / (float) rs.src.strength();
-				totalLight.add(rs.src.r() * ratio * rs.src.r() * ratio, rs.src.g() * ratio * rs.src.g() * ratio,
+				totalLight.add(rs.src.r() * ratio * rs.src.r() * ratio,
+					rs.src.g() * ratio * rs.src.g() * ratio,
 					rs.src.b() * ratio * rs.src.b() * ratio);
 			}
 
@@ -83,7 +85,8 @@ public class LightMap
 			totalLight.y = Maths.sqrt(totalLight.y);
 			totalLight.z = Maths.sqrt(totalLight.z);
 
-			if (totalLight.x >= 1 && totalLight.x >= totalLight.y && totalLight.x >= totalLight.z)
+			if (totalLight.x >= 1 && totalLight.x >= totalLight.y
+				&& totalLight.x >= totalLight.z)
 			{
 				float ratioY = totalLight.y / totalLight.x;
 				float ratioZ = totalLight.z / totalLight.x;
@@ -93,7 +96,8 @@ public class LightMap
 				totalLight.z = ratioZ;
 			}
 
-			if (totalLight.y >= 1 && totalLight.y >= totalLight.x && totalLight.y >= totalLight.z)
+			if (totalLight.y >= 1 && totalLight.y >= totalLight.x
+				&& totalLight.y >= totalLight.z)
 			{
 				float ratioX = totalLight.x / totalLight.y;
 				float ratioZ = totalLight.z / totalLight.y;
@@ -103,7 +107,8 @@ public class LightMap
 				totalLight.z = ratioZ;
 			}
 
-			if (totalLight.z >= 1 && totalLight.z >= totalLight.x && totalLight.z >= totalLight.y)
+			if (totalLight.z >= 1 && totalLight.z >= totalLight.x
+				&& totalLight.z >= totalLight.y)
 			{
 				float ratioX = totalLight.x / totalLight.z;
 				float ratioY = totalLight.y / totalLight.z;
@@ -235,7 +240,8 @@ public class LightMap
 		}
 	}
 
-	private void propagateSourceAt(int x, int y, int z, LightSource src, Vector3ic origin)
+	private void propagateSourceAt(int x, int y, int z, LightSource src,
+		Vector3ic origin)
 	{
 		if (within(x, y, z))
 		{
@@ -245,8 +251,8 @@ public class LightMap
 		}
 	}
 
-	private void calculateNextPoints(int x, int y, int z, int strength, Vector3ic origin, Set<Vector3i> nextPoints,
-		Set<Vector3i> onReserve)
+	private void calculateNextPoints(int x, int y, int z, int strength,
+		Vector3ic origin, Set<Vector3i> nextPoints, Set<Vector3i> onReserve)
 	{
 		if (within(x, y, z))
 		{
@@ -275,8 +281,8 @@ public class LightMap
 	}
 
 	/**
-	 * Propagates a light source at a given location with a given strength. Does not
-	 * have to be called from a block with an actual light
+	 * Propagates a light source at a given location with a given strength. Does
+	 * not have to be called from a block with an actual light
 	 * 
 	 * @param x        The x position of the light
 	 * @param y        The y position of the light
@@ -286,7 +292,8 @@ public class LightMap
 	 * @param src      The light source to spread
 	 * @param origin   The origin of the light source you are spreading
 	 */
-	private void propagateAt(int x, int y, int z, int strength, LightSource src, final Vector3ic origin)
+	private void propagateAt(int x, int y, int z, int strength, LightSource src,
+		final Vector3ic origin)
 	{
 		Set<Vector3i> points = new HashSet<>();
 		Set<Vector3i> nextPoints = new HashSet<>();
@@ -313,12 +320,18 @@ public class LightMap
 
 						if (strength - 1 != 0)
 						{
-							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength,
+								origin, nextPoints, onReserve);
 						}
 					}
 				}
@@ -337,25 +350,38 @@ public class LightMap
 
 						if (strength + 1 != 0)
 						{
-							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength, origin, nextPoints, onReserve);
-							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength, origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x - 1, pt.y, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x + 1, pt.y, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y - 1, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y + 1, pt.z, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z - 1, strength,
+								origin, nextPoints, onReserve);
+							calculateNextPoints(pt.x, pt.y, pt.z + 1, strength,
+								origin, nextPoints, onReserve);
 						}
 						else
 						{
-							propagateSourceAt(pt.x - 1, pt.y, pt.z, src, origin);
-							propagateSourceAt(pt.x + 1, pt.y, pt.z, src, origin);
-							propagateSourceAt(pt.x, pt.y - 1, pt.z, src, origin);
-							propagateSourceAt(pt.x, pt.y + 1, pt.z, src, origin);
-							propagateSourceAt(pt.x, pt.y, pt.z - 1, src, origin);
-							propagateSourceAt(pt.x, pt.y, pt.z + 1, src, origin);
+							propagateSourceAt(pt.x - 1, pt.y, pt.z, src,
+								origin);
+							propagateSourceAt(pt.x + 1, pt.y, pt.z, src,
+								origin);
+							propagateSourceAt(pt.x, pt.y - 1, pt.z, src,
+								origin);
+							propagateSourceAt(pt.x, pt.y + 1, pt.z, src,
+								origin);
+							propagateSourceAt(pt.x, pt.y, pt.z - 1, src,
+								origin);
+							propagateSourceAt(pt.x, pt.y, pt.z + 1, src,
+								origin);
 
 							for (Vector3i nextPt : onReserve)
 							{
-								propagateSourceAt(nextPt.x, nextPt.y, nextPt.z, src, origin);
+								propagateSourceAt(nextPt.x, nextPt.y, nextPt.z,
+									src, origin);
 							}
 
 							onReserve.clear();
@@ -389,7 +415,8 @@ public class LightMap
 
 		for (LightResult lr : toHandle)
 		{
-			changes.put(origin, Math.max(changes.getOrDefault(origin, 0), lr.strength));
+			changes.put(origin,
+				Math.max(changes.getOrDefault(origin, 0), lr.strength));
 			propagateAt(x, y, z, -lr.strength, lr.src, lr.origin);
 		}
 
@@ -425,7 +452,8 @@ public class LightMap
 				LightResult l = lightMap[z][y][x - 1].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x - 1, y, z);
 			}
@@ -434,7 +462,8 @@ public class LightMap
 				LightResult l = lightMap[z][y][x + 1].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x + 1, y, z);
 			}
@@ -443,7 +472,8 @@ public class LightMap
 				LightResult l = lightMap[z][y - 1][x].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x, y - 1, z);
 			}
@@ -452,7 +482,8 @@ public class LightMap
 				LightResult l = lightMap[z][y + 1][x].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x, y + 1, z);
 			}
@@ -461,7 +492,8 @@ public class LightMap
 				LightResult l = lightMap[z - 1][y][x].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x, y, z - 1);
 			}
@@ -470,7 +502,8 @@ public class LightMap
 				LightResult l = lightMap[z + 1][y][x].largestLightResult();
 
 				if (l != null)
-					changes.put(here, Math.max(changes.getOrDefault(here, 0), l.strength - 1));
+					changes.put(here, Math.max(changes.getOrDefault(here, 0),
+						l.strength - 1));
 
 				propagateAll(x, y, z + 1);
 			}
@@ -508,7 +541,8 @@ public class LightMap
 		{
 			LightResult lr = lightMap[z][y][x].lightResultFromSource(src);
 
-			changes.put(key, Math.max(changes.getOrDefault(key, 0), src.strength()));
+			changes.put(key,
+				Math.max(changes.getOrDefault(key, 0), src.strength()));
 
 			propagateAt(x, y, z, -lr.strength, lr.src, lr.origin);
 		}
@@ -526,8 +560,8 @@ public class LightMap
 
 	public boolean needsUpdating()
 	{
-		return blockingsToCreate.size() != 0 || blockingsToRemove.size() != 0 || lightsToRemove.size() != 0
-			|| lightsToAdd.size() != 0;
+		return blockingsToCreate.size() != 0 || blockingsToRemove.size() != 0
+			|| lightsToRemove.size() != 0 || lightsToAdd.size() != 0;
 	}
 
 	public Map<Vector3ic, Integer> updateMap()
@@ -570,7 +604,8 @@ public class LightMap
 			{
 				for (int x = 0; x < width(); x++)
 				{
-					System.out.print(Utils.toEasyString(lightAt(x, y, z).x()) + " ");
+					System.out
+						.print(Utils.toEasyString(lightAt(x, y, z).x()) + " ");
 				}
 				System.out.println();
 			}
@@ -612,7 +647,8 @@ public class LightMap
 						System.out.print("00 ");
 					else
 						System.out
-							.print(df.format(lightMap[z][y][x].lightResults.values().iterator().next().strength) + " ");
+							.print(df.format(lightMap[z][y][x].lightResults
+								.values().iterator().next().strength) + " ");
 				}
 				System.out.println();
 			}
@@ -644,8 +680,11 @@ public class LightMap
 						if (lightMap[z][y][x].lightResults.size() == 0)
 							System.out.print("00 ");
 						else
-							System.out.print(
-								df.format(lightMap[z][y][x].lightResults.values().iterator().next().strength) + " ");
+							System.out
+								.print(df
+									.format(lightMap[z][y][x].lightResults
+										.values().iterator().next().strength)
+									+ " ");
 					}
 				}
 				System.out.println();
@@ -657,7 +696,8 @@ public class LightMap
 
 	public boolean within(int x, int y, int z)
 	{
-		return z >= 0 && z < lightMap.length && y >= 0 && y < lightMap[z].length && x >= 0 && x < lightMap[z][y].length;
+		return z >= 0 && z < lightMap.length && y >= 0 && y < lightMap[z].length
+			&& x >= 0 && x < lightMap[z][y].length;
 	}
 
 	public Map<Vector3ic, Integer> changes()

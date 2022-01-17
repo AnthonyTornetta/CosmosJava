@@ -17,7 +17,8 @@ public class GUIButton extends GUIElement implements IGUIInteractable
 	private boolean locked = false;
 	private boolean wasHovered = false;
 
-	public GUIButton(MeasurementPair position, MeasurementPair dim, Runnable onclick)
+	public GUIButton(MeasurementPair position, MeasurementPair dim,
+		Runnable onclick)
 	{
 		super(position, dim);
 
@@ -53,7 +54,8 @@ public class GUIButton extends GUIElement implements IGUIInteractable
 		{
 			wasHovered = true;
 
-			if (!hidden() && Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+			if (!hidden()
+				&& Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 				onclick.run();
 		}
 		else

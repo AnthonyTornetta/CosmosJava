@@ -85,8 +85,8 @@ public class GrassBiosphere extends Biosphere
 			{
 				for (int dx = -off; dx <= off; dx++)
 				{
-					if (s.withinBlocks(x + dx, y + 3 + dy, z + dz)
-						&& !(dy == 4 && (dz == -1 || dz == 1) && (dx == -1 || dx == 1)))
+					if (s.withinBlocks(x + dx, y + 3 + dy, z + dz) && !(dy == 4
+						&& (dz == -1 || dz == 1) && (dx == -1 || dx == 1)))
 					{
 						if (dx == 0 && dz == 0 && dy != 4)
 							s.block(x + dx, y + 3 + dy, z + dz, Blocks.LOG);

@@ -7,7 +7,8 @@ import com.cornchipss.cosmos.systems.BlockSystemIDs;
 
 public class ThrusterBlock extends ShipBlock implements IThrustProducer
 {
-	private static final String[] properties = new String[] { BlockSystemIDs.THRUSTER_ID };
+	private static final String[] properties = new String[] {
+		BlockSystemIDs.THRUSTER_ID };
 
 	public ThrusterBlock()
 	{

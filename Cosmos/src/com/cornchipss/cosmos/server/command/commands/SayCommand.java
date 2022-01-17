@@ -14,7 +14,8 @@ public class SayCommand implements Command
 	}
 
 	@Override
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand)
 	{
 		if (arguments.size() == 0)
 		{
@@ -22,7 +23,8 @@ public class SayCommand implements Command
 			return true;
 		}
 		rawCommand = rawCommand.trim();
-		System.out.println("SAY: " + rawCommand.substring(rawCommand.indexOf(' ') + 1));
+		System.out.println(
+			"SAY: " + rawCommand.substring(rawCommand.indexOf(' ') + 1));
 
 		return true;
 	}

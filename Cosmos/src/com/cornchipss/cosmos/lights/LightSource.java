@@ -34,7 +34,7 @@ public class LightSource
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{

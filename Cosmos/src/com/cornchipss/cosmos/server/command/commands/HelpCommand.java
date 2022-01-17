@@ -34,7 +34,8 @@ public class HelpCommand implements Command
 	}
 
 	@Override
-	public boolean call(CosmosNettyServer server, List<String> arguments, String rawCommand)
+	public boolean call(CosmosNettyServer server, List<String> arguments,
+		String rawCommand)
 	{
 		if (arguments.size() == 0)
 		{
@@ -43,14 +44,16 @@ public class HelpCommand implements Command
 			{
 				System.out.println(cmd.name());
 			}
-			System.out.println("Use help [command] to get a detailed description.");
+			System.out
+				.println("Use help [command] to get a detailed description.");
 		}
 		else
 		{
 			for (String s : arguments)
 			{
 				Command cmd = handler.command(s);
-				System.out.println("Usage: " + cmd.name() + " " + cmd.argumentsHelp());
+				System.out.println(
+					"Usage: " + cmd.name() + " " + cmd.argumentsHelp());
 				System.out.println("\t" + cmd.description());
 			}
 		}

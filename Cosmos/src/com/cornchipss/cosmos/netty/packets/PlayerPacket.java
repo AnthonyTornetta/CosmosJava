@@ -20,9 +20,9 @@ public class PlayerPacket extends Packet
 
 	public PlayerPacket()
 	{
-		
+
 	}
-	
+
 	public PlayerPacket(Player p)
 	{
 		this.name = p.name();
@@ -48,7 +48,8 @@ public class PlayerPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		c.player().body().transform().position(position);
 		c.player().body().transform().orientation().quaternion(rotation);

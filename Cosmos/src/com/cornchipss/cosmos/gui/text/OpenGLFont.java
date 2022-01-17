@@ -16,7 +16,8 @@ public class OpenGLFont
 	 * The minimum/maximum ASCII codes of the characters supported -
 	 * {@link OpenGLFont#DEL_CHAR} is also not rendered
 	 */
-	public static final int CHAR_MIN = 32, CHAR_MAX = 256; // 0-31 are control codes
+	public static final int CHAR_MIN = 32, CHAR_MAX = 256; // 0-31 are control
+															// codes
 
 	/**
 	 * This character is ignored because it has no visual representation
@@ -40,8 +41,8 @@ public class OpenGLFont
 	private FontMetrics metrics;
 
 	/**
-	 * The starting pixel position in the {@link OpenGLFont#fontTexture} for each
-	 * character The extra space is for the width of the image
+	 * The starting pixel position in the {@link OpenGLFont#fontTexture} for
+	 * each character The extra space is for the width of the image
 	 */
 	private int[] offsets = new int[CHAR_MAX - CHAR_MIN + 1];
 
@@ -59,7 +60,8 @@ public class OpenGLFont
 	 */
 	private static FontMetrics getMetrics(@Nonnull Font f)
 	{
-		BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(1, 1,
+			BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
 
 		g.setFont(f);
@@ -110,7 +112,8 @@ public class OpenGLFont
 			imgWidth += metrics.charWidth(c);
 		}
 
-		BufferedImage image = new BufferedImage(imgWidth, fontHeight, BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image = new BufferedImage(imgWidth, fontHeight,
+			BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g = image.createGraphics();
 
 		offsets[CHAR_MAX - CHAR_MIN] = imgWidth;
@@ -151,8 +154,8 @@ public class OpenGLFont
 	}
 
 	/**
-	 * Finds the u coordinate in the u,v texture pair for a given character - used
-	 * to draw a character on a mesh.
+	 * Finds the u coordinate in the u,v texture pair for a given character -
+	 * used to draw a character on a mesh.
 	 * 
 	 * @param c The character to get the u texture coordinate for
 	 * @return The u coordinate in the u,v texture pair for a given character
@@ -163,15 +166,17 @@ public class OpenGLFont
 	}
 
 	/**
-	 * Finds the u ending coordinate in the u,v texture pair for a given character -
-	 * used to draw a character on a mesh.
+	 * Finds the u ending coordinate in the u,v texture pair for a given
+	 * character - used to draw a character on a mesh.
 	 * 
 	 * @param c The character to get the u ending texture coordinate for
-	 * @return The u ending coordinate in the u,v texture pair for a given character
+	 * @return The u ending coordinate in the u,v texture pair for a given
+	 *         character
 	 */
 	public float uEnd(char c)
 	{
-		return getOffset((char) ((int) c + 1)) / (float) offsets[offsets.length - 1];
+		return getOffset((char) ((int) c + 1))
+			/ (float) offsets[offsets.length - 1];
 	}
 
 	/**

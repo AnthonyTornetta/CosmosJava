@@ -26,7 +26,8 @@ public class CosmosClient implements Runnable
 		NettySide.initNettySide(NettySide.CLIENT);
 
 		if (instance != null)
-			throw new IllegalStateException("Cannot have more than 1 running clients!");
+			throw new IllegalStateException(
+				"Cannot have more than 1 running clients!");
 		instance = this;
 	}
 

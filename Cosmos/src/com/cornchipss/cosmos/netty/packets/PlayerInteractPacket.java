@@ -34,7 +34,7 @@ public class PlayerInteractPacket extends Packet
 		Structure s = game.world().structureFromID(sid);
 		if (s == null)
 			return;
-		
+
 		StructureBlock b = new StructureBlock(s, x, y, z);
 		Player p = client.players().player(name);
 
@@ -45,7 +45,8 @@ public class PlayerInteractPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game,
+		ClientConnection c)
 	{
 		Structure s = game.world().structureFromID(sid);
 		if (s == null)

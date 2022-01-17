@@ -14,7 +14,8 @@ public class DebugMaterial extends Material
 	}
 
 	@Override
-	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc camera, Matrix4fc transform, boolean inGUI)
+	public void initUniforms(Matrix4fc projectionMatrix, Matrix4fc camera,
+		Matrix4fc transform, boolean inGUI)
 	{
 		shader().setUniformMatrix(projLoc, projectionMatrix);
 		shader().setUniformMatrix(camLoc, camera);

@@ -35,8 +35,8 @@ public class Maths
 	 */
 	public static final float EQUALS_PRECISION = 0.0001f;
 
-	private static final Vector3fc X_VECTOR = new Vector3f(1, 0, 0), Y_VECTOR = new Vector3f(0, 1, 0),
-		Z_VECTOR = new Vector3f(0, 0, 1);
+	private static final Vector3fc X_VECTOR = new Vector3f(1, 0, 0),
+		Y_VECTOR = new Vector3f(0, 1, 0), Z_VECTOR = new Vector3f(0, 0, 1);
 
 	public static final Vector3fc x()
 	{
@@ -64,7 +64,8 @@ public class Maths
 	 * @param rz   Rotation Z
 	 * @param dest The destiantion matrix
 	 */
-	public static void createViewMatrix(float x, float y, float z, float rx, float ry, float rz, Matrix4f dest)
+	public static void createViewMatrix(float x, float y, float z, float rx,
+		float ry, float rz, Matrix4f dest)
 	{
 		dest.identity();
 
@@ -75,7 +76,8 @@ public class Maths
 		dest.translate(-x, -y, -z);
 	}
 
-	public static void createViewMatrix(Vector3fc position, Quaternionfc rotation, Matrix4f dest)
+	public static void createViewMatrix(Vector3fc position,
+		Quaternionfc rotation, Matrix4f dest)
 	{
 		dest.identity();
 
@@ -91,21 +93,24 @@ public class Maths
 	 * @param rot  Rotation
 	 * @param dest The destiantion matrix
 	 */
-	public static void createViewMatrix(Vector3fc pos, Vector3fc rot, Matrix4f dest)
+	public static void createViewMatrix(Vector3fc pos, Vector3fc rot,
+		Matrix4f dest)
 	{
-		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(), dest);
+		createViewMatrix(pos.x(), pos.y(), pos.z(), rot.x(), rot.y(), rot.z(),
+			dest);
 	}
 
-	public static Matrix4f createTransformationMatrix(Vector3fc position, float rx, float ry, float rz, Matrix4f matrix)
+	public static Matrix4f createTransformationMatrix(Vector3fc position,
+		float rx, float ry, float rz, Matrix4f matrix)
 	{
 		return createTransformationMatrix(position, rx, ry, rz, 1, matrix);
 	}
 
-	public static final Vector3fc RIGHT = new Vector3f(1, 0, 0), UP = new Vector3f(0, 1, 0),
-		FORWARD = new Vector3f(0, 0, 1);
+	public static final Vector3fc RIGHT = new Vector3f(1, 0, 0),
+		UP = new Vector3f(0, 1, 0), FORWARD = new Vector3f(0, 0, 1);
 
-	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx, float ry, float rz, float scale,
-		Matrix4f matrix)
+	public static Matrix4f createTransformationMatrix(Vector3fc pos, float rx,
+		float ry, float rz, float scale, Matrix4f matrix)
 	{
 		matrix.identity();
 		matrix.translate(pos);
@@ -116,7 +121,8 @@ public class Maths
 		return matrix;
 	}
 
-	public static Matrix4f createTransformationMatrix(Vector3fc pos, Quaternionfc rot)
+	public static Matrix4f createTransformationMatrix(Vector3fc pos,
+		Quaternionfc rot)
 	{
 		Matrix4f matrix = new Matrix4f();
 		matrix.identity();
@@ -145,17 +151,22 @@ public class Maths
 		float c = cos(angle);
 		float oc = 1.0f - c;
 
-		return new Matrix4f(oc * axis.x() * axis.x() + c, oc * axis.x() * axis.y() - axis.z() * s,
-			oc * axis.z() * axis.x() + axis.y() * s, 0.0f, oc * axis.x() * axis.y() + axis.z() * s,
-			oc * axis.y() * axis.y() + c, oc * axis.y() * axis.z() - axis.x() * s, 0.0f,
-			oc * axis.z() * axis.x() - axis.y() * s, oc * axis.y() * axis.z() + axis.x() * s,
+		return new Matrix4f(oc * axis.x() * axis.x() + c,
+			oc * axis.x() * axis.y() - axis.z() * s,
+			oc * axis.z() * axis.x() + axis.y() * s, 0.0f,
+			oc * axis.x() * axis.y() + axis.z() * s,
+			oc * axis.y() * axis.y() + c,
+			oc * axis.y() * axis.z() - axis.x() * s, 0.0f,
+			oc * axis.z() * axis.x() - axis.y() * s,
+			oc * axis.y() * axis.z() + axis.x() * s,
 			oc * axis.z() * axis.z() + c, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	public static Matrix4f createCombinedRotationMatrix(Vector3fc rotation)
 	{
 		return createRotationMatrix(x(), rotation.x())
-			.mul(createRotationMatrix(y(), rotation.y()).mul(createRotationMatrix(z(), rotation.z())));
+			.mul(createRotationMatrix(y(), rotation.y())
+				.mul(createRotationMatrix(z(), rotation.z())));
 	}
 
 	public static float cos(float theta)
@@ -209,40 +220,46 @@ public class Maths
 
 		Quaternionf rotationQuat = blankQuaternion();
 
-		rotationQuat.rotateXYZ(rotation.x(), rotation.y(), rotation.z(), transQuat);
+		rotationQuat.rotateXYZ(rotation.x(), rotation.y(), rotation.z(),
+			transQuat);
 
 		transQuat.transform(punto);
 
 		return punto;
 	}
 
-	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ,
-		Vector3f point)
+	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX,
+		Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector3f point)
 	{
 		return rotatePoint(rotationMatrixX, rotationMatrixX, rotationMatrixX,
 			new Vector4f(point.x(), point.y(), point.z(), 0));
 	}
 
-	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX, Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ,
+	public static Vector3f rotatePoint(Matrix4fc rotationMatrixX,
+		Matrix4fc rotationMatrixY, Matrix4fc rotationMatrixZ, Vector4fc point)
+	{
+		return rotatePoint(
+			Maths.mul(rotationMatrixX, rotationMatrixY).mul(rotationMatrixZ),
+			point);
+	}
+
+	public static Vector3f rotatePoint(Matrix4fc combinedRotation,
+		Vector3f point)
+	{
+		return rotatePoint(combinedRotation,
+			new Vector4f(point.x(), point.y(), point.z(), 0));
+	}
+
+	public static Vector3f rotatePoint(Matrix4fc combinedRotation,
 		Vector4fc point)
-	{
-		return rotatePoint(Maths.mul(rotationMatrixX, rotationMatrixY).mul(rotationMatrixZ), point);
-	}
-
-	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector3f point)
-	{
-		return rotatePoint(combinedRotation, new Vector4f(point.x(), point.y(), point.z(), 0));
-	}
-
-	public static Vector3f rotatePoint(Matrix4fc combinedRotation, Vector4fc point)
 	{
 		Vector4f vec = new Vector4f(point).mul(combinedRotation);
 		return new Vector3f(vec.x, vec.y, vec.z);
 	}
 
 	/**
-	 * Calculates the ending point based off the starting position, rotation values,
-	 * and the total distance
+	 * Calculates the ending point based off the starting position, rotation
+	 * values, and the total distance
 	 * 
 	 * @param start The starting point
 	 * @param v     The rotation (z is ignored)
@@ -255,8 +272,8 @@ public class Maths
 	}
 
 	/**
-	 * Calculates the ending point based off the starting position, rotation values,
-	 * and the total distance
+	 * Calculates the ending point based off the starting position, rotation
+	 * values, and the total distance
 	 * 
 	 * @param start The starting point
 	 * @param rx    The x rotation
@@ -264,14 +281,15 @@ public class Maths
 	 * @param dist  The total distance travelable
 	 * @return The ending point
 	 */
-	public static Vector3f pointAt(Vector3f start, float rx, float ry, float dist)
+	public static Vector3f pointAt(Vector3f start, float rx, float ry,
+		float dist)
 	{
 		return add(toComponents(rx, ry, dist), start);
 	}
 
 	/**
-	 * Calculates the ending point based off the starting position, rotation values,
-	 * and the total distance
+	 * Calculates the ending point based off the starting position, rotation
+	 * values, and the total distance
 	 * 
 	 * @param rx   The x rotation
 	 * @param ry   The y rotation
@@ -487,7 +505,8 @@ public class Maths
 
 	public static Vector3f toDegs(Vector3f rads)
 	{
-		return new Vector3f(toDegs(rads.x()), toDegs(rads.y()), toDegs(rads.z()));
+		return new Vector3f(toDegs(rads.x()), toDegs(rads.y()),
+			toDegs(rads.z()));
 	}
 
 	public static Matrix4f identity()
@@ -561,12 +580,13 @@ public class Maths
 
 	public static Quaternionf clone(Quaternionfc rotation)
 	{
-		return new Quaternionf(rotation.x(), rotation.y(), rotation.z(), rotation.w());
+		return new Quaternionf(rotation.x(), rotation.y(), rotation.z(),
+			rotation.w());
 	}
 
 	/**
-	 * Normalizes a vector ({@link Vector3f#normalize(float)}), but keeps it 0,0,0
-	 * if every value is 0
+	 * Normalizes a vector ({@link Vector3f#normalize(float)}), but keeps it
+	 * 0,0,0 if every value is 0
 	 * 
 	 * @param vec The vector to normalize
 	 * @param max The amount to normalize it to (generally 1)
@@ -648,7 +668,8 @@ public class Maths
 
 	public static boolean equals(Quaternionfc a, Quaternionfc b)
 	{
-		return equals(a.x(), b.x()) && equals(a.y(), b.y()) && equals(a.z(), b.z()) && equals(a.w(), b.w());
+		return equals(a.x(), b.x()) && equals(a.y(), b.y())
+			&& equals(a.z(), b.z()) && equals(a.w(), b.w());
 	}
 
 	public static float distSqrd(Vector3f a, Vector3f b)
@@ -720,9 +741,9 @@ public class Maths
 
 	/**
 	 * (https://stackoverflow.com/questions/1966587/given-3-points-how-do-i-calculate-the-normal-vector)
-	 * Finds the normal vector of the triangle generated by 3 edges The points are
-	 * specified in a counter-clockwise order as seen from a direction opposing the
-	 * normal
+	 * Finds the normal vector of the triangle generated by 3 edges The points
+	 * are specified in a counter-clockwise order as seen from a direction
+	 * opposing the normal
 	 * 
 	 * @param a Edge A
 	 * @param b Edge B
@@ -731,7 +752,8 @@ public class Maths
 	 */
 	public static Vector3f findNormal(Vector3fc a, Vector3fc b, Vector3fc c)
 	{
-		return b.sub(a, new Vector3f()).cross(c.sub(a, new Vector3f())).normalize(1);
+		return b.sub(a, new Vector3f()).cross(c.sub(a, new Vector3f()))
+			.normalize(1);
 	}
 
 	public static Vector3fc signum(Vector3fc v, Vector3f out)
@@ -742,7 +764,8 @@ public class Maths
 
 	public static Vector3i signumi(Vector3fc v, Vector3i out)
 	{
-		out.set((int) Math.signum(v.x()), (int) Math.signum(v.y()), (int) Math.signum(v.z()));
+		out.set((int) Math.signum(v.x()), (int) Math.signum(v.y()),
+			(int) Math.signum(v.z()));
 		return out;
 	}
 }

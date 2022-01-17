@@ -10,7 +10,8 @@ import com.cornchipss.cosmos.rendering.Texture;
 
 public class GUIRectangle extends GUITexture
 {
-	public GUIRectangle(MeasurementPair position, MeasurementPair dimensions, Color color)
+	public GUIRectangle(MeasurementPair position, MeasurementPair dimensions,
+		Color color)
 	{
 		super(position, dimensions, 0, 0, generateMaterial(color));
 	}

@@ -19,7 +19,8 @@ public class PlayerModel implements Model
 	}
 
 	@Override
-	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX,
+		float scaleY, float scaleZ)
 	{
 		if (baseModel == null)
 		{

@@ -80,38 +80,39 @@ class TestStructure
 		init(W, H, L);
 
 		Vector3i temp = new Vector3i(), out = new Vector3i();
-		
+
 		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
-		
+
 		assertEquals(new Vector3i(), out);
-		
+
 		OBBCollider c = a.obbForBlock(out);
 
-		assertEquals(new OBBCollider(new Vector3f(0, 0, 0), new Orientation(), new Vector3f(8, 8, 8)),
-			a.obbForChunk(a.chunk(0, 0, 0)));
+		assertEquals(new OBBCollider(new Vector3f(0, 0, 0), new Orientation(),
+			new Vector3f(8, 8, 8)), a.obbForChunk(a.chunk(0, 0, 0)));
 
-		assertEquals(
-			new OBBCollider(new Vector3f(-7.5f, -7.5f, -7.5f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)), c);
+		assertEquals(new OBBCollider(new Vector3f(-7.5f, -7.5f, -7.5f),
+			new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)), c);
 
 		init(W + W, H + H, L + L);
-		
+
 		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
-		
+
 		c = a.obbForBlock(out);
 
-		assertEquals(
-			new OBBCollider(new Vector3f(-15.5f, -15.5f, -15.5f), new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)),
-			c);
+		assertEquals(new OBBCollider(new Vector3f(-15.5f, -15.5f, -15.5f),
+			new Orientation(), new Vector3f(0.5f, 0.5f, 0.5f)), c);
 
-		a.body().transform().orientation().rotateRelative(new Vector3f(0, Maths.PI, 0));
+		a.body().transform().orientation()
+			.rotateRelative(new Vector3f(0, Maths.PI, 0));
 		a.body().transform().position(new Vector3f(100, 0, 0));
-		
+
 		temp.x = 15;
 		a.chunkCoordsToBlockCoords(a.chunk(0, 0, 0), temp, out);
-		
+
 		c = a.obbForBlock(out);
 
-		assertEquals(new OBBCollider(new Vector3f(100.5f, -15.5f, 15.5f), a.body().transform().orientation(),
-			new Vector3f(0.5f, 0.5f, 0.5f)), c);
+		assertEquals(new OBBCollider(new Vector3f(100.5f, -15.5f, 15.5f),
+			a.body().transform().orientation(), new Vector3f(0.5f, 0.5f, 0.5f)),
+			c);
 	}
 }

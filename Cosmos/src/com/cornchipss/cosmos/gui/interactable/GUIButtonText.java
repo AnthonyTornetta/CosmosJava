@@ -18,7 +18,8 @@ public class GUIButtonText extends GUIButton implements IGUIContainer
 {
 	private List<GUIElement> textArr = new ArrayList<>(1);
 
-	public GUIButtonText(String text, MeasurementPair position, MeasurementPair dim, Runnable onclick)
+	public GUIButtonText(String text, MeasurementPair position,
+		MeasurementPair dim, Runnable onclick)
 	{
 		super(position, dim, onclick);
 
@@ -27,14 +28,19 @@ public class GUIButtonText extends GUIButton implements IGUIContainer
 
 		OpenGLFont font = Fonts.ARIAL_28;
 
-		textArr.add(new GUIText(text, Fonts.ARIAL_28,
-			new MeasurementPair(
-				new SubtractedMeasurement(
-					new AddedMeasurement(position.x(), new DividedMeasurement(dim.x(), PixelMeasurement.TWO)),
-					new PixelMeasurement(font.stringWidth(text) / 2.f)),
-				new SubtractedMeasurement(
-					new AddedMeasurement(position.y(), new DividedMeasurement(dim.y(), PixelMeasurement.TWO)),
-					new PixelMeasurement(font.height() / 2.f)))));
+		textArr
+			.add(new GUIText(text, Fonts.ARIAL_28,
+				new MeasurementPair(
+					new SubtractedMeasurement(
+						new AddedMeasurement(position.x(),
+							new DividedMeasurement(dim.x(),
+								PixelMeasurement.TWO)),
+						new PixelMeasurement(font.stringWidth(text) / 2.f)),
+					new SubtractedMeasurement(
+						new AddedMeasurement(position.y(),
+							new DividedMeasurement(dim.y(),
+								PixelMeasurement.TWO)),
+						new PixelMeasurement(font.height() / 2.f)))));
 	}
 
 	@Override
@@ -52,6 +58,7 @@ public class GUIButtonText extends GUIButton implements IGUIContainer
 	@Override
 	public void removeChild(GUIElement elem)
 	{
-		throw new IllegalStateException("Cannot remove the text from this button!");
+		throw new IllegalStateException(
+			"Cannot remove the text from this button!");
 	}
 }

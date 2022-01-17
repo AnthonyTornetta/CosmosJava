@@ -13,7 +13,8 @@ import com.cornchipss.cosmos.gui.measurement.PixelMeasurement;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInteractable
+public class GUIScrollBox extends GUIRectangle
+	implements IGUIContainer, IGUIInteractable
 {
 	private List<GUIElement> children;
 
@@ -21,7 +22,8 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 
 	private PixelMeasurement scrollOffset;
 
-	public GUIScrollBox(MeasurementPair position, MeasurementPair dimensions, Color color)
+	public GUIScrollBox(MeasurementPair position, MeasurementPair dimensions,
+		Color color)
 	{
 		super(position, dimensions, color);
 
@@ -85,8 +87,10 @@ public class GUIScrollBox extends GUIRectangle implements IGUIContainer, IGUIInt
 
 		for (GUIElement elem : children)
 		{
-			float y = elem.position().x().actualValue(Window.instance().getHeight());
-			float height = elem.dimensions().y().actualValue(Window.instance().getHeight());
+			float y = elem.position().x()
+				.actualValue(Window.instance().getHeight());
+			float height = elem.dimensions().y()
+				.actualValue(Window.instance().getHeight());
 
 			if (y + height > maxY)
 				maxY = y;

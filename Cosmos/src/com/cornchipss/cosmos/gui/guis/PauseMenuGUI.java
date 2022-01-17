@@ -24,15 +24,21 @@ public class PauseMenuGUI extends GUIElementHolder
 	public void onAdd(GUI gui)
 	{
 		GUIButtonText quitBtn = new GUIButtonText("QUIT",
-			new MeasurementPair(MeasurementParser.parse("50% - 150"), MeasurementParser.parse("50% - 30 - 50")),
-			new MeasurementPair(new PixelMeasurement(300), new PixelMeasurement(60)), () ->
+			new MeasurementPair(MeasurementParser.parse("50% - 150"),
+				MeasurementParser.parse("50% - 30 - 50")),
+			new MeasurementPair(new PixelMeasurement(300),
+				new PixelMeasurement(60)),
+			() ->
 			{
 				CosmosClient.instance().quit();
 			});
 
 		GUIButtonText resumeBtn = new GUIButtonText("RESUME",
-			new MeasurementPair(MeasurementParser.parse("50% - 150"), MeasurementParser.parse("50% - 30 + 50")),
-			new MeasurementPair(new PixelMeasurement(300), new PixelMeasurement(60)), () ->
+			new MeasurementPair(MeasurementParser.parse("50% - 150"),
+				MeasurementParser.parse("50% - 30 + 50")),
+			new MeasurementPair(new PixelMeasurement(300),
+				new PixelMeasurement(60)),
+			() ->
 			{
 				active(false);
 			});

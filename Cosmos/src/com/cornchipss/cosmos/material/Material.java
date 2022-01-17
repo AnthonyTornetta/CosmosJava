@@ -5,7 +5,7 @@ import com.cornchipss.cosmos.shaders.Shader;
 public abstract class Material implements IMaterial
 {
 	private Shader shader;
-	
+
 	public Material(String shaderLoc)
 	{
 		this(new Shader(shaderLoc));
@@ -15,7 +15,7 @@ public abstract class Material implements IMaterial
 	{
 		shader = s;
 	}
-	
+
 	/**
 	 * Used to get the uniform locations
 	 */
@@ -31,7 +31,7 @@ public abstract class Material implements IMaterial
 	{
 		shader = s;
 	}
-	
+
 	public void useShader()
 	{
 		shader.use();

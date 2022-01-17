@@ -163,11 +163,13 @@ public abstract class CubeModel implements Model
 				return null;
 		}
 	}
-	
+
 	@Override
-	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ)
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX,
+		float scaleY, float scaleZ)
 	{
-		return createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ, BlockFace.RIGHT, BlockFace.LEFT, BlockFace.BOTTOM, BlockFace.TOP,
+		return createMesh(offX, offY, offZ, scaleX, scaleY, scaleZ,
+			BlockFace.RIGHT, BlockFace.LEFT, BlockFace.BOTTOM, BlockFace.TOP,
 			BlockFace.FRONT, BlockFace.BACK);
 	}
 
@@ -177,12 +179,12 @@ public abstract class CubeModel implements Model
 		return createMesh(offX, offY, offZ, scale, scale, scale);
 	}
 
-	protected void fillVertices(List<Float> vertices, float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
+	protected void fillVertices(List<Float> vertices, float offX, float offY,
+		float offZ, float scaleX, float scaleY, float scaleZ,
 		BlockFace... sides)
 	{
 		Vector3f scales = new Vector3f(scaleX, scaleY, scaleZ);
-		
-		
+
 		for (BlockFace s : sides)
 		{
 			int i = 0;
@@ -194,7 +196,8 @@ public abstract class CubeModel implements Model
 		}
 	}
 
-	protected void fillIndices(List<Integer> indices, float offX, float offY, float offZ, BlockFace... sides)
+	protected void fillIndices(List<Integer> indices, float offX, float offY,
+		float offZ, BlockFace... sides)
 	{
 		int maxI = 0;
 
@@ -213,7 +216,8 @@ public abstract class CubeModel implements Model
 		}
 	}
 
-	protected void fillUVs(List<Float> uvs, float offX, float offY, float offZ, BlockFace... sides)
+	protected void fillUVs(List<Float> uvs, float offX, float offY, float offZ,
+		BlockFace... sides)
 	{
 		for (BlockFace s : sides)
 		{
@@ -237,19 +241,21 @@ public abstract class CubeModel implements Model
 		}
 	}
 
-	public Mesh createMesh(float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
-		BlockFace... sides)
+	public Mesh createMesh(float offX, float offY, float offZ, float scaleX,
+		float scaleY, float scaleZ, BlockFace... sides)
 	{
-		return createMesh(true, offX, offY, offZ, scaleX, scaleY, scaleZ, sides);
+		return createMesh(true, offX, offY, offZ, scaleX, scaleY, scaleZ,
+			sides);
 	}
 
-	public Mesh createMesh(float offX, float offY, float offZ, float scale, BlockFace... sides)
+	public Mesh createMesh(float offX, float offY, float offZ, float scale,
+		BlockFace... sides)
 	{
 		return createMesh(true, offX, offY, offZ, scale, sides);
 	}
 
-	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scaleX, float scaleY, float scaleZ,
-		BlockFace... sides)
+	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ,
+		float scaleX, float scaleY, float scaleZ, BlockFace... sides)
 	{
 		List<Float> verts = new LinkedList<>();
 		List<Integer> indices = new LinkedList<>();
@@ -266,7 +272,8 @@ public abstract class CubeModel implements Model
 		return Mesh.createMesh(asArrVerts, asArrIndicies, asArrUvs, unbind);
 	}
 
-	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ, float scale, BlockFace... sides)
+	public Mesh createMesh(boolean unbind, float offX, float offY, float offZ,
+		float scale, BlockFace... sides)
 	{
 		return createMesh(unbind, offX, offY, offZ, scale, scale, scale, sides);
 	}

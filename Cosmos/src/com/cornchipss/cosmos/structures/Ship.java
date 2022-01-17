@@ -43,20 +43,23 @@ public class Ship extends Structure
 
 		if (pilot == null)
 		{
-			body().velocity(body().velocity().mul(0.99f, new Vector3f())); // no more drifting into space once the pilot
-																			// leaves
+			// no more drifting into space once the pilot leaves
+			body().velocity(body().velocity().mul(0.99f, new Vector3f()));
 			movement = Movement.movement(MovementType.NONE);
 		}
 		else
 		{
-			Vector3f where = new Vector3f(width() / 2, height() / 2, length() / 2);
+			Vector3f where = new Vector3f(width() / 2, height() / 2,
+				length() / 2);
 			pilot.body().velocity(Maths.zero());
-			pilot.body().transform().position(blockCoordsToWorldCoords(where, where));
+			pilot.body().transform()
+				.position(blockCoordsToWorldCoords(where, where));
 
-			pilot.body().transform().orientation(body().transform().orientation());
+			pilot.body().transform()
+				.orientation(body().transform().orientation());
 			movement = pilot.movement();
 		}
-		
+
 		return true;
 	}
 
@@ -68,9 +71,9 @@ public class Ship extends Structure
 			movement(Movement.movement(MovementType.NONE));
 
 			Player temp = pilot;
-			
+
 			pilot = null;
-			
+
 			if (temp != null)
 				temp.shipPiloting(null);
 
@@ -99,7 +102,7 @@ public class Ship extends Structure
 	{
 		blockSystemManager().sendAction(action);
 	}
-	
+
 	@Override
 	public boolean shouldCollideWith(PhysicalObject other)
 	{

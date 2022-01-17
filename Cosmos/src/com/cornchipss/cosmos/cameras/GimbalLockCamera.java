@@ -53,7 +53,8 @@ public class GimbalLockCamera extends Camera
 	}
 
 	/**
-	 * Call this after every update to a variable - updates all the other variables
+	 * Call this after every update to a variable - updates all the other
+	 * variables
 	 */
 	public void update()
 	{

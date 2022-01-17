@@ -11,13 +11,16 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	@Override
 	public boolean testOBBOBB(OBBCollider a, OBBCollider b)
 	{
-		return (Intersectionf.testObOb((Vector3f) a.center(), (Vector3f) a.localAxis()[0], (Vector3f) a.localAxis()[1],
-			(Vector3f) a.localAxis()[2], (Vector3f) a.halfwidths(), (Vector3f) b.center(), (Vector3f) b.localAxis()[0],
-			(Vector3f) b.localAxis()[1], (Vector3f) b.localAxis()[2], (Vector3f) b.halfwidths()));
+		return (Intersectionf.testObOb((Vector3f) a.center(),
+			(Vector3f) a.localAxis()[0], (Vector3f) a.localAxis()[1],
+			(Vector3f) a.localAxis()[2], (Vector3f) a.halfwidths(),
+			(Vector3f) b.center(), (Vector3f) b.localAxis()[0],
+			(Vector3f) b.localAxis()[1], (Vector3f) b.localAxis()[2],
+			(Vector3f) b.halfwidths()));
 	}
 
-	private boolean testMovingOBBOBB(Vector3fc aDeltaPos, Vector3fc deltaStart, OBBCollider a, OBBCollider b,
-		CollisionInfo info, CollisionInfo actual)
+	private boolean testMovingOBBOBB(Vector3fc aDeltaPos, Vector3fc deltaStart,
+		OBBCollider a, OBBCollider b, CollisionInfo info, CollisionInfo actual)
 	{
 		boolean hit = false;
 
@@ -41,7 +44,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	}
 
 	@Override
-	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a, OBBCollider b, CollisionInfo info)
+	public boolean testMovingOBBOBB(Vector3fc aDeltaPos, OBBCollider a,
+		OBBCollider b, CollisionInfo info)
 	{
 		CollisionInfo actual = info;
 		if (info == null)
@@ -65,7 +69,9 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 			// Last resort collision
 			if (actual != null)
 			{
-				float max = Math.max(Math.max(b.halfwidths().x(), b.halfwidths().y()), b.halfwidths().z());
+				float max = Math.max(
+					Math.max(b.halfwidths().x(), b.halfwidths().y()),
+					b.halfwidths().z());
 				Vector3f deltaStart = new Vector3f(aDeltaPos);
 
 				if (deltaStart.x != 0 || deltaStart.y != 0 || deltaStart.z != 0)
@@ -75,7 +81,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 					deltaStart.mul(-max);
 					newDelta.mul(2 * max);
 
-					return testMovingOBBOBB(newDelta, deltaStart, a, b, info, actual);
+					return testMovingOBBOBB(newDelta, deltaStart, a, b, info,
+						actual);
 				}
 				else
 				{
@@ -95,9 +102,11 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	}
 
 	@Override
-	public boolean testLineOBB(Vector3fc point, Vector3fc aDeltaPos, OBBCollider b, CollisionInfo info)
+	public boolean testLineOBB(Vector3fc point, Vector3fc aDeltaPos,
+		OBBCollider b, CollisionInfo info)
 	{
-		Vector3f end = new Vector3f(point.x() + aDeltaPos.x(), point.y() + aDeltaPos.y(), point.z() + aDeltaPos.z());
+		Vector3f end = new Vector3f(point.x() + aDeltaPos.x(),
+			point.y() + aDeltaPos.y(), point.z() + aDeltaPos.z());
 
 		Vector3f v0 = new Vector3f(), v1 = new Vector3f(), v2 = new Vector3f();
 
@@ -138,7 +147,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 			v2.sub(dy2);
 			// v2 = +x, -y, -z
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;
@@ -165,7 +175,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 
 			// v2 = +x, -y, -z from last check
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;
@@ -208,7 +219,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 			v2.sub(dx2);
 			// v2 = -x, +y, -z
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;
@@ -235,7 +247,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 
 			// v2 = -x, +y, -z from last check
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;
@@ -277,7 +290,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 			v2.sub(dx2);
 			// v2 = -x, -y, +z
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;
@@ -304,7 +318,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 
 			// v2 = -x, -y, +z from last check
 
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1, v2, EPSILON, temp))
+			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
+				v2, EPSILON, temp))
 			{
 				if (info == null)
 					return true;

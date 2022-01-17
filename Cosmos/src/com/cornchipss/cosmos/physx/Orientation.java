@@ -56,7 +56,8 @@ public class Orientation implements Cloneable
 		rotateRelative(dRot, right, up, forward);
 	}
 
-	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up, Vector3fc forward)
+	public void rotateRelative(Vector3fc dRot, Vector3fc right, Vector3fc up,
+		Vector3fc forward)
 	{
 		// Default quaternion
 		temp.x = 0;
