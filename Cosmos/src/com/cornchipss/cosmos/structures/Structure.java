@@ -777,11 +777,6 @@ public abstract class Structure extends PhysicalObject
 					+ "x" + height + "x" + length);
 	}
 
-	public Vector3fc center()
-	{
-		return body().transform().position();
-	}
-
 	public int length()
 	{
 		return length;

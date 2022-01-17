@@ -131,4 +131,9 @@ public class Orientation implements Cloneable
 		quaternion(quat);
 //		quaternion(quaternion().nlerp(quat, f, rotation));
 	}
+
+	public Quaternionfc inverseQuaternion()
+	{
+		return inverted;
+	}
 }

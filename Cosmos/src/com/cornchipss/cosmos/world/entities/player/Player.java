@@ -127,17 +127,19 @@ public abstract class Player extends PhysicalObject
 	}
 
 	/**
-	 * Use {@link Ship#setPilot(Player)}
+	 * <h1><b>DO NOT DIRECTLY CALL</b></h1>
+	 * Use {@link Ship#setPilot(Player)} instead.
 	 * 
 	 * @param s
 	 */
-	public @Deprecated void shipPiloting(Ship s)
+	public void shipPiloting(Ship s)
 	{
 		if (Utils.equals(pilotingShip, s))
 			return;
 
 		if (pilotingShip != null)
 			pilotingShip.setPilot(null);
+		
 		pilotingShip = null;
 
 		this.body().transform().position(

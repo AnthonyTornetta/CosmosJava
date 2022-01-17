@@ -14,6 +14,7 @@ import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.cameras.GimbalLockCamera;
+import com.cornchipss.cosmos.cameras.ShipCamera;
 import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
@@ -30,6 +31,7 @@ import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
+import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
@@ -38,7 +40,7 @@ import com.cornchipss.cosmos.world.entities.player.Player;
 
 public class ClientPlayer extends Player
 {
-	private GimbalLockCamera cam;
+	private Camera cam;
 
 	public ClientPlayer(World world, String name)
 	{
@@ -129,6 +131,17 @@ public class ClientPlayer extends Player
 
 		CosmosClient.instance().nettyClient().sendUDP(packet);
 		CosmosClient.instance().nettyClient().sendUDP(p);
+	}
+	
+	@Override
+	public void shipPiloting(Ship s)
+	{
+		super.shipPiloting(s);
+		
+		if(s == null)
+			this.cam = new GimbalLockCamera(this.body().transform());
+		else
+			this.cam = new ShipCamera(s);
 	}
 
 	private void handleInteractions()

@@ -5,7 +5,6 @@ import org.joml.Matrix4fc;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
-import org.lwjgl.opengl.GL30;
 
 import com.cornchipss.cosmos.client.CosmosClient;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
@@ -142,24 +141,30 @@ public class ClientGame extends Game
 			initGraphics();
 
 		GL11.glEnable(GL13.GL_TEXTURE0);
+		
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glEnable(GL11.GL_CULL_FACE);
 
-		GL30.glEnable(GL30.GL_DEPTH_TEST);
-		GL30.glDepthFunc(GL30.GL_LESS);
+		GL11.glDepthFunc(GL11.GL_LESS);
 
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 
 		world().lock();
 
-		Matrix4fc camera = player.shipPiloting() == null
-			? player.camera().viewMatrix()
-			: player.shipPiloting().body().transform().invertedMatrix();
+//		Matrix4fc camera = player.shipPiloting() == null
+//			? player.camera().viewMatrix()
+//			: player.shipPiloting().body().transform().invertedMatrix();
 
+		Matrix4fc camera = player.camera().viewMatrix();
+		
 		world().draw(projectionMatrix, camera, player());
 
 		world().unlock();
 
 		gui.update(delta);
 
+		GL11.glDisable(GL11.GL_CULL_FACE);
+		
 		if (drawGUI)
 			gui.draw();
 	}

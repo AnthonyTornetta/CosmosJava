@@ -1,12 +1,14 @@
 package com.cornchipss.cosmos.structures;
 
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
+import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.physx.Movement;
-import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
+import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.World;
@@ -22,12 +24,17 @@ public class Ship extends Structure
 	private Player pilot;
 
 	private Movement movement;
+	
+	private Vector3f centerBlockPosition;
+	private Vector3f centerBlockPositionLocal;
 
 	public Ship(World world, int id)
 	{
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
 
 		movement = Movement.movement(MovementType.NONE);
+		
+		centerBlockPosition = new Vector3f();
 	}
 
 	@Override
@@ -38,7 +45,9 @@ public class Ship extends Structure
 
 	@Override
 	public boolean update(float delta)
-	{
+	{		
+		centerBlockPositionLocal = new Vector3f(width() / 2, height() / 2, length() / 2);
+		
 		super.update(delta);
 
 		if (pilot == null)
@@ -63,7 +72,6 @@ public class Ship extends Structure
 		return true;
 	}
 
-	@SuppressWarnings("deprecation")
 	public void setPilot(Player p)
 	{
 		if (!Utils.equals(pilot, p))
@@ -81,6 +89,16 @@ public class Ship extends Structure
 			if (p != null)
 				p.shipPiloting(this);
 		}
+	}
+	
+	/**
+	 * The central block of the ship's location (ship core location) relative to the world
+	 * @return
+	 */
+	public Vector3fc center()
+	{
+		this.blockCoordsToWorldCoords(centerBlockPositionLocal, centerBlockPosition);
+		return centerBlockPosition;
 	}
 
 	public Player pilot()
