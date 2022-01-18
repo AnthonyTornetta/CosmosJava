@@ -78,4 +78,14 @@ public class World extends PhysicsWorld
 				return s;
 		return null;
 	}
+	
+	private int currentSid = 1;
+	
+	public int nextStructureId()
+	{
+		while(structureFromID(currentSid) != null)
+			currentSid++;
+		
+		return currentSid++;
+	}
 }

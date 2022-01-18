@@ -10,6 +10,7 @@ import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.netty.packets.ClientInteractPacket;
+import com.cornchipss.cosmos.netty.packets.CreateShipPacket;
 import com.cornchipss.cosmos.netty.packets.ExitShipPacket;
 import com.cornchipss.cosmos.netty.packets.JoinPacket;
 import com.cornchipss.cosmos.netty.packets.LoginPacket;
@@ -82,5 +83,6 @@ public class NetworkRegistry
 		register(ExitShipPacket.class, k);
 		register(StructureStatusPacket.class, k);
 		register(MovementPacket.class, k);
+		register(CreateShipPacket.class, k);
 	}
 }

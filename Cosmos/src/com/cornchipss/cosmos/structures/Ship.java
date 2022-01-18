@@ -2,8 +2,8 @@ package com.cornchipss.cosmos.structures;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.joml.Vector3i;
 
-import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
@@ -25,7 +25,7 @@ public class Ship extends Structure
 	private Movement movement;
 	
 	private Vector3f centerBlockPosition;
-	private Vector3f centerBlockPositionLocal;
+	private Vector3i shipCoreBlockLocation;
 
 	public Ship(World world, int id)
 	{
@@ -34,19 +34,12 @@ public class Ship extends Structure
 		movement = Movement.movement(MovementType.NONE);
 		
 		centerBlockPosition = new Vector3f();
-	}
-
-	@Override
-	public void block(int x, int y, int z, Block b)
-	{
-		super.block(x, y, z, b);
+		shipCoreBlockLocation = new Vector3i(width() / 2, height() / 2, length() / 2);
 	}
 
 	@Override
 	public boolean update(float delta)
 	{		
-		centerBlockPositionLocal = new Vector3f(width() / 2, height() / 2, length() / 2);
-		
 		super.update(delta);
 
 		if (pilot == null)
@@ -94,9 +87,9 @@ public class Ship extends Structure
 	 * The central block of the ship's location (ship core location) relative to the world
 	 * @return
 	 */
-	public Vector3fc center()
+	public Vector3fc shipCoreWorldPosition()
 	{
-		this.blockCoordsToWorldCoords(centerBlockPositionLocal, centerBlockPosition);
+		this.blockCoordsToWorldCoords(shipCoreBlockLocation, centerBlockPosition);
 		return centerBlockPosition;
 	}
 
@@ -124,5 +117,10 @@ public class Ship extends Structure
 	public boolean shouldCollideWith(PhysicalObject other)
 	{
 		return !other.equals(pilot());
+	}
+	
+	public Vector3i shipCoreBlockPosition()
+	{
+		return shipCoreBlockLocation;
 	}
 }

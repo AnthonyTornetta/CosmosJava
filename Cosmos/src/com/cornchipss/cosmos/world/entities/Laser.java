@@ -8,7 +8,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
-import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.types.RawImageMaterial;
@@ -31,7 +30,7 @@ import com.cornchipss.cosmos.world.World;
 public class Laser extends PhysicalObject
 	implements IHasCollisionEvent, IRenderable, IUpdatable
 {
-	private Vector3f halfwidths = new Vector3f(0.5f, 0.5f, 0.5f);
+	private Vector3f halfwidths = new Vector3f(0.5f, 0.5f, 10f);
 
 	private float speed;
 
@@ -45,7 +44,7 @@ public class Laser extends PhysicalObject
 	public Laser(World world, float speed, Structure sender)
 	{
 		super(world);
-		this.speed = 2;
+		this.speed = speed;
 		this.sender = sender;
 	}
 
@@ -80,10 +79,14 @@ public class Laser extends PhysicalObject
 		if (obj instanceof Structure)
 		{
 			Structure s = (Structure) obj;
+			
+			info.collisionPoint.sub(info.normal.x / 2.f, info.normal.y / 2.f, info.normal.z / 2.f);
+			
 			Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
 				new Vector3i());
-
-			s.block(point.x, point.y, point.z, Blocks.LIGHT);
+			
+			if(s.withinBlocks(point.x, point.y, point.z))
+				s.removeBlock(point.x, point.y, point.z);
 		}
 		this.world().removeObject(this);
 

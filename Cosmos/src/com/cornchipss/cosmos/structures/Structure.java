@@ -724,6 +724,11 @@ public abstract class Structure extends PhysicalObject
 		return ret;
 	}
 
+	public void block(Vector3ic pos, Block b)
+	{
+		this.block(pos.x(), pos.y(), pos.z(), b);
+	}
+	
 	public void block(int x, int y, int z, Block b)
 	{
 		if (!initialized)

@@ -50,7 +50,7 @@ public class ShipCamera extends Camera
 	@Override
 	public Vector3fc position()
 	{
-		return ship.center();
+		return ship.shipCoreWorldPosition();
 	}
 
 	@Override

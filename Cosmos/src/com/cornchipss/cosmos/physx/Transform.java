@@ -2,11 +2,12 @@ package com.cornchipss.cosmos.physx;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-public class Transform
+public class Transform implements Cloneable
 {
 	private Vector3f position;
 
@@ -44,6 +45,13 @@ public class Transform
 		invertedMatirx = new Matrix4f();
 
 		updateMatrix();
+	}
+
+	@Override
+	public Transform clone()
+	{
+		return new Transform(new Vector3f(position),
+			new Orientation(new Quaternionf().set(orientation.quaternion())));
 	}
 
 	private void updateMatrix()
