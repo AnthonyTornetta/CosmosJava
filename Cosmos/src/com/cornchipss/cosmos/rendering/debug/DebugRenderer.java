@@ -61,7 +61,6 @@ public class DebugRenderer implements IRenderable
 		}
 	}
 
-	@Deprecated
 	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
 		ClientPlayer p)
 	{

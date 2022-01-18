@@ -23,7 +23,7 @@ public class Ship extends Structure
 	private Player pilot;
 
 	private Movement movement;
-	
+
 	private Vector3f centerBlockPosition;
 	private Vector3i shipCoreBlockLocation;
 
@@ -32,14 +32,15 @@ public class Ship extends Structure
 		super(world, MAX_DIMENSIONS, MAX_DIMENSIONS, MAX_DIMENSIONS, id);
 
 		movement = Movement.movement(MovementType.NONE);
-		
+
 		centerBlockPosition = new Vector3f();
-		shipCoreBlockLocation = new Vector3i(width() / 2, height() / 2, length() / 2);
+		shipCoreBlockLocation = new Vector3i(width() / 2, height() / 2,
+			length() / 2);
 	}
 
 	@Override
 	public boolean update(float delta)
-	{		
+	{
 		super.update(delta);
 
 		if (pilot == null)
@@ -60,6 +61,9 @@ public class Ship extends Structure
 				.orientation(body().transform().orientation());
 			movement = pilot.movement();
 		}
+		
+		if(body().velocity().dot(body().velocity()) < 0.1f)
+			body().velocity(Maths.zero());
 
 		return true;
 	}
@@ -82,14 +86,17 @@ public class Ship extends Structure
 				p.shipPiloting(this);
 		}
 	}
-	
+
 	/**
-	 * The central block of the ship's location (ship core location) relative to the world
+	 * The central block of the ship's location (ship core location) relative to
+	 * the world
+	 * 
 	 * @return
 	 */
 	public Vector3fc shipCoreWorldPosition()
 	{
-		this.blockCoordsToWorldCoords(shipCoreBlockLocation, centerBlockPosition);
+		this.blockCoordsToWorldCoords(shipCoreBlockLocation,
+			centerBlockPosition);
 		return centerBlockPosition;
 	}
 
@@ -118,7 +125,7 @@ public class Ship extends Structure
 	{
 		return !other.equals(pilot());
 	}
-	
+
 	public Vector3i shipCoreBlockPosition()
 	{
 		return shipCoreBlockLocation;

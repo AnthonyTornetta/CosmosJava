@@ -8,6 +8,7 @@ import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
+import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
 
 public class StructureStatusPacket extends Packet
@@ -44,6 +45,9 @@ public class StructureStatusPacket extends Packet
 		s.body().transform().orientation().quaternion(rot);
 		s.energy(energy);
 		s.maxEnergy(maxEnergy);
+		
+		if(game.player().isPilotingShip() && s instanceof Ship && game.player().shipPiloting().equals(s))
+			game.player().camera().update();
 	}
 
 	@Override
