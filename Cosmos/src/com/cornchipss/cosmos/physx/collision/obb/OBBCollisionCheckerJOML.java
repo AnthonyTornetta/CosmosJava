@@ -4,6 +4,7 @@ import org.joml.Intersectionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 
 public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
@@ -24,9 +25,11 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 	{
 		boolean hit = false;
 
+		Vector3f point = MemoryPool.getInstanceOrCreate(Vector3f.class);
+		
 		for (Vector3fc pt : a)
 		{
-			Vector3f point = new Vector3f(pt);
+			point.set(pt);
 			point.add(deltaStart);
 
 			if (testLineOBB(point, aDeltaPos, b, info))
@@ -39,6 +42,8 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				return true;
 			}
 		}
+		
+		MemoryPool.addToPool(point);
 
 		return hit;
 	}

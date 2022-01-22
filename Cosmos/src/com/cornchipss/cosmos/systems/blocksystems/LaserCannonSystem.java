@@ -26,12 +26,18 @@ public class LaserCannonSystem extends BlockSystem
 	}
 
 	private List<Node> nodes;
+	
+	private long lastFireTime = 0;
+	
+	private PlayerAction lastAction = new PlayerAction(0);
 
 	public LaserCannonSystem(Structure s)
 	{
 		super(s);
 
 		nodes = new LinkedList<>();
+		
+		lastFireTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -153,7 +159,10 @@ public class LaserCannonSystem extends BlockSystem
 	@Override
 	public void update(float delta)
 	{
-
+		if(lastAction.isFiring())
+		{
+			receiveAction(lastAction);
+		}
 	}
 
 	@Override
@@ -165,8 +174,12 @@ public class LaserCannonSystem extends BlockSystem
 	@Override
 	public void receiveAction(PlayerAction action)
 	{
-		if (action.isFiring())
+		lastAction = action;
+		
+		if (action.isFiring() && System.currentTimeMillis() - 100 > lastFireTime)
 		{
+			lastFireTime = System.currentTimeMillis();
+			
 			for (Node n : nodes)
 			{
 				Vector3i pos = new Vector3i(n.start.x, n.start.y,

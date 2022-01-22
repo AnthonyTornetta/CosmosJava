@@ -18,13 +18,13 @@ public class ThrusterBlock extends ShipBlock implements IThrustProducer
 	@Override
 	public float thrustGeneratedPerSecond()
 	{
-		return 2000;
+		return 1_250_000; // 1 ship hull is 50k kg
 	}
 
 	@Override
 	public float powerUsedPerSecond()
 	{
-		return 200;
+		return 1_250_000; // just a guess
 	}
 
 	@Override

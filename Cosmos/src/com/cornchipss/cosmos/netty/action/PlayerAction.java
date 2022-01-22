@@ -14,6 +14,7 @@ public class PlayerAction
 		code = c;
 	}
 
+	private static final int NONE = 0;
 	private static final int FIRE = 0b1;
 
 	/**
@@ -24,6 +25,11 @@ public class PlayerAction
 	public int code()
 	{
 		return code;
+	}
+	
+	public boolean isNone()
+	{
+		return code == 0;
 	}
 
 	public boolean isFiring()
@@ -36,7 +42,7 @@ public class PlayerAction
 	 */
 	public static class Builder
 	{
-		private int code = 0;
+		private int code = NONE;
 
 		public Builder setFiring(boolean f)
 		{

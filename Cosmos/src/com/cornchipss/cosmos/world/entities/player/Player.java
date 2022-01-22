@@ -127,8 +127,8 @@ public abstract class Player extends PhysicalObject
 	}
 
 	/**
-	 * <h1><b>DO NOT DIRECTLY CALL</b></h1>
-	 * Use {@link Ship#setPilot(Player)} instead.
+	 * <h1><b>DO NOT DIRECTLY CALL</b></h1> Use {@link Ship#setPilot(Player)}
+	 * instead.
 	 * 
 	 * @param s
 	 */
@@ -138,12 +138,17 @@ public abstract class Player extends PhysicalObject
 			return;
 
 		if (pilotingShip != null)
+		{
 			pilotingShip.setPilot(null);
-		
-		pilotingShip = null;
 
-		this.body().transform().position(
-			this.position().add(new Vector3f(0, -5, 0), new Vector3f()));
+			this.body().transform()
+				.position(this.position().add(
+					new Vector3f(pilotingShip.body().transform().orientation()
+						.forward().mul(-1.3f, new Vector3f())),
+					new Vector3f()));
+		}
+
+		pilotingShip = null;
 
 		if (s != null)
 		{

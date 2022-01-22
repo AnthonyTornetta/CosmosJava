@@ -4,7 +4,10 @@ import java.awt.Color;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -977,10 +980,25 @@ public abstract class Structure extends PhysicalObject
 		return totalMass;
 	}
 
+	private Vector3f lastCalculations = new Vector3f();
+	private Map<Chunk, OBBCollider> obbs = new HashMap<>();
+	
 	public OBBCollider obbForChunk(Chunk c)
 	{
-		return new OBBCollider(chunkWorldPosition(c, new Vector3f()),
-			body().transform().orientation(), Chunk.HALF_DIMENSIONS);
+		Vector3fc position = position();
+		if(!lastCalculations.equals(position))
+		{
+			obbs.clear();
+			lastCalculations.set(position);
+		}
+		
+		if(!obbs.containsKey(c))
+		{
+			obbs.put(c, new OBBCollider(chunkWorldPosition(c, new Vector3f()),
+			body().transform().orientation(), Chunk.HALF_DIMENSIONS));
+		}
+		
+		return obbs.get(c);
 	}
 
 	public OBBCollider OBB()

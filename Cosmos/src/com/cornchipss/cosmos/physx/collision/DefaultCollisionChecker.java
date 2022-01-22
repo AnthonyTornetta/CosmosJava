@@ -1,7 +1,6 @@
 package com.cornchipss.cosmos.physx.collision;
 
 import java.awt.Color;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +17,7 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -209,6 +209,8 @@ public class DefaultCollisionChecker implements ICollisionChecker
 	{
 		if (a instanceof Structure && b instanceof Structure)
 		{
+			boolean hit = false;
+			
 			Structure sa = (Structure) a;
 			Structure sb = (Structure) b;
 
@@ -217,7 +219,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				return false;
 			}
 
-			boolean hit = false;
 
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
 
@@ -238,9 +239,12 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 
 			return hit;
+			
 		} // BEWARE: UNTESTED CODE BELOW THIS LINE //
 		else if (b instanceof Structure)
 		{
+			boolean hit = false;
+			
 			OBBCollider obbA = a.OBB();
 
 			if (NettySide.side() == NettySide.CLIENT)
@@ -253,11 +257,9 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			if (!obbChecker.testMovingOBBOBB(deltaA, obbA, b.OBB(), null))
 			{
-//				Utils.println("EARLY RETURN");
+				Utils.println("EARLY RETURN");
 				return false;
 			}
-
-			boolean hit = false;
 
 			for (Chunk c : ((Structure) b).chunks())
 			{

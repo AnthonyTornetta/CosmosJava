@@ -11,14 +11,9 @@ public class CameraModel extends CubeModel
 		switch (side)
 		{
 			case BACK:
-				return 6 * material().uLength();
-			case FRONT:
-				return 8 * material().uLength();
-			case TOP:
-			case BOTTOM:
-				return 7 * material().uLength();
+				return 9 * material().uLength();
 			default: // left right
-				return 5 * material().uLength();
+				return 4 * material().uLength();
 		}
 	}
 

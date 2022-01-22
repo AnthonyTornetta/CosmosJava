@@ -53,7 +53,7 @@ public class Chunk implements IWritable
 	{
 		needsRendered = b;
 	}
-
+	
 	/**
 	 * Dimensions of a Chunk - must be even
 	 */
@@ -598,5 +598,22 @@ public class Chunk implements IWritable
 	public boolean empty()
 	{
 		return empty;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		return structure().hashCode() + relativePos.hashCode();
+	}
+	
+	@Override
+	public boolean equals(Object o)
+	{
+		if(o instanceof Chunk)
+		{
+			Chunk c = (Chunk)o;
+			return c.localPosition.equals(localPosition) && c.structure.equals(structure);
+		}
+		return false;
 	}
 }

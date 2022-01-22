@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.utils.Utils;
 
@@ -116,13 +117,23 @@ public class OBBCollider implements Iterable<Vector3fc>
 		int cx = 0, cy = 0, cz = 0;
 
 		OBBCollider obc;
-		Vector3f temp = new Vector3f();
+		Vector3f temp;
 
 		CornerIterator(OBBCollider obc)
 		{
 			this.obc = obc;
+			
+			temp = MemoryPool.getInstance(Vector3f.class);
+			if(temp == null)
+				temp = new Vector3f();
 		}
 
+		@Override
+		public void finalize()
+		{
+			MemoryPool.addToPool(temp);
+		}
+		
 		@Override
 		public boolean hasNext()
 		{

@@ -24,6 +24,6 @@ public class EnergyStorageBlock extends Block implements IEnergyStorageBlock
 	@Override
 	public float energyCapacity()
 	{
-		return 10_000;
+		return 20_000_000;
 	}
 }

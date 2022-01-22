@@ -20,13 +20,13 @@ public class ReactorBlock extends Block
 	@Override
 	public float energyGeneratedPerSecond()
 	{
-		return 1000;
+		return 5_000_000;
 	}
 
 	@Override
 	public float energyCapacity()
 	{
-		return 1_000;
+		return 1_000_000;
 	}
 
 	@Override
