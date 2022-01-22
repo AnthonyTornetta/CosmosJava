@@ -6,8 +6,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +22,7 @@ import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
@@ -211,7 +210,6 @@ public abstract class Structure extends PhysicalObject
 						DebugRenderer.instance().drawOBB(obbBlock, Color.pink,
 							DrawMode.LINES);
 
-
 						if (hasBlock(point.x(), point.y(), point.z())
 							&& temp.distanceSquared < info.distanceSquared
 							&& temp.normal.dot(temp.normal) != 0)
@@ -347,9 +345,10 @@ public abstract class Structure extends PhysicalObject
 			}
 		}
 	}
-	
+
 	/**
 	 * The system, null if it doesn't exist
+	 * 
 	 * @param id the system's ID
 	 * @return The system, null if it doesn't exist
 	 */
@@ -742,15 +741,16 @@ public abstract class Structure extends PhysicalObject
 	{
 		this.block(pos.x(), pos.y(), pos.z(), b);
 	}
-	
+
 	public Block block(Vector3ic pos)
 	{
 		return this.block(pos.x(), pos.y(), pos.z());
 	}
-	
+
 	/**
-	 * Returns the block data for that specific block
-	 * Creates that data if none is present
+	 * Returns the block data for that specific block Creates that data if none
+	 * is present
+	 * 
 	 * @param x The block's X
 	 * @param y The block's Y
 	 * @param z The block's Z
@@ -759,19 +759,21 @@ public abstract class Structure extends PhysicalObject
 	public BlockData blockData(int x, int y, int z)
 	{
 		if (!initialized)
-			throw new IllegalStateException("Cannot get block data from an uninitialized structure!");
-		
-		if(withinBlocks(x, y, z))
+			throw new IllegalStateException(
+				"Cannot get block data from an uninitialized structure!");
+
+		if (withinBlocks(x, y, z))
 		{
 			Chunk c = chunkFromBlockCoords(x, y, z);
-			return c.blockData(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
+			return c.blockData(x % Chunk.WIDTH, y % Chunk.HEIGHT,
+				z % Chunk.LENGTH);
 		}
 		else
 			throw new IndexOutOfBoundsException(
 				x + ", " + y + ", " + z + " was out of bounds for " + width
 					+ "x" + height + "x" + length);
 	}
-	
+
 	public void block(int x, int y, int z, Block b)
 	{
 		if (!initialized)
@@ -982,28 +984,29 @@ public abstract class Structure extends PhysicalObject
 
 	private Vector3f lastCalculations = new Vector3f();
 	private Map<Chunk, OBBCollider> obbs = new HashMap<>();
-	
+
 	public OBBCollider obbForChunk(Chunk c)
 	{
 		Vector3fc position = position();
-		if(!lastCalculations.equals(position))
+		if (!lastCalculations.equals(position))
 		{
 			obbs.clear();
 			lastCalculations.set(position);
 		}
-		
-		if(!obbs.containsKey(c))
+
+		if (!obbs.containsKey(c))
 		{
 			obbs.put(c, new OBBCollider(chunkWorldPosition(c, new Vector3f()),
-			body().transform().orientation(), Chunk.HALF_DIMENSIONS));
+				body().transform().orientation(), Chunk.HALF_DIMENSIONS));
 		}
-		
+
 		return obbs.get(c);
 	}
 
 	public OBBCollider OBB()
 	{
-		return new OBBCollider(position(), body().transform().orientation(),
+		return MemoryPool.getInstanceOrCreate(OBBCollider.class).set(position(),
+			body().transform().orientation(),
 			new Vector3f(width() / 2.f, height() / 2.f, length() / 2.f));
 	}
 

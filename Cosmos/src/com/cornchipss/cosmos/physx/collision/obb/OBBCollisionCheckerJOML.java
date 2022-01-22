@@ -26,7 +26,7 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		boolean hit = false;
 
 		Vector3f point = MemoryPool.getInstanceOrCreate(Vector3f.class);
-		
+
 		for (Vector3fc pt : a)
 		{
 			point.set(pt);
@@ -42,7 +42,7 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 				return true;
 			}
 		}
-		
+
 		MemoryPool.addToPool(point);
 
 		return hit;
@@ -53,296 +53,351 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		OBBCollider b, CollisionInfo info)
 	{
 		CollisionInfo actual = info;
+
+		boolean madeInfo = false;
 		if (info == null)
-			info = new CollisionInfo(); // It's still needed for JOML functions
-
-		boolean hit = false;
-
-		for (Vector3fc point : a.cornerIterator())
 		{
-			if (testLineOBB(point, aDeltaPos, b, info))
-			{
-				if (actual == null)
-					return true;
-
-				hit = true;
-			}
+			// It's still needed for JOML functions
+			info = MemoryPool.getInstanceOrCreate(CollisionInfo.class);
+			madeInfo = true;
 		}
 
-		if (!hit && testOBBOBB(a, b))
+		try
 		{
-			// Last resort collision
-			if (actual != null)
+			boolean hit = false;
+
+			for (Vector3fc point : a.cornerIterator())
 			{
-				float max = Math.max(
-					Math.max(b.halfwidths().x(), b.halfwidths().y()),
-					b.halfwidths().z());
-				Vector3f deltaStart = new Vector3f(aDeltaPos);
-
-				if (deltaStart.x != 0 || deltaStart.y != 0 || deltaStart.z != 0)
+				if (testLineOBB(point, aDeltaPos, b, info))
 				{
-					deltaStart.normalize();
-					Vector3f newDelta = new Vector3f(deltaStart);
-					deltaStart.mul(-max);
-					newDelta.mul(2 * max);
+					if (actual == null)
+						return true;
 
-					return testMovingOBBOBB(newDelta, deltaStart, a, b, info,
-						actual);
+					hit = true;
+				}
+			}
+
+			if (!hit && testOBBOBB(a, b))
+			{
+				// Last resort collision
+				if (actual != null)
+				{
+					float max = Math.max(
+						Math.max(b.halfwidths().x(), b.halfwidths().y()),
+						b.halfwidths().z());
+					Vector3f deltaStart = MemoryPool
+						.getInstanceOrCreate(Vector3f.class).set(aDeltaPos);
+
+					if (deltaStart.x != 0 || deltaStart.y != 0
+						|| deltaStart.z != 0)
+					{
+						deltaStart.normalize();
+						Vector3f newDelta = MemoryPool
+							.getInstanceOrCreate(Vector3f.class)
+							.set(deltaStart);
+						deltaStart.mul(-max);
+						newDelta.mul(2 * max);
+
+						MemoryPool.addToPool(newDelta);
+						MemoryPool.addToPool(deltaStart);
+
+						return testMovingOBBOBB(newDelta, deltaStart, a, b,
+							info, actual);
+					}
+					else
+					{
+						MemoryPool.addToPool(deltaStart);
+
+						// If the OBB isn't actually moving just take a guess
+						info.collisionPoint.set(a.center());
+						info.distanceSquared = 0;
+						info.normal.set(0, 0, 0);
+
+						return true;
+					}
 				}
 				else
-				{
-					// If the OBB isn't actually moving just take a guess
-					info.collisionPoint.set(a.center());
-					info.distanceSquared = 0;
-					info.normal.set(0, 0, 0);
-
 					return true;
-				}
 			}
-			else
-				return true;
-		}
 
-		return hit;
+			return hit;
+
+		}
+		finally
+		{
+			if (madeInfo)
+			{
+				MemoryPool.addToPool(info);
+			}
+		}
 	}
 
 	@Override
 	public boolean testLineOBB(Vector3fc point, Vector3fc aDeltaPos,
 		OBBCollider b, CollisionInfo info)
 	{
-		Vector3f end = new Vector3f(point.x() + aDeltaPos.x(),
-			point.y() + aDeltaPos.y(), point.z() + aDeltaPos.z());
+		Vector3f end = MemoryPool.getInstanceOrCreate(Vector3f.class).set(
+			point.x() + aDeltaPos.x(), point.y() + aDeltaPos.y(),
+			point.z() + aDeltaPos.z());
 
-		Vector3f v0 = new Vector3f(), v1 = new Vector3f(), v2 = new Vector3f();
+		Vector3f v0 = MemoryPool.getInstanceOrCreate(Vector3f.class),
+			v1 = MemoryPool.getInstanceOrCreate(Vector3f.class),
+			v2 = MemoryPool.getInstanceOrCreate(Vector3f.class);
 
-		final float EPSILON = 1e-5f;
+		Vector3f temp = MemoryPool.getInstanceOrCreate(Vector3f.class);
 
-		Vector3f temp = new Vector3f();
-		boolean hit = false;
+		Vector3f dx = b.localAxis()[0].mul(b.halfwidths().x(),
+			MemoryPool.getInstanceOrCreate(Vector3f.class));
+		Vector3f dy = b.localAxis()[1].mul(b.halfwidths().y(),
+			MemoryPool.getInstanceOrCreate(Vector3f.class));
+		Vector3f dz = b.localAxis()[2].mul(b.halfwidths().z(),
+			MemoryPool.getInstanceOrCreate(Vector3f.class));
 
-		Vector3f dx = b.localAxis()[0].mul(b.halfwidths().x(), new Vector3f());
-		Vector3f dy = b.localAxis()[1].mul(b.halfwidths().y(), new Vector3f());
-		Vector3f dz = b.localAxis()[2].mul(b.halfwidths().z(), new Vector3f());
+		Vector3f dx2 = MemoryPool.getInstanceOrCreate(Vector3f.class).set(dx)
+			.mul(2);
+		Vector3f dy2 = MemoryPool.getInstanceOrCreate(Vector3f.class).set(dy)
+			.mul(2);
+		Vector3f dz2 = MemoryPool.getInstanceOrCreate(Vector3f.class).set(dz)
+			.mul(2);
 
-		Vector3f dx2 = new Vector3f(dx).mul(2);
-		Vector3f dy2 = new Vector3f(dy).mul(2);
-		Vector3f dz2 = new Vector3f(dz).mul(2);
-
-		// LEFT + RIGHT SIDE CHECKS
-		for (int signX = -1; signX <= 1; signX += 2)
+		try
 		{
-			// 1st Triangle
+			final float EPSILON = 1e-5f;
+			boolean hit = false;
 
-			v0.set(b.center());
+			// LEFT + RIGHT SIDE CHECKS
+			for (int signX = -1; signX <= 1; signX += 2)
+			{
+				// 1st Triangle
 
-			if (signX == -1)
-				v0.sub(dx);
-			else
+				v0.set(b.center());
+
+				if (signX == -1)
+					v0.sub(dx);
+				else
+					v0.add(dx);
+
+				v0.add(dy);
+				v0.add(dz);
+				// v0 = +x, +y, +z
+
+				v1.set(v0);
+				v1.sub(dz2);
+				// v1 = +x, +y, -z
+
+				v2.set(v1);
+				v2.sub(dy2);
+				// v2 = +x, -y, -z
+
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
+				{
+					if (info == null)
+						return true;
+
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[0]);
+						info.normal.mul(signX);
+					}
+				}
+
+				// 2nd Triangle
+
+				// v0 = +x, +y, +z from last check
+
+				v1.set(v0);
+				v1.sub(dy2);
+				// v1 = +x, -y, +z
+
+				// v2 = +x, -y, -z from last check
+
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
+				{
+					if (info == null)
+						return true;
+
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[0]);
+						info.normal.mul(signX);
+					}
+				}
+			}
+
+			// TOP + BOTTOM SIDE CHECKS
+			for (int sign = -1; sign <= 1; sign += 2)
+			{
+				// 1st Triangle
+
+				v0.set(b.center());
+
 				v0.add(dx);
 
-			v0.add(dy);
-			v0.add(dz);
-			// v0 = +x, +y, +z
+				if (sign == -1)
+					v0.sub(dy);
+				else
+					v0.add(dy);
 
-			v1.set(v0);
-			v1.sub(dz2);
-			// v1 = +x, +y, -z
-
-			v2.set(v1);
-			v2.sub(dy2);
-			// v2 = +x, -y, -z
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
-			{
-				if (info == null)
-					return true;
-
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
-				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
-
-					info.normal.set(b.localAxis()[0]);
-					info.normal.mul(signX);
-				}
-			}
-
-			// 2nd Triangle
-
-			// v0 = +x, +y, +z from last check
-
-			v1.set(v0);
-			v1.sub(dy2);
-			// v1 = +x, -y, +z
-
-			// v2 = +x, -y, -z from last check
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
-			{
-				if (info == null)
-					return true;
-
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
-				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
-
-					info.normal.set(b.localAxis()[0]);
-					info.normal.mul(signX);
-				}
-			}
-		}
-
-		// TOP + BOTTOM SIDE CHECKS
-		for (int sign = -1; sign <= 1; sign += 2)
-		{
-			// 1st Triangle
-
-			v0.set(b.center());
-
-			v0.add(dx);
-
-			if (sign == -1)
-				v0.sub(dy);
-			else
-				v0.add(dy);
-
-			v0.add(dz);
-			// v0 = +x, +y, +z
-
-			v1.set(v0);
-			v1.sub(dz2);
-			// v1 = +x, +y, -z
-
-			v2.set(v1);
-			v2.sub(dx2);
-			// v2 = -x, +y, -z
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
-			{
-				if (info == null)
-					return true;
-
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
-				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
-
-					info.normal.set(b.localAxis()[1]);
-					info.normal.mul(sign);
-				}
-			}
-
-			// 2nd Triangle
-
-			// v0 = +x, +y, +z from last check
-
-			v1.set(v0);
-			v1.sub(dx2);
-			// v1 = -x, +y, +z
-
-			// v2 = -x, +y, -z from last check
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
-			{
-				if (info == null)
-					return true;
-
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
-				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
-
-					info.normal.set(b.localAxis()[1]);
-					info.normal.mul(sign);
-				}
-			}
-		}
-
-		// FRONT + BACK SIDE CHECKS
-		for (int sign = -1; sign <= 1; sign += 2)
-		{
-			// 1st Triangle
-
-			v0.set(b.center());
-
-			v0.add(dx);
-			v0.add(dy);
-			if (sign == -1)
-				v0.sub(dz);
-			else
 				v0.add(dz);
+				// v0 = +x, +y, +z
 
-			// v0 = +x, +y, +z
+				v1.set(v0);
+				v1.sub(dz2);
+				// v1 = +x, +y, -z
 
-			v1.set(v0);
-			v1.sub(dy2);
-			// v1 = +x, -y, +z
+				v2.set(v1);
+				v2.sub(dx2);
+				// v2 = -x, +y, -z
 
-			v2.set(v1);
-			v2.sub(dx2);
-			// v2 = -x, -y, +z
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
-			{
-				if (info == null)
-					return true;
-
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
 				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
+					if (info == null)
+						return true;
 
-					info.normal.set(b.localAxis()[2]);
-					info.normal.mul(sign);
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[1]);
+						info.normal.mul(sign);
+					}
+				}
+
+				// 2nd Triangle
+
+				// v0 = +x, +y, +z from last check
+
+				v1.set(v0);
+				v1.sub(dx2);
+				// v1 = -x, +y, +z
+
+				// v2 = -x, +y, -z from last check
+
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
+				{
+					if (info == null)
+						return true;
+
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[1]);
+						info.normal.mul(sign);
+					}
 				}
 			}
 
-			// 2nd Triangle
-
-			// v0 = +x, +y, +z from last check
-
-			v1.set(v0);
-			v1.sub(dx2);
-			// v1 = -x, +y, +z
-
-			// v2 = -x, -y, +z from last check
-
-			if (Intersectionf.intersectLineSegmentTriangle(point, end, v0, v1,
-				v2, EPSILON, temp))
+			// FRONT + BACK SIDE CHECKS
+			for (int sign = -1; sign <= 1; sign += 2)
 			{
-				if (info == null)
-					return true;
+				// 1st Triangle
 
-				hit = true;
-				float distSqrd = temp.distanceSquared(point);
-				if (distSqrd < info.distanceSquared)
+				v0.set(b.center());
+
+				v0.add(dx);
+				v0.add(dy);
+				if (sign == -1)
+					v0.sub(dz);
+				else
+					v0.add(dz);
+
+				// v0 = +x, +y, +z
+
+				v1.set(v0);
+				v1.sub(dy2);
+				// v1 = +x, -y, +z
+
+				v2.set(v1);
+				v2.sub(dx2);
+				// v2 = -x, -y, +z
+
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
 				{
-					info.collisionPoint.set(temp);
-					info.distanceSquared = distSqrd;
+					if (info == null)
+						return true;
 
-					info.normal.set(b.localAxis()[2]);
-					info.normal.mul(sign);
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[2]);
+						info.normal.mul(sign);
+					}
+				}
+
+				// 2nd Triangle
+
+				// v0 = +x, +y, +z from last check
+
+				v1.set(v0);
+				v1.sub(dx2);
+				// v1 = -x, +y, +z
+
+				// v2 = -x, -y, +z from last check
+
+				if (Intersectionf.intersectLineSegmentTriangle(point, end, v0,
+					v1, v2, EPSILON, temp))
+				{
+					if (info == null)
+						return true;
+
+					hit = true;
+					float distSqrd = temp.distanceSquared(point);
+					if (distSqrd < info.distanceSquared)
+					{
+						info.collisionPoint.set(temp);
+						info.distanceSquared = distSqrd;
+
+						info.normal.set(b.localAxis()[2]);
+						info.normal.mul(sign);
+					}
 				}
 			}
+			return hit;
+
 		}
+		finally
+		{
+			MemoryPool.addToPool(end);
+			MemoryPool.addToPool(v0);
+			MemoryPool.addToPool(v1);
+			MemoryPool.addToPool(v2);
 
-		return hit;
+			MemoryPool.addToPool(dx);
+			MemoryPool.addToPool(dy);
+			MemoryPool.addToPool(dz);
+
+			MemoryPool.addToPool(dx2);
+			MemoryPool.addToPool(dy2);
+			MemoryPool.addToPool(dz2);
+
+			MemoryPool.addToPool(temp);
+		}
 	}
 
 //	/**

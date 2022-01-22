@@ -1,6 +1,7 @@
 package com.cornchipss.cosmos.physx.collision;
 
 import java.awt.Color;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
@@ -17,7 +19,6 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -77,28 +78,35 @@ public class DefaultCollisionChecker implements ICollisionChecker
 	private boolean fineCheck(Chunk a, Chunk b, Vector3fc deltaA,
 		CollisionInfo info)
 	{
-		OBBCollider bOBB = b.structure().obbForChunk(b);
-
-		Vector3fc pos = a.structure().chunkWorldPosition(a, new Vector3f());
-
 		List<Integer> xs = new LinkedList<>();
 		List<Integer> ys = new LinkedList<>();
 		List<Integer> zs = new LinkedList<>();
 
 		{
-			Vector3f at = new Vector3f(pos);
+			OBBCollider bOBB = b.structure().obbForChunk(b);
+
+			Vector3f pos = a.structure().chunkWorldPosition(a,
+				MemoryPool.getInstanceOrCreate(Vector3f.class).set(0, 0, 0));
+
+			OBBCollider obc = MemoryPool.getInstanceOrCreate(OBBCollider.class);
+
+			Vector3f temp = MemoryPool.getInstanceOrCreate(Vector3f.class);
+
+			Vector3f at = MemoryPool.getInstanceOrCreate(Vector3f.class)
+				.set(pos);
+
 			at.sub(a.structure().body().transform().orientation().up()
-				.mul(Chunk.HEIGHT / 2.f, new Vector3f()));
+				.mul(Chunk.HEIGHT / 2.f, temp));
 
 			// Start Y
-			Vector3f halfWidthsY = new Vector3f(Chunk.WIDTH / 2.f, 0.5f,
-				Chunk.LENGTH / 2.f);
+			Vector3f halfwidthsStorage = MemoryPool
+				.getInstanceOrCreate(Vector3f.class)
+				.set(Chunk.WIDTH / 2.f, 0.5f, Chunk.LENGTH / 2.f);
 
 			for (int y = 0; y < a.height(); y++)
 			{
-				OBBCollider obc = new OBBCollider(at,
-					a.structure().body().transform().orientation(),
-					halfWidthsY);
+				obc.set(at, a.structure().body().transform().orientation(),
+					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -107,22 +115,18 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 				at.add(a.structure().body().transform().orientation().up());
 			}
-		}
 
-		{
-			Vector3f at = new Vector3f(pos);
+			at.set(pos);
 			at.sub(a.structure().body().transform().orientation().right()
-				.mul(Chunk.WIDTH / 2.f, new Vector3f()));
+				.mul(Chunk.WIDTH / 2.f, temp));
 
 			// Start X
-			Vector3f halfWidthsX = new Vector3f(0.5f, Chunk.HEIGHT / 2.f,
-				Chunk.LENGTH / 2.f);
+			halfwidthsStorage.set(0.5f, Chunk.HEIGHT / 2.f, Chunk.LENGTH / 2.f);
 
 			for (int x = 0; x < a.width(); x++)
 			{
-				OBBCollider obc = new OBBCollider(at,
-					a.structure().body().transform().orientation(),
-					halfWidthsX);
+				obc.set(at, a.structure().body().transform().orientation(),
+					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -131,26 +135,22 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 				at.add(a.structure().body().transform().orientation().right());
 			}
-		}
 
-		Vector3fc backward = a.structure().body().transform().orientation()
-			.forward().mul(-1, new Vector3f());
+			Vector3fc backward = a.structure().body().transform().orientation()
+				.forward().mul(-1, temp);
 
-		{
-			Vector3f at = new Vector3f(pos);
+			at.set(pos);
 			// it is add here
 			at.add(a.structure().body().transform().orientation().forward()
-				.mul(Chunk.LENGTH / 2.f, new Vector3f()));
+				.mul(Chunk.LENGTH / 2.f, temp));
 
 			// Start Z
-			Vector3f halfWidthsZ = new Vector3f(Chunk.WIDTH / 2.f,
-				Chunk.HEIGHT / 2.f, 0.5f);
+			halfwidthsStorage.set(Chunk.WIDTH / 2.f, Chunk.HEIGHT / 2.f, 0.5f);
 
 			for (int z = 0; z < a.length(); z++)
 			{
-				OBBCollider obc = new OBBCollider(at,
-					a.structure().body().transform().orientation(),
-					halfWidthsZ);
+				obc.set(at, a.structure().body().transform().orientation(),
+					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
 				{
@@ -159,48 +159,63 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 				at.add(backward);
 			}
+			
+			MemoryPool.addToPool(obc);
+			MemoryPool.addToPool(at.set(0));
+			MemoryPool.addToPool(pos.set(0));
+			MemoryPool.addToPool(temp.set(0));
+			MemoryPool.addToPool(halfwidthsStorage.set(0));
 		}
 
-		boolean hit = false;
-
-		Vector3i temp = new Vector3i(), out = new Vector3i();
-
-		for (int z : zs)
+		Vector3i tempVeci = MemoryPool.getInstanceOrCreate(Vector3i.class);
+		Vector3i out = MemoryPool.getInstanceOrCreate(Vector3i.class);
+		
+		try
 		{
-			for (int y : ys)
+			boolean hit = false;
+	
+			for (int z : zs)
 			{
-				for (int x : xs)
+				for (int y : ys)
 				{
-					if (a.hasBlock(x, y, z))
+					for (int x : xs)
 					{
-						temp.set(x, y, z);
-						Vector3i blockCoords = a.structure()
-							.chunkCoordsToBlockCoords(a, temp, out);
-
-						OBBCollider obbBlockA = a.structure()
-							.obbForBlock(blockCoords);
-
-						if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA,
-							b.structure().obbForChunk(b), null))
+						if (a.hasBlock(x, y, z))
 						{
-							for (Vector3fc pointOfInterest : obbBlockA)
+							tempVeci.set(x, y, z);
+							Vector3i blockCoords = a.structure()
+								.chunkCoordsToBlockCoords(a, tempVeci, out);
+	
+							OBBCollider obbBlockA = a.structure()
+								.obbForBlock(blockCoords);
+	
+							if (obbChecker.testMovingOBBOBB(deltaA, obbBlockA,
+								b.structure().obbForChunk(b), null))
 							{
-								if (b.testLineIntersection(pointOfInterest,
-									deltaA, info, obbChecker))
+								for (Vector3fc pointOfInterest : obbBlockA)
 								{
-									if (info == null
-										|| info.distanceSquared == 0)
-										return true;
-									hit = true;
+									if (b.testLineIntersection(pointOfInterest,
+										deltaA, info, obbChecker))
+									{
+										if (info == null
+											|| info.distanceSquared == 0)
+											return true;
+										hit = true;
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+	
+			return hit;
 		}
-
-		return hit;
+		finally
+		{
+			MemoryPool.addToPool(tempVeci);
+			MemoryPool.addToPool(out);
+		}
 	}
 
 	@Override
@@ -210,7 +225,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 		if (a instanceof Structure && b instanceof Structure)
 		{
 			boolean hit = false;
-			
+
 			Structure sa = (Structure) a;
 			Structure sb = (Structure) b;
 
@@ -218,7 +233,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			{
 				return false;
 			}
-
 
 			Map<Chunk, List<Chunk>> chunks = new HashMap<>();
 
@@ -239,12 +253,12 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 
 			return hit;
-			
+
 		} // BEWARE: UNTESTED CODE BELOW THIS LINE //
 		else if (b instanceof Structure)
 		{
 			boolean hit = false;
-			
+
 			OBBCollider obbA = a.OBB();
 
 			if (NettySide.side() == NettySide.CLIENT)
@@ -257,7 +271,6 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			if (!obbChecker.testMovingOBBOBB(deltaA, obbA, b.OBB(), null))
 			{
-				Utils.println("EARLY RETURN");
 				return false;
 			}
 
@@ -304,39 +317,51 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				if (c.empty())
 					continue;
 
-				Vector3i chunkCoords = new Vector3i(),
-					blockCoords = new Vector3i();
+				Vector3i chunkCoords = MemoryPool
+					.getInstanceOrCreate(Vector3i.class),
+					blockCoords = MemoryPool
+						.getInstanceOrCreate(Vector3i.class);
 
-				if (obbChecker.testMovingOBBOBB(deltaA,
-					((Structure) a).obbForChunk(c), obbB, null))
+				try
 				{
-					for (int z = 0; z < c.length(); z++)
+					if (obbChecker.testMovingOBBOBB(deltaA,
+						((Structure) a).obbForChunk(c), obbB, null))
 					{
-						for (int y = 0; y < c.height(); y++)
+						for (int z = 0; z < c.length(); z++)
 						{
-							for (int x = 0; x < c.width(); x++)
+							for (int y = 0; y < c.height(); y++)
 							{
-								if (c.hasBlock(x, y, z))
+								for (int x = 0; x < c.width(); x++)
 								{
-									chunkCoords.set(x, y, z);
-									((Structure) a).chunkCoordsToBlockCoords(c,
-										chunkCoords, blockCoords);
-
-									if (obbChecker.testMovingOBBOBB(deltaA,
-										((Structure) a).obbForBlock(
-											blockCoords),
-										obbB, info))
+									if (c.hasBlock(x, y, z))
 									{
-										if (info == null
-											|| info.distanceSquared == 0)
-											return true;
+										chunkCoords.set(x, y, z);
+										((Structure) a)
+											.chunkCoordsToBlockCoords(c,
+												chunkCoords, blockCoords);
 
-										hit = true;
+										if (obbChecker
+											.testMovingOBBOBB(
+												deltaA, ((Structure) a)
+													.obbForBlock(blockCoords),
+												obbB, info))
+										{
+											if (info == null
+												|| info.distanceSquared == 0)
+												return true;
+
+											hit = true;
+										}
 									}
 								}
 							}
 						}
 					}
+				}
+				finally
+				{
+					MemoryPool.addToPool(chunkCoords.set(0));
+					MemoryPool.addToPool(blockCoords.set(0));
 				}
 			}
 

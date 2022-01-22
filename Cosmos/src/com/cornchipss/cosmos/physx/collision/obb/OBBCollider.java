@@ -20,7 +20,20 @@ public class OBBCollider implements Iterable<Vector3fc>
 
 	private int cornerCountX, cornerCountY, cornerCountZ;
 
+	/**
+	 * Call {@link OBBCollider#set(Vector3fc, Orientation, Vector3fc)} before use
+	 */
+	public OBBCollider()
+	{
+	}
+
 	public OBBCollider(Vector3fc center, Orientation orientation,
+		Vector3fc halfwidths)
+	{
+		set(center, orientation, halfwidths);
+	}
+
+	public OBBCollider set(Vector3fc center, Orientation orientation,
 		Vector3fc halfwidths)
 	{
 		this.center = new Vector3f(center);
@@ -36,6 +49,8 @@ public class OBBCollider implements Iterable<Vector3fc>
 		this.or = orientation;
 
 		cornerIterable = new CornerIterable(this);
+		
+		return this;
 	}
 
 	private static class OldCornerIterator implements Iterator<Vector3fc>
@@ -122,9 +137,9 @@ public class OBBCollider implements Iterable<Vector3fc>
 		CornerIterator(OBBCollider obc)
 		{
 			this.obc = obc;
-			
+
 			temp = MemoryPool.getInstance(Vector3f.class);
-			if(temp == null)
+			if (temp == null)
 				temp = new Vector3f();
 		}
 
@@ -133,7 +148,7 @@ public class OBBCollider implements Iterable<Vector3fc>
 		{
 			MemoryPool.addToPool(temp);
 		}
-		
+
 		@Override
 		public boolean hasNext()
 		{
