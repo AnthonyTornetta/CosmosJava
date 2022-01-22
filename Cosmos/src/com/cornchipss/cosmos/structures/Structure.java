@@ -32,6 +32,7 @@ import com.cornchipss.cosmos.rendering.MaterialMesh;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.types.IEnergyHolder;
+import com.cornchipss.cosmos.systems.BlockSystem;
 import com.cornchipss.cosmos.systems.BlockSystemManager;
 import com.cornchipss.cosmos.utils.IUpdatable;
 import com.cornchipss.cosmos.utils.Logger;
@@ -342,6 +343,16 @@ public abstract class Structure extends PhysicalObject
 				}
 			}
 		}
+	}
+	
+	/**
+	 * The system, null if it doesn't exist
+	 * @param id the system's ID
+	 * @return The system, null if it doesn't exist
+	 */
+	public BlockSystem systemFromID(String id)
+	{
+		return blockSystemManager.systemFromID(id);
 	}
 
 	@Override
@@ -727,6 +738,11 @@ public abstract class Structure extends PhysicalObject
 	public void block(Vector3ic pos, Block b)
 	{
 		this.block(pos.x(), pos.y(), pos.z(), b);
+	}
+	
+	public Block block(Vector3ic pos)
+	{
+		return this.block(pos.x(), pos.y(), pos.z());
 	}
 	
 	/**

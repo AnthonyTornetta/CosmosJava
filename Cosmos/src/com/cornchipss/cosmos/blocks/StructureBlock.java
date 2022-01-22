@@ -1,18 +1,19 @@
 package com.cornchipss.cosmos.blocks;
 
+import org.joml.Vector3i;
+import org.joml.Vector3ic;
+
 import com.cornchipss.cosmos.structures.Structure;
 
 public class StructureBlock
 {
 	private Structure structure;
-	private int x, y, z;
+	private Vector3i position;
 
 	public StructureBlock(Structure s, int x, int y, int z)
 	{
 		this.structure = s;
-		this.x = x;
-		this.y = y;
-		this.z = z;
+		this.position = new Vector3i(x, y, z);
 	}
 
 	public Structure structure()
@@ -20,29 +21,34 @@ public class StructureBlock
 		return structure;
 	}
 
+	public Vector3ic position()
+	{
+		return position;
+	}
+
 	public int structureX()
 	{
-		return x;
+		return position.x;
 	}
 
 	public int structureY()
 	{
-		return y;
+		return position.y;
 	}
 
 	public int structureZ()
 	{
-		return z;
+		return position.z;
 	}
 
 	public Block block()
 	{
-		return structure.block(x, y, z);
+		return structure.block(position);
 	}
 
 	public void changeBlock(Block to)
 	{
-		structure.block(x, y, z, to);
+		structure.block(position, to);
 	}
 
 	@Override
@@ -53,13 +59,12 @@ public class StructureBlock
 
 		StructureBlock otr = (StructureBlock) o;
 
-		return x == otr.x && y == otr.y && z == otr.z
-			&& structure.equals(otr.structure);
+		return position.equals(otr.position) && structure.equals(otr.structure);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return x * y * z * structure.hashCode();
+		return position.hashCode() * structure.hashCode();
 	}
 }

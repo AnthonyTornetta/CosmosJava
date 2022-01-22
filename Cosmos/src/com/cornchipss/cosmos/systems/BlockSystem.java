@@ -23,5 +23,5 @@ public abstract class BlockSystem
 	public Structure structure()
 	{
 		return s;
-	};
+	}
 }

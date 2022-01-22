@@ -14,7 +14,7 @@ public class ReactorBlock extends Block
 
 	public ReactorBlock()
 	{
-		super(new ReactorModel(), "reactor", 10);
+		super(new ReactorModel(), "reactor", 10000, 100);
 	}
 
 	@Override

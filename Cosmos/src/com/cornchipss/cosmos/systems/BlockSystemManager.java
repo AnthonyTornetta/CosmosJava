@@ -61,4 +61,14 @@ public class BlockSystemManager
 			}
 		}
 	}
+
+	/**
+	 * The system, null if it doesn't exist
+	 * @param id the system's ID
+	 * @return The system, null if it doesn't exist
+	 */
+	public BlockSystem systemFromID(String id)
+	{
+		return systems.get(id);
+	}
 }

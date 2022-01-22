@@ -2,10 +2,13 @@ package com.cornchipss.cosmos.cameras;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Ship;
+import com.cornchipss.cosmos.systems.BlockSystemIDs;
+import com.cornchipss.cosmos.systems.blocksystems.CameraBlockSystem;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class ShipCamera extends Camera
@@ -14,11 +17,16 @@ public class ShipCamera extends Camera
 	
 	private Matrix4f view;
 	
+	// Used to save memory
+	private Vector3f cameraPositionTempVector;
+	
 	public ShipCamera(Ship ship)
 	{
 		this.ship = ship;
 		
 		view = new Matrix4f();
+		
+		cameraPositionTempVector = new Vector3f();
 		
 		update();
 	}
@@ -50,7 +58,9 @@ public class ShipCamera extends Camera
 	@Override
 	public Vector3fc position()
 	{
-		return ship.shipCoreWorldPosition();
+		CameraBlockSystem cams = (CameraBlockSystem)ship.systemFromID(BlockSystemIDs.CAMERA_ID);
+		
+		return cams.selectedViewportWorldPosition(cameraPositionTempVector);
 	}
 
 	@Override

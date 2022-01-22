@@ -12,7 +12,7 @@ public class EnergyStorageBlock extends Block implements IEnergyStorageBlock
 
 	public EnergyStorageBlock()
 	{
-		super(new EnergyStorageModel(), "energy_storage", 10);
+		super(new EnergyStorageModel(), "energy_storage", 10000, 100);
 	}
 
 	@Override

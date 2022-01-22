@@ -31,7 +31,9 @@ public class Block implements IHasModel
 
 	private String name;
 
-	private int mass;
+	private float mass;
+
+	private float maxDamage;
 
 	/**
 	 * <p>
@@ -47,14 +49,18 @@ public class Block implements IHasModel
 	 * Use {@link BlockData} to differentiate between different blocks
 	 * </p>
 	 * 
-	 * @param m    The model the block has
-	 * @param name The name used to refer to the block in the r@Override egistry
+	 * @param m         The model the block has
+	 * @param name      The name used to refer to the block in the r@Override
+	 *                  egistry
+	 * @param mass      The mass of the block in kilograms (water is 1000kg)
+	 * @param maxDamage The max damage this block can take before breaking
 	 */
-	public Block(CubeModel m, String name, int mass)
+	public Block(CubeModel m, String name, float mass, float maxDamage)
 	{
 		this.model = m;
 		this.name = name;
 		this.mass = mass;
+		this.maxDamage = maxDamage;
 
 		id = -1;
 	}
@@ -94,7 +100,7 @@ public class Block implements IHasModel
 		return true;
 	}
 
-	public int mass()
+	public float mass()
 	{
 		return mass;
 	}
@@ -126,19 +132,21 @@ public class Block implements IHasModel
 	{
 		return "Block [" + name() + "]";
 	}
-	
+
 	public void takeDamage(StructureBlock b, float dmg)
 	{
-		BlockData data = b.structure().blockData(b.structureX(), b.structureY(), b.structureZ());
+		BlockData data = b.structure().blockData(b.structureX(), b.structureY(),
+			b.structureZ());
 		data.takeDamage(dmg);
-		
-		if(data.damage() >= maxDamage())
-			b.structure().removeBlock(b.structureX(), b.structureY(), b.structureZ());
+
+		if (data.damage() >= maxDamage())
+			b.structure().removeBlock(b.structureX(), b.structureY(),
+				b.structureZ());
 	}
-	
+
 	public float maxDamage()
 	{
-		return 100.0f;
+		return maxDamage;
 	}
 
 	/**

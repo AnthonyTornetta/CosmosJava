@@ -11,7 +11,7 @@ public class LaserCannonBlock extends ShipBlock implements ISystemBlock
 
 	public LaserCannonBlock()
 	{
-		super(new LaserCannonModel(), "laser-cannon", 10);
+		super(new LaserCannonModel(), "laser-cannon", 10000, 100);
 	}
 
 	@Override

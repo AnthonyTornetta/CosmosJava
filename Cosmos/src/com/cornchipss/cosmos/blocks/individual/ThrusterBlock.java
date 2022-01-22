@@ -12,7 +12,7 @@ public class ThrusterBlock extends ShipBlock implements IThrustProducer
 
 	public ThrusterBlock()
 	{
-		super(new ThrusterModel(), "thruster", 10);
+		super(new ThrusterModel(), "thruster", 10, 100);
 	}
 
 	@Override

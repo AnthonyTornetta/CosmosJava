@@ -6,6 +6,7 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.modifiers.BlockSystemFactories;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.systems.BlockSystemIDs;
+import com.cornchipss.cosmos.systems.factories.CameraSystemFactory;
 import com.cornchipss.cosmos.systems.factories.EnergyGenerationSystemFactory;
 import com.cornchipss.cosmos.systems.factories.EnergyStorageSystemFactory;
 import com.cornchipss.cosmos.systems.factories.LaserCannonSystemFactory;
@@ -24,6 +25,8 @@ public class Initializer
 			BlockSystemIDs.THRUSTER_ID);
 		BlockSystemFactories.register(new LaserCannonSystemFactory(),
 			BlockSystemIDs.LASER_CANNON_ID);
+		BlockSystemFactories.register(new CameraSystemFactory(),
+			BlockSystemIDs.CAMERA_ID);
 	}
 
 	protected void initTerrainGeneration()

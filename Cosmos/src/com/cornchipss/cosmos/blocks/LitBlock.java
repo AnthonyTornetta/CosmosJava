@@ -15,13 +15,16 @@ public class LitBlock extends Block
 	/**
 	 * A block that emits light
 	 * 
-	 * @param m   The model to use
-	 * @param src The {@link LightSource} the block emits
+	 * @param m         The model to use
+	 * @param src       The {@link LightSource} the block emits
+	 * @param name      Name of the block
+	 * @param mass      The mass
+	 * @param maxDamage The max damage this can take
 	 */
 	public LitBlock(CubeModel m, @Nonnull LightSource src, String name,
-		int mass)
+		int mass, float maxDamage)
 	{
-		super(m, name, mass);
+		super(m, name, mass, maxDamage);
 
 		source = src;
 	}
