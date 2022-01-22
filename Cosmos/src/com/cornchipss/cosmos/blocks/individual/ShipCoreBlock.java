@@ -3,7 +3,7 @@ package com.cornchipss.cosmos.blocks.individual;
 import com.cornchipss.cosmos.blocks.ShipBlock;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.blocks.data.BlockData;
-import com.cornchipss.cosmos.blocks.modifiers.IHasData;
+import com.cornchipss.cosmos.blocks.data.ShipCoreData;
 import com.cornchipss.cosmos.blocks.modifiers.IInteractable;
 import com.cornchipss.cosmos.models.blocks.ShipCoreModel;
 import com.cornchipss.cosmos.structures.Ship;
@@ -18,7 +18,7 @@ import com.cornchipss.cosmos.world.entities.player.Player;
  * If this is removed, then there is no ship
  * </p>
  */
-public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
+public class ShipCoreBlock extends ShipBlock implements IInteractable
 {
 	/**
 	 * <p>
@@ -44,8 +44,7 @@ public class ShipCoreBlock extends ShipBlock implements IHasData, IInteractable
 	@Override
 	public BlockData generateData(Structure s, int x, int y, int z)
 	{
-		BlockData data = new BlockData();
-		data.data("ship", s);
+		ShipCoreData data = new ShipCoreData((Ship) s);
 		return data;
 	}
 

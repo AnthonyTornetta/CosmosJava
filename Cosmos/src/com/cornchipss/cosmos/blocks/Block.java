@@ -48,7 +48,7 @@ public class Block implements IHasModel
 	 * </p>
 	 * 
 	 * @param m    The model the block has
-	 * @param name The name used to refer to the block in the registry
+	 * @param name The name used to refer to the block in the r@Override egistry
 	 */
 	public Block(CubeModel m, String name, int mass)
 	{
@@ -126,6 +126,20 @@ public class Block implements IHasModel
 	{
 		return "Block [" + name() + "]";
 	}
+	
+	public void takeDamage(StructureBlock b, float dmg)
+	{
+		BlockData data = b.structure().blockData(b.structureX(), b.structureY(), b.structureZ());
+		data.takeDamage(dmg);
+		
+		if(data.damage() >= maxDamage())
+			b.structure().removeBlock(b.structureX(), b.structureY(), b.structureZ());
+	}
+	
+	public float maxDamage()
+	{
+		return 100.0f;
+	}
 
 	/**
 	 * Halfwidths for OBB collision detection
@@ -138,5 +152,10 @@ public class Block implements IHasModel
 	public Vector3fc halfWidths()
 	{
 		return halfwidths;
+	}
+
+	public BlockData generateData(Structure s, int x, int y, int z)
+	{
+		return new BlockData();
 	}
 }

@@ -18,6 +18,7 @@ import org.joml.Vector3ic;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.StructureBlock;
+import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -201,11 +202,11 @@ public abstract class Structure extends PhysicalObject
 
 					CollisionInfo temp = new CollisionInfo();
 
-					DebugRenderer.instance().drawOBB(obbBlock, Color.pink,
-						DrawMode.LINES);
-
 					if (obc.testLineOBB(start, delta, obbBlock, temp))
 					{
+						DebugRenderer.instance().drawOBB(obbBlock, Color.pink,
+							DrawMode.LINES);
+
 
 						if (hasBlock(point.x(), point.y(), point.z())
 							&& temp.distanceSquared < info.distanceSquared
@@ -389,8 +390,7 @@ public abstract class Structure extends PhysicalObject
 		return chunks[flatten(x, y, z)];
 	}
 
-	@Deprecated
-	private Chunk chunk_old(int x, int y, int z)
+	private Chunk chunkFromBlockCoords(int x, int y, int z)
 	{
 		return chunk(x / Chunk.WIDTH, y / Chunk.HEIGHT, z / Chunk.LENGTH);
 	}
@@ -729,6 +729,30 @@ public abstract class Structure extends PhysicalObject
 		this.block(pos.x(), pos.y(), pos.z(), b);
 	}
 	
+	/**
+	 * Returns the block data for that specific block
+	 * Creates that data if none is present
+	 * @param x The block's X
+	 * @param y The block's Y
+	 * @param z The block's Z
+	 * @return the block data for that specific block
+	 */
+	public BlockData blockData(int x, int y, int z)
+	{
+		if (!initialized)
+			throw new IllegalStateException("Cannot get block data from an uninitialized structure!");
+		
+		if(withinBlocks(x, y, z))
+		{
+			Chunk c = chunkFromBlockCoords(x, y, z);
+			return c.blockData(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
+		}
+		else
+			throw new IndexOutOfBoundsException(
+				x + ", " + y + ", " + z + " was out of bounds for " + width
+					+ "x" + height + "x" + length);
+	}
+	
 	public void block(int x, int y, int z, Block b)
 	{
 		if (!initialized)
@@ -736,7 +760,7 @@ public abstract class Structure extends PhysicalObject
 
 		if (withinBlocks(x, y, z))
 		{
-			Chunk c = chunk_old(x, y, z);
+			Chunk c = chunkFromBlockCoords(x, y, z);
 
 			Block old = c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT,
 				z % Chunk.LENGTH);
@@ -772,7 +796,7 @@ public abstract class Structure extends PhysicalObject
 
 		if (withinBlocks(x, y, z))
 		{
-			Chunk c = chunk_old(x, y, z);
+			Chunk c = chunkFromBlockCoords(x, y, z);
 
 			return c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH);
 		}

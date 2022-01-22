@@ -1,8 +1,5 @@
 package com.cornchipss.cosmos.blocks.data;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * <p>
  * Data for a block in the world
@@ -13,40 +10,25 @@ import java.util.Map;
  */
 public class BlockData
 {
-	private Map<String, Object> data;
-
-	/**
-	 * <p>
-	 * Data for a block in the world
-	 * </p>
-	 * <p>
-	 * Unique to each block
-	 * </p>
-	 */
-	public BlockData()
+	private float damage;
+	
+	public void takeDamage(float dmg)
 	{
-		data = new HashMap<>();
+		damage += dmg;
 	}
-
-	/**
-	 * The data at a given tag
-	 * 
-	 * @param key the tag
-	 * @return the data
-	 */
-	public Object data(String key)
+	
+	public float damage()
 	{
-		return data.get(key);
+		return damage;
 	}
-
-	/**
-	 * Sets the data at a given tag
-	 * 
-	 * @param key   the tag
-	 * @param value the data
-	 */
-	public void data(String key, Object value)
+	
+	public void damage(int damage)
 	{
-		data.put(key, value);
+		this.damage = damage;
+	}
+	
+	public boolean needsToBeSaved()
+	{
+		return damage != 0;
 	}
 }

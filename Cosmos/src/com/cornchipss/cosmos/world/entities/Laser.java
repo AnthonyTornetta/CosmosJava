@@ -8,6 +8,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.types.RawImageMaterial;
@@ -38,6 +39,8 @@ public class Laser extends PhysicalObject
 
 	private static Mesh mesh;
 	private static TexturedMaterial material;
+	
+	public static final float BASE_DAMAGE = 50;
 
 	private Vector3fc origin;
 
@@ -85,8 +88,8 @@ public class Laser extends PhysicalObject
 			Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
 				new Vector3i());
 			
-			if(s.withinBlocks(point.x, point.y, point.z))
-				s.removeBlock(point.x, point.y, point.z);
+			if(s.hasBlock(point.x, point.y, point.z))
+				s.block(point.x, point.y, point.z).takeDamage(new StructureBlock(s, point.x, point.y, point.z), BASE_DAMAGE);
 		}
 		this.world().removeObject(this);
 

@@ -17,6 +17,8 @@ import org.joml.Vector3ic;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
+import com.cornchipss.cosmos.blocks.data.BlockData;
+import com.cornchipss.cosmos.blocks.data.DataStorage;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
@@ -68,6 +70,8 @@ public class Chunk implements IWritable
 
 	private Block[][][] blocks;
 
+	private DataStorage blockDataStorage;
+
 	/**
 	 * Offset in the structure's lightmap
 	 */
@@ -101,6 +105,7 @@ public class Chunk implements IWritable
 		needsRendered = true;
 
 		blocks = new Block[LENGTH][HEIGHT][WIDTH];
+		blockDataStorage = new DataStorage(WIDTH, HEIGHT, LENGTH);
 		model = new BulkModel(blocks);
 	}
 
@@ -247,6 +252,31 @@ public class Chunk implements IWritable
 	}
 
 	/**
+	 * Returns the block data for that specific block Creates that data if none
+	 * is present. This initializes the blockdata if none is present
+	 * 
+	 * @param x The block's X
+	 * @param y The block's Y
+	 * @param z The block's Z
+	 * @return the block data for that specific block
+	 */
+	public BlockData blockData(int x, int y, int z)
+	{
+		BlockData data = blockDataStorage.get(x, y, z);
+		if (data == null)
+		{
+			Vector3i temp = new Vector3i(x, y, z);
+			structure.chunkCoordsToBlockCoords(this, temp, temp);
+
+			data = block(x, y, z).generateData(structure, temp.x, temp.y,
+				temp.z);
+
+			blockDataStorage.set(x, y, z, data);
+		}
+		return data;
+	}
+
+	/**
 	 * <p>
 	 * Sets the block at the given coordinates relative to this chunk.
 	 * </p>
@@ -254,14 +284,10 @@ public class Chunk implements IWritable
 	 * Sets the needs rendered flag to true
 	 * </p>
 	 * 
-	 * @param x            The X coordinate relative to this chunk
-	 * @param y            The Y coordinate relative to this chunk
-	 * @param z            The Z coordinate relative to this chunk
-	 * @param block        The block to set it to
-	 * @param shouldRender If true, the chunk will update the lightmap +
-	 *                     re-render the mesh. If the chunk has not been
-	 *                     rendered yet - this will be false no matter what is
-	 *                     passed
+	 * @param x     The X coordinate relative to this chunk
+	 * @param y     The Y coordinate relative to this chunk
+	 * @param z     The Z coordinate relative to this chunk
+	 * @param block The block to set it to
 	 */
 	public void block(int x, int y, int z, Block block)
 	{
@@ -269,14 +295,18 @@ public class Chunk implements IWritable
 			throw new IllegalArgumentException(
 				"Bad x,y,z: " + x + ", " + y + ", " + z);
 
-		boolean shouldRender = false;// rendered && shouldRender &&
-										// NettySide.side() == NettySide.CLIENT;
+		boolean shouldRender = false;
 
 		if (block != null)
 			empty = false;
 
 		if (!Utils.equals(blocks[z][y][x], block))
 		{
+			if (blocks[z][y][x] != null)
+			{
+				blockDataStorage.remove(x, y, z);
+			}
+
 			blocks[z][y][x] = block;
 
 			if (block != null)
@@ -306,8 +336,7 @@ public class Chunk implements IWritable
 			needsRendered(true);
 
 			// Make sure if this block is neighboring another chunk, that chunk
-			// updates
-			// aswell
+			// updates aswell
 			if (x == 0 && left != null && shouldRender)
 				left.needsRendered(true);
 			if (x + 1 == Chunk.WIDTH && right != null && shouldRender)
@@ -476,8 +505,6 @@ public class Chunk implements IWritable
 
 				if (c == null)
 					continue;
-
-//				DebugRenderer.instance().drawOBB(c, Color.PINK, DrawMode.LINES);
 
 				Vector3f wc = structure().chunkCoordsToWorldCoords(this, v,
 					new Vector3f());
