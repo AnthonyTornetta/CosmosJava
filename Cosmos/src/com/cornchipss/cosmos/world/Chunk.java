@@ -19,6 +19,7 @@ import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
 import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.blocks.data.DataStorage;
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
@@ -53,7 +54,7 @@ public class Chunk implements IWritable
 	{
 		needsRendered = b;
 	}
-	
+
 	/**
 	 * Dimensions of a Chunk - must be even
 	 */
@@ -494,74 +495,98 @@ public class Chunk implements IWritable
 		Vector3i start = new Vector3i(x, y, z);
 		todo.add(start);
 
-		Vector3i here = new Vector3i();
-
-		while (todo.size() != 0)
+		Vector3i here = MemoryPool.getInstanceOrCreate(Vector3i.class);// new
+															// Vector3i();
+		
+		Vector3f wc = MemoryPool.getInstance(Vector3f.class);
+		
+		try
 		{
-			for (Vector3i v : todo)
+			while (todo.size() != 0)
 			{
-				structure().chunkCoordsToBlockCoords(this, v, here);
-				OBBCollider c = structure().wholeOBBForBlock(here);
-
-				if (c == null)
-					continue;
-
-				Vector3f wc = structure().chunkCoordsToWorldCoords(this, v,
-					new Vector3f());
-
-				// 1 doesnt work so I use 2
-				if (wc.distance(lineStart) > dist + 2)
+				for (Vector3i v : todo)
 				{
-					continue;
-				}
+					structure().chunkCoordsToBlockCoords(this, v, here);
+					OBBCollider c = structure().wholeOBBForBlock(here);
 
-				if (checker.testLineOBB(lineStart, lineDelta, c, null))
-				{
-					temp.set(v.x + 1, v.y, v.z);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
-					temp.set(v.x - 1, v.y, v.z);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
-					temp.set(v.x, v.y + 1, v.z);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
-					temp.set(v.x, v.y - 1, v.z);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
-					temp.set(v.x, v.y, v.z + 1);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
-					temp.set(v.x, v.y, v.z - 1);
-					if (structure().withinBlocks(temp.x, temp.y, temp.z)
-						&& !todo.contains(temp) && !done.contains(temp))
-						nextTodo.add(new Vector3i(temp));
+					if (c == null)
+						continue;
 
-					c = structure().obbForBlock(here);
+					structure().chunkCoordsToWorldCoords(this, v, wc);
 
-					if (c != null
-						&& checker.testLineOBB(lineStart, lineDelta, c, info))
+					// 1 doesnt work so I use 2
+					if (wc.distance(lineStart) > dist + 2)
 					{
-						DebugRenderer.instance().drawOBB(c, Color.GREEN,
-							DrawMode.FILL);
-						res = true;
+						continue;
+					}
+
+					if (checker.testLineOBB(lineStart, lineDelta, c, null))
+					{
+						temp.set(v.x + 1, v.y, v.z);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+						temp.set(v.x - 1, v.y, v.z);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+						temp.set(v.x, v.y + 1, v.z);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+						temp.set(v.x, v.y - 1, v.z);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+						temp.set(v.x, v.y, v.z + 1);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+						temp.set(v.x, v.y, v.z - 1);
+						if (structure().withinBlocks(temp.x, temp.y, temp.z)
+							&& !todo.contains(temp) && !done.contains(temp))
+							nextTodo.add(MemoryPool
+								.getInstanceOrCreate(Vector3i.class).set(temp));
+
+						MemoryPool.addToPool(c);
+						c = structure().obbForBlock(here);
+
+						if (c != null && checker.testLineOBB(lineStart,
+							lineDelta, c, info))
+						{
+							DebugRenderer.instance().drawOBB(c, Color.GREEN,
+								DrawMode.FILL);
+							res = true;
+
+							MemoryPool.addToPool(c);
+						}
 					}
 				}
-			}
 
-			if (!res)
-			{
-				done.addAll(todo);
-				todo = nextTodo;
-				nextTodo = new HashSet<>();
+				if (!res)
+				{
+					done.addAll(todo);
+					todo = nextTodo;
+					nextTodo = new HashSet<>();
+				}
+				else
+					return res;
 			}
-			else
-				return res;
+		}
+		finally
+		{
+			MemoryPool.addToPool(wc);
+			MemoryPool.addToPool(here);
+			
+			for(Vector3i v : done)
+			{
+				MemoryPool.addToPool(v);
+			}
 		}
 
 		return res;
@@ -589,30 +614,36 @@ public class Chunk implements IWritable
 
 		Vector3i here = structure.worldCoordsToChunkCoords(
 			tempInfo.collisionPoint.add(EPSILON * direction.x,
-				EPSILON * direction.y, EPSILON * direction.z));
+				EPSILON * direction.y, EPSILON * direction.z),
+			MemoryPool.getInstanceOrCreate(Vector3i.class));
 
-		return testLineIntersection(lineStart, lineDelta, direction, info,
+		boolean res = testLineIntersection(lineStart, lineDelta, direction, info,
 			checker, here.x, here.y, here.z, done, new Vector3i());
+		
+		MemoryPool.addToPool(here);
+		
+		return res;
 	}
 
 	public boolean empty()
 	{
 		return empty;
 	}
-	
+
 	@Override
 	public int hashCode()
 	{
 		return structure().hashCode() + relativePos.hashCode();
 	}
-	
+
 	@Override
 	public boolean equals(Object o)
 	{
-		if(o instanceof Chunk)
+		if (o instanceof Chunk)
 		{
-			Chunk c = (Chunk)o;
-			return c.localPosition.equals(localPosition) && c.structure.equals(structure);
+			Chunk c = (Chunk) o;
+			return c.localPosition.equals(localPosition)
+				&& c.structure.equals(structure);
 		}
 		return false;
 	}

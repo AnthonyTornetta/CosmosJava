@@ -1,1 +1,2 @@
 After pausing you can click the buttons after it closes
+get list of every block + face the player hits not just the one to compute physics

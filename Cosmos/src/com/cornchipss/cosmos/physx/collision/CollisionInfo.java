@@ -2,7 +2,9 @@ package com.cornchipss.cosmos.physx.collision;
 
 import org.joml.Vector3f;
 
-public class CollisionInfo
+import com.cornchipss.cosmos.memory.IReusable;
+
+public class CollisionInfo implements IReusable
 {
 	public Vector3f normal;
 	public float distanceSquared;
@@ -20,5 +22,13 @@ public class CollisionInfo
 		normal.set(i.normal);
 		distanceSquared = i.distanceSquared;
 		collisionPoint.set(i.collisionPoint);
+	}
+
+	@Override
+	public void reuse()
+	{
+		normal.set(0);
+		distanceSquared = Float.MAX_VALUE;
+		collisionPoint.set(0);
 	}
 }

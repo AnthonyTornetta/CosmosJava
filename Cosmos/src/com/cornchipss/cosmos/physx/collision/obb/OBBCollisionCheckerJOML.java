@@ -59,6 +59,10 @@ public class OBBCollisionCheckerJOML implements IOBBCollisionChecker
 		{
 			// It's still needed for JOML functions
 			info = MemoryPool.getInstanceOrCreate(CollisionInfo.class);
+			info.distanceSquared = Float.MAX_VALUE;
+			info.normal.set(0);
+			info.collisionPoint.set(0);
+			
 			madeInfo = true;
 		}
 

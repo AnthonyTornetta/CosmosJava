@@ -26,6 +26,8 @@ public class MemoryPool
 			((Vector3f) o).set(0, 0, 0);
 		if (o instanceof Vector3i)
 			((Vector3i) o).set(0, 0, 0);
+		if (o instanceof IReusable)
+			((IReusable)o).reuse();
 
 		if(!instances.containsKey(Thread.currentThread()))
 		{

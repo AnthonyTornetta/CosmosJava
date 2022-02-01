@@ -30,7 +30,7 @@ public class CreateShipPacket extends Packet
 
 		s.body().transform()
 			.position(s.body().transform().position().add(
-				p.body().transform().forward().mul(5, new Vector3f()),
+				p.camera().forward().mul(5, new Vector3f()),
 				new Vector3f()));
 	}
 

@@ -12,6 +12,7 @@ import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.types.RawImageMaterial;
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.models.ModelLoader;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -19,7 +20,7 @@ import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
-import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
+import com.cornchipss.cosmos.physx.collision.obb.LaserOBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
@@ -31,7 +32,7 @@ import com.cornchipss.cosmos.world.World;
 public class Laser extends PhysicalObject
 	implements IHasCollisionEvent, IRenderable, IUpdatable
 {
-	private Vector3f halfwidths = new Vector3f(0.5f, 0.5f, 10f);
+	private Vector3f halfwidths = new Vector3f(0.1f, 0.1f, 10f);
 
 	private float speed;
 
@@ -39,7 +40,7 @@ public class Laser extends PhysicalObject
 
 	private static Mesh mesh;
 	private static TexturedMaterial material;
-	
+
 	public static final float BASE_DAMAGE = 50;
 
 	private Vector3fc origin;
@@ -52,10 +53,10 @@ public class Laser extends PhysicalObject
 	}
 
 	@Override
-	public OBBCollider OBB()
+	public LaserOBBCollider OBB()
 	{
-		return new OBBCollider(this.position(),
-			this.body().transform().orientation(), halfwidths);
+		return MemoryPool.getInstanceOrCreate(LaserOBBCollider.class)
+			.set(this.position(), this.body().transform().orientation());
 	}
 
 	@Override
@@ -79,18 +80,25 @@ public class Laser extends PhysicalObject
 	@Override
 	public boolean onCollide(PhysicalObject obj, CollisionInfo info)
 	{
-		if (obj instanceof Structure)
+		if (NettySide.side() == NettySide.SERVER)
 		{
-			Structure s = (Structure) obj;
-			
-			info.collisionPoint.sub(info.normal.x / 2.f, info.normal.y / 2.f, info.normal.z / 2.f);
-			
-			Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
-				new Vector3i());
-			
-			if(s.hasBlock(point.x, point.y, point.z))
-				s.block(point.x, point.y, point.z).takeDamage(new StructureBlock(s, point.x, point.y, point.z), BASE_DAMAGE);
+			if (obj instanceof Structure)
+			{
+				Structure s = (Structure) obj;
+
+				info.collisionPoint.sub(info.normal.x / 2.f,
+					info.normal.y / 2.f, info.normal.z / 2.f);
+
+				Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
+					new Vector3i());
+
+				if (s.hasBlock(point.x, point.y, point.z))
+					s.block(point.x, point.y, point.z).takeDamage(
+						new StructureBlock(s, point.x, point.y, point.z),
+						BASE_DAMAGE);
+			}
 		}
+
 		this.world().removeObject(this);
 
 		return true;

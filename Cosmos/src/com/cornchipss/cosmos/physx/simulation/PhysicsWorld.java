@@ -6,12 +6,13 @@ import java.util.List;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
-import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class PhysicsWorld
 {
@@ -97,16 +98,22 @@ public class PhysicsWorld
 	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b,
 		Vector3fc deltaA)
 	{
-		CollisionInfo info = new CollisionInfo();
-
-		if (strategy.colliding(a, b, deltaA, info))
+//		Utils.println("==========");
+		
+		CollisionInfo info;
+		
+		// TODO: make this work
+		
+		for (int i = 0; i < 1 && strategy.colliding(a, b, deltaA, info = MemoryPool.getInstanceOrCreate(CollisionInfo.class)); i++)
 		{
 			if (a instanceof IHasCollisionEvent)
 			{
 				if (!((IHasCollisionEvent) a).onCollide(b, info))
 					return;
 			}
-			Vector3f mulBy = new Vector3f();
+			
+			Vector3f mulBy = MemoryPool.getInstanceOrCreate(Vector3f.class);
+			
 			mulBy.x = Math.signum(a.body().velocity().x()) == Math
 				.signum(info.normal.x) ? 1 : -1;
 			mulBy.y = Math.signum(a.body().velocity().y()) == Math
@@ -126,9 +133,15 @@ public class PhysicsWorld
 				info.normal.y = 1;
 			if (info.normal.z == 0)
 				info.normal.z = 1;
-
-//			a.body().velocity(a.body().velocity().mul(info.normal, new Vector3f()));
-			a.body().velocity(Maths.zero());
+			
+			Utils.println(info.normal);
+			Utils.println(a.body().velocity().y());
+			a.body().velocity(a.body().velocity().mul(info.normal, mulBy));
+			Utils.println("-> " + a.body().velocity().y());
+			
+			MemoryPool.addToPool(mulBy);
+			MemoryPool.addToPool(info);
+//			a.body().velocity(Maths.zero());
 		}
 	}
 

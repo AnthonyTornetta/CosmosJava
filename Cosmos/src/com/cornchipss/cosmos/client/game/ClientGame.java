@@ -23,6 +23,7 @@ import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.gui.text.GUIText;
 import com.cornchipss.cosmos.gui.text.OpenGLFont;
 import com.cornchipss.cosmos.material.Materials;
+import com.cornchipss.cosmos.models.skybox.Skybox;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.utils.DebugMonitor;
@@ -58,6 +59,8 @@ public class ClientGame extends Game
 	private PauseMenuGUI pauseMenu;
 
 	private ShipGUI shipGUI;
+	
+	private Skybox skybox;
 
 	private void initPauseMenu()
 	{
@@ -97,6 +100,8 @@ public class ClientGame extends Game
 		fpsText = new GUIText("-- --ms", font,
 			new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
+		
+		skybox.updateGraphics();
 	}
 
 	public ClientGame(CosmosNettyClient nettyClient)
@@ -115,6 +120,8 @@ public class ClientGame extends Game
 			Window.instance().getWidth()
 				/ (float) Window.instance().getHeight(),
 			0.1f, 1000);
+		
+		skybox = new Skybox();
 	}
 
 	@Override
@@ -142,20 +149,19 @@ public class ClientGame extends Game
 
 		GL11.glEnable(GL13.GL_TEXTURE0);
 		
+		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
+
+		Matrix4fc camera = player.camera().viewMatrix();
+		
+		if(skybox.shouldBeDrawn())
+			skybox.draw(projectionMatrix, camera, player());
+		
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 
 		GL11.glDepthFunc(GL11.GL_LESS);
 
-		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
-
 		world().lock();
-
-//		Matrix4fc camera = player.shipPiloting() == null
-//			? player.camera().viewMatrix()
-//			: player.shipPiloting().body().transform().invertedMatrix();
-
-		Matrix4fc camera = player.camera().viewMatrix();
 		
 		world().draw(projectionMatrix, camera, player());
 
