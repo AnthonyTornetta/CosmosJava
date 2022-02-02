@@ -81,7 +81,7 @@ public class Skybox implements IRenderable
 	{
 		cubemapID = loadCubemap(
 //			new String[] { "right", "left", "up", "down", "front", "back" }
-			new String[] { "back", "back", "back", "back", "back", "back" }
+			new String[] { "4k/back", "4k/back", "4k/back", "4k/back", "4k/back", "4k/back" }
 			);
 
 		shader = new Shader("assets/shaders/skybox");

@@ -7,7 +7,9 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
+import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.game.Game;
+import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
@@ -69,6 +71,18 @@ public class ServerGame extends Game
 			StructureStatusPacket smp = new StructureStatusPacket(s);
 
 			CosmosServer.nettyServer().sendToAllUDP(smp);
+			
+			if(s.isDirty())
+			{
+				for(StructureBlock b : s.modifiedBlocks())
+				{
+					ModifyBlockPacket mbp = new ModifyBlockPacket(b, b.block());
+					
+					CosmosServer.nettyServer().sendToAllTCP(mbp);
+				}
+				
+				s.makeClean();
+			}
 		}
 	}
 

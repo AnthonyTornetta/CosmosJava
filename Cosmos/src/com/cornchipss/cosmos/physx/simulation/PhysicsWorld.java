@@ -12,7 +12,7 @@ import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
-import com.cornchipss.cosmos.utils.Utils;
+import com.cornchipss.cosmos.utils.Maths;
 
 public class PhysicsWorld
 {
@@ -98,8 +98,6 @@ public class PhysicsWorld
 	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b,
 		Vector3fc deltaA)
 	{
-//		Utils.println("==========");
-		
 		CollisionInfo info;
 		
 		// TODO: make this work
@@ -134,14 +132,14 @@ public class PhysicsWorld
 			if (info.normal.z == 0)
 				info.normal.z = 1;
 			
-			Utils.println(info.normal);
-			Utils.println(a.body().velocity().y());
-			a.body().velocity(a.body().velocity().mul(info.normal, mulBy));
-			Utils.println("-> " + a.body().velocity().y());
+//			Utils.println(info.normal);
+//			Utils.println(a.body().velocity().y());
+//			a.body().velocity(a.body().velocity().mul(info.normal, mulBy));
+//			Utils.println("-> " + a.body().velocity().y());
 			
 			MemoryPool.addToPool(mulBy);
 			MemoryPool.addToPool(info);
-//			a.body().velocity(Maths.zero());
+			a.body().velocity(Maths.zero());
 		}
 	}
 

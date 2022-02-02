@@ -67,6 +67,8 @@ public abstract class Structure extends PhysicalObject
 
 	private Vector3fc halfwidths;
 	
+	private Set<StructureBlock> changes = new HashSet<>();
+	
 	public Structure(World world, int id)
 	{
 		super(world);
@@ -97,9 +99,6 @@ public abstract class Structure extends PhysicalObject
 		chunks = new Chunk[cLength * cHeight * cWidth];
 	}
 
-	/**
-	 * For sub classes to override if needed
-	 */
 	@Override
 	public boolean update(float delta)
 	{
@@ -811,11 +810,28 @@ public abstract class Structure extends PhysicalObject
 			c.block(x % Chunk.WIDTH, y % Chunk.HEIGHT, z % Chunk.LENGTH, b);
 
 			blockSystemManager.addBlock(sb);
+			
+			changes.add(sb);
 		}
 		else
 			throw new IndexOutOfBoundsException(
 				x + ", " + y + ", " + z + " was out of bounds for " + width
 					+ "x" + height + "x" + length);
+	}
+	
+	public boolean isDirty()
+	{
+		return changes.size() != 0;
+	}
+	
+	public void makeClean()
+	{
+		changes.clear();
+	}
+	
+	public Set<StructureBlock> modifiedBlocks()
+	{
+		return changes;
 	}
 
 	public Block block(int x, int y, int z)
