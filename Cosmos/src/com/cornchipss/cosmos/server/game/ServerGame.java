@@ -14,10 +14,10 @@ import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.server.CosmosServer;
+import com.cornchipss.cosmos.server.game.world.ServerWorld;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.world.World;
 
 public class ServerGame extends Game
 {
@@ -28,7 +28,7 @@ public class ServerGame extends Game
 
 	public ServerGame()
 	{
-		super(new World());
+		super(new ServerWorld());
 
 		if (instance != null)
 			throw new IllegalStateException(

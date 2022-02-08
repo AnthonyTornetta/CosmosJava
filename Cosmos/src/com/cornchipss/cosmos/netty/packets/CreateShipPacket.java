@@ -27,7 +27,7 @@ public class CreateShipPacket extends Packet
 		s.block(s.shipCoreBlockPosition(), Blocks.SHIP_CORE);
 
 		s.addToWorld(p.body().transform().clone());
-
+		
 		s.body().transform()
 			.position(s.body().transform().position().add(
 				p.camera().forward().mul(5, new Vector3f()),

@@ -50,7 +50,5 @@ public class ModifyBlockPacket extends Packet
 		Block b = Blocks.fromNumericId(bid);
 
 		s.block(x, y, z, b);
-
-		server.sendToAllTCP(this);
 	}
 }

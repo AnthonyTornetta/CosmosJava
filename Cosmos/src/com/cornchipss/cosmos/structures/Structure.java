@@ -6,6 +6,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -68,6 +70,13 @@ public abstract class Structure extends PhysicalObject
 	private Vector3fc halfwidths;
 	
 	private Set<StructureBlock> changes = new HashSet<>();
+	
+	private List<StructureObserver> observers = new LinkedList<>();
+	
+	public void addObserver(StructureObserver o)
+	{
+		observers.add(o);
+	}
 	
 	public Structure(World world, int id)
 	{
@@ -812,6 +821,11 @@ public abstract class Structure extends PhysicalObject
 			blockSystemManager.addBlock(sb);
 			
 			changes.add(sb);
+			
+			for(StructureObserver s : observers)
+			{
+				s.onBlockModify(sb, old, b);
+			}
 		}
 		else
 			throw new IndexOutOfBoundsException(
