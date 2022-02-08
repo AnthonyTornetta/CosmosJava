@@ -5,11 +5,12 @@ import java.util.Iterator;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.memory.IReusable;
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.utils.Utils;
 
-public class OBBCollider implements Iterable<Vector3fc>
+public class OBBCollider implements Iterable<Vector3fc>, IReusable
 {
 	private Vector3f center;
 	private Vector3f[] localAxis = new Vector3f[3];
@@ -21,7 +22,8 @@ public class OBBCollider implements Iterable<Vector3fc>
 	private int cornerCountX, cornerCountY, cornerCountZ;
 
 	/**
-	 * Call {@link OBBCollider#set(Vector3fc, Orientation, Vector3fc)} before use
+	 * Call {@link OBBCollider#set(Vector3fc, Orientation, Vector3fc)} before
+	 * use
 	 */
 	public OBBCollider()
 	{
@@ -36,11 +38,22 @@ public class OBBCollider implements Iterable<Vector3fc>
 	public OBBCollider set(Vector3fc center, Orientation orientation,
 		Vector3fc halfwidths)
 	{
-		this.center = new Vector3f(center);
-		localAxis[0] = new Vector3f(orientation.right());
-		localAxis[1] = new Vector3f(orientation.up());
-		localAxis[2] = new Vector3f(orientation.forward());
-		this.halfwidths = new Vector3f(halfwidths);
+		if (this.center == null)
+		{
+			this.center = new Vector3f();
+			localAxis[0] = new Vector3f();
+			localAxis[1] = new Vector3f();
+			localAxis[2] = new Vector3f();
+			this.halfwidths = new Vector3f();
+			
+			cornerIterable = new CornerIterable(this);
+		}
+		
+		this.center.set(center);
+		localAxis[0].set(orientation.right());
+		localAxis[1].set(orientation.up());
+		localAxis[2].set(orientation.forward());
+		this.halfwidths.set(halfwidths);
 
 		cornerCountX = (int) Math.ceil(halfwidths.x() * 2);
 		cornerCountY = (int) Math.ceil(halfwidths.y() * 2);
@@ -48,8 +61,6 @@ public class OBBCollider implements Iterable<Vector3fc>
 
 		this.or = orientation;
 
-		cornerIterable = new CornerIterable(this);
-		
 		return this;
 	}
 
@@ -242,5 +253,20 @@ public class OBBCollider implements Iterable<Vector3fc>
 			+ Utils.toEasyString(localAxis[0]) + "; Y: "
 			+ Utils.toEasyString(localAxis[1]) + "; Z: "
 			+ Utils.toEasyString(localAxis[2]) + "}";
+	}
+
+	@Override
+	public void reuse()
+	{
+		center.set(0);
+		localAxis[0].set(0);
+		localAxis[1].set(0);
+		localAxis[2].set(0);
+		halfwidths.set(0);
+		or = null;
+
+		cornerCountX = 0;
+		cornerCountY = 0;
+		cornerCountZ = 0;
 	}
 }

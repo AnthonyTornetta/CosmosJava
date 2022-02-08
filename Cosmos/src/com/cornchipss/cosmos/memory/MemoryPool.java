@@ -20,15 +20,26 @@ public class MemoryPool
 
 	private static Map<Thread, Map<Class<?>, List<Object>>> instances = new HashMap<>();
 
-	public static void addToPool(Object o)
+	public static void addToPool(Vector3f o)
 	{
-		if (o instanceof Vector3f)
-			((Vector3f) o).set(0, 0, 0);
-		if (o instanceof Vector3i)
-			((Vector3i) o).set(0, 0, 0);
-		if (o instanceof IReusable)
-			((IReusable)o).reuse();
-
+		o.set(0);
+		actuallyAddToPool(o);
+	}
+	
+	public static void addToPool(Vector3i o)
+	{
+		o.set(0);
+		actuallyAddToPool(o);
+	}
+	
+	public static void addToPool(IReusable o)
+	{
+		o.reuse();
+		actuallyAddToPool(o);
+	}
+	
+	private static void actuallyAddToPool(Object o)
+	{
 		if(!instances.containsKey(Thread.currentThread()))
 		{
 			instances.put(Thread.currentThread(), new HashMap<>());

@@ -96,20 +96,11 @@ public class ClientPlayer extends Player
 		}
 		else
 		{
-			if (Input.isMouseBtnJustDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
+			PlayerAction.Builder actionBuilder = new PlayerAction.Builder();
+			
+			if (Input.isMouseBtnDown(GLFW.GLFW_MOUSE_BUTTON_LEFT))
 			{
-				PlayerAction action = new PlayerAction.Builder().setFiring(true)
-					.create();
-				PlayerActionPacket p = new PlayerActionPacket(action);
-
-				try
-				{
-					CosmosClient.instance().nettyClient().sendTCP(p);
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
+				actionBuilder.setFiring(true);
 			}
 
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_R))
@@ -125,6 +116,10 @@ public class ClientPlayer extends Player
 					e.printStackTrace();
 				}
 			}
+			
+			PlayerActionPacket p = new PlayerActionPacket(actionBuilder.create());
+			
+			CosmosClient.instance().nettyClient().sendUDP(p);
 		}
 
 		camera().update();

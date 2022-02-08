@@ -15,7 +15,13 @@ public class PlayerAction
 	}
 
 	private static final int NONE = 0;
-	private static final int FIRE = 0b1;
+	
+	/**
+	 * Stops ongoing action
+	 */
+	private static final int STOP = 0b01;
+	
+	private static final int FIRE = 0b10;
 
 	/**
 	 * Used for sending over packet
@@ -36,6 +42,11 @@ public class PlayerAction
 	{
 		return (code & FIRE) != 0;
 	}
+	
+	public boolean isStopping()
+	{
+		return (code & STOP) != 0;
+	}
 
 	/**
 	 * Creates a player action
@@ -51,6 +62,16 @@ public class PlayerAction
 			else
 				code &= ~FIRE;
 
+			return this;
+		}
+		
+		public Builder setStopping(boolean s)
+		{
+			if (s)
+				code |= STOP;
+			else
+				code &= ~STOP;
+			
 			return this;
 		}
 

@@ -8,6 +8,7 @@ import org.joml.Vector3fc;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
+import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.PhysicalObject;
@@ -93,7 +94,9 @@ public abstract class Player extends PhysicalObject
 				.structuresNear(body().transform().position()))
 			{
 				Structure.RayRes hit = s.raycast(camera().position(),
-					camera().forward().mul(50.0f, new Vector3f()), jomlChecker);
+					camera().forward().mul(50.0f,
+						MemoryPool.getInstanceOrCreate(Vector3f.class)),
+					jomlChecker);
 				if (hit != null)
 				{
 					float distSqrd = hit.distance();
