@@ -1065,7 +1065,8 @@ public abstract class Structure extends PhysicalObject
 
 	private OBBCollider genOBB(Vector3fc pos, Vector3fc halfwidths)
 	{
-		return MemoryPool.getInstanceOrCreate(OBBCollider.class).set(pos,
+		return new OBBCollider(pos,
+//		return MemoryPool.getInstanceOrCreate(OBBCollider.class).set(pos,
 			body().transform().orientation(), halfwidths);
 	}
 

@@ -19,6 +19,7 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
@@ -136,9 +137,9 @@ public class DefaultCollisionChecker implements ICollisionChecker
 				at.add(a.structure().body().transform().orientation().right());
 			}
 
-			Vector3fc backward = a.structure().body().transform().orientation()
-				.forward().mul(-1, temp);
-
+			Vector3f backward = a.structure().body().transform().orientation()
+				.forward().mul(-1, MemoryPool.getInstanceOrCreate(Vector3f.class));
+			
 			at.set(pos);
 			// it is add here
 			at.add(a.structure().body().transform().orientation().forward()
@@ -161,9 +162,10 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			}
 			
 			MemoryPool.addToPool(obc);
-			MemoryPool.addToPool(at.set(0));
-			MemoryPool.addToPool(pos.set(0));
-			MemoryPool.addToPool(temp.set(0));
+			MemoryPool.addToPool(at);
+			MemoryPool.addToPool(pos);
+			MemoryPool.addToPool(temp);
+			MemoryPool.addToPool(backward);
 			MemoryPool.addToPool(halfwidthsStorage.set(0));
 		}
 

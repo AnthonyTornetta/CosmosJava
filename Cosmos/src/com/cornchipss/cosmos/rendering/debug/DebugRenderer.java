@@ -37,7 +37,7 @@ public class DebugRenderer implements IRenderable
 		public MeshKey(Color c, Vector3fc halfwidths)
 		{
 			this.c = c;
-			this.halfwidths = halfwidths;
+			this.halfwidths = new Vector3f(halfwidths);
 		}
 		
 		public int hashCode()
@@ -49,7 +49,7 @@ public class DebugRenderer implements IRenderable
 		{
 			if(o instanceof MeshKey)
 			{
-				return halfwidths.equals(((MeshKey)o).halfwidths) && c.equals(((MeshKey)o).c);
+				return ((MeshKey)o).halfwidths.distanceSquared(halfwidths) < 0.01f && c.equals(((MeshKey)o).c);
 			}
 			return false;
 		}
@@ -111,9 +111,13 @@ public class DebugRenderer implements IRenderable
 			}
 
 			Mesh mesh = meshCache.get(m.mesh);
-			mesh.prepare();
-			mesh.draw();
-			mesh.finish();
+			
+			if(mesh != null)
+			{
+				mesh.prepare();
+				mesh.draw();
+				mesh.finish();
+			}
 		}
 
 		debugMaterial.stop();
@@ -158,6 +162,9 @@ public class DebugRenderer implements IRenderable
 
 		try
 		{
+			if(halfwidths.x() == 0 && halfwidths.y() == 0 && halfwidths.z() == 0)
+				throw new IllegalArgumentException("NO");
+			
 			MeshKey mk = new MeshKey(color, halfwidths);
 			
 			if(!meshCache.containsKey(mk))
