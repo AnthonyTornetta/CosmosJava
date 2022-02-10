@@ -192,7 +192,7 @@ public class LaserCannonSystem extends BlockSystem
 				baseSpeed = Maths.sqrt(baseSpeed);
 
 				Laser laser = new Laser(structure().world(), baseSpeed + 1000,
-					structure());
+					structure(), n.count);
 
 				Transform t = new Transform(coords);
 				t.orientation(structure().body().transform().orientation());

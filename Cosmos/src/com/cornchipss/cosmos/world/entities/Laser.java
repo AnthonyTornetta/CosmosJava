@@ -34,7 +34,7 @@ public class Laser extends PhysicalObject
 {
 	private Vector3f halfwidths = new Vector3f(0.1f, 0.1f, 10f);
 
-	private float speed;
+	private float speed, damageMultiplier;
 
 	private Structure sender;
 
@@ -45,11 +45,12 @@ public class Laser extends PhysicalObject
 
 	private Vector3fc origin;
 
-	public Laser(World world, float speed, Structure sender)
+	public Laser(World world, float speed, Structure sender, float damageMultiplier)
 	{
 		super(world);
 		this.speed = speed;
 		this.sender = sender;
+		this.damageMultiplier = damageMultiplier;
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class Laser extends PhysicalObject
 				if (s.hasBlock(point.x, point.y, point.z))
 					s.block(point.x, point.y, point.z).takeDamage(
 						new StructureBlock(s, point.x, point.y, point.z),
-						BASE_DAMAGE);
+						damageMultiplier * BASE_DAMAGE);
 			}
 		}
 

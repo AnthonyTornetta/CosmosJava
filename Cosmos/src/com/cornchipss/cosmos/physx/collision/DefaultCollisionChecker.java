@@ -19,7 +19,6 @@ import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
-import com.cornchipss.cosmos.utils.Utils;
 import com.cornchipss.cosmos.world.Chunk;
 
 public class DefaultCollisionChecker implements ICollisionChecker
