@@ -4,24 +4,17 @@ import org.joml.Vector3f;
 import org.joml.Vector3i;
 
 import com.cornchipss.cosmos.netty.action.PlayerAction;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.systems.BlockSystemIDs;
 import com.cornchipss.cosmos.systems.blocksystems.types.ChainActionBlockSystem;
-import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.world.entities.Laser;
 
-public class LaserCannonSystem extends ChainActionBlockSystem
+public class MiningLaserSystem extends ChainActionBlockSystem
 {
-	private long lastFireTime = 0;
-
 	private PlayerAction lastAction = new PlayerAction(0);
 
-	public LaserCannonSystem(Structure s)
+	public MiningLaserSystem(Structure s)
 	{
 		super(s);
-
-		lastFireTime = System.currentTimeMillis();
 	}
 
 	@Override
@@ -47,17 +40,7 @@ public class LaserCannonSystem extends ChainActionBlockSystem
 		Vector3f coords = structure().blockCoordsToWorldCoords(pos,
 			new Vector3f());
 
-		float baseSpeed = structure().body().velocity()
-			.dot(structure().body().velocity());
-		baseSpeed = Maths.sqrt(baseSpeed);
-
-		Laser laser = new Laser(structure().world(), baseSpeed + 1000,
-			structure(), chainCount);
-
-		Transform t = new Transform(coords);
-		t.orientation(structure().body().transform().orientation());
-
-		laser.addToWorld(t);
+		structure().world().sendRaycast(coords, structure().body().transform().orientation(), 1000);
 	}
 
 	@Override
@@ -65,10 +48,8 @@ public class LaserCannonSystem extends ChainActionBlockSystem
 	{
 		lastAction = action;
 
-		if (action.isFiring()
-			&& System.currentTimeMillis() - 100 > lastFireTime)
+		if (action.isFiring())
 		{
-			lastFireTime = System.currentTimeMillis();
 			super.receiveAction(action);
 		}
 	}

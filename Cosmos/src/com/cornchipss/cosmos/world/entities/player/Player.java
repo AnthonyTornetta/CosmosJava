@@ -149,6 +149,7 @@ public abstract class Player extends PhysicalObject
 					new Vector3f(pilotingShip.body().transform().orientation()
 						.forward().mul(-1.3f, new Vector3f())),
 					new Vector3f()));
+			this.body().transform().orientation().zero();
 		}
 
 		pilotingShip = null;

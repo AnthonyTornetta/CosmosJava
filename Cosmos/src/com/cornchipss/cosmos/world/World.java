@@ -1,12 +1,19 @@
 package com.cornchipss.cosmos.world;
 
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.memory.MemoryPool;
+import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.simulation.PhysicsWorld;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
+import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.IUpdatable;
 
@@ -87,5 +94,22 @@ public class World extends PhysicsWorld
 			currentSid++;
 		
 		return currentSid++;
+	}
+
+	public void sendRaycast(Vector3fc start, Orientation orientation, float distance)
+	{
+		OBBCollider obc = MemoryPool.getInstanceOrCreate(OBBCollider.class);
+		Vector3f end = MemoryPool.getInstanceOrCreate(Vector3f.class);
+		
+		orientation.forward().mul(distance, end);
+		end.add(start);
+		
+		Vector3f middle = MemoryPool.getInstanceOrCreate(Vector3f.class);
+		
+		start.add(orientation.forward().mul(distance, middle).div(2), middle);
+
+		obc.set(middle, orientation, new Vector3f(0.01f, 0.01f, distance / 2.f));
+		
+		DebugRenderer.instance().drawOBB(obc, Color.cyan, DrawMode.FILL);
 	}
 }

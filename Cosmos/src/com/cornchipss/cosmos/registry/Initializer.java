@@ -10,6 +10,7 @@ import com.cornchipss.cosmos.systems.factories.CameraSystemFactory;
 import com.cornchipss.cosmos.systems.factories.EnergyGenerationSystemFactory;
 import com.cornchipss.cosmos.systems.factories.EnergyStorageSystemFactory;
 import com.cornchipss.cosmos.systems.factories.LaserCannonSystemFactory;
+import com.cornchipss.cosmos.systems.factories.MiningLaserSystemFactory;
 import com.cornchipss.cosmos.systems.factories.ThrusterSystemFactory;
 import com.cornchipss.cosmos.utils.Logger;
 
@@ -27,6 +28,8 @@ public class Initializer
 			BlockSystemIDs.LASER_CANNON_ID);
 		BlockSystemFactories.register(new CameraSystemFactory(),
 			BlockSystemIDs.CAMERA_ID);
+		BlockSystemFactories.register(new MiningLaserSystemFactory(),
+			BlockSystemIDs.MINING_LASER_ID);
 	}
 
 	protected void initTerrainGeneration()
