@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.lwjgl.opengl.GL30;
@@ -19,6 +20,7 @@ import com.cornchipss.cosmos.models.ModelLoader;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
+import com.cornchipss.cosmos.utils.Maths;
 
 public class DebugRenderer implements IRenderable
 {
@@ -33,35 +35,37 @@ public class DebugRenderer implements IRenderable
 	{
 		Vector3fc halfwidths;
 		Color c;
-		
+
 		public MeshKey(Color c, Vector3fc halfwidths)
 		{
 			this.c = c;
 			this.halfwidths = new Vector3f(halfwidths);
 		}
-		
+
 		public int hashCode()
 		{
 			return halfwidths.hashCode() + c.hashCode();
 		}
-		
+
 		public boolean equals(Object o)
 		{
-			if(o instanceof MeshKey)
+			if (o instanceof MeshKey)
 			{
-				return ((MeshKey)o).halfwidths.distanceSquared(halfwidths) < 0.01f && c.equals(((MeshKey)o).c);
+				return ((MeshKey) o).halfwidths
+					.distanceSquared(halfwidths) < 0.01f
+					&& c.equals(((MeshKey) o).c);
 			}
 			return false;
 		}
 	}
-	
+
 	public static enum DrawMode
 	{
 		LINES, FILL
 	}
 
 	private Map<MeshKey, Mesh> meshCache = new HashMap<>();
-	
+
 	private List<DebugInfo> info = new LinkedList<>();
 	private DebugMaterial debugMaterial;
 
@@ -111,8 +115,8 @@ public class DebugRenderer implements IRenderable
 			}
 
 			Mesh mesh = meshCache.get(m.mesh);
-			
-			if(mesh != null)
+
+			if (mesh != null)
 			{
 				mesh.prepare();
 				mesh.draw();
@@ -121,7 +125,7 @@ public class DebugRenderer implements IRenderable
 		}
 
 		debugMaterial.stop();
-		
+
 		info.clear();
 
 		GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_FILL);
@@ -132,10 +136,10 @@ public class DebugRenderer implements IRenderable
 	{
 		return debugMaterial != null;
 	}
-	
+
 	public void freeResources()
 	{
-		for(Mesh m : meshCache.values())
+		for (Mesh m : meshCache.values())
 			m.delete();
 		meshCache.clear();
 	}
@@ -154,6 +158,62 @@ public class DebugRenderer implements IRenderable
 		drawRectangle(mat, c.halfwidths(), color, mode);
 	}
 
+	public static Quaternionf lookAt(Vector3f sourcePoint, Vector3f destPoint)
+	{
+	    Vector3f forwardVector = (destPoint.sub(sourcePoint, new Vector3f())).normalize();
+
+	    float dot = new Vector3f(0, 0, 1).dot(forwardVector);
+
+	    if (Math.abs(dot - (-1.0f)) < 0.000001f)
+	    {
+	        return new Quaternionf(0, 1, 0, 3.1415926535897932f);
+	    }
+	    if (Math.abs(dot - (1.0f)) < 0.000001f)
+	    {
+	        return new Quaternionf();
+	    }
+
+	    float rotAngle = (float)Math.acos(dot);
+	    Vector3f rotAxis = new Vector3f(0, 0, -1).cross(forwardVector);
+	    rotAxis.normalize();
+	    return createFromAxisAngle(rotAxis, rotAngle);
+	}
+	
+	// just in case you need that function also
+	public static Quaternionf createFromAxisAngle(Vector3f axis, float angle)
+	{
+	    float halfAngle = angle * .5f;
+	    float s = (float)Math.sin(halfAngle);
+	    Quaternionf q = new Quaternionf();
+	    q.x = axis.x * s;
+	    q.y = axis.y * s;
+	    q.z = axis.z * s;
+	    q.w = (float)Math.cos(halfAngle);
+	    return q;
+	}
+	
+	public void drawLine(Vector3f from, Vector3f to, Color color)
+	{
+		if (!enabled())
+			return;
+		
+		Vector3f delta = to.sub(from, new Vector3f());
+		Quaternionf q = new Quaternionf();
+//		q.lookAlong(delta, Maths.UP, q);
+		Vector3f halfwidths = new Vector3f(delta.x / 2.f + 0.01f,
+			delta.y / 2.f + 0.01f, delta.z / 2.f + 0.01f);
+
+		from.x += delta.x / 2;
+		from.y += delta.y / 2;
+		from.z += delta.z / 2;
+		
+		drawRectangle(Maths.createTransformationMatrix(from, q), halfwidths,
+			color, DrawMode.FILL);
+
+		drawPoint(from, color);
+		drawPoint(to, color);
+	}
+
 	public void drawRectangle(Matrix4fc transform, Vector3fc halfwidths,
 		Color color, DrawMode mode)
 	{
@@ -162,30 +222,32 @@ public class DebugRenderer implements IRenderable
 
 		try
 		{
-			if(halfwidths.x() == 0 && halfwidths.y() == 0 && halfwidths.z() == 0)
+			if (halfwidths.x() == 0 && halfwidths.y() == 0
+				&& halfwidths.z() == 0)
 				throw new IllegalArgumentException("NO");
-			
+
 			MeshKey mk = new MeshKey(color, halfwidths);
-			
-			if(!meshCache.containsKey(mk))
+
+			if (!meshCache.containsKey(mk))
 			{
-				Mesh m = ModelLoader.fromFile("assets/models/rectangle").createMesh(
-					0, 0, 0, halfwidths.x() * 2, halfwidths.y() * 2,
-					halfwidths.z() * 2, false);
-	
+				Mesh m = ModelLoader.fromFile("assets/models/rectangle")
+					.createMesh(0, 0, 0, halfwidths.x() * 2, halfwidths.y() * 2,
+						halfwidths.z() * 2, false);
+
 				float r, g, b;
 				r = color.getRed() / 255.0f;
 				g = color.getGreen() / 255.0f;
 				b = color.getBlue() / 255.0f;
-	
+
 				m.storeData(Mesh.COLOR_INDEX, 3,
-					new float[] { r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g,
-						b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r,
-						g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b,
-						r, g, b, r, g, b, r, g, b, r, g, b, r, g, b });
-	
+					new float[] { r, g, b, r, g, b, r, g, b, r, g, b, r, g, b,
+						r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r,
+						g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g,
+						b, r, g, b, r, g, b, r, g, b, r, g, b, r, g, b, r, g,
+						b });
+
 				m.unbind();
-				
+
 				meshCache.put(mk, m);
 			}
 
@@ -226,4 +288,5 @@ public class DebugRenderer implements IRenderable
 	{
 		enabled = !enabled;
 	}
+
 }

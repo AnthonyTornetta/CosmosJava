@@ -5,6 +5,10 @@ import java.util.ConcurrentModificationException;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.bulletphysics.collision.shapes.CapsuleShape;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
@@ -12,7 +16,7 @@ import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.RigidBody;
+import com.cornchipss.cosmos.physx.CRigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
@@ -72,7 +76,7 @@ public abstract class Player extends PhysicalObject
 	@Override
 	public void addToWorld(Transform transform)
 	{
-		body(new RigidBody(transform));
+		body(new CRigidBody(transform));
 		world().addObject(this);
 	}
 
@@ -220,5 +224,21 @@ public abstract class Player extends PhysicalObject
 	public boolean shouldCollideWith(PhysicalObject o)
 	{
 		return !isPilotingShip();
+	}
+	
+	@Override
+	public RigidBody createRigidBody()
+	{
+		CapsuleShape cshape = new CapsuleShape(0.45f, 0.9f);
+		
+		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(
+			10.0f, new DefaultMotionState(), cshape);
+		
+		info.restitution = 0.05f;
+		info.angularDamping = 0.25f;
+		info.linearDamping = 0.25f;
+		info.friction = 0.25f;
+		
+		return new RigidBody(info);
 	}
 }

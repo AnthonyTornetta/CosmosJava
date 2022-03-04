@@ -2,12 +2,13 @@ package com.cornchipss.cosmos.physx;
 
 import org.joml.Vector3fc;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.world.World;
 
 public abstract class PhysicalObject
 {
-	private RigidBody body;
+	private CRigidBody body;
 	private World world;
 
 	public abstract OBBCollider OBB();
@@ -17,7 +18,7 @@ public abstract class PhysicalObject
 		this.world = world;
 	}
 
-	public PhysicalObject(World world, RigidBody b)
+	public PhysicalObject(World world, CRigidBody b)
 	{
 		this.world = world;
 		body = b;
@@ -45,12 +46,12 @@ public abstract class PhysicalObject
 		this.world = world;
 	}
 
-	public RigidBody body()
+	public CRigidBody body()
 	{
 		return body;
 	}
 
-	public void body(RigidBody body)
+	public void body(CRigidBody body)
 	{
 		this.body = body;
 	}
@@ -59,4 +60,6 @@ public abstract class PhysicalObject
 	{
 		return true;
 	}
+
+	public abstract RigidBody createRigidBody();
 }

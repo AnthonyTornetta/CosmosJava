@@ -26,7 +26,7 @@ import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.RigidBody;
+import com.cornchipss.cosmos.physx.CRigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
@@ -370,7 +370,7 @@ public abstract class Structure extends PhysicalObject
 	@Override
 	public void addToWorld(Transform transform)
 	{
-		body(new RigidBody(transform));
+		body(new CRigidBody(transform));
 		world().addObject(this);
 	}
 

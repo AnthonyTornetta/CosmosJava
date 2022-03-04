@@ -6,23 +6,23 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.utils.Maths;
 
-public class RigidBody
+public class CRigidBody
 {
 	private Transform transform;
 	private Vector3f velocity;
 	private Vector3f angularVelocity;
 
-	public RigidBody(Transform t)
+	public CRigidBody(Transform t)
 	{
 		this(t, Maths.zero(), Maths.zero());
 	}
 
-	public RigidBody(Transform t, Vector3fc vel)
+	public CRigidBody(Transform t, Vector3fc vel)
 	{
 		this(t, vel, Maths.zero());
 	}
 
-	public RigidBody(Transform t, Vector3fc vel, Vector3fc angularVel)
+	public CRigidBody(Transform t, Vector3fc vel, Vector3fc angularVel)
 	{
 		this.transform = t;
 		this.velocity = new Vector3f().set(vel);

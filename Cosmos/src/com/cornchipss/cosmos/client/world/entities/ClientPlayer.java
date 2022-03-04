@@ -25,9 +25,9 @@ import com.cornchipss.cosmos.netty.packets.MovementPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
+import com.cornchipss.cosmos.physx.CRigidBody;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
-import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
@@ -122,7 +122,10 @@ public class ClientPlayer extends Player
 			CosmosClient.instance().nettyClient().sendUDP(p);
 		}
 
+		body().transform().position(new Vector3f(2, 2, 2));
+		
 		camera().update();
+		
 
 		MovementPacket packet = new MovementPacket(movement());
 		PlayerPacket p = new PlayerPacket(this);
@@ -341,7 +344,7 @@ public class ClientPlayer extends Player
 	}
 
 	@Override
-	public void body(RigidBody b)
+	public void body(CRigidBody b)
 	{
 		super.body(b);
 

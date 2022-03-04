@@ -8,6 +8,11 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.dynamics.RigidBody;
+import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
+import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.MotionState;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.TexturedMaterial;
@@ -15,8 +20,8 @@ import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.models.ModelLoader;
 import com.cornchipss.cosmos.netty.NettySide;
+import com.cornchipss.cosmos.physx.CRigidBody;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.RigidBody;
 import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
@@ -27,6 +32,7 @@ import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.utils.IUpdatable;
+import com.cornchipss.cosmos.utils.VecUtils;
 import com.cornchipss.cosmos.world.World;
 
 public class Laser extends PhysicalObject
@@ -63,7 +69,7 @@ public class Laser extends PhysicalObject
 	@Override
 	public void addToWorld(Transform transform)
 	{
-		body(new RigidBody(transform));
+		body(new CRigidBody(transform));
 		world().addObject(this);
 
 		origin = new Vector3f(transform.position());
@@ -166,5 +172,21 @@ public class Laser extends PhysicalObject
 		}
 
 		return true;
+	}
+
+	@Override
+	public RigidBody createRigidBody()
+	{
+		BoxShape cshape = new BoxShape(VecUtils.convert(halfwidths));
+		
+		MotionState state = new DefaultMotionState();
+		state.setWorldTransform(
+			new com.bulletphysics.linearmath.Transform(
+				VecUtils.convert(body().transform().matrix())));
+		
+		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(
+			0.1f, state, cshape);
+		
+		return new RigidBody(info);
 	}
 }

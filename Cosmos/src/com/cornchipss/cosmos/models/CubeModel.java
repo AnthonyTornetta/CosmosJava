@@ -36,7 +36,7 @@ public abstract class CubeModel implements Model
 
 	private static float[] tempReturn = new float[3 * 4];
 
-	public float[] verticies(BlockFace side, float offX, float offY, float offZ)
+	public float[] vertices(BlockFace side, float offX, float offY, float offZ)
 	{
 		switch (side)
 		{
@@ -188,7 +188,7 @@ public abstract class CubeModel implements Model
 		for (BlockFace s : sides)
 		{
 			int i = 0;
-			for (float f : verticies(s, offX, offY, offZ))
+			for (float f : vertices(s, offX, offY, offZ))
 			{
 				vertices.add(f * scales.get(i % 3));
 				i++;

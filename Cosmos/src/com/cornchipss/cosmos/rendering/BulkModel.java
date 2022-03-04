@@ -68,7 +68,7 @@ public class BulkModel
 		CubeModel model = cubes[z][y][x].model();
 		boolean animated = model instanceof AnimatedCubeModel;
 
-		for (float f : model.verticies(face, x, y, z))
+		for (float f : model.vertices(face, x, y, z))
 			matMesh.verticies.add(f);
 
 		matMesh.maxIndex = indiciesAndUvs(face, model, matMesh);
