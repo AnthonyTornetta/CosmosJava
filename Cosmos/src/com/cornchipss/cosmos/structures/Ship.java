@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 
-import com.bulletphysics.collision.shapes.BoxShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
@@ -39,7 +38,8 @@ public class Ship extends Structure
 		movement = Movement.movement(MovementType.NONE);
 
 		centerBlockPosition = new Vector3f();
-		shipCoreBlockLocation = new Vector3i(width() / 2, height() / 2, length() / 2);
+		shipCoreBlockLocation = new Vector3i(width() / 2, height() / 2,
+			length() / 2);
 	}
 
 	@Override
@@ -55,7 +55,8 @@ public class Ship extends Structure
 		}
 		else
 		{
-			Vector3f where = new Vector3f(width() / 2, height() / 2, length() / 2);
+			Vector3f where = new Vector3f(width() / 2, height() / 2,
+				length() / 2);
 			pilot.body().velocity(Maths.zero());
 			pilot.body().position(blockCoordsToWorldCoords(where, where));
 
@@ -89,14 +90,15 @@ public class Ship extends Structure
 	}
 
 	/**
-	 * The central block of the ship's location (ship core location) relative to the
-	 * world
+	 * The central block of the ship's location (ship core location) relative to
+	 * the world
 	 * 
 	 * @return
 	 */
 	public Vector3fc shipCoreWorldPosition()
 	{
-		this.blockCoordsToWorldCoords(shipCoreBlockLocation, centerBlockPosition);
+		this.blockCoordsToWorldCoords(shipCoreBlockLocation,
+			centerBlockPosition);
 		return centerBlockPosition;
 	}
 
@@ -134,41 +136,8 @@ public class Ship extends Structure
 	@Override
 	public RigidBody createRigidBody(Transform trans)
 	{
-		int lessZ = 999999;
-		int highestZ = 0;
-		
-		int lessX = 999999;
-		int highestX = 0;
-		
-		int highestY = 0;
-		
-		for (int z = 0; z < length(); z++)
-		{
-			for(int x = 0; x < width(); x++)
-			{
-				int hy = this.higehstYAt(x, z);
-				if(hy != -1)
-				{
-					if(z < lessZ)
-						lessZ = z;
-					if(z > highestZ)
-						highestZ = z;
-					
-					if(x < lessX)
-						lessX = x;
-					if(x > highestX)
-						highestX = x;
-					
-					if(highestY < hy)
-						highestY = hy;
-				}
-			}
-		}
-		
-		BoxShape bs = new BoxShape(
-			new javax.vecmath.Vector3f(this.width() / 2.f, highestY / 2.f, this.length() / 2.f));
-
-		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass(), new DefaultMotionState(trans), bs);
+		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass() / 1000.0f,
+			new DefaultMotionState(trans), createStructureShape(trans));
 
 		rbInfo.restitution = 0.25f;
 		rbInfo.angularDamping = 0.25f;

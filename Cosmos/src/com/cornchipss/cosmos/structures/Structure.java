@@ -11,13 +11,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.vecmath.Quat4f;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.BlockFace;
 import com.cornchipss.cosmos.blocks.StructureBlock;
@@ -25,6 +30,7 @@ import com.cornchipss.cosmos.blocks.data.BlockData;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.lights.LightMap;
 import com.cornchipss.cosmos.memory.MemoryPool;
+import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.obb.IOBBCollisionChecker;
@@ -1100,5 +1106,31 @@ public abstract class Structure extends PhysicalObject implements IWritable, IEn
 	public boolean shouldBeDrawn()
 	{
 		return true;
+	}
+	
+	protected CompoundShape createStructureShape(Transform trans)
+	{
+		CompoundShape shape = new CompoundShape();
+
+		for (Chunk c : this.chunks())
+		{
+			Vector3f coords = this.chunkCoordsToRelativeWorldCoords(c,
+				new Vector3i(0),
+				new Vector3f());
+
+			// Could be done better
+			new Orientation(Maths.convert(trans.getRotation(new Quat4f()),
+				new Quaternionf())).applyRotation(coords, coords);
+
+			shape.addChildShape(
+				new Transform(
+					new javax.vecmath.Matrix4f(new Quat4f(),
+						new javax.vecmath.Vector3f(coords.x, coords.y,
+							coords.z),
+						1.0f)),
+				c.createCollider());
+		}
+		
+		return shape;
 	}
 }
