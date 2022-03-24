@@ -38,17 +38,17 @@ public class ThrusterSystem extends BlockSystem
 			Vector3f dVel = new Vector3f();
 
 			if (ship.movement().forward())
-				dVel.add(ship.body().transform().forward());
+				dVel.add(ship.body().forward());
 			if (ship.movement().backward())
-				dVel.sub(ship.body().transform().forward());
+				dVel.sub(ship.body().forward());
 			if (ship.movement().right())
-				dVel.add(ship.body().transform().right());
+				dVel.add(ship.body().right());
 			if (ship.movement().left())
-				dVel.sub(ship.body().transform().right());
+				dVel.sub(ship.body().right());
 			if (ship.movement().up())
-				dVel.add(ship.body().transform().up());
+				dVel.add(ship.body().up());
 			if (ship.movement().down())
-				dVel.sub(ship.body().transform().up());
+				dVel.sub(ship.body().up());
 
 			if (dVel.x != 0 || dVel.y != 0 || dVel.z != 0
 				|| ship.movement().deltaRotation().x() != 0

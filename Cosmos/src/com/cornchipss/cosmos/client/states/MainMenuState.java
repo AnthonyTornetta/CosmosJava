@@ -20,7 +20,7 @@ import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.material.Materials;
 import com.cornchipss.cosmos.rendering.Window;
 
-public class MainMenuState extends State
+public class MainMenuState implements ClientState
 {
 	private GUI gui;
 

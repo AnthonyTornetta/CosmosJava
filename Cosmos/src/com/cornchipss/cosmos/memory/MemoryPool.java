@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import javax.vecmath.Quat4f;
+
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
@@ -23,6 +25,18 @@ public class MemoryPool
 	public static void addToPool(Vector3f o)
 	{
 		o.set(0);
+		actuallyAddToPool(o);
+	}
+	
+	public static void addToPool(javax.vecmath.Vector3f o)
+	{
+		o.set(0, 0, 0);
+		actuallyAddToPool(o);
+	}
+	
+	public static void addToPool(Quat4f o)
+	{
+		o.set(0, 0, 0, 1);
 		actuallyAddToPool(o);
 	}
 	

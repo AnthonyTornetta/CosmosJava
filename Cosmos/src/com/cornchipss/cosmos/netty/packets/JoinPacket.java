@@ -2,14 +2,17 @@ package com.cornchipss.cosmos.netty.packets;
 
 import java.io.IOException;
 
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
 import com.cornchipss.cosmos.utils.Logger;
+import com.cornchipss.cosmos.utils.Maths;
 
 public class JoinPacket extends Packet
 {
@@ -32,9 +35,12 @@ public class JoinPacket extends Packet
 		if (success)
 		{
 			Logger.LOGGER.info(this);
-			game.player(new ClientPlayer(game.world(), name()));
-			game.player().addToWorld(new Transform());
-			client.players().addPlayer(game.player());
+			ClientPlayer cp = new ClientPlayer(game.world(), name());
+			game.player(cp);
+			cp.addToWorld(
+				new RigidBodyProxy(
+					cp.createRigidBody(new Vector3f(), Maths.blankQuaternion())));
+			client.players().addPlayer(cp);
 		}
 		else
 		{
@@ -51,8 +57,7 @@ public class JoinPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game,
-		ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		// not happening
 	}
@@ -60,8 +65,7 @@ public class JoinPacket extends Packet
 	@Override
 	public String toString()
 	{
-		return success ? "Name: " + msg
-			: "Error: " + (msg != null ? " - " + msg : "");
+		return success ? "Name: " + msg : "Error: " + (msg != null ? " - " + msg : "");
 	}
 
 	public boolean success()

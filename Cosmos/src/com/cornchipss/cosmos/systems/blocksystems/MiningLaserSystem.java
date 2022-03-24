@@ -40,7 +40,7 @@ public class MiningLaserSystem extends ChainActionBlockSystem
 		Vector3f coords = structure().blockCoordsToWorldCoords(pos,
 			new Vector3f());
 
-		structure().world().sendRaycast(coords, structure().body().transform().orientation(), 1000);
+//		structure().world().sendRaycast(coords, structure().body().transform().orientation(), 1000);
 	}
 
 	@Override

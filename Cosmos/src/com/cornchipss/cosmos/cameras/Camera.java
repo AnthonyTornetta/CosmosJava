@@ -3,7 +3,7 @@ package com.cornchipss.cosmos.cameras;
 import org.joml.Matrix4fc;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.IHasPositionAndRotation;
 
 /**
  * Contains methods to set the view OpenGL view matrix
@@ -65,12 +65,12 @@ public abstract class Camera
 	 * 
 	 * @param parent The parent
 	 */
-	public abstract void parent(Transform parent);
+	public abstract void parent(IHasPositionAndRotation parent);
 
 	/**
 	 * The camera's parent
 	 * 
 	 * @return The camera's parent
 	 */
-	public abstract Transform parent();
+	public abstract IHasPositionAndRotation parent();
 }

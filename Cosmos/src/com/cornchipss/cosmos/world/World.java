@@ -31,10 +31,10 @@ public class World extends PhysicsWorld
 	@Override
 	public void update(float delta)
 	{
-		super.update(delta);
-
 		for (IUpdatable o : updatableObjects)
 			o.update(delta);
+		
+		super.update(delta);
 	}
 
 	public List<Structure> structures()

@@ -5,7 +5,7 @@ import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.rendering.Window;
 import com.cornchipss.cosmos.utils.io.Input;
 
-public class GameState extends State
+public class GameState implements ClientState
 {
 	private Window window;
 

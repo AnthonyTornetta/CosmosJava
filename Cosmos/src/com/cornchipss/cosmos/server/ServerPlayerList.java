@@ -4,8 +4,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.cornchipss.cosmos.physx.Transform;
+import org.joml.Vector3f;
+
+import com.bulletphysics.dynamics.RigidBody;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
+import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.world.World;
 import com.esotericsoftware.kryonet.Connection;
 
@@ -42,8 +46,10 @@ public class ServerPlayerList implements Iterable<ServerPlayer>
 			ServerPlayer p = new ServerPlayer(world, c, name);
 
 			players.add(p);
+			
+			RigidBody rb = p.createRigidBody(new Vector3f(), Maths.blankQuaternion());
 
-			p.addToWorld(new Transform());
+			p.addToWorld(new RigidBodyProxy(rb));
 
 			players.add(p);
 

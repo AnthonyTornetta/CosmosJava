@@ -5,19 +5,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import org.joml.Vector3f;
+
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.biospheres.Biosphere;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.game.Game;
 import com.cornchipss.cosmos.netty.packets.ModifyBlockPacket;
 import com.cornchipss.cosmos.netty.packets.StructureStatusPacket;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.registry.Biospheres;
 import com.cornchipss.cosmos.server.CosmosServer;
 import com.cornchipss.cosmos.server.game.world.ServerWorld;
 import com.cornchipss.cosmos.structures.Planet;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.structures.Structure;
+import com.cornchipss.cosmos.utils.Maths;
 
 public class ServerGame extends Game
 {
@@ -57,8 +61,11 @@ public class ServerGame extends Game
 				Blocks.SHIP_CORE);
 		}
 
-		ship.addToWorld(new Transform(0, 5, 0));
-		mainPlanet.addToWorld(new Transform(0, -mainPlanet.height(), 0));
+		RigidBody bdyShip = ship.createRigidBody(new Vector3f(0, 100, 0), Maths.blankQuaternion());
+		ship.addToWorld(new RigidBodyProxy(bdyShip));
+		
+		RigidBody bdyPlanet = mainPlanet.createRigidBody(new Vector3f(0, -mainPlanet.height(), 0), Maths.blankQuaternion());
+		mainPlanet.addToWorld(new RigidBodyProxy(bdyPlanet));
 	}
 
 	@Override

@@ -60,11 +60,12 @@ public class CosmosServer implements Runnable
 
 			for (ServerPlayer p : server.players().players())
 			{
-//				System.out.println(p);
+				if (p.body() != null)
+				{
+					PlayerPacket packet = new PlayerPacket(p);
 
-				PlayerPacket packet = new PlayerPacket(p);
-
-				server.sendToAllExceptUDP(packet, p);
+					server.sendToAllExceptUDP(packet, p);
+				}
 			}
 
 			return server.running();

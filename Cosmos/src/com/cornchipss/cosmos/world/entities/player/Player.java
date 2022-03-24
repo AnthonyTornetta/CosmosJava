@@ -9,6 +9,7 @@ import com.bulletphysics.collision.shapes.CapsuleShape;
 import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.cameras.Camera;
 import com.cornchipss.cosmos.inventory.Inventory;
@@ -16,8 +17,6 @@ import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.CRigidBody;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollisionCheckerJOML;
 import com.cornchipss.cosmos.structures.Ship;
@@ -28,8 +27,7 @@ import com.cornchipss.cosmos.world.World;
 public abstract class Player extends PhysicalObject
 {
 	public static final float WIDTH = 0.8f, LENGTH = 0.6f, HEIGHT = 1.8f;
-	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2,
-		HEIGHT / 2, LENGTH / 2);
+	private static final Vector3fc HALF_WIDTHS = new Vector3f(WIDTH / 2, HEIGHT / 2, LENGTH / 2);
 
 	private Ship pilotingShip;
 
@@ -74,17 +72,9 @@ public abstract class Player extends PhysicalObject
 	public abstract void update(float delta);
 
 	@Override
-	public void addToWorld(Transform transform)
-	{
-		body(new CRigidBody(transform));
-		world().addObject(this);
-	}
-
-	@Override
 	public OBBCollider OBB()
 	{
-		return new OBBCollider(this.position(),
-			this.body().transform().orientation(), HALF_WIDTHS);
+		return new OBBCollider(this.position(), this.body().orientation(), HALF_WIDTHS);
 	}
 
 	public Structure.RayRes calculateLookingAt()
@@ -94,13 +84,10 @@ public abstract class Player extends PhysicalObject
 
 		try
 		{
-			for (Structure s : world()
-				.structuresNear(body().transform().position()))
+			for (Structure s : world().structuresNear(body().position()))
 			{
 				Structure.RayRes hit = s.raycast(camera().position(),
-					camera().forward().mul(50.0f,
-						MemoryPool.getInstanceOrCreate(Vector3f.class)),
-					jomlChecker);
+					camera().forward().mul(50.0f, MemoryPool.getInstanceOrCreate(Vector3f.class)), jomlChecker);
 				if (hit != null)
 				{
 					float distSqrd = hit.distance();
@@ -148,12 +135,9 @@ public abstract class Player extends PhysicalObject
 		{
 			pilotingShip.setPilot(null);
 
-			this.body().transform()
-				.position(this.position().add(
-					new Vector3f(pilotingShip.body().transform().orientation()
-						.forward().mul(-1.3f, new Vector3f())),
-					new Vector3f()));
-			this.body().transform().orientation().zero();
+			this.body().position(this.position().add(
+				new Vector3f(pilotingShip.body().orientation().forward().mul(-1.3f, new Vector3f())), new Vector3f()));
+			this.body().orientation().zero();
 		}
 
 		pilotingShip = null;
@@ -225,20 +209,22 @@ public abstract class Player extends PhysicalObject
 	{
 		return !isPilotingShip();
 	}
-	
+
 	@Override
-	public RigidBody createRigidBody()
+	protected RigidBody createRigidBody(Transform trans)
 	{
 		CapsuleShape cshape = new CapsuleShape(0.45f, 0.9f);
-		
-		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(
-			10.0f, new DefaultMotionState(), cshape);
-		
+
+		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(10.0f, new DefaultMotionState(trans), cshape);
+
 		info.restitution = 0.05f;
 		info.angularDamping = 0.25f;
 		info.linearDamping = 0.25f;
 		info.friction = 0.25f;
 		
-		return new RigidBody(info);
+		RigidBody rb = new RigidBody(info);
+		rb.setActivationState(RigidBody.DISABLE_DEACTIVATION);
+		
+		return rb;
 	}
 }

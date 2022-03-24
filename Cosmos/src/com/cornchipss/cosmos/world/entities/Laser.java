@@ -13,6 +13,7 @@ import com.bulletphysics.dynamics.RigidBody;
 import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.linearmath.DefaultMotionState;
 import com.bulletphysics.linearmath.MotionState;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.StructureBlock;
 import com.cornchipss.cosmos.client.world.entities.ClientPlayer;
 import com.cornchipss.cosmos.material.TexturedMaterial;
@@ -20,9 +21,8 @@ import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.models.ModelLoader;
 import com.cornchipss.cosmos.netty.NettySide;
-import com.cornchipss.cosmos.physx.CRigidBody;
 import com.cornchipss.cosmos.physx.PhysicalObject;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 import com.cornchipss.cosmos.physx.collision.obb.LaserOBBCollider;
@@ -35,8 +35,7 @@ import com.cornchipss.cosmos.utils.IUpdatable;
 import com.cornchipss.cosmos.utils.VecUtils;
 import com.cornchipss.cosmos.world.World;
 
-public class Laser extends PhysicalObject
-	implements IHasCollisionEvent, IRenderable, IUpdatable
+public class Laser extends PhysicalObject implements IHasCollisionEvent, IRenderable, IUpdatable
 {
 	private Vector3f halfwidths = new Vector3f(0.1f, 0.1f, 10f);
 
@@ -62,20 +61,16 @@ public class Laser extends PhysicalObject
 	@Override
 	public LaserOBBCollider OBB()
 	{
-		return MemoryPool.getInstanceOrCreate(LaserOBBCollider.class)
-			.set(this.position(), this.body().transform().orientation());
+		return MemoryPool.getInstanceOrCreate(LaserOBBCollider.class).set(this.position(),
+			this.body().orientation());
 	}
 
 	@Override
-	public void addToWorld(Transform transform)
+	public void addToWorld(RigidBodyProxy body)
 	{
-		body(new CRigidBody(transform));
-		world().addObject(this);
+		super.addToWorld(body);
 
-		origin = new Vector3f(transform.position());
-
-		this.body().velocity(this.body().transform().orientation().forward()
-			.mul(speed, new Vector3f()));
+		this.body().velocity(this.body().orientation().forward().mul(speed, new Vector3f()));
 	}
 
 	@Override
@@ -93,15 +88,12 @@ public class Laser extends PhysicalObject
 			{
 				Structure s = (Structure) obj;
 
-				info.collisionPoint.sub(info.normal.x / 2.f,
-					info.normal.y / 2.f, info.normal.z / 2.f);
+				info.collisionPoint.sub(info.normal.x / 2.f, info.normal.y / 2.f, info.normal.z / 2.f);
 
-				Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint,
-					new Vector3i());
+				Vector3i point = s.worldCoordsToBlockCoords(info.collisionPoint, new Vector3i());
 
 				if (s.hasBlock(point.x, point.y, point.z))
-					s.block(point.x, point.y, point.z).takeDamage(
-						new StructureBlock(s, point.x, point.y, point.z),
+					s.block(point.x, point.y, point.z).takeDamage(new StructureBlock(s, point.x, point.y, point.z),
 						damageMultiplier * BASE_DAMAGE);
 			}
 		}
@@ -118,8 +110,8 @@ public class Laser extends PhysicalObject
 		{
 			try
 			{
-				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0,
-					0, 0, halfwidths.x, halfwidths.y, halfwidths.z);
+				mesh = ModelLoader.fromFile("assets/models/laser").createMesh(0, 0, 0, halfwidths.x, halfwidths.y,
+					halfwidths.z);
 
 				material = new RawImageMaterial("assets/images/atlas/laser");
 				material.init();
@@ -132,13 +124,11 @@ public class Laser extends PhysicalObject
 	}
 
 	@Override
-	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera,
-		ClientPlayer p)
+	public void draw(Matrix4fc projectionMatrix, Matrix4fc camera, ClientPlayer p)
 	{
 		material.use();
 
-		material.initUniforms(projectionMatrix, camera,
-			body().transform().matrix(), false);
+		material.initUniforms(projectionMatrix, camera, body().matrix(), false);
 
 		mesh.prepare();
 		mesh.draw();
@@ -158,13 +148,12 @@ public class Laser extends PhysicalObject
 	{
 		if (NettySide.side() == NettySide.CLIENT)
 		{
-			DebugRenderer.instance().drawRectangle(
-				body().transform().matrix(), new Vector3f(halfwidths.x + 0.01f,
-					halfwidths.y + 0.01f, halfwidths.z + 0.01f),
-				Color.red, DrawMode.LINES);
+			DebugRenderer.instance().drawRectangle(body().matrix(),
+				new Vector3f(halfwidths.x + 0.01f, halfwidths.y + 0.01f, halfwidths.z + 0.01f), Color.red,
+				DrawMode.LINES);
 		}
 
-		float dSqrd = origin.distanceSquared(body().transform().position());
+		float dSqrd = origin.distanceSquared(body().position());
 
 		if (dSqrd > 10_000)
 		{
@@ -175,18 +164,14 @@ public class Laser extends PhysicalObject
 	}
 
 	@Override
-	public RigidBody createRigidBody()
+	protected RigidBody createRigidBody(Transform transform)
 	{
 		BoxShape cshape = new BoxShape(VecUtils.convert(halfwidths));
-		
-		MotionState state = new DefaultMotionState();
-		state.setWorldTransform(
-			new com.bulletphysics.linearmath.Transform(
-				VecUtils.convert(body().transform().matrix())));
-		
-		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(
-			0.1f, state, cshape);
-		
+
+		MotionState state = new DefaultMotionState(transform);
+
+		RigidBodyConstructionInfo info = new RigidBodyConstructionInfo(0.1f, state, cshape);
+
 		return new RigidBody(info);
 	}
 }

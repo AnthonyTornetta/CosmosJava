@@ -1,9 +1,12 @@
 package com.cornchipss.cosmos.netty.packets;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.client.world.entities.DummyPlayer;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
@@ -28,12 +31,11 @@ public class LoginPacket extends Packet
 	{
 		DummyPlayer p;
 		client.players().addPlayer(p = new DummyPlayer(game.world(), name));
-		p.addToWorld(new Transform());
+		p.addToWorld(new RigidBodyProxy(p.createRigidBody(new Vector3f(), new Quaternionf())));
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game,
-		ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		if (server.players().nameTaken(name))
 		{

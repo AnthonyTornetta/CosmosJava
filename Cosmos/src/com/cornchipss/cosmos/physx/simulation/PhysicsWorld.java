@@ -1,12 +1,7 @@
 package com.cornchipss.cosmos.physx.simulation;
 
-import java.nio.ByteBuffer;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Quat4f;
 
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
@@ -16,21 +11,12 @@ import com.bulletphysics.collision.broadphase.DbvtBroadphase;
 import com.bulletphysics.collision.dispatch.CollisionConfiguration;
 import com.bulletphysics.collision.dispatch.CollisionDispatcher;
 import com.bulletphysics.collision.dispatch.DefaultCollisionConfiguration;
-import com.bulletphysics.collision.shapes.CollisionShape;
-import com.bulletphysics.collision.shapes.IndexedMesh;
-import com.bulletphysics.collision.shapes.StaticPlaneShape;
-import com.bulletphysics.collision.shapes.TriangleIndexVertexArray;
 import com.bulletphysics.dynamics.DiscreteDynamicsWorld;
 import com.bulletphysics.dynamics.DynamicsWorld;
 import com.bulletphysics.dynamics.RigidBody;
-import com.bulletphysics.dynamics.RigidBodyConstructionInfo;
 import com.bulletphysics.dynamics.constraintsolver.ConstraintSolver;
 import com.bulletphysics.dynamics.constraintsolver.SequentialImpulseConstraintSolver;
 import com.bulletphysics.extras.gimpact.GImpactCollisionAlgorithm;
-import com.bulletphysics.extras.gimpact.GImpactMeshShape;
-import com.bulletphysics.extras.gimpact.GImpactMeshShapePart;
-import com.bulletphysics.linearmath.DefaultMotionState;
-import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
@@ -38,15 +24,11 @@ import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 import com.cornchipss.cosmos.utils.Maths;
-import com.cornchipss.cosmos.utils.Utils;
-import com.cornchipss.cosmos.world.Chunk;
 
 public class PhysicsWorld
 {
 	protected DynamicsWorld world;
-
-	private Set<RigidBody> rbs;
-
+	
 	/**
 	 * Sector dimensions in meters
 	 */
@@ -113,128 +95,129 @@ public class PhysicsWorld
 		ConstraintSolver solver = new SequentialImpulseConstraintSolver();
 
 		world = new DiscreteDynamicsWorld(dispatcher, broadphase, solver, cfg);
-		world.setGravity(new javax.vecmath.Vector3f(0, -9.81f, 0));
+		world.setGravity(new javax.vecmath.Vector3f(0, 0, 0));
 
-		CollisionShape groundShape = new StaticPlaneShape(
-			new javax.vecmath.Vector3f(0, 1, 0), 0.25f);
-
-		RigidBodyConstructionInfo cinfo = new RigidBodyConstructionInfo(0,
-			new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1),
-				new javax.vecmath.Vector3f(0, 0, 0), 1.0f))),
-			groundShape);
-		cinfo.restitution = 0.25f;
-
-		planeRb = new RigidBody(cinfo);
-
-		world.addRigidBody(planeRb);
-		
-		IndexedMesh im = new IndexedMesh();
-		/*
-		 *
-		public int numTriangles;
-		public ByteBuffer triangleIndexBase;
-		public int triangleIndexStride;
-		public int numVertices;
-		public ByteBuffer vertexBase;
-		public int vertexStride;
-		 */
-		
-		int[] indices = new int[]
-			{
-				0, 1, 2, 2, 3, 0,
-				4, 5, 6, 6, 7, 4,
-				8, 9, 10, 10, 11, 8,
-				12, 13, 14, 14, 15, 12,
-				16, 17, 18, 18, 19, 16,
-				20, 21, 22, 22, 23, 20
-			};
-		
-		float[] vertices = new float[]
-			{
-				0.5f, -0.5f, 0.5f,
-				0.5f, -0.5f, 0.5f,
-				0.5f, 0.5f, 0.5f,
-				0.5f, 0.5f, 0.5f,
-				
-				0.5f, 0.5f, -0.5f,
-				0.5f, 0.5f, -0.5f,
-				0.5f, -0.5f, -0.5f,
-				0.5f, -0.5f, -0.5f,
-				
-				0.5f, -0.5f, -0.5f,
-				0.5f, 0.5f, -0.5f,
-				0.5f, 0.5f, 0.5f,
-				0.5f, -0.5f, 0.5f,
-				
-				0.5f, -0.5f, 0.5f,
-				0.5f, 0.5f, 0.5f,
-				0.5f, 0.5f, -0.5f,
-				0.5f, -0.5f, -0.5f,
-				
-				0.5f, 0.5f, -0.5f,
-				0.5f, 0.5f, -0.5f,
-				0.5f, 0.5f, 0.5f,
-				0.5f, 0.5f, 0.5f,
-				
-				0.5f, -0.5f, 0.5f,
-				0.5f, -0.5f, 0.5f,
-				0.5f, -0.5f, -0.5f,
-				0.5f, -0.5f, -0.5f
-			};
-		
-		int triCount = indices.length / 3;
-		
-		im.numTriangles = triCount;
-		im.triangleIndexBase = ByteBuffer.allocate(indices.length * 4);
-		
-		for (int i = 0; i < indices.length; i++) {
-	        im.triangleIndexBase.putInt(indices[i]);
-	    }
-		
-		im.triangleIndexBase.rewind();
-		
-		im.triangleIndexStride = 3 * Integer.BYTES;
-		
-		im.numVertices = vertices.length / 3;
-		im.vertexBase = ByteBuffer.allocate(vertices.length * 4);
-		
-		for (int i = 0; i < vertices.length; i++) {
-	        im.vertexBase.putFloat(vertices[i]);
-	    }
-		
-		im.vertexBase.rewind();
-
-		im.vertexStride = 3 * Float.BYTES; // OK
-		
-		TriangleIndexVertexArray smi = new TriangleIndexVertexArray();
-		smi.addIndexedMesh(im);
-		
-		GImpactMeshShape fancyShape = new GImpactMeshShape(smi);//new SphereShape(2.5f);
-		
-		fancyShape.setLocalScaling(new javax.vecmath.Vector3f(1, 1, 1));
-		fancyShape.updateBound();
-		fancyShape.setMargin(0);
-		
-		RigidBodyConstructionInfo cinfoball = new RigidBodyConstructionInfo(
-			10.0f, new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1),
-				new javax.vecmath.Vector3f(0, 10, 0), 1.0f))), fancyShape);
-
-//		javax.vecmath.Vector3f inertia = new javax.vecmath.Vector3f();
-//		fancyShape.calculateLocalInertia(10, inertia);
-//		cinfoball.localInertia.set(inertia);
-
-		cinfoball.restitution = 0.25f;
-		cinfoball.angularDamping = 0.25f;
-		cinfoball.friction = 0.25f;
-
-		ballRb = new RigidBody(cinfoball);
-		world.addRigidBody(ballRb);
+//		CollisionShape groundShape = new StaticPlaneShape(
+//			new javax.vecmath.Vector3f(0, 1, 0), 0.25f);
+//
+//		RigidBodyConstructionInfo cinfo = new RigidBodyConstructionInfo(0,
+//			new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1),
+//				new javax.vecmath.Vector3f(0, 0, 0), 1.0f))),
+//			groundShape);
+//		cinfo.restitution = 0.25f;
+//
+//		planeRb = new RigidBody(cinfo);
+//
+//		world.addRigidBody(planeRb);
+//		
+//		IndexedMesh im = new IndexedMesh();
+//		/*
+//		 *
+//		public int numTriangles;
+//		public ByteBuffer triangleIndexBase;
+//		public int triangleIndexStride;
+//		public int numVertices;
+//		public ByteBuffer vertexBase;
+//		public int vertexStride;
+//		 */
+//		
+//		int[] indices = new int[]
+//			{
+//				0, 1, 2, 2, 3, 0,
+//				4, 5, 6, 6, 7, 4,
+//				8, 9, 10, 10, 11, 8,
+//				12, 13, 14, 14, 15, 12,
+//				16, 17, 18, 18, 19, 16,
+//				20, 21, 22, 22, 23, 20
+//			};
+//		
+//		float[] vertices = new float[]
+//			{
+//				0.5f, -0.5f, 0.5f,
+//				0.5f, -0.5f, 0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, -0.5f, -0.5f,
+//				0.5f, -0.5f, -0.5f,
+//				
+//				0.5f, -0.5f, -0.5f,
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				0.5f, -0.5f, 0.5f,
+//				
+//				0.5f, -0.5f, 0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, -0.5f, -0.5f,
+//				
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, 0.5f, -0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				0.5f, 0.5f, 0.5f,
+//				
+//				0.5f, -0.5f, 0.5f,
+//				0.5f, -0.5f, 0.5f,
+//				0.5f, -0.5f, -0.5f,
+//				0.5f, -0.5f, -0.5f
+//			};
+//		
+//		int triCount = indices.length / 3;
+//		
+//		im.numTriangles = triCount;
+//		im.triangleIndexBase = ByteBuffer.allocate(indices.length * 4);
+//		
+//		for (int i = 0; i < indices.length; i++) {
+//	        im.triangleIndexBase.putInt(indices[i]);
+//	    }
+//		
+//		im.triangleIndexBase.rewind();
+//		
+//		im.triangleIndexStride = 3 * Integer.BYTES;
+//		
+//		im.numVertices = vertices.length / 3;
+//		im.vertexBase = ByteBuffer.allocate(vertices.length * 4);
+//		
+//		for (int i = 0; i < vertices.length; i++) {
+//	        im.vertexBase.putFloat(vertices[i]);
+//	    }
+//		
+//		im.vertexBase.rewind();
+//
+//		im.vertexStride = 3 * Float.BYTES; // OK
+//		
+//		TriangleIndexVertexArray smi = new TriangleIndexVertexArray();
+//		smi.addIndexedMesh(im);
+//		
+//		GImpactMeshShape fancyShape = new GImpactMeshShape(smi);//new SphereShape(2.5f);
+//		
+//		fancyShape.setLocalScaling(new javax.vecmath.Vector3f(1, 1, 1));
+//		fancyShape.updateBound();
+//		fancyShape.setMargin(0);
+//		
+//		RigidBodyConstructionInfo cinfoball = new RigidBodyConstructionInfo(
+//			10.0f, new DefaultMotionState(new Transform(new Matrix4f(new Quat4f(0, 0, 0, 1),
+//				new javax.vecmath.Vector3f(0, 10, 0), 1.0f))), fancyShape);
+//
+////		javax.vecmath.Vector3f inertia = new javax.vecmath.Vector3f();
+////		fancyShape.calculateLocalInertia(10, inertia);
+////		cinfoball.localInertia.set(inertia);
+//
+//		cinfoball.restitution = 0.25f;
+//		cinfoball.angularDamping = 0.25f;
+//		cinfoball.friction = 0.25f;
+//
+//		ballRb = new RigidBody(cinfoball);
+//		world.addRigidBody(ballRb);
 	}
 
 	protected void addObjectDuringUnlock(PhysicalObject bdy)
 	{
 		bodies.add(bdy);
-		world.addRigidBody(bdy.createRigidBody());
+		
+		world.addRigidBody(bdy.body().jbulletRigidBody());
 	}
 
 	protected void removeObjectDuringUnlock(PhysicalObject bdy)
@@ -260,15 +243,10 @@ public class PhysicsWorld
 
 	public void update(float delta)
 	{
-		world.stepSimulation(1.0f / 60.0f);
-
-		Transform out = new Transform();
-		Utils.println("BALL : " + ballRb.getWorldTransform(out).origin);
-
-		Utils.println("PLANE: " + planeRb.getWorldTransform(out).origin);
-
+		world.stepSimulation(delta);
+		
 //		for (PhysicalObject a : bodies)
-//		{
+//		{			
 //			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
 //
 //			if (deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
@@ -285,13 +263,12 @@ public class PhysicsWorld
 //
 //			a.body().velocity().mul(delta, deltaA);
 //
-//			a.body().transform()
-//				.position(a.body().transform().position().add(deltaA, deltaA));
+//			a.body().position(a.body().position().add(deltaA, deltaA));
 //
 //			Vector3f deltaR = a.body().angularVelocity().mul(delta,
 //				new Vector3f());
 //
-//			a.body().transform().rotateRelative(deltaR);
+//			a.body().rotateRelative(deltaR);
 //		}
 	}
 

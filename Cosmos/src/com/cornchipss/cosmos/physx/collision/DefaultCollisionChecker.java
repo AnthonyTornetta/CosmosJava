@@ -95,7 +95,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 			Vector3f at = MemoryPool.getInstanceOrCreate(Vector3f.class)
 				.set(pos);
 
-			at.sub(a.structure().body().transform().orientation().up()
+			at.sub(a.structure().body().orientation().up()
 				.mul(Chunk.HEIGHT / 2.f, temp));
 
 			// Start Y
@@ -105,7 +105,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			for (int y = 0; y < a.height(); y++)
 			{
-				obc.set(at, a.structure().body().transform().orientation(),
+				obc.set(at, a.structure().body().orientation(),
 					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
@@ -113,11 +113,11 @@ public class DefaultCollisionChecker implements ICollisionChecker
 					ys.add(y);
 				}
 
-				at.add(a.structure().body().transform().orientation().up());
+				at.add(a.structure().body().orientation().up());
 			}
 
 			at.set(pos);
-			at.sub(a.structure().body().transform().orientation().right()
+			at.sub(a.structure().body().orientation().right()
 				.mul(Chunk.WIDTH / 2.f, temp));
 
 			// Start X
@@ -125,7 +125,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			for (int x = 0; x < a.width(); x++)
 			{
-				obc.set(at, a.structure().body().transform().orientation(),
+				obc.set(at, a.structure().body().orientation(),
 					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))
@@ -133,15 +133,15 @@ public class DefaultCollisionChecker implements ICollisionChecker
 					xs.add(x);
 				}
 
-				at.add(a.structure().body().transform().orientation().right());
+				at.add(a.structure().body().orientation().right());
 			}
 
-			Vector3f backward = a.structure().body().transform().orientation()
+			Vector3f backward = a.structure().body().orientation()
 				.forward().mul(-1, MemoryPool.getInstanceOrCreate(Vector3f.class));
 			
 			at.set(pos);
 			// it is add here
-			at.add(a.structure().body().transform().orientation().forward()
+			at.add(a.structure().body().orientation().forward()
 				.mul(Chunk.LENGTH / 2.f, temp));
 
 			// Start Z
@@ -149,7 +149,7 @@ public class DefaultCollisionChecker implements ICollisionChecker
 
 			for (int z = 0; z < a.length(); z++)
 			{
-				obc.set(at, a.structure().body().transform().orientation(),
+				obc.set(at, a.structure().body().orientation(),
 					halfwidthsStorage);
 
 				if (obbChecker.testMovingOBBOBB(deltaA, obc, bOBB, null))

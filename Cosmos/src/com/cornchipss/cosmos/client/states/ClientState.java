@@ -2,7 +2,7 @@ package com.cornchipss.cosmos.client.states;
 
 import com.cornchipss.cosmos.rendering.Window;
 
-public abstract class State
+public interface ClientState
 {
 	public abstract void init(Window window);
 

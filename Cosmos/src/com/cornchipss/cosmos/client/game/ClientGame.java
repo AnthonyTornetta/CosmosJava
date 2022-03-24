@@ -59,13 +59,12 @@ public class ClientGame extends Game
 	private PauseMenuGUI pauseMenu;
 
 	private ShipGUI shipGUI;
-	
+
 	private Skybox skybox;
 
 	private void initPauseMenu()
 	{
-		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO,
-			MeasurementPair.HUNDRED_PERCENT);
+		pauseMenu = new PauseMenuGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 
 		gui.addElement(pauseMenu);
 	}
@@ -73,34 +72,27 @@ public class ClientGame extends Game
 	private void initGraphics()
 	{
 		gui = new GUI(Materials.GUI_MATERIAL);
-		gui.init(0, 0, Window.instance().getWidth(),
-			Window.instance().getHeight());
+		gui.init(0, 0, Window.instance().getWidth(), Window.instance().getHeight());
 
 		initPauseMenu();
 
-		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO,
-			MeasurementPair.HUNDRED_PERCENT);
+		hotbarGUI = new HotbarGUI(player().inventory(), MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(hotbarGUI);
 
-		shipGUI = new ShipGUI(MeasurementPair.ZERO,
-			MeasurementPair.HUNDRED_PERCENT);
+		shipGUI = new ShipGUI(MeasurementPair.ZERO, MeasurementPair.HUNDRED_PERCENT);
 		gui.addElement(shipGUI);
 
 		GUITexture crosshair = new GUITexture(
-			new MeasurementPair(MeasurementParser.parse("50% - 16"),
-				MeasurementParser.parse("50% - 16")),
-			new MeasurementPair(new PixelMeasurement(32),
-				new PixelMeasurement(32)),
-			0, 0);
+			new MeasurementPair(MeasurementParser.parse("50% - 16"), MeasurementParser.parse("50% - 16")),
+			new MeasurementPair(new PixelMeasurement(32), new PixelMeasurement(32)), 0, 0);
 
 		gui.addElement(crosshair);
 
 		OpenGLFont font = Fonts.ARIAL_28;
 
-		fpsText = new GUIText("-- --ms", font,
-			new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
+		fpsText = new GUIText("-- --ms", font, new MeasurementPair(PixelMeasurement.ZERO, PixelMeasurement.ZERO));
 		gui.addElement(fpsText);
-		
+
 		skybox.updateGraphics();
 	}
 
@@ -117,10 +109,8 @@ public class ClientGame extends Game
 
 		projectionMatrix = new Matrix4f();
 		projectionMatrix.perspective((float) Math.toRadians(90),
-			Window.instance().getWidth()
-				/ (float) Window.instance().getHeight(),
-			0.1f, 1000);
-		
+			Window.instance().getWidth() / (float) Window.instance().getHeight(), 0.1f, 1000);
+
 		skybox = new Skybox();
 	}
 
@@ -133,8 +123,7 @@ public class ClientGame extends Game
 	public void onResize(int w, int h)
 	{
 		projectionMatrix.identity();
-		projectionMatrix.perspective((float) Math.toRadians(90), w / (float) h,
-			0.1f, 1000);
+		projectionMatrix.perspective((float) Math.toRadians(90), w / (float) h, 0.1f, 1000);
 
 		gui.onResize(w, h);
 		pauseMenu.onResize(w, h);
@@ -148,21 +137,21 @@ public class ClientGame extends Game
 			initGraphics();
 
 		GL11.glEnable(GL13.GL_TEXTURE0);
-		
+
 		// GL30.glPolygonMode(GL30.GL_FRONT_AND_BACK, GL30.GL_LINE);
 
 		Matrix4fc camera = player.camera().viewMatrix();
-		
-		if(skybox.shouldBeDrawn())
+
+		if (skybox.shouldBeDrawn())
 			skybox.draw(projectionMatrix, camera, player());
-		
+
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 
 		GL11.glDepthFunc(GL11.GL_LESS);
 
 		world().lock();
-		
+
 		world().draw(projectionMatrix, camera, player());
 
 		world().unlock();
@@ -170,7 +159,7 @@ public class ClientGame extends Game
 		gui.update(delta);
 
 		GL11.glDisable(GL11.GL_CULL_FACE);
-		
+
 		if (drawGUI)
 			gui.draw();
 	}
@@ -209,8 +198,8 @@ public class ClientGame extends Game
 
 		if ((pauseMenu == null || !pauseMenu.active()) && nettyClient.ready())
 		{
-			super.update(delta);
-
+			super.update(delta); // prob not the best way just putting it here - maybe move later
+			
 			if (player() == null)
 				return;
 			if (gui == null)
@@ -222,9 +211,8 @@ public class ClientGame extends Game
 			if (Input.isKeyJustDown(GLFW.GLFW_KEY_F3))
 				DebugRenderer.instance().toggleEnabled();
 
-			fpsText.text(DebugMonitor.get("ups") + " "
-				+ (int) ((Float) DebugMonitor.get("ups-variance") * 1000)
-				+ "ms");
+			fpsText
+				.text(DebugMonitor.get("ups") + " " + (int) ((Float) DebugMonitor.get("ups-variance") * 1000) + "ms");
 
 			int prevRow = player.selectedInventoryColumn();
 

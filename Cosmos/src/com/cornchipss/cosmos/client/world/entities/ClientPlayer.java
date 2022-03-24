@@ -25,10 +25,10 @@ import com.cornchipss.cosmos.netty.packets.MovementPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerActionPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerInteractPacket;
 import com.cornchipss.cosmos.netty.packets.PlayerPacket;
-import com.cornchipss.cosmos.physx.CRigidBody;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.physx.Movement;
 import com.cornchipss.cosmos.physx.Movement.MovementType;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.Orientation;
 import com.cornchipss.cosmos.physx.collision.obb.OBBCollider;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer;
 import com.cornchipss.cosmos.rendering.debug.DebugRenderer.DrawMode;
@@ -38,7 +38,7 @@ import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.io.Input;
 import com.cornchipss.cosmos.world.World;
 import com.cornchipss.cosmos.world.entities.player.Player;
-
+  
 public class ClientPlayer extends Player
 {
 	private Camera cam;
@@ -49,11 +49,11 @@ public class ClientPlayer extends Player
 	}
 
 	@Override
-	public void addToWorld(Transform transform)
+	public void addToWorld(RigidBodyProxy bdy)
 	{
-		super.addToWorld(transform);
+		super.addToWorld(bdy);
 
-		cam = new GimbalLockCamera(transform);
+		cam = new GimbalLockCamera(bdy);
 	}
 
 	@Override
@@ -122,10 +122,7 @@ public class ClientPlayer extends Player
 			CosmosClient.instance().nettyClient().sendUDP(p);
 		}
 
-		body().transform().position(new Vector3f(2, 2, 2));
-		
 		camera().update();
-		
 
 		MovementPacket packet = new MovementPacket(movement());
 		PlayerPacket p = new PlayerPacket(this);
@@ -140,7 +137,7 @@ public class ClientPlayer extends Player
 		super.shipPiloting(s);
 		
 		if(s == null)
-			this.cam = new GimbalLockCamera(this.body().transform());
+			this.cam = new GimbalLockCamera(this.body());
 		else
 			this.cam = new ShipCamera(s);
 	}
@@ -189,7 +186,7 @@ public class ClientPlayer extends Player
 
 		if (Input.isKeyJustDown(GLFW.GLFW_KEY_F))
 		{
-			this.body().transform().position(new Vector3f());
+			this.body().position(new Vector3f());
 		}
 
 		if ((Input.isKeyJustDown(GLFW.GLFW_KEY_R)
@@ -344,11 +341,16 @@ public class ClientPlayer extends Player
 	}
 
 	@Override
-	public void body(CRigidBody b)
+	public void body(RigidBodyProxy b)
 	{
 		super.body(b);
 
 		if (cam != null)
-			cam.parent(b.transform());
+			cam.parent(b);
+	}
+
+	public Orientation orientation()
+	{
+		return body().orientation();
 	}
 }

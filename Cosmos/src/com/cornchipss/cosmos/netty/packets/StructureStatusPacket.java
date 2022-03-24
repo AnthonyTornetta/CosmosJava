@@ -28,7 +28,7 @@ public class StructureStatusPacket extends Packet
 	{
 		sid = s.id();
 		pos = s.position();
-		rot = s.body().transform().orientation().quaternion();
+		rot = s.body().orientation().quaternion();
 		energy = s.energy();
 		maxEnergy = s.maxEnergy();
 	}
@@ -41,8 +41,8 @@ public class StructureStatusPacket extends Packet
 		if (s == null)
 			return;
 
-		s.body().transform().position(pos);
-		s.body().transform().orientation().quaternion(rot);
+		s.body().position(pos);
+		s.body().orientation().quaternion(rot);
 		s.energy(energy);
 		s.maxEnergy(maxEnergy);
 		

@@ -3,8 +3,9 @@ package com.cornchipss.cosmos.systems.blocksystems;
 import org.joml.Vector3f;
 import org.joml.Vector3i;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.netty.action.PlayerAction;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.structures.Structure;
 import com.cornchipss.cosmos.systems.BlockSystemIDs;
 import com.cornchipss.cosmos.systems.blocksystems.types.ChainActionBlockSystem;
@@ -53,11 +54,10 @@ public class LaserCannonSystem extends ChainActionBlockSystem
 
 		Laser laser = new Laser(structure().world(), baseSpeed + 1000,
 			structure(), chainCount);
+		
+		RigidBody rb = laser.createRigidBody(coords, structure().body().orientation().quaternion());
 
-		Transform t = new Transform(coords);
-		t.orientation(structure().body().transform().orientation());
-
-		laser.addToWorld(t);
+		laser.addToWorld(new RigidBodyProxy(rb));
 	}
 
 	@Override

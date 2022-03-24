@@ -3,10 +3,11 @@ package com.cornchipss.cosmos.netty.packets;
 import org.joml.Quaternionfc;
 import org.joml.Vector3fc;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
 import com.cornchipss.cosmos.client.world.entities.DummyPlayer;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
@@ -27,7 +28,7 @@ public class PlayerPacket extends Packet
 	{
 		this.name = p.name();
 		this.position = p.position();
-		this.rotation = p.body().transform().orientation().quaternion();
+		this.rotation = p.body().orientation().quaternion();
 	}
 
 	@Override
@@ -37,13 +38,15 @@ public class PlayerPacket extends Packet
 		if (p == null)
 		{
 			p = new DummyPlayer(game.world(), name);
-			p.addToWorld(new Transform(position, rotation));
+			
+			RigidBody rb = p.createRigidBody(position, rotation);
+			p.addToWorld(new RigidBodyProxy(rb));
 			client.players().addPlayer(p);
 		}
 		else if (p.body() != null)
 		{
-			p.body().transform().position(position);
-			p.body().transform().orientation().quaternion(rotation);
+			p.body().position(position);
+			p.body().orientation().quaternion(rotation);
 		}
 	}
 
@@ -51,8 +54,8 @@ public class PlayerPacket extends Packet
 	public void receiveServer(CosmosNettyServer server, ServerGame game,
 		ClientConnection c)
 	{
-		c.player().body().transform().position(position);
-		c.player().body().transform().orientation().quaternion(rotation);
+		c.player().body().position(position);
+		c.player().body().orientation().quaternion(rotation);
 
 		name = c.player().name();
 

@@ -10,9 +10,10 @@ import java.lang.reflect.InvocationTargetException;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
@@ -45,9 +46,9 @@ public class StructurePacket extends Packet
 			this.id = s.id();
 			this.clazz = s.getClass();
 
-			this.pos = new Vector3f(s.body().transform().position());
+			this.pos = new Vector3f(s.body().position());
 			this.rotation = new Quaternionf()
-				.set(s.body().transform().orientation().quaternion());
+				.set(s.body().orientation().quaternion());
 		}
 		catch (IOException e)
 		{
@@ -64,7 +65,8 @@ public class StructurePacket extends Packet
 				.newInstance(game.world(), id);
 			s.read(new DataInputStream(new ByteArrayInputStream(bytes)));
 
-			s.addToWorld(new Transform(pos, rotation));
+			RigidBody bdy = s.createRigidBody(pos, rotation);
+			s.addToWorld(new RigidBodyProxy(bdy));
 		}
 		catch (InstantiationException | IllegalAccessException
 			| IllegalArgumentException | InvocationTargetException

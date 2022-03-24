@@ -2,6 +2,8 @@ package com.cornchipss.cosmos.utils;
 
 import java.nio.FloatBuffer;
 
+import javax.vecmath.Quat4f;
+
 import org.joml.Matrix4f;
 import org.joml.Matrix4fc;
 import org.joml.Quaternionf;
@@ -767,5 +769,10 @@ public class Maths
 		out.set((int) Math.signum(v.x()), (int) Math.signum(v.y()),
 			(int) Math.signum(v.z()));
 		return out;
+	}
+
+	public static Quaternionfc convert(Quat4f rotation, Quaternionf out)
+	{
+		return out.set(rotation.x, rotation.y, rotation.z, rotation.w);
 	}
 }

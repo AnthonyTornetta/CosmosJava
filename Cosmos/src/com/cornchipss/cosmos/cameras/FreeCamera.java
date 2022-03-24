@@ -5,13 +5,13 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
+import com.cornchipss.cosmos.physx.IHasPositionAndRotation;
 import com.cornchipss.cosmos.physx.Orientation;
-import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.utils.Maths;
 
 public class FreeCamera extends Camera
 {
-	private Transform parent;
+	private IHasPositionAndRotation parent;
 
 	private Orientation orientation;
 
@@ -27,7 +27,7 @@ public class FreeCamera extends Camera
 	 * 
 	 * @param parent The parent this camera sits on
 	 */
-	public FreeCamera(Transform parent)
+	public FreeCamera(IHasPositionAndRotation parent)
 	{
 		this.parent = parent;
 
@@ -66,7 +66,7 @@ public class FreeCamera extends Camera
 	 * @param transform The camera's new parent
 	 */
 	@Override
-	public void parent(Transform transform)
+	public void parent(IHasPositionAndRotation transform)
 	{
 		this.parent = transform;
 	}
@@ -77,7 +77,7 @@ public class FreeCamera extends Camera
 	 * @return The camera's parent
 	 */
 	@Override
-	public Transform parent()
+	public IHasPositionAndRotation parent()
 	{
 		return parent;
 	}

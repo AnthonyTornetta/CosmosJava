@@ -7,7 +7,7 @@ import com.cornchipss.cosmos.cameras.GimbalLockCamera;
 import com.cornchipss.cosmos.material.TexturedMaterial;
 import com.cornchipss.cosmos.material.types.RawImageMaterial;
 import com.cornchipss.cosmos.models.entities.PlayerModel;
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.rendering.IRenderable;
 import com.cornchipss.cosmos.rendering.Mesh;
 import com.cornchipss.cosmos.world.World;
@@ -26,11 +26,11 @@ public class DummyPlayer extends Player implements IRenderable
 	}
 
 	@Override
-	public void addToWorld(Transform transform)
+	public void addToWorld(RigidBodyProxy body)
 	{
-		super.addToWorld(transform);
+		super.addToWorld(body);
 
-		cam = new GimbalLockCamera(transform);
+		cam = new GimbalLockCamera(body);
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class DummyPlayer extends Player implements IRenderable
 		playerMaterial.use();
 
 		playerMaterial.initUniforms(projectionMatrix, camera,
-			body().transform().matrix(), false);
+			body().matrix(), false);
 
 		playerMesh.prepare();
 		playerMesh.draw();

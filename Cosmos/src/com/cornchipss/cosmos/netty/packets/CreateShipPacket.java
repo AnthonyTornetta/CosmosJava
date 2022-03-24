@@ -2,9 +2,11 @@ package com.cornchipss.cosmos.netty.packets;
 
 import org.joml.Vector3f;
 
+import com.bulletphysics.dynamics.RigidBody;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.client.CosmosNettyClient;
 import com.cornchipss.cosmos.client.game.ClientGame;
+import com.cornchipss.cosmos.physx.RigidBodyProxy;
 import com.cornchipss.cosmos.server.CosmosNettyServer;
 import com.cornchipss.cosmos.server.game.ServerGame;
 import com.cornchipss.cosmos.server.kyros.ClientConnection;
@@ -26,12 +28,11 @@ public class CreateShipPacket extends Packet
 		Ship s = new Ship(p.world(), sid);
 		s.block(s.shipCoreBlockPosition(), Blocks.SHIP_CORE);
 
-		s.addToWorld(p.body().transform().clone());
-		
-		s.body().transform()
-			.position(s.body().transform().position().add(
-				p.camera().forward().mul(5, new Vector3f()),
-				new Vector3f()));
+		RigidBody rb = s.createRigidBody(p.position(), p.orientation().quaternion());
+
+		s.addToWorld(new RigidBodyProxy(rb));
+
+		s.body().position(s.body().position().add(p.camera().forward().mul(5, new Vector3f()), new Vector3f()));
 	}
 
 	@Override
@@ -43,8 +44,7 @@ public class CreateShipPacket extends Packet
 	}
 
 	@Override
-	public void receiveServer(CosmosNettyServer server, ServerGame game,
-		ClientConnection c)
+	public void receiveServer(CosmosNettyServer server, ServerGame game, ClientConnection c)
 	{
 		Player p = c.player();
 
@@ -54,7 +54,7 @@ public class CreateShipPacket extends Packet
 		createShip(p);
 
 		Logger.LOGGER.info("Ship with ID " + sid + " created by " + p.name());
-		
+
 		server.sendToAllTCP(this);
 	}
 }

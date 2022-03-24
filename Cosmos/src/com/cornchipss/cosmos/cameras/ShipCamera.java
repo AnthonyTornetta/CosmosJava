@@ -5,7 +5,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.IHasPositionAndRotation;
 import com.cornchipss.cosmos.structures.Ship;
 import com.cornchipss.cosmos.systems.BlockSystemIDs;
 import com.cornchipss.cosmos.systems.blocksystems.CameraBlockSystem;
@@ -40,19 +40,19 @@ public class ShipCamera extends Camera
 	@Override
 	public Vector3fc forward()
 	{
-		return ship.body().transform().forward();
+		return ship.body().forward();
 	}
 
 	@Override
 	public Vector3fc right()
 	{
-		return ship.body().transform().right();
+		return ship.body().right();
 	}
 
 	@Override
 	public Vector3fc up()
 	{
-		return ship.body().transform().up();
+		return ship.body().up();
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class ShipCamera extends Camera
 	public void update()
 	{
 		// Inverted because of OpenGL
-		Maths.createViewMatrix(position(), ship.body().transform().orientation().inverseQuaternion(), view);
+		Maths.createViewMatrix(position(), ship.body().orientation().inverseQuaternion(), view);
 	}
 
 	@Override
@@ -83,14 +83,14 @@ public class ShipCamera extends Camera
 	}
 
 	@Override
-	public void parent(Transform parent)
+	public void parent(IHasPositionAndRotation parent)
 	{
 		throw new IllegalStateException("A ship camera cannot have its parent changed.");
 	}
 
 	@Override
-	public Transform parent()
+	public IHasPositionAndRotation parent()
 	{
-		return ship.body().transform();
+		return ship.body();
 	}
 }

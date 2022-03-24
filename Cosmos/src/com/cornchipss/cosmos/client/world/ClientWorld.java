@@ -81,7 +81,7 @@ public class ClientWorld extends World implements IRenderable
 			}
 		});
 		
-		world.getDebugDrawer().setDebugMode(DebugDrawModes.DRAW_WIREFRAME);
+		world.getDebugDrawer().setDebugMode(DebugDrawModes.DRAW_AABB);
 	}
 	
 	@Override
@@ -124,9 +124,9 @@ public class ClientWorld extends World implements IRenderable
 	{
 		try
 		{
-//			for (IRenderable r : renderables)
-//				if (r.shouldBeDrawn())
-//					r.draw(projectionMatrix, camera, p);
+			for (IRenderable r : renderables)
+				if (r.shouldBeDrawn())
+					r.draw(projectionMatrix, camera, p);
 
 			if (DebugRenderer.instance().shouldBeDrawn())
 				DebugRenderer.instance().draw(projectionMatrix, camera, p);

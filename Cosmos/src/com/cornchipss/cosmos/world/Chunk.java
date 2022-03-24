@@ -8,12 +8,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.vecmath.Quat4f;
+
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector3i;
 import org.joml.Vector3ic;
 
+import com.bulletphysics.collision.shapes.BoxShape;
+import com.bulletphysics.collision.shapes.CompoundShape;
+import com.bulletphysics.linearmath.Transform;
 import com.cornchipss.cosmos.blocks.Block;
 import com.cornchipss.cosmos.blocks.Blocks;
 import com.cornchipss.cosmos.blocks.LitBlock;
@@ -59,13 +64,10 @@ public class Chunk implements IWritable
 	 * Dimensions of a Chunk - must be even
 	 */
 	public static final int WIDTH = 16, HEIGHT = 16, LENGTH = 16;
-	public static final int HALF_WIDTH = WIDTH / 2, HALF_HEIGHT = HEIGHT / 2,
-		HALF_LENGTH = LENGTH / 2;
+	public static final int HALF_WIDTH = WIDTH / 2, HALF_HEIGHT = HEIGHT / 2, HALF_LENGTH = LENGTH / 2;
 
-	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT,
-		LENGTH);
-	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS)
-		.div(2);
+	public static final Vector3fc DIMENSIONS = new Vector3f(WIDTH, HEIGHT, LENGTH);
+	public static final Vector3fc HALF_DIMENSIONS = new Vector3f(DIMENSIONS).div(2);
 
 	private static final float EPSILON = 1E-4f;
 
@@ -94,8 +96,7 @@ public class Chunk implements IWritable
 	 */
 	private Structure structure;
 
-	public Chunk(int x, int y, int z, float relX, float relY, float relZ,
-		int offX, int offY, int offZ, Structure s)
+	public Chunk(int x, int y, int z, float relX, float relY, float relZ, int offX, int offY, int offZ, Structure s)
 	{
 		this.lightingOffset = new Vector3i(offX, offY, offZ);
 		this.localPosition = new Vector3i(x, y, z);
@@ -122,9 +123,7 @@ public class Chunk implements IWritable
 			{
 				for (int x = 0; x < blocks[z][y].length; x++)
 				{
-					short id = blocks[z][y][x] != null
-						? blocks[z][y][x].numericId()
-						: 0;
+					short id = blocks[z][y][x] != null ? blocks[z][y][x].numericId() : 0;
 
 					if (currentId == -1)
 					{
@@ -248,13 +247,12 @@ public class Chunk implements IWritable
 
 	public boolean within(int x, int y, int z)
 	{
-		return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT && z >= 0
-			&& z < LENGTH;
+		return x >= 0 && x < WIDTH && y >= 0 && y < HEIGHT && z >= 0 && z < LENGTH;
 	}
 
 	/**
-	 * Returns the block data for that specific block Creates that data if none
-	 * is present. This initializes the blockdata if none is present
+	 * Returns the block data for that specific block Creates that data if none is
+	 * present. This initializes the blockdata if none is present
 	 * 
 	 * @param x The block's X
 	 * @param y The block's Y
@@ -269,8 +267,7 @@ public class Chunk implements IWritable
 			Vector3i temp = new Vector3i(x, y, z);
 			structure.chunkCoordsToBlockCoords(this, temp, temp);
 
-			data = block(x, y, z).generateData(structure, temp.x, temp.y,
-				temp.z);
+			data = block(x, y, z).generateData(structure, temp.x, temp.y, temp.z);
 
 			blockDataStorage.set(x, y, z, data);
 		}
@@ -293,8 +290,7 @@ public class Chunk implements IWritable
 	public void block(int x, int y, int z, Block block)
 	{
 		if (!within(x, y, z))
-			throw new IllegalArgumentException(
-				"Bad x,y,z: " + x + ", " + y + ", " + z);
+			throw new IllegalArgumentException("Bad x,y,z: " + x + ", " + y + ", " + z);
 
 		boolean shouldRender = false;
 
@@ -311,27 +307,26 @@ public class Chunk implements IWritable
 			blocks[z][y][x] = block;
 
 			if (block != null)
-				structure.lightMap().setBlocking(x + lightingOffset.x(),
-					y + lightingOffset.y(), z + lightingOffset.z());
+				structure.lightMap().setBlocking(x + lightingOffset.x(), y + lightingOffset.y(),
+					z + lightingOffset.z());
 			else
-				structure.lightMap().removeBlocking(x + lightingOffset.x(),
-					y + lightingOffset.y(), z + lightingOffset.z());
+				structure.lightMap().removeBlocking(x + lightingOffset.x(), y + lightingOffset.y(),
+					z + lightingOffset.z());
 
 			if (block instanceof LitBlock)
 			{
 				// remove it if there is already one
-				structure.lightMap().removeLight(x + lightingOffset.x(),
-					y + lightingOffset.y(), z + lightingOffset.z());
-
-				structure.lightMap().addLight(((LitBlock) block).lightSource(),
-					x + lightingOffset.x(), y + lightingOffset.y(),
+				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(),
 					z + lightingOffset.z());
-			}
-			else if (structure.lightMap().hasLightSource(x + lightingOffset.x(),
-				y + lightingOffset.y(), z + lightingOffset.z()))
-			{
-				structure.lightMap().removeLight(x + lightingOffset.x(),
+
+				structure.lightMap().addLight(((LitBlock) block).lightSource(), x + lightingOffset.x(),
 					y + lightingOffset.y(), z + lightingOffset.z());
+			}
+			else if (structure.lightMap().hasLightSource(x + lightingOffset.x(), y + lightingOffset.y(),
+				z + lightingOffset.z()))
+			{
+				structure.lightMap().removeLight(x + lightingOffset.x(), y + lightingOffset.y(),
+					z + lightingOffset.z());
 			}
 
 			needsRendered(true);
@@ -361,20 +356,18 @@ public class Chunk implements IWritable
 	 * {@link Chunk#mesh()}
 	 * </p>
 	 * <p>
-	 * Once this method is called, all changes to this chunk's blocks will call
-	 * this method.
+	 * Once this method is called, all changes to this chunk's blocks will call this
+	 * method.
 	 * </p>
 	 */
 	public void render()
 	{
 		needsRendered = false;
 
-		model.render(left != null ? left.model : null,
-			right != null ? right.model : null, top != null ? top.model : null,
-			bottom != null ? bottom.model : null,
-			front != null ? front.model : null,
-			back != null ? back.model : null, lightingOffset.x(),
-			lightingOffset.y(), lightingOffset.z(), structure.lightMap());
+		model.render(left != null ? left.model : null, right != null ? right.model : null,
+			top != null ? top.model : null, bottom != null ? bottom.model : null, front != null ? front.model : null,
+			back != null ? back.model : null, lightingOffset.x(), lightingOffset.y(), lightingOffset.z(),
+			structure.lightMap());
 	}
 
 	/**
@@ -420,8 +413,8 @@ public class Chunk implements IWritable
 	 * The mesh of all the blocks - null if {@link Chunk#render()} has not been
 	 * called.
 	 * 
-	 * @return The mesh of all the blocks - null if {@link Chunk#render()} has
-	 *         not been called.
+	 * @return The mesh of all the blocks - null if {@link Chunk#render()} has not
+	 *         been called.
 	 */
 	public List<MaterialMesh> meshes()
 	{
@@ -480,10 +473,8 @@ public class Chunk implements IWritable
 		return localPosition;
 	}
 
-	private boolean testLineIntersection(Vector3fc lineStart,
-		Vector3fc lineDelta, Vector3ic dir, CollisionInfo info,
-		IOBBCollisionChecker checker, int x, int y, int z, Set<Vector3i> done,
-		Vector3i temp)
+	private boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, Vector3ic dir, CollisionInfo info,
+		IOBBCollisionChecker checker, int x, int y, int z, Set<Vector3i> done, Vector3i temp)
 	{
 		boolean res = false;
 
@@ -496,10 +487,10 @@ public class Chunk implements IWritable
 		todo.add(start);
 
 		Vector3i here = MemoryPool.getInstanceOrCreate(Vector3i.class);// new
-															// Vector3i();
-		
+		// Vector3i();
+
 		Vector3f wc = MemoryPool.getInstance(Vector3f.class);
-		
+
 		try
 		{
 			while (todo.size() != 0)
@@ -523,44 +514,36 @@ public class Chunk implements IWritable
 					if (checker.testLineOBB(lineStart, lineDelta, c, null))
 					{
 						temp.set(v.x + 1, v.y, v.z);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 						temp.set(v.x - 1, v.y, v.z);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 						temp.set(v.x, v.y + 1, v.z);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 						temp.set(v.x, v.y - 1, v.z);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 						temp.set(v.x, v.y, v.z + 1);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 						temp.set(v.x, v.y, v.z - 1);
-						if (structure().withinBlocks(temp.x, temp.y, temp.z)
-							&& !todo.contains(temp) && !done.contains(temp))
-							nextTodo.add(MemoryPool
-								.getInstanceOrCreate(Vector3i.class).set(temp));
+						if (structure().withinBlocks(temp.x, temp.y, temp.z) && !todo.contains(temp)
+							&& !done.contains(temp))
+							nextTodo.add(MemoryPool.getInstanceOrCreate(Vector3i.class).set(temp));
 
 						MemoryPool.addToPool(c);
 						c = structure().obbForBlock(here);
 
-						if (c != null && checker.testLineOBB(lineStart,
-							lineDelta, c, info))
+						if (c != null && checker.testLineOBB(lineStart, lineDelta, c, info))
 						{
-							DebugRenderer.instance().drawOBB(c, Color.GREEN,
-								DrawMode.FILL);
+							DebugRenderer.instance().drawOBB(c, Color.GREEN, DrawMode.FILL);
 							res = true;
 
 							MemoryPool.addToPool(c);
@@ -582,8 +565,8 @@ public class Chunk implements IWritable
 		{
 			MemoryPool.addToPool(wc);
 			MemoryPool.addToPool(here);
-			
-			for(Vector3i v : done)
+
+			for (Vector3i v : done)
 			{
 				MemoryPool.addToPool(v);
 			}
@@ -592,8 +575,8 @@ public class Chunk implements IWritable
 		return res;
 	}
 
-	public boolean testLineIntersection(Vector3fc lineStart,
-		Vector3fc lineDelta, CollisionInfo info, IOBBCollisionChecker checker)
+	public boolean testLineIntersection(Vector3fc lineStart, Vector3fc lineDelta, CollisionInfo info,
+		IOBBCollisionChecker checker)
 	{
 		OBBCollider chunkCollider = structure.obbForChunk(this);
 
@@ -604,8 +587,7 @@ public class Chunk implements IWritable
 		{
 			tempInfo.collisionPoint.set(lineStart);
 			DebugRenderer.instance().drawPoint(lineStart, Color.blue);
-			DebugRenderer.instance().drawPoint(
-				lineStart.add(lineDelta, new Vector3f()), Color.orange);
+			DebugRenderer.instance().drawPoint(lineStart.add(lineDelta, new Vector3f()), Color.orange);
 		}
 
 		Set<Vector3i> done = new HashSet<>();
@@ -613,15 +595,14 @@ public class Chunk implements IWritable
 		Vector3i direction = Maths.signumi(lineDelta, new Vector3i());
 
 		Vector3i here = structure.worldCoordsToChunkCoords(
-			tempInfo.collisionPoint.add(EPSILON * direction.x,
-				EPSILON * direction.y, EPSILON * direction.z),
+			tempInfo.collisionPoint.add(EPSILON * direction.x, EPSILON * direction.y, EPSILON * direction.z),
 			MemoryPool.getInstanceOrCreate(Vector3i.class));
 
-		boolean res = testLineIntersection(lineStart, lineDelta, direction, info,
-			checker, here.x, here.y, here.z, done, new Vector3i());
-		
+		boolean res = testLineIntersection(lineStart, lineDelta, direction, info, checker, here.x, here.y, here.z, done,
+			new Vector3i());
+
 		MemoryPool.addToPool(here);
-		
+
 		return res;
 	}
 
@@ -642,9 +623,173 @@ public class Chunk implements IWritable
 		if (o instanceof Chunk)
 		{
 			Chunk c = (Chunk) o;
-			return c.localPosition.equals(localPosition)
-				&& c.structure.equals(structure);
+			return c.localPosition.equals(localPosition) && c.structure.equals(structure);
 		}
 		return false;
+	}
+
+	public CompoundShape createCollider()
+	{
+		CompoundShape shape = new CompoundShape();
+
+		boolean[] tested = new boolean[LENGTH * HEIGHT * WIDTH];
+
+		for (int z = 0; z < LENGTH; z++)
+		{
+			for (int y = 0; y < HEIGHT; y++)
+			{
+				for (int x = 0; x < WIDTH; x++)
+				{
+					int i = Utils.array3Dto1D(x, y, z, WIDTH, HEIGHT);
+					if (!tested[i])
+					{
+						tested[i] = true;
+
+						if (hasBlock(x, y, z))
+						{
+							Vector3i start = new Vector3i(x, y, z);
+							Vector3i size = new Vector3i(1, 1, 1);
+
+							boolean canSpreadX = true;
+							boolean canSpreadY = true;
+							boolean canSpreadZ = true;
+							// Attempts to expand in all directions and stops in each direction when it no
+							// longer can.
+							while (canSpreadX || canSpreadY || canSpreadZ)
+							{
+								canSpreadX = trySpreadX(canSpreadX, tested, start, size);
+								canSpreadY = trySpreadY(canSpreadY, tested, start, size);
+								canSpreadZ = trySpreadZ(canSpreadZ, tested, start, size);
+							}
+							
+							float halfX = size.x / 2.f;
+							float halfY = size.y / 2.f;
+							float halfZ = size.z / 2.f;
+
+							BoxShape bs = new BoxShape(
+								new javax.vecmath.Vector3f(halfX, halfY, halfZ));
+							
+							shape.addChildShape(
+								new Transform(
+									new javax.vecmath.Matrix4f(
+										new Quat4f(), 
+										new javax.vecmath.Vector3f(start.x + halfX, start.y + halfY, start.z + halfZ), 
+										1.0f)),
+								bs);
+						}
+					}
+				}
+			}
+		}
+
+		return shape;
+	}
+
+	private boolean trySpreadX(boolean canSpreadX, boolean[] tested, Vector3i boxStart, Vector3i boxSize)
+	{
+		// Checks the square made by the Y and Z size on the X index one larger than the
+		// size of the box.
+		int yLimit = boxStart.y + boxSize.y;
+		int zLimit = boxStart.z + boxSize.z;
+		for (int y = boxStart.y; y < yLimit && canSpreadX; ++y)
+		{
+			for (int z = boxStart.z; z < zLimit; ++z)
+			{
+				int newX = boxStart.x + boxSize.x;
+				int newIndex = Utils.array3Dto1D(newX, y, z, WIDTH, HEIGHT);
+				if (newX >= WIDTH || tested[newIndex] || !hasBlock(newX, y, z))
+				{
+					canSpreadX = false;
+				}
+			}
+		}
+		// If the box can spread, mark it as tested and increase the box size in the X
+		// dimension.
+		if (canSpreadX)
+		{
+			for (int y = boxStart.y; y < yLimit; ++y)
+			{
+				for (int z = boxStart.z; z < zLimit; ++z)
+				{
+					int newX = boxStart.x + boxSize.x;
+					int newIndex = Utils.array3Dto1D(newX, y, z, WIDTH, HEIGHT);
+					tested[newIndex] = true;
+				}
+			}
+			++boxSize.x;
+		}
+		return canSpreadX;
+	}
+
+	private boolean trySpreadY(boolean canSpreadY, boolean[] tested, Vector3i boxStart, Vector3i boxSize)
+	{
+		// Checks the square made by the X and Z size on the Y index one larger than the
+		// size of the box.
+		int xLimit = boxStart.x + boxSize.x;
+		int zLimit = boxStart.z + boxSize.z;
+		for (int x = boxStart.x; x < xLimit && canSpreadY; ++x)
+		{
+			for (int z = boxStart.z; z < zLimit; ++z)
+			{
+				int newY = boxStart.y + boxSize.y;
+				int newIndex = Utils.array3Dto1D(x, newY, z, WIDTH, HEIGHT);
+				if (newY >= HEIGHT || tested[newIndex] || !hasBlock(x, newY, z))
+				{
+					canSpreadY = false;
+				}
+			}
+		}
+		// If the box can spread, mark it as tested and increase the box size in the Y
+		// dimension.
+		if (canSpreadY)
+		{
+			for (int x = boxStart.x; x < xLimit; ++x)
+			{
+				for (int z = boxStart.z; z < zLimit; ++z)
+				{
+					int newY = boxStart.y + boxSize.y;
+					int newIndex = Utils.array3Dto1D(x, newY, z, WIDTH, HEIGHT);
+					tested[newIndex] = true;
+				}
+			}
+			++boxSize.y;
+		}
+		return canSpreadY;
+	}
+
+	private boolean trySpreadZ(boolean canSpreadZ, boolean[] tested, Vector3i boxStart, Vector3i boxSize)
+	{
+		// Checks the square made by the X and Y size on the Z index one larger than the
+		// size of the box.
+		int xLimit = boxStart.x + boxSize.x;
+		int yLimit = boxStart.y + boxSize.y;
+		for (int x = boxStart.x; x < xLimit && canSpreadZ; ++x)
+		{
+			for (int y = boxStart.y; y < yLimit; ++y)
+			{
+				int newZ = boxStart.z + boxSize.z;
+				int newIndex = Utils.array3Dto1D(x, y, newZ, WIDTH, HEIGHT);
+				if (newZ >= LENGTH || tested[newIndex] || !hasBlock(x, y, newZ))
+				{
+					canSpreadZ = false;
+				}
+			}
+		}
+		// If the box can spread, mark it as tested and increase the box size in the Z
+		// dimension.
+		if (canSpreadZ)
+		{
+			for (int x = boxStart.x; x < xLimit; ++x)
+			{
+				for (int y = boxStart.y; y < yLimit; ++y)
+				{
+					int newZ = boxStart.z + boxSize.z;
+					int newIndex = Utils.array3Dto1D(x, y, newZ, WIDTH, HEIGHT);
+					tested[newIndex] = true;
+				}
+			}
+			++boxSize.z;
+		}
+		return canSpreadZ;
 	}
 }

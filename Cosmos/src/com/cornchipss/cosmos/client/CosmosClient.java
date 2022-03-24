@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.cornchipss.cosmos.client.states.GameState;
 import com.cornchipss.cosmos.client.states.MainMenuState;
-import com.cornchipss.cosmos.client.states.State;
+import com.cornchipss.cosmos.client.states.ClientState;
 import com.cornchipss.cosmos.gui.text.Fonts;
 import com.cornchipss.cosmos.netty.NettySide;
 import com.cornchipss.cosmos.registry.Initializer;
@@ -32,7 +32,7 @@ public class CosmosClient implements Runnable
 	}
 
 	private volatile boolean running = true;
-	private State state;
+	private ClientState state;
 	private CosmosNettyClient client;
 
 	public boolean connected()
@@ -165,7 +165,7 @@ public class CosmosClient implements Runnable
 		return !window.shouldClose() && running;
 	}
 
-	public void state(State state)
+	public void state(ClientState state)
 	{
 		if (this.state != null)
 			this.state.remove();
@@ -174,7 +174,7 @@ public class CosmosClient implements Runnable
 		state.init(window);
 	}
 
-	public State state()
+	public ClientState state()
 	{
 		return state;
 	}

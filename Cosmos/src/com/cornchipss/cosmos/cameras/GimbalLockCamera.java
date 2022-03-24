@@ -5,7 +5,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.physx.Transform;
+import com.cornchipss.cosmos.physx.IHasPositionAndRotation;
 import com.cornchipss.cosmos.utils.Maths;
 
 /**
@@ -21,7 +21,7 @@ import com.cornchipss.cosmos.utils.Maths;
 public class GimbalLockCamera extends Camera
 {
 	private Matrix4f matrix;
-	private Transform parent;
+	private IHasPositionAndRotation parent;
 
 	private Vector3f forward, right, up;
 	private Vector3f rot;
@@ -38,7 +38,7 @@ public class GimbalLockCamera extends Camera
 	 * 
 	 * @param parent The parent this camera sits on
 	 */
-	public GimbalLockCamera(Transform parent)
+	public GimbalLockCamera(IHasPositionAndRotation parent)
 	{
 		this.parent = parent;
 
@@ -120,13 +120,13 @@ public class GimbalLockCamera extends Camera
 	}
 
 	@Override
-	public void parent(Transform parent)
+	public void parent(IHasPositionAndRotation parent)
 	{
 		this.parent = parent;
 	}
 
 	@Override
-	public Transform parent()
+	public IHasPositionAndRotation parent()
 	{
 		return parent;
 	}
