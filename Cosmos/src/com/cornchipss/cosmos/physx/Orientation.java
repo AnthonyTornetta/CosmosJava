@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class Orientation implements Cloneable
 {
@@ -135,5 +136,11 @@ public class Orientation implements Cloneable
 	public Quaternionfc inverseQuaternion()
 	{
 		return inverted;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return "(FWD: " + Utils.toEasyString(forward) + ")";
 	}
 }

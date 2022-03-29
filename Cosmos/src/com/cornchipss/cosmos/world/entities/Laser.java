@@ -71,6 +71,7 @@ public class Laser extends PhysicalObject implements IHasCollisionEvent, IRender
 		super.addToWorld(body);
 
 		this.body().velocity(this.body().orientation().forward().mul(speed, new Vector3f()));
+		this.origin = new Vector3f(this.body().position());
 	}
 
 	@Override

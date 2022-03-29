@@ -136,7 +136,7 @@ public class Ship extends Structure
 	@Override
 	public RigidBody createRigidBody(Transform trans)
 	{
-		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass() / 1000.0f,
+		RigidBodyConstructionInfo rbInfo = new RigidBodyConstructionInfo(mass(),
 			new DefaultMotionState(trans), createStructureShape(trans));
 
 		rbInfo.restitution = 0.25f;

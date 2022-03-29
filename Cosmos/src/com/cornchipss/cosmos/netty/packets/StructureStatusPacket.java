@@ -42,7 +42,7 @@ public class StructureStatusPacket extends Packet
 			return;
 
 		s.body().position(pos);
-		s.body().orientation().quaternion(rot);
+		s.body().orientation(rot);
 		s.energy(energy);
 		s.maxEnergy(maxEnergy);
 		

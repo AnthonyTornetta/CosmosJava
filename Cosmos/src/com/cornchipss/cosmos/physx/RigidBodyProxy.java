@@ -110,11 +110,23 @@ public class RigidBodyProxy implements IHasPositionAndRotation
 		return new Orientation(new Quaternionf(q.x, q.y, q.z, q.w));
 	}
 	
-	public void orientation(Orientation o)
+	public void orientation(Quat4f q)
 	{
 		Transform t = linkedBody.getWorldTransform(new Transform());
-		t.setRotation(new Quat4f(o.quaternion().x(), o.quaternion().y(), o.quaternion().z(), o.quaternion().w()));
+		t.setRotation(q);
 		linkedBody.setWorldTransform(t);
+		
+		linkedBody.activate();
+	}
+	
+	public void orientation(Quaternionfc q)
+	{
+		orientation(new Quat4f(q.x(), q.y(), q.z(), q.w()));
+	}
+	
+	public void orientation(Orientation o)
+	{
+		orientation(o.quaternion());
 	}
 
 	public void rotateRelative(Vector3f deltaR)

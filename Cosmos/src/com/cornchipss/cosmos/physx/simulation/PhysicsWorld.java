@@ -223,6 +223,8 @@ public class PhysicsWorld
 	protected void removeObjectDuringUnlock(PhysicalObject bdy)
 	{
 		bodies.remove(bdy);
+		
+		world.removeRigidBody(bdy.body().jbulletRigidBody());
 	}
 
 	public void addObject(PhysicalObject bdy)
