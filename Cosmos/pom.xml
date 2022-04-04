@@ -16,12 +16,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>cz.advel.jbullet</groupId>
-			<artifactId>jbullet</artifactId>
-			<version>20101010-1</version>
-		</dependency>
-
-		<dependency>
 			<groupId>kryonet</groupId>
 			<artifactId>kryonet</artifactId>
 			<!-- Docs called for 2.21 but 2.21-2 was the one that worked - may change 
