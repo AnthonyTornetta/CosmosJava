@@ -123,4 +123,22 @@ public class Transform implements Cloneable
 	{
 		return orientation.up();
 	}
+
+	public Vector3f q3Mul(Vector3f vector3f)
+	{
+		return vector3f.set(
+			orientation().applyRotation(vector3f, vector3f).add(position()));
+	}
+
+	public Transform q3Mul(Transform u)
+	{
+		return new Transform(
+			orientation.applyRotation(u.position(), new Vector3f()).add(position),
+			orientation.quaternion().mul(u.orientation.quaternion(), new Quaternionf()));
+	}
+
+	public Vector3f q3MulT(Vector3fc p)
+	{
+		return orientation().inverseQuaternion().transform(p.sub(position(), new Vector3f()));
+	}
 }

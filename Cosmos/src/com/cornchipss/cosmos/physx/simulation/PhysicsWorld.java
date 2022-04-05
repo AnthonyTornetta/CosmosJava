@@ -8,11 +8,18 @@ import org.joml.Vector3fc;
 
 import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
+import com.cornchipss.cosmos.physx.Transform;
 import com.cornchipss.cosmos.physx.collision.CollisionInfo;
 import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
 import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
 import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
+import com.cornchipss.cosmos.physx.qu3e.collision.Q3BoxDef;
+import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3Body;
+import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3Body.BodyStatus;
+import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3BodyDef;
+import com.cornchipss.cosmos.physx.qu3e.scene.Q3Scene;
 import com.cornchipss.cosmos.utils.Maths;
+import com.cornchipss.cosmos.utils.Utils;
 
 public class PhysicsWorld
 {
@@ -27,16 +34,38 @@ public class PhysicsWorld
 
 	private List<PhysicalObject> bodiesToAdd;
 	private List<PhysicalObject> bodiesToRemove;
+	
+	private Q3Scene scene;
 
-	private ICollisionChecker strategy;
-
+	private Q3Body body, floor;
+	
 	public PhysicsWorld()
 	{
 		bodies = new LinkedList<>();
 		bodiesToAdd = new LinkedList<>();
 		bodiesToRemove = new LinkedList<>();
-
-		strategy = new DefaultCollisionChecker();
+		
+		scene = new Q3Scene(1.0f / 60.0f, new Vector3f(0, -10, 0), 20);
+		
+		Q3BodyDef bdyDef = new Q3BodyDef();
+		bdyDef.position = new Vector3f(0, 10, 0);
+		bdyDef.bodyType = BodyStatus.DynamicBody;
+		
+		Q3BodyDef floorDef = new Q3BodyDef();
+		floorDef.position = new Vector3f(0, 0, 0);
+		floorDef.bodyType = BodyStatus.DynamicBody;
+		
+		body = scene.CreateBody(bdyDef);
+		floor = scene.CreateBody(floorDef);
+		
+		Q3BoxDef boxDef = new Q3BoxDef();
+		boxDef.set(new Transform(), new Vector3f(0.5f, 0.5f, 0.5f));
+		
+		body.AddBox(boxDef);
+		
+		Q3BoxDef floorBoxDef = new Q3BoxDef();
+		floorBoxDef.set(new Transform(), new Vector3f(10.0f, 0.5f, 10.0f));
+		floor.AddBox(floorBoxDef);
 	}
 
 	protected void addObjectDuringUnlock(PhysicalObject bdy)
@@ -67,81 +96,92 @@ public class PhysicsWorld
 
 	public void update(float delta)
 	{
+		// TODO: make sure this works w/ delta time
+		scene.Step();
+		
+		Utils.println(body.rb.transform().position());
+		Utils.println(body.m_mass);
+		
+//		body.rb.velocity(new Vector3f(0, -1.0f, 0));
+		
+		Utils.println(floor.rb.transform().position());
+		Utils.println(floor.m_mass);
+		
 		for (PhysicalObject a : bodies)
 		{
-			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
-
-			if (deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
-			{
-				for (PhysicalObject b : bodies)
-				{
-					if (!b.equals(a) && b.shouldCollideWith(a)
-						&& a.shouldCollideWith(b))
-					{
-						handlePotentialCollision(a, b, deltaA);
-					}
-				}
-			}
-
-			a.body().velocity().mul(delta, deltaA);
-
-			a.body().transform()
-				.position(a.body().transform().position().add(deltaA, deltaA));
-
-			Vector3f deltaR = a.body().angularVelocity().mul(delta,
-				new Vector3f());
-
-			a.body().transform().rotateRelative(deltaR);
+//			Vector3f deltaA = a.body().velocity().mul(delta, new Vector3f());
+//
+//			if (deltaA.x != 0 || deltaA.y != 0 || deltaA.z != 0)
+//			{
+//				for (PhysicalObject b : bodies)
+//				{
+//					if (!b.equals(a) && b.shouldCollideWith(a)
+//						&& a.shouldCollideWith(b))
+//					{
+//						handlePotentialCollision(a, b, deltaA);
+//					}
+//				}
+//			}
+//
+//			a.body().velocity().mul(delta, deltaA);
+//
+//			a.body().transform()
+//				.position(a.body().transform().position().add(deltaA, deltaA));
+//
+//			Vector3f deltaR = a.body().angularVelocity().mul(delta,
+//				new Vector3f());
+//
+//			a.body().transform().rotateRelative(deltaR);
 		}
 	}
 
-	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b,
-		Vector3fc deltaA)
-	{
-		CollisionInfo info;
-		
-		// TODO: make this work
-		
-		for (int i = 0; i < 1 && strategy.colliding(a, b, deltaA, info = MemoryPool.getInstanceOrCreate(CollisionInfo.class)); i++)
-		{
-			if (a instanceof IHasCollisionEvent)
-			{
-				if (!((IHasCollisionEvent) a).onCollide(b, info))
-					return;
-			}
-			
-			Vector3f mulBy = MemoryPool.getInstanceOrCreate(Vector3f.class);
-			
-			mulBy.x = Math.signum(a.body().velocity().x()) == Math
-				.signum(info.normal.x) ? 1 : -1;
-			mulBy.y = Math.signum(a.body().velocity().y()) == Math
-				.signum(info.normal.y) ? 1 : -1;
-			mulBy.z = Math.signum(a.body().velocity().z()) == Math
-				.signum(info.normal.z) ? 1 : -1;
-
-			info.normal.x = Math.abs(info.normal.x) * mulBy.x;
-			info.normal.y = Math.abs(info.normal.y) * mulBy.y;
-			info.normal.z = Math.abs(info.normal.z) * mulBy.z;
-
-			info.normal.mul(0.5f);
-
-			if (info.normal.x == 0)
-				info.normal.x = 1;
-			if (info.normal.y == 0)
-				info.normal.y = 1;
-			if (info.normal.z == 0)
-				info.normal.z = 1;
-			
-//			Utils.println(info.normal);
-//			Utils.println(a.body().velocity().y());
-//			a.body().velocity(a.body().velocity().mul(info.normal, mulBy));
-//			Utils.println("-> " + a.body().velocity().y());
-			
-			MemoryPool.addToPool(mulBy);
-			MemoryPool.addToPool(info);
-			a.body().velocity(Maths.zero());
-		}
-	}
+//	private void handlePotentialCollision(PhysicalObject a, PhysicalObject b,
+//		Vector3fc deltaA)
+//	{
+//		CollisionInfo info;
+//		
+//		// TODO: make this work
+//		
+//		for (int i = 0; i < 1 && strategy.colliding(a, b, deltaA, info = MemoryPool.getInstanceOrCreate(CollisionInfo.class)); i++)
+//		{
+//			if (a instanceof IHasCollisionEvent)
+//			{
+//				if (!((IHasCollisionEvent) a).onCollide(b, info))
+//					return;
+//			}
+//			
+//			Vector3f mulBy = MemoryPool.getInstanceOrCreate(Vector3f.class);
+//			
+//			mulBy.x = Math.signum(a.body().velocity().x()) == Math
+//				.signum(info.normal.x) ? 1 : -1;
+//			mulBy.y = Math.signum(a.body().velocity().y()) == Math
+//				.signum(info.normal.y) ? 1 : -1;
+//			mulBy.z = Math.signum(a.body().velocity().z()) == Math
+//				.signum(info.normal.z) ? 1 : -1;
+//
+//			info.normal.x = Math.abs(info.normal.x) * mulBy.x;
+//			info.normal.y = Math.abs(info.normal.y) * mulBy.y;
+//			info.normal.z = Math.abs(info.normal.z) * mulBy.z;
+//
+//			info.normal.mul(0.5f);
+//
+//			if (info.normal.x == 0)
+//				info.normal.x = 1;
+//			if (info.normal.y == 0)
+//				info.normal.y = 1;
+//			if (info.normal.z == 0)
+//				info.normal.z = 1;
+//			
+////			Utils.println(info.normal);
+////			Utils.println(a.body().velocity().y());
+////			a.body().velocity(a.body().velocity().mul(info.normal, mulBy));
+////			Utils.println("-> " + a.body().velocity().y());
+//			
+//			MemoryPool.addToPool(mulBy);
+//			MemoryPool.addToPool(info);
+//			a.body().velocity(Maths.zero());
+//		}
+//	}
 
 	public boolean locked()
 	{

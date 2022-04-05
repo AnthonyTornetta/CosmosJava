@@ -1,10 +1,14 @@
 package com.cornchipss.cosmos.physx;
 
+import java.nio.FloatBuffer;
+
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
+import org.lwjgl.BufferUtils;
 
 import com.cornchipss.cosmos.utils.Maths;
 
@@ -76,11 +80,19 @@ public class Orientation implements Cloneable
 		update();
 	}
 
+	public Matrix3f asMatrix3f()
+	{
+		FloatBuffer buff = BufferUtils.createFloatBuffer(9);
+		rotation.getAsMatrix3f(buff);
+//		buff.flip();
+		return new Matrix3f(buff);
+	}
+	
 	public Quaternionfc quaternion()
 	{
 		return rotation;
 	}
-
+	
 	public void quaternion(Quaternionfc q)
 	{
 		rotation.set(q);
