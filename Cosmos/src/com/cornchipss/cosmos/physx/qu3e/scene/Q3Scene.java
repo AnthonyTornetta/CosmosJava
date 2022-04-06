@@ -14,7 +14,6 @@ import com.cornchipss.cosmos.physx.qu3e.dynamics.contact.Q3ContactConstraint;
 import com.cornchipss.cosmos.physx.qu3e.dynamics.contact.Q3ContactEdge;
 import com.cornchipss.cosmos.physx.qu3e.dynamics.contact.solver.Q3ContactConstraintState;
 import com.cornchipss.cosmos.physx.qu3e.geometry.Q3RaycastData;
-import com.cornchipss.cosmos.utils.Utils;
 
 public class Q3Scene
 {
@@ -64,27 +63,29 @@ public class Q3Scene
 		m_contactManager.TestCollisions();
 
 		for (Q3Body body = m_bodyList; body != null; body = body.m_next)
+		{
 			body.m_flags &= ~Q3Body.BodyStatus.eIsland.code;
+		}
 
 		Q3Island island = new Q3Island();
 		island.bodyCapacity = m_bodyCount;
 		island.contactCapacity = m_contactManager.m_contactCount;
 		island.bodies = new Q3Body[m_bodyCount];
 		island.velocities = new Q3VelocityState[m_bodyCount];
-		
-		for(int i = 0; i < island.velocities.length; i++)
+
+		for (int i = 0; i < island.velocities.length; i++)
 			island.velocities[i] = new Q3VelocityState();
-		
+
 		island.contacts = new Q3ContactConstraint[island.contactCapacity];
-		
-		for(int i = 0; i < island.contacts.length; i++)
+
+		for (int i = 0; i < island.contacts.length; i++)
 			island.contacts[i] = new Q3ContactConstraint();
-		
+
 		island.contactStates = new Q3ContactConstraintState[island.contactCapacity];
-		
-		for(int i = 0; i < island.contactStates.length; i++)
+
+		for (int i = 0; i < island.contactStates.length; i++)
 			island.contactStates[i] = new Q3ContactConstraintState();
-		
+
 		island.allowSleep = m_allowSleep;
 		island.enableFriction = m_enableFriction;
 		island.bodyCount = 0;
@@ -98,8 +99,6 @@ public class Q3Scene
 		Q3Body[] stack = new Q3Body[stackSize];
 		for (Q3Body seed = m_bodyList; seed != null; seed = seed.m_next)
 		{
-			Utils.println(seed.m_flags);
-			
 			// Seed cannot be apart of an island already
 			if ((seed.m_flags & Q3Body.BodyStatus.eIsland.code) != 0)
 				continue;
@@ -110,11 +109,8 @@ public class Q3Scene
 
 			// Seed cannot be a static body in order to keep islands
 			// as small as possible
-			if ((seed.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+			if ((seed.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 				continue;
-			
-			Utils.println("OOGA BOODYA");
-			
 
 			int stackCount = 0;
 			stack[stackCount++] = seed;
@@ -138,7 +134,7 @@ public class Q3Scene
 				// formations as small as possible, however the static
 				// body itself should be apart of the island in order
 				// to properly represent a full contact
-				if ((body.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+				if ((body.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 					continue;
 
 				// Search all contacts connected to this body
@@ -148,14 +144,12 @@ public class Q3Scene
 					Q3ContactConstraint contact = edge.constraint;
 
 					// Skip contacts that have been added to an island already
-					if ((contact.m_flags
-						& Q3ContactConstraint.Q3ContactConstraintTypes.eIsland.code) != 0)
+					if ((contact.m_flags & Q3ContactConstraint.Q3ContactConstraintTypes.eIsland.code) != 0)
 						continue;
 
 					// Can safely skip this contact if it didn't actually
 					// collide with anything
-					if ((contact.m_flags
-						& Q3ContactConstraint.Q3ContactConstraintTypes.eColliding.code) == 0)
+					if ((contact.m_flags & Q3ContactConstraint.Q3ContactConstraintTypes.eColliding.code) == 0)
 						continue;
 
 					// Skip sensors
@@ -192,7 +186,7 @@ public class Q3Scene
 			{
 				Q3Body body = island.bodies[i];
 
-				if ((body.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+				if ((body.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 					body.m_flags &= ~Q3Body.BodyStatus.eIsland.code;
 			}
 		}
@@ -206,7 +200,7 @@ public class Q3Scene
 		// Update the broadphase AABBs
 		for (Q3Body body = m_bodyList; body != null; body = body.m_next)
 		{
-			if ((body.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+			if ((body.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 				continue;
 
 			body.SynchronizeProxies();
@@ -375,8 +369,7 @@ public class Q3Scene
 	// Query the world to find any shapes intersecting a world space point.
 	public void QueryPoint(Q3QueryCallback cb, Vector3fc point)
 	{
-		AABBf aabb = new AABBf(point.x() - 0.5f, point.y() - 0.5f,
-			point.z() - 0.5f, point.x() + 0.5f, point.y() + 0.5f,
+		AABBf aabb = new AABBf(point.x() - 0.5f, point.y() - 0.5f, point.z() - 0.5f, point.x() + 0.5f, point.y() + 0.5f,
 			point.z() + 0.5f);
 
 		m_contactManager.m_broadphase.m_tree.Query((id) ->
@@ -397,15 +390,15 @@ public class Q3Scene
 	{
 		m_contactManager.m_broadphase.m_tree.Query((id) ->
 		{
-			Q3Box box = (Q3Box)m_contactManager.m_broadphase.m_tree.GetUserData( id );
+			Q3Box box = (Q3Box) m_contactManager.m_broadphase.m_tree.GetUserData(id);
 
-			if ( box.Raycast( box.body.GetTransform( ), rayCast ) )
+			if (box.Raycast(box.body.GetTransform(), rayCast))
 			{
-				return cb.reportShape( box );
+				return cb.reportShape(box);
 			}
 
 			return true;
-		}, rayCast );
+		}, rayCast);
 	}
 
 	// Dump all rigid bodies and shapes into a log file. The log can be

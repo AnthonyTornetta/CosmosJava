@@ -43,7 +43,7 @@ public class Q3Island
 			Q3Body body = bodies[i];
 			Q3VelocityState v = velocities[i];
 			
-			if ((body.m_flags & Q3Body.BodyStatus.eDynamic.code) != 0)
+			if ((body.m_flags & Q3Body.BodyStatus.DynamicBody.code) != 0)
 			{
 				body.ApplyLinearForce(
 					gravity.mul(body.m_gravityScale, new Vector3f()));
@@ -54,10 +54,14 @@ public class Q3Island
 					.mul(body.m_invInertiaModel, new Matrix3f())
 					.mul(r.transpose(new Matrix3f()));
 
+				/*
+			body->m_linearVelocity += (body->m_force * body->m_invMass) * m_dt;
+			body->m_angularVelocity += (body->m_invInertiaWorld * body->m_torque) * m_dt;
+				 */
 				// Integrate velocity
-				body.rb.velocity(body.m_force.mul(body.m_invMass, new Vector3f().add(body.GetLinearVelocity()).mul(dt)));
+				body.rb.velocity(body.rb.velocity().add(body.m_force.mul(body.m_invMass, new Vector3f()), new Vector3f())); //body.m_force.mul(body.m_invMass, new Vector3f().add().mul(dt)));
 				
-				body.rb.angularVelocity(Q3Math.mul(body.m_invInertiaWorld, body.m_torque).add(body.GetAngularVelocity()).mul(dt));
+				body.rb.angularVelocity(body.rb.angularVelocity().add(body.m_invInertiaWorld.transform(body.m_torque, new Vector3f()), new Vector3f()));
 
 				// From Box2D!
 				// Apply damping.
@@ -71,7 +75,7 @@ public class Q3Island
 				body.rb.velocity(body.GetLinearVelocity()
 					.mul((1.0f) / ((1.0f) + dt * body.m_linearDamping), new Vector3f()));
 				
-				body.rb.velocity(body.GetAngularVelocity()
+				body.rb.angularVelocity(body.GetAngularVelocity()
 					.mul((1.0f) / ((1.0f) + dt * body.m_angularDamping), new Vector3f()));
 			}
 
@@ -79,12 +83,15 @@ public class Q3Island
 			v.w = new Vector3f(body.GetAngularVelocity());
 		}
 
+		
 		// Create contact solver, pass in state buffers, create buffers for
 		// contacts
 		// Initialize velocity constraint for normal + friction and warm start
 		Q3ContactSolver contactSolver = new Q3ContactSolver();
 		contactSolver.Initialize(this);
 		contactSolver.PreSolve(dt);
+
+		Utils.println(this.contactCount);
 
 		// Solve contacts
 		for (int i = 0; i < iterations; ++i)
@@ -99,7 +106,7 @@ public class Q3Island
 			Q3Body body = bodies[i];
 			Q3VelocityState v = velocities[i];
 
-			if ((body.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+			if ((body.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 				continue;
 
 			body.rb.velocity(v.v);
@@ -123,7 +130,7 @@ public class Q3Island
 			{
 				Q3Body body = bodies[i];
 
-				if ((body.m_flags & Q3Body.BodyStatus.eStatic.code) != 0)
+				if ((body.m_flags & Q3Body.BodyStatus.StaticBody.code) != 0)
 					continue;
 
 				final float sqrLinVel = body.GetLinearVelocity()

@@ -25,19 +25,19 @@ public class Q3Body
 	// m_flags
 	public static enum BodyStatus
 	{
-		eAwake(),  //0b1
+		eAwake(), 
 		eActive(),
 		eAllowSleep(),
 		eIsland(),
-		eStatic(),
-		eDynamic(),
-		eKinematic(),
-		eLockAxisX(),
-		eLockAxisY(),
-		eLockAxisZ(),
 		StaticBody(),
 		DynamicBody(),
-		KinematicBody();
+		KinematicBody(),
+		eLockAxisX(),
+		eLockAxisY(),
+		eLockAxisZ();
+//		StaticBody(),
+//		DynamicBody(),
+//		KinematicBody();
 
 		public final int code;
 
@@ -95,10 +95,10 @@ public class Q3Body
 		m_flags = 0;
 		m_linearDamping = def.linearDamping;
 		m_angularDamping = def.angularDamping;
+		m_localCenter = new Vector3f();
 
 		if (def.bodyType == BodyStatus.DynamicBody)
 			m_flags |= BodyStatus.DynamicBody.code;
-
 		else
 		{
 			if (def.bodyType == BodyStatus.StaticBody)
@@ -134,7 +134,7 @@ public class Q3Body
 
 		if (def.lockAxisZ)
 			m_flags |= BodyStatus.eLockAxisZ.code;
-
+		
 		m_boxes = null;
 		m_contactList = null;
 	}
@@ -178,7 +178,7 @@ public class Q3Body
 		m_mass = 0.0f;
 		float mass = 0.0f;
 
-		if ( (m_flags & BodyStatus.eStatic.code) != 0 || (m_flags & BodyStatus.eKinematic.code) != 0 )
+		if ( (m_flags & BodyStatus.StaticBody.code) != 0 || (m_flags & BodyStatus.KinematicBody.code) != 0 )
 		{
 			m_localCenter.zero();
 			return;

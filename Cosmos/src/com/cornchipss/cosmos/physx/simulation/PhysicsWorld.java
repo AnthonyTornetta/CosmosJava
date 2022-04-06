@@ -4,21 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.joml.Vector3f;
-import org.joml.Vector3fc;
 
-import com.cornchipss.cosmos.memory.MemoryPool;
 import com.cornchipss.cosmos.physx.PhysicalObject;
 import com.cornchipss.cosmos.physx.Transform;
-import com.cornchipss.cosmos.physx.collision.CollisionInfo;
-import com.cornchipss.cosmos.physx.collision.DefaultCollisionChecker;
-import com.cornchipss.cosmos.physx.collision.ICollisionChecker;
-import com.cornchipss.cosmos.physx.collision.IHasCollisionEvent;
 import com.cornchipss.cosmos.physx.qu3e.collision.Q3BoxDef;
 import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3Body;
 import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3Body.BodyStatus;
 import com.cornchipss.cosmos.physx.qu3e.dynamics.Q3BodyDef;
 import com.cornchipss.cosmos.physx.qu3e.scene.Q3Scene;
-import com.cornchipss.cosmos.utils.Maths;
 import com.cornchipss.cosmos.utils.Utils;
 
 public class PhysicsWorld
@@ -53,18 +46,17 @@ public class PhysicsWorld
 		
 		Q3BodyDef floorDef = new Q3BodyDef();
 		floorDef.position = new Vector3f(0, 0, 0);
-		floorDef.bodyType = BodyStatus.DynamicBody;
+		floorDef.bodyType = BodyStatus.StaticBody;
 		
 		body = scene.CreateBody(bdyDef);
 		floor = scene.CreateBody(floorDef);
 		
 		Q3BoxDef boxDef = new Q3BoxDef();
 		boxDef.set(new Transform(), new Vector3f(0.5f, 0.5f, 0.5f));
-		
 		body.AddBox(boxDef);
 		
 		Q3BoxDef floorBoxDef = new Q3BoxDef();
-		floorBoxDef.set(new Transform(), new Vector3f(10.0f, 0.5f, 10.0f));
+		floorBoxDef.set(new Transform(), new Vector3f(10.0f, 2.5f, 10.0f));
 		floor.AddBox(floorBoxDef);
 	}
 
@@ -100,12 +92,9 @@ public class PhysicsWorld
 		scene.Step();
 		
 		Utils.println(body.rb.transform().position());
-		Utils.println(body.m_mass);
 		
-//		body.rb.velocity(new Vector3f(0, -1.0f, 0));
 		
 		Utils.println(floor.rb.transform().position());
-		Utils.println(floor.m_mass);
 		
 		for (PhysicalObject a : bodies)
 		{
