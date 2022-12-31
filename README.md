@@ -1,3 +1,7 @@
+# THIS IS DISCONTINUED
+
+Please see [!https://github.com/AnthonyTornetta/Cosmos](https://github.com/AnthonyTornetta/Cosmos) for the rust version that is in active development.
+
 # Cosmos
 A multiplayer block-based space exploration game
 
